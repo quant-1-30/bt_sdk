@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import socket
 import asyncio
 import pickle
-# import httpx
-from urllib.parse import urlencode, urljoin
+import zmq
+import zmq.asyncio
+import threading
+
+from time import time
+from functools import lru_cache
 from typing import Dict, Any
+
+from .exception import RemoteException
+from .const import HEARTBEAT_TOPIC, HEARTBEAT_TOLERANCE
 
 
 class AsyncStreamClient:
@@ -45,8 +53,7 @@ class AsyncStreamClient:
                 await writer.wait_closed()
                 break
 
-    async def on_receive(self, req):
-        
+    async def on_receive(self, req): 
         result = []
         async for data in self.get_data(req):
             print("data", data)
@@ -58,9 +65,9 @@ class AsyncStreamClient:
         raw = asyncio.run(self.on_receive(req))
         return raw    
 
-    def on_exit(self):
-        print("Closing socket")
-        self.sock.close()
+    # def on_exit(self):
+    #     print("Closing socket")
+    #     self.sock.close()
 
 
 class AsyncDatagramClient(object):
@@ -159,46 +166,157 @@ class AsyncDatagramClient(object):
         self.sock.close()
 
 
-# class AsyncApiClient:
+class ZmqClient:
 
-#     def __init__(self, addr):
-#         self.addr = addr
-#         self.client = httpx.AsyncClient()
+    def __init__(self) -> None:
+        """Constructor"""
+        # zmq port related
+        self._context: zmq.Context = zmq.Context()
 
-#     async def get_data(self, req_map: Dict[str, Any]):
-#         endpoint = req_map.pop("endpoint", '')
-#         params = req_map.pop("params", {})
-#         method = req_map.pop("method", "GET")
-#         headers = req_map.pop("headers", {})
-#         async with httpx.AsyncClient() as client:
-#             url = urljoin(self.addr, endpoint)
-#             if method == "GET":
-#                 resp = await client.get(url, params=params, headers=headers)
-#             else:
-#                 resp = await client.post(url, json=params, headers=headers)
-#         return resp.json()
-    
-#     async def get_stream(self, req_map: Dict[str, Any]):
-#         endpoint = req_map.pop("endpoint", '')
-#         params = req_map.pop("params", {})
-#         method = req_map.pop("method", "GET")
-#         url = urljoin(self.addr, endpoint)
-#         async with httpx.AsyncClient() as client:
-#             async with client.stream(method, url, params=params) as response:
-#                 # aiter_bytes / aiter_text / aiter_lines  
-#                 async for chunk in response.aiter_bytes():
-#                     yield chunk
+        # Request socket (Request–reply pattern)
+        self._socket_req: zmq.Socket = self._context.socket(zmq.REQ)
 
-#     async def on_receive(self, req_map: Dict[str, Any]):
-#         stream = req_map.pop("stream", False)
-#         if not stream:
-#             resp = await self.get_data(req_map)
-#             return resp
-#         # stream
-#         result = []
-#         async for message in self.get_stream(req_map):
-#             result.append(message)
-#         return result
+        # Subscribe socket (Publish–subscribe pattern)
+        self._socket_sub: zmq.Socket = self._context.socket(zmq.SUB)
 
-#     def run(self, req_map: Dict[str, Any]):
-#         return asyncio.run(self.on_receive(req_map))
+        # Set socket option to keepalive
+        for socket in [self._socket_req, self._socket_sub]:
+            socket.setsockopt(zmq.TCP_KEEPALIVE, 1)
+            socket.setsockopt(zmq.TCP_KEEPALIVE_IDLE, 60)
+
+        # Worker thread relate, used to process data pushed from server
+        self._active: bool = False                 # RpcClient status
+        self._thread: threading.Thread = None      # RpcClient thread
+        self._lock: threading.Lock = threading.Lock()
+
+        self._last_received_ping: time = time()
+
+    @lru_cache(100)
+    def __getattr__(self, name: str) -> Any:
+        """
+        Realize remote call function
+        """
+        # Perform remote call task
+        def dorpc(*args, **kwargs):
+            # Get timeout value from kwargs, default value is 30 seconds
+            if "timeout" in kwargs:
+                timeout = kwargs.pop("timeout")
+            else:
+                timeout = 30000
+
+            # Generate request
+            req: list = [name, args, kwargs]
+
+            # Send request and wait for response
+            with self._lock:
+                self._socket_req.send_pyobj(req)
+
+                # Timeout reached without any data
+                n: int = self._socket_req.poll(timeout)
+                if not n:
+                    msg: str = f"Timeout of {timeout}ms reached for {req}"
+                    raise RemoteException(msg)
+
+                rep = self._socket_req.recv_pyobj()
+
+            # Return response if successed; Trigger exception if failed
+            if rep[0]:
+                return rep[1]
+            else:
+                raise RemoteException(rep[1])
+
+        return dorpc
+
+    def start(
+        self,
+        req_address: str,
+        sub_address: str
+    ) -> None:
+        """
+        Start RpcClient
+        """
+        if self._active:
+            return
+
+        # Connect zmq port
+        self._socket_req.connect(req_address)
+        self._socket_sub.connect(sub_address)
+
+        # Start RpcClient status
+        self._active = True
+
+        # Start RpcClient thread
+        self._thread = threading.Thread(target=self.run)
+        self._thread.start()
+
+        self._last_received_ping = time()
+
+    def stop(self) -> None:
+        """
+        Stop RpcClient
+        """
+        if not self._active:
+            return
+
+        # Stop RpcClient status
+        self._active = False
+
+    def join(self) -> None:
+        # Wait for RpcClient thread to exit
+        if self._thread and self._thread.is_alive():
+            self._thread.join()
+        self._thread = None
+
+    def run(self) -> None:
+        """
+        Run RpcClient function
+        """
+        pull_tolerance: int = HEARTBEAT_TOLERANCE * 1000
+
+        poller = zmq.Poller()
+        poller.register(self._socket_sub, zmq.POLLIN)
+        poller.register(self._socket_req, zmq.POLLOUT)
+
+        while self._active:
+            socks = dict(poller.poll(pull_tolerance))
+
+            if self._socket_sub in socks and socks[self._socket_sub] == zmq.POLLIN:
+                self.on_disconnected()
+                continue
+
+            if self._socket_req in socks and socks[self._socket_req] == zmq.POLLOUT:
+                # Ready to send a request
+                # Example: self._socket_req.send_pyobj(your_request_object)
+                pass
+
+            # Receive data from subscribe socket
+            topic, data = self._socket_sub.recv_pyobj(flags=zmq.NOBLOCK)
+
+            if topic == HEARTBEAT_TOPIC:
+                self._last_received_ping = data
+            else:
+                # Process data by callable function
+                self.callback(topic, data)
+
+        # Close socket
+        self._socket_req.close()
+        self._socket_sub.close()
+
+    def callback(self, topic: str, data: Any) -> None:
+        """
+        Callable function / accumulate data
+        """
+        raise NotImplementedError
+
+    def subscribe_topic(self, topic: str) -> None:
+        """
+        Subscribe data
+        """
+        self._socket_sub.setsockopt_string(zmq.SUBSCRIBE, topic)
+
+    def on_disconnected(self):
+        """
+        Callback when heartbeat is lost.
+        """
+        msg: str = f"RpcServer has no response over {HEARTBEAT_TOLERANCE} seconds, please check you connection."
+        print(msg)

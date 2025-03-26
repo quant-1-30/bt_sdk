@@ -1,8 +1,8 @@
 import pytest
 import numpy as np
 import datetime
-from core.tradeApi import *
-from core.meta import LoginMeta, QuoteMeta, OrderMeta, EventMeta, RangeMeta
+from bt_sdk.core.trade.tradeApi import *
+from bt_sdk.meta import LoginMeta, QuoteMeta, OrderMeta, EventMeta, RangeMeta
 
 
 # reuse / dependency / setup / teardown

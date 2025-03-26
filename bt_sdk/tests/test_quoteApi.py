@@ -1,8 +1,8 @@
 import pytest
 import numpy as np
 import datetime
-from core.quoteApi import *
-from core.meta import QuoteMeta
+from bt_sdk.core.quote.quoteApi import *
+from bt_sdk.meta import QuoteMeta
 
 # reuse / dependency / setup / teardown
 

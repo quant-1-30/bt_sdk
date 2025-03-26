@@ -1,19 +1,27 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 import pydantic
+from enum import Enum
 from pydantic import Field, field_validator, ConfigDict
 from typing import List, Union, Tuple, Mapping, Any
+
+
+class QuoteType(Enum):
+    DEFAULT = ""
+    INSTRUMENT = "instrument"
+    CALENDAR = "calendar"
+    DATASET = "dataset"
+    TICK = "tick"
+    ADJUSTMENT = "adjustment"
+    RIGHT = "rightment"
+
 
 class QuoteMeta(pydantic.BaseModel):
     start_date: int = Field(default=19900101)
     end_date: int = Field(default=30000101)
     sid: List[str] = Field(default=[])
-
-    # class Config:
-    #     extra = "forbid"   
-    #     # allow_mutation = False
-    #     frozen = True
 
     model_config = ConfigDict(
         extra="forbid",
@@ -21,10 +29,20 @@ class QuoteMeta(pydantic.BaseModel):
     )
 
 
-class LoginMeta(pydantic.BaseModel):
-    name: str
-    phone: int
-    email: str
+class QuoteEvent(pydantic.BaseModel):
+    rpc_type: QuoteType
+    quote_meta: QuoteMeta
+
+    @field_validator('rpc_type')
+    def validate_rpc_type(cls, v):
+        assert v in [QuoteType.DEFAULT, QuoteType.INSTRUMENT, QuoteType.CALENDAR, 
+                     QuoteType.DATASET, QuoteType.TICK, QuoteType.ADJUSTMENT, QuoteType.RIGHT], "Invalid event type"
+        return v
+    
+    @field_validator('quote_meta')
+    def validate_quote_meta(cls, v):
+        assert v.start_date <= v.end_date, "start_date must be less than end_date"
+        return v
 
     model_config = ConfigDict(
         extra="forbid",
@@ -34,30 +52,34 @@ class LoginMeta(pydantic.BaseModel):
     # _secret: str = "hidden"  # Private attribute
     # model_config = {"private_attributes": {"_secret"}}
 
-class AuthMeta(pydantic.BaseModel):
 
-    token: str  
-    experiment_id: str = Field(default="")
+class TradeType(Enum):
+    Order = "order"
+    Eos = "eos"
+    Query = "query"
 
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True
-    )
+
+class ExecType(Enum):
+    Market = 0
+    Close = 1
+    Limit = 2
+    Stop = 3
+    StopLimit = 4
 
 
 class OrderMeta(pydantic.BaseModel):
+    owner: str
     sid: str
-    order_type: int
-    direction: int
-    created_at: str
-    price: int
-    amount: int = Field(default=0)
     size: int = Field(default=0)
+    price: int
+    pricelimit: int
+    created_at: str
+    exectype: int
 
-    @field_validator('direction')
-    def validate_direction(cls, v):
-        if v not in [1, 0]:
-            raise ValueError('Invalid order type')
+    @field_validator('exectype')
+    def validate_exectype(cls, v):
+        if v not in [ExecType.Market, ExecType.Close, ExecType.Limit, ExecType.Stop, ExecType.StopLimit]:
+            raise ValueError('Invalid exectype')
         return v
 
     model_config = ConfigDict(
@@ -65,79 +87,57 @@ class OrderMeta(pydantic.BaseModel):
         frozen=True
     )
 
-# class AssetMeta(pydantic.BaseModel):
-#     sid: str
-#     first_trading: int
-#     delist: int
 
-#     class Config:
-#         extra = 'forbid'
-#         allow_mutation = False
+class EosMeta(pydantic.BaseModel):
+     dteos: int
+     closes: Mapping[str, float]
+     adjustments: List[Mapping[str, float]]
 
-# class TradeMeta(pydantic.BaseModel):
+     @field_validator('dteos')
+     def validate_dteos(cls, v):
+         if isinstance(v, str):
+             v = datetime.strptime(v, "%Y%m%d%H%M%S")
+         elif isinstance(v, datetime):
+             v = int(v.timestamp())
+         assert v > 0, "dteos must be greater than 0"
+         return v
 
-#     order_meta: OrderMeta
-#     experiment_id: str
-#     meta: Dict[str, Any]
-    
-#     class Config:
-#         extra = "forbid"   
-#         allow_mutation = False
-
-
-class EventMeta(pydantic.BaseModel):
-
-    event_type: str
-    meta: QuoteMeta
+     class Config:
+         extra = 'forbid'
+         allow_mutation = False
 
 
-class RangeMeta(pydantic.BaseModel):
+class QueryMeta(pydantic.BaseModel):
 
-    start_dt: int
-    end_dt: int
-
-
-# class TradeMeta(pydantic.BaseModel):
-#     experiment_id: str
-#     session_ix: str
-#     sids: List[str]
-    
-
-# class TradeEvent(pydantic.BaseModel):
-    
-#     event_type: str
-#     execution_style: str
-#     trade_meta: TradeMeta
-    
-#     class Config:
-#         extra = "forbid"   
-#         allow_mutation = False
-
-#     @field_validator(mode="before")
-#     def validate_event_type(cls, v):
-#         assert v in [TradeType.TRADE, TradeType.SYNC, TradeType.EVENT], "Invalid event type"
-#         return v
+    user_id: str
+    start_dt: datetime
+    end_dt: datetime
+  
+    class Config:
+        extra = "forbid"   
+        allow_mutation = False
 
 
-# class Quote(pydantic.BaseModel):
-#     event_type: QuoteType = QuoteType.DEFAULT
-#     quote_meta: QuoteMeta
-    
-#     class Config:
-#         extra = "forbid"   
-#         allow_mutation = False
+class TradeEvent(pydantic.BaseModel):
 
-#     @field_validator(mode="before")
-#     def validate_event_type(cls, v):
-#         assert v in [QuoteType.DEFAULT, QuoteType.INSTRUMENT, QuoteType.CALENDAR, QuoteType.DATASET, QuoteType.TICK, QuoteType.ADJUSTMENT, QuoteType.RIGHT], "Invalid event type"
-#         return v
+    event_type: TradeType
+    meta: Union[QueryMeta, OrderMeta, EosMeta]
+
+    @field_validator('event_type')
+    def validate_event_type(cls, v):
+        assert v in [TradeType.Order, TradeType.Eos, TradeType.Query], "Invalid event type"
+        return v
 
 
-# class LogEvent(pydantic.BaseModel):
 
-#     log_level: str
-#     log_meta: Any
+class LogEvent(pydantic.BaseModel):
 
-#     class Config:
-#         extra = "forbid"   
-#         allow_mutation = False
+    log_level: str
+    log_meta: Any
+
+    class Config:
+        extra = "forbid"   
+        allow_mutation = False
+
+
+__all__ = ["QuoteEvent", "QuoteMeta", "QuoteType", "TradeEvent", "LogEvent", "OrderMeta", "EosMeta", "QueryMeta", "TradeType"]
