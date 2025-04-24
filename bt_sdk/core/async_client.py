@@ -1,169 +1,217 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import struct
 import socket
 import asyncio
 import pickle
 import zmq
 import zmq.asyncio
 import threading
-
+import collections
+import itertools
+from queue import Queue
 from time import time
 from functools import lru_cache
 from typing import Dict, Any
 
+
 from .exception import RemoteException
-from .const import HEARTBEAT_TOPIC, HEARTBEAT_TOLERANCE
 
 
-class AsyncStreamClient:
+HEARTBEAT_TOPIC = "heartbeat"
+HEARTBEAT_INTERVAL = 10
+HEARTBEAT_TOLERANCE = 30
 
-    # asyncio.open_connection() --- socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
-    # getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
 
-    def __init__(self, addr):
-        self.host, self.port = addr
-        self.buffer = 1024
+class AsyncClient:
 
-    async def get_data(self, req):
-        reader, writer = await asyncio.open_connection(host=self.host, port=self.port)
-        message = pickle.dumps(req.model_dump())
-        print(f'Send: {message!r}')
-        writer.write(message)
-        await writer.drain()
+    _instance = None
+    _lock_instance = threading.Lock()
+    # transport sendto / abort
+    # transport.sendto(message, self.addr)
+    # sock = transport.get_extra_info("socket")
+    # transport.close()
 
-        chunks=b""
-        while True:
-            # recv 面向连接 
-            recv_message = await reader.read(self.buffer)
-            print("recv_message", recv_message)
-            chunks = chunks + recv_message 
-            if recv_message == b"sentinel": 
-                try:
-                    received = pickle.loads(chunks)
-                    yield received
-                except Exception as e:
-                    print("error", e)
-                print("Received: {}".format(len(received)))
-                chunks = b""
-            elif recv_message == b"shutdown":
-                print('Close the connection')
-                writer.close()
-                await writer.wait_closed()
-                break
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            with cls._lock_instance:
+                if not cls._instance:
+                    cls._instance = super(AsyncClient, cls).__new__(cls)
+                    cls._instance.qs = collections.OrderedDict()  # key: tickerId -> queues
+                    # cls._instance.ts = collections.OrderedDict()  # key: queue -> t
+                    cls._instance._lock_q = threading.Lock()
+                    cls._instance._tickerId = itertools.count()
+                    cls._instance._running = True  # Flag to control the running state
+                    cls._instance.buffer_size = 1024
 
-    async def on_receive(self, req): 
-        result = []
-        async for data in self.get_data(req):
-            print("data", data)
-            if data:
-                result.append(data)
-        return result
+                    # # Initialize the event loop
+                    loop = asyncio.new_event_loop()
+                    cls.activte_event_loop(loop)
+                    cls._instance.loop = loop
+
+        return cls._instance
+    
+    @classmethod
+    def activte_event_loop(cls, loop):
+        # if called in a context where no event loop is running
+        def run_loop():
+            asyncio.set_event_loop(loop)
+            print("[loop] Event loop started")
+            loop.run_forever()
+        t = threading.Thread(target=run_loop, daemon=True)
+        t.start()
+    
+    def reuseQueue(self, tickerId):
+        '''Reuses queue for tickerId, returning the new tickerId and q'''
+        with self._lock_q:
+            # Invalidate tickerId in qs (where it is a key)
+            q = self.qs.pop(tickerId, None)  # invalidate old
+            iscash = self.iscash.pop(tickerId, None)
+
+            # Update ts: q -> ticker
+            tickerId = self.nextTickerId()  # get new tickerId
+            self.ts[q] = tickerId  # Update ts: q -> tickerId
+            self.qs[tickerId] = q  # Update qs: tickerId -> q
+            self.iscash[tickerId] = iscash
+
+        return tickerId, q
+
+    def getTickQueue(self, start=False):
+        '''Creates tick/Queue for data delivery to a data feed'''
+        q = Queue()
+        if start:
+            q.put(None)
+            return q
+
+        with self._lock_q:
+            tickerId = next(self._tickerId)
+            self.qs[tickerId] = q
+
+        return tickerId
+    
+    async def on_receive(self, req: Dict[str, Any], tickerId: int):
+        try:
+            message = pickle.dumps(req)
+            # print(f"Serialized request: {message[:100]}...")
+            
+            async for data in self.get_data(message):
+                print("on_receive ", data)
+                self.qs[tickerId].put(data)
+                if data == "eof":
+                    print("on_receive done")
+                    break
+        except Exception as e:
+            print(f"Error in on_receive: {e}")
+            self.qs[tickerId].put("eof")
 
     def run(self, req):
-        raw = asyncio.run(self.on_receive(req))
-        return raw    
+        tickerId = self.getTickQueue()
+        print("run ", tickerId)
+        # asyncio.create_task(self.on_receive(req, tickerId)) # asyncio.run
+        # self.loop.run_in_executor(None, self.on_receive, req, tickerId) # cpu-bound task
+        coro = self.on_receive(req, tickerId)
+        future = asyncio.run_coroutine_threadsafe(coro, self.loop)
+        # Callback function to handle the result
+        future.add_done_callback(lambda f: print("[CALLBACK TRIGGERED] ", f.result()))
+        return self.qs[tickerId]
+    
+    def stop(self):
+        """Stop the UDP / TCP client by setting the running flag to False and closing the socket."""
+        self._running = False
+        self.sock.close()
+        print("client stopped.")
+    
+    def on_exit(self):
+        """Clean up resources and close the loop."""
+        print("Closing event loop")
+        self.loop.run_until_complete(self.loop.shutdown_asyncgens())
+        self.loop.close()
 
-    # def on_exit(self):
-    #     print("Closing socket")
-    #     self.sock.close()
 
-
-class AsyncDatagramClient(object):
+class AsyncDatagramClient(AsyncClient):
         
-        # transport sendto / abort
-        # transport.sendto(message, self.addr)
-        # sock = transport.get_extra_info("socket")
-        # transport.close()
-        # Resource temporarily unavailable need sleep or pdb
-
     def __init__(self, addr):
-        self.buffer_size = 1024
         self.addr = addr
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setblocking(False)
 
     async def get_data(self, message):
-        loop = asyncio.get_running_loop()
-        
         print(f"Sending message to {self.addr}")
-        # no attribute
-        # loop.sock_sendto(self.sock, message, self.addr)
-        self.sock.sendto(message, self.addr)
-        
+        print("loop running?", self.loop.is_running())
+
+        # async send the message
+        # await self.loop.sock_sendto(self.sock, message, self.addr)
+        await self.loop.run_in_executor(None, self.sock.sendto, message, self.addr)
         chunks = b""
-        try:
-            while True:
-                try:
-                    # no attribute
-                    # recv_message, _ = await loop.sock_recvfrom (self.sock, self.buffer)
-                    recv_message = await loop.sock_recv (self.sock, self.buffer_size)
-                    # print(f"Received chunk: {recv_message[:100]}...")  # Print first 100 bytes
-                    
-                    if not recv_message:
-                        print("Connection closed by server")
-                        break
-                        
-                    chunks += recv_message
-                    
-                    if recv_message == b"sentinel":
-                        print("Sentinel received, processing chunks...")
-                        try:
-                            received = pickle.loads(chunks[:-8])  # Remove sentinel
-                            # print(f"Successfully unpickled data: {received}")
-                            yield received
-                        except Exception as e:
-                            print(f"Error unpickling data: {e}")
-                            print(f"Chunks content: {chunks}")
-                        chunks = b""
-                    elif recv_message == b"shutdown":
-                        print("Shutdown signal received")
-                        break
-                    
-                except BlockingIOError:
-                    print("Socket would block, waiting...")
-                    await asyncio.sleep(0.1)
-                except Exception as e:
-                    print(f"Error during reception: {e}")
+
+        while self._running:
+            try:
+                recv_message = await self.loop.sock_recv(self.sock, self.buffer_size)
+                # print("recv_message", recv_message)
+
+                chunks += recv_message
+                if recv_message == b"sentinel":
+                    print("Sentinel received, processing chunks...")
+                    try:
+                        received = pickle.loads(chunks[:-8])
+                        yield received
+                    except Exception as e:
+                        print(f"[Unpickle Error] {e}")
+                        print(f"Chunks content: {chunks}")
+                    chunks = b""
+                elif recv_message == b"shutdown":
+                    print("Shutdown signal received")
+                    yield "eof"
                     break
-                    
-        except Exception as e:
-            print(f"Outer loop error: {e}")
-        finally:
-            print("Exiting get_data")
 
-    async def on_receive(self, req: Dict[str, Any]):
-        # Get a reference to the event loop as we plan to use
-        # low-level APIs.
-        datas = []
-        try:
-            # message = pickle.dumps(req.model_dump())
-            message = pickle.dumps(req)
-            print(f"Serialized request: {message[:100]}...")  # Print first 100 bytes
-            
-            async for data in self.get_data(message):
-                # print(f"Received data chunk: {data}")
-                datas.append(data)
-                
-        except Exception as e:
-            print(f"Error in on_receive: {e}")
-        return datas
-    
-    def run(self, req: Dict[str, Any]):
-        print(f"Starting run with request: {req}")
-        try:
-            resp = asyncio.run(self.on_receive(req))
-            # print(f"Run completed with response: {resp}")
-            print(f"Run completed with response: {len(resp)}")
-            return resp
-        except Exception as e:
-            print(f"Error in run: {e}")
-            raise
+            except Exception as e:
+                print(f"[Recv Error] {e}")
+                break
 
-    def on_exit(self):
-        print("Closing socket")
-        self.sock.close()
+
+class AsyncStreamClient(AsyncClient):
+
+
+    def __init__(self, addr, client_id=""):
+        # asyncio.open_connection() --- socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+        # getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
+        self.host, self.port = addr
+        self.client_id = client_id
+
+    async def get_data(self, message):
+        # self.loop = asyncio.get_event_loop()
+        # import pdb
+        # pdb.set_trace()
+        reader, writer = await asyncio.open_connection(host=self.host, port=self.port)
+        writer.write(message)
+        print("writer.write", message)
+        await writer.drain()
+        print("writer.drain")
+
+        chunks = b""
+        while self._running:
+            try:
+                recv_message = await reader.read(self.buffer_size)
+
+                if not recv_message:
+                    print("recv_message is empty", recv_message)
+                    yield "eof"
+                    await writer.wait_closed()
+                    break
+
+                chunks = chunks + recv_message 
+                if recv_message[-8:] == b"sentinel": 
+                    # received = pickle.loads(chunks)
+                    # yield received
+                    unpack = struct.unpack("!dIff", chunks[:-8])
+                    print("unpack", unpack)
+                    yield unpack
+                    chunks = b""
+            except Exception as e:
+                print(f"[Recv Error] {e}")
+                break
 
 
 class ZmqClient:

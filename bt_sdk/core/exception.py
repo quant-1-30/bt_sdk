@@ -20,3 +20,4 @@ class RemoteException(Exception):
         Output error message
         """
         return self._value
+    
