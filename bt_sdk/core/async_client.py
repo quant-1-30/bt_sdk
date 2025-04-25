@@ -14,6 +14,7 @@ from queue import Queue
 from time import time
 from functools import lru_cache
 from typing import Dict, Any
+from .pack import unpack
 
 
 from .exception import RemoteException
@@ -90,11 +91,8 @@ class AsyncClient:
 
         return tickerId
     
-    async def on_receive(self, req: Dict[str, Any], tickerId: int):
+    async def on_receive(self, message: Dict[str, Any], tickerId: int):
         try:
-            message = pickle.dumps(req)
-            # print(f"Serialized request: {message[:100]}...")
-            
             async for data in self.get_data(message):
                 print("on_receive ", data)
                 self.qs[tickerId].put(data)
@@ -137,14 +135,11 @@ class AsyncDatagramClient(AsyncClient):
         self.sock.setblocking(False)
 
     async def get_data(self, message):
-        print(f"Sending message to {self.addr}")
-        print("loop running?", self.loop.is_running())
-
-        # async send the message
+        byte_message = pickle.dumps(message)
         # await self.loop.sock_sendto(self.sock, message, self.addr)
-        await self.loop.run_in_executor(None, self.sock.sendto, message, self.addr)
-        chunks = b""
+        await self.loop.run_in_executor(None, self.sock.sendto, byte_message, self.addr)
 
+        chunks = b""
         while self._running:
             try:
                 recv_message = await self.loop.sock_recv(self.sock, self.buffer_size)
@@ -171,22 +166,22 @@ class AsyncDatagramClient(AsyncClient):
 
 
 class AsyncStreamClient(AsyncClient):
+    # asyncio.open_connection() --- socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+    # getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
 
-
-    def __init__(self, addr, client_id=""):
-        # asyncio.open_connection() --- socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
-        # getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
+    def __init__(self, addr):
         self.host, self.port = addr
-        self.client_id = client_id
 
     async def get_data(self, message):
-        # self.loop = asyncio.get_event_loop()
-        # import pdb
-        # pdb.set_trace()
+
+        sub_topic = message["msg"].get("sub_topic", None)
+        unpack_topic = sub_topic if sub_topic else message["topic"]
+
+        byte_message = pickle.dumps(message)
         reader, writer = await asyncio.open_connection(host=self.host, port=self.port)
-        writer.write(message)
-        print("writer.write", message)
+        writer.write(byte_message)
+        print("writer.write", byte_message)
         await writer.drain()
         print("writer.drain")
 
@@ -206,10 +201,12 @@ class AsyncStreamClient(AsyncClient):
                 if recv_message[-8:] == b"sentinel": 
                     # received = pickle.loads(chunks)
                     # yield received
-                    unpack = struct.unpack("!dIff", chunks[:-8])
-                    print("unpack", unpack)
-                    yield unpack
+                    # unpack = struct.unpack("!dIff", chunks[:-8])
+                    decoded = unpack(unpack_topic, chunks[:-8])
+                    print("decoded", decoded)
+                    yield decoded
                     chunks = b""
+
                 elif recv_message[-8:] == b"shutdown":
                     print("Shutdown signal received")
                     yield "eof"

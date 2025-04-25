@@ -1,20 +1,37 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import re
 import pydantic
 from pydantic import Field, field_validator, ConfigDict
 from typing import List, Union, Tuple, Mapping, Any
 
+class LoginMeta(pydantic.BaseModel):
+    user_id: str
+    phone: int
+    auto_register: bool = Field(default=True)
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True
+    )
+
+    @field_validator('phone')
+    def validate_phone(cls, v):
+        if not re.match(r'1[3-9]\d{9}$', str(v)):
+            raise ValueError('Invalid phone number')
+        return v
 
 class OrderMeta(pydantic.BaseModel):
     client_id: str
     sid: str
     size: int = Field(default=0)
-    sizer_cash: int
     price: int
     pricelimit: int
+    exec_type: int
+    order_type: int
     created_at: int
-    exectype: int
+    sizer_cash: int
 
     # @field_validator('exectype')
     # def validate_exectype(cls, v):
@@ -40,9 +57,17 @@ class ReqMeta(pydantic.BaseModel):
     )
 
 class TimerMeta(pydantic.BaseModel):
+    client_id: str
+    timer: str
 
-    sub_topic: str
-    msg: int
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True
+    )
+
+class LoginMsg(pydantic.BaseModel):
+    topic: str = Field(default="login")
+    msg: LoginMeta
 
     model_config = ConfigDict(
         extra="forbid",
@@ -79,4 +104,6 @@ class TimerMsg(pydantic.BaseModel):
     )
 
 
-__all__ = ["OrderMeta", "ReqMeta", "TimerMeta", "OrderMsg", "RequestMsg", "TimerMsg"]
+__all__ = ["LoginMeta", "OrderMeta", "ReqMeta", "TimerMeta", 
+           "OrderMsg", "RequestMsg", "TimerMsg", "LoginMsg"]
+
