@@ -22,60 +22,52 @@ class TestTdApi:
         return TdApi(addr=("127.0.0.1", 8888), client_id="hx")
     
     @pytest.fixture
-    def order(self):
-        return OrderMeta(client_id="hx", 
-                         sid="603676", 
-                         size=100,
-                         sizer_cash=10000,
-                         price=97,
-                         pricelimit=102,
-                         created_at=1728351060, 
-                         exectype=0)
+    def ordermsg(self):
+        return OrderMsg(topic="default", 
+                         msg=OrderMeta(
+                             client_id="hx", 
+                             sid="603676", 
+                             size=100,
+                             sizer_cash=10000,
+                             price=97,
+                             pricelimit=102,
+                             created_at=1728351060, 
+                             exectype=0))
+    
+    @pytest.fixture 
+    def reqmsg(self):
+        return RequestMsg(topic="query", 
+                          msg=ReqMeta(
+                              sub_topic="order",
+                              client_id="hx",
+                              sids=["603676"], 
+                              start_time=20241008, 
+                              end_time=20241008))
     
     @pytest.fixture
-    def req_order(self):
-        return Req(sid=["603676"], start_date=20241008, end_date=20241008)
+    def timermsg(self):
+        return TimerMsg(topic="timer", 
+                        msg=TimerMeta(
+                              sub_topic="sos",
+                              eos=20241008)
+                              )
     
-    # @pytest.fixture 
-    # def req_position(self):
-    #     return Req(sid=["603676"], start_date=20241008, end_date=20241008)
-    
-    # @pytest.fixture
-    # def req_account(self):
-    #     return Req(sid=["603676"], start_date=20241008, end_date=20241008)
-    
-    # @pytest.fixture
-    # def req_sync(self):
-    #     return 20241008
-    
-    def test_default(self, td_api, order):
-        # body = {"user_id": "hx", "session": 0, "data": order.model_dump()} 
-        # body = {"client_id": "hx", "data": order.model_dump()} 
-        q = td_api.on_trade(order)
+    # def test_default(self, td_api, ordermsg):
+    #     # body = {"user_id": "hx", "session": 0, "data": order.model_dump()} 
+    #     # body = {"client_id": "hx", "data": order.model_dump()} 
+    #     q = td_api.on_trade(ordermsg)
+    #     data = self.get_data(q)
+    #     print(data)
+    #     assert data is not None
+
+    def test_request(self, td_api, reqmsg):
+        q = td_api.on_request(reqmsg)
         data = self.get_data(q)
         print(data)
         assert data is not None
 
-    # def test_reqOrder(self, td_api, req_order):
-    #     q = td_api.reqOrder(req_order)
-    #     data = self.get_data(q)
-    #     print(data)
-    #     assert data is not None
-
-    # def test_reqPosition(self, td_api, req_position):
-    #     q = td_api.reqPosition(req_position)
-    #     data = self.get_data(q)
-    #     print(data)
-    #     assert data is not None
-
-    # def test_reqAccount(self, td_api, req_account):
-    #     q = td_api.reqAccount(req_account)
-    #     data = self.get_data(q)
-    #     print(data)
-    #     assert data is not None
-
-    # def test_sync(self, td_api, req_sync):
-    #     q = td_api.sync(req_sync)    
+    # def test_timer(self, td_api, timermsg):
+    #     q = td_api.on_timer(timermsg)    
     #     data = self.get_data(q)
     #     print(data)
     #     assert data is not None

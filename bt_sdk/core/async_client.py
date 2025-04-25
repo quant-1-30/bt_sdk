@@ -194,6 +194,7 @@ class AsyncStreamClient(AsyncClient):
         while self._running:
             try:
                 recv_message = await reader.read(self.buffer_size)
+                print("recv_message", recv_message)
 
                 if not recv_message:
                     print("recv_message is empty", recv_message)
@@ -209,6 +210,11 @@ class AsyncStreamClient(AsyncClient):
                     print("unpack", unpack)
                     yield unpack
                     chunks = b""
+                elif recv_message[-8:] == b"shutdown":
+                    print("Shutdown signal received")
+                    yield "eof"
+                    break
+
             except Exception as e:
                 print(f"[Recv Error] {e}")
                 break
