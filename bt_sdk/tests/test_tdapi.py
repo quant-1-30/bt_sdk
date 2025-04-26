@@ -23,7 +23,7 @@ class TestTdApi:
     
     @pytest.fixture
     def client_id(self):
-        return "685c25e9-c25a-43d0-a3bf-d3f304a3fe28"
+        return "0c4d4d18-d8be-4525-901b-f1b702ce702f"
     
     @pytest.fixture
     def loginmsg(self):
@@ -53,13 +53,13 @@ class TestTdApi:
     def reqmsg(self, client_id):
         return RequestMsg(topic="query", 
                           msg=ReqMeta(
-                            #   sub_topic="order",
+                              sub_topic="order",
                             #   sub_topic="position",
                             #   sub_topic="account",
                               client_id=client_id,
                               sids=["603676"], 
-                              start_time=20241008, 
-                              end_time=20241008))
+                              start_time=1728351060, 
+                              end_time=1728351060))
     
     @pytest.fixture
     def timermsg(self, client_id):
@@ -72,22 +72,20 @@ class TestTdApi:
     # def test_login(self, td_api, loginmsg):
     #     q = td_api.on_login(loginmsg)
     #     data = self.get_data(q)
-    #     print(data)
+    #     print(f"login: {data}")
     #     assert data is not None
     
-    def test_default(self, td_api, ordermsg):
-        # body = {"user_id": "hx", "session": 0, "data": order.model_dump()} 
-        # body = {"client_id": "hx", "data": order.model_dump()} 
-        q = td_api.on_trade(ordermsg)
-        data = self.get_data(q)
-        print(data)
-        assert data is not None
-
-    # def test_request(self, td_api, reqmsg):
-    #     q = td_api.on_request(reqmsg)
+    # def test_default(self, td_api, ordermsg):
+    #     q = td_api.on_trade(ordermsg)
     #     data = self.get_data(q)
     #     print(data)
     #     assert data is not None
+
+    def test_request(self, td_api, reqmsg):
+        q = td_api.on_request(reqmsg)
+        data = self.get_data(q)
+        print(data)
+        assert data is not None
 
     # def test_timer(self, td_api, timermsg):
     #     q = td_api.on_timer(timermsg)    

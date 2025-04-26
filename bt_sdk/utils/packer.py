@@ -26,7 +26,6 @@ struct_format = {
 def unpack(msg_type: str, msg: bytes) -> Any:
     unpacked = struct.unpack(struct_format[msg_type], msg)
     if msg_type == "login":
-        import pdb; pdb.set_trace()
         uuid_obj = uuid.UUID(bytes=unpacked[0])
         return str(uuid_obj)
     return unpacked

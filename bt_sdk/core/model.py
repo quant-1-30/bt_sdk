@@ -45,8 +45,8 @@ class OrderMeta(pydantic.BaseModel):
     )
 
 class ReqMeta(pydantic.BaseModel):
-    sub_topic: str
     client_id: str
+    sub_topic: str
     start_time: int = Field(default=19900101)
     end_time: int = Field(default=30000101)
     sids: List[str] = Field(default=[])
