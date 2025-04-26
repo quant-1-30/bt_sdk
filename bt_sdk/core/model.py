@@ -59,6 +59,7 @@ class ReqMeta(pydantic.BaseModel):
 class TimerMeta(pydantic.BaseModel):
     client_id: str
     timer: str
+    body: Mapping[str, Any]
 
     model_config = ConfigDict(
         extra="forbid",
@@ -75,7 +76,7 @@ class LoginMsg(pydantic.BaseModel):
     )
 
 class OrderMsg(pydantic.BaseModel):
-    topic: str = Field(default="default")
+    topic: str = Field(default="order")
     msg: OrderMeta
 
     model_config = ConfigDict(

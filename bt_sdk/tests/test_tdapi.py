@@ -23,7 +23,7 @@ class TestTdApi:
     
     @pytest.fixture
     def client_id(self):
-        return "0c4d4d18-d8be-4525-901b-f1b702ce702f"
+        return "86e0cefc-d5dc-4994-b190-50531597ea61"
     
     @pytest.fixture
     def loginmsg(self):
@@ -36,7 +36,7 @@ class TestTdApi:
     
     @pytest.fixture
     def ordermsg(self, client_id):
-        return OrderMsg(topic="default", 
+        return OrderMsg(topic="order", 
                          msg=OrderMeta(
                              client_id=client_id, 
                              sid="603676", 
@@ -66,34 +66,26 @@ class TestTdApi:
         return TimerMsg(topic="timer", 
                         msg=TimerMeta(
                               client_id=client_id,
-                              timer="eos")
+                              timer="eos",
+                              body={'session': "20241008"})
                               )
     
     # def test_login(self, td_api, loginmsg):
-    #     q = td_api.on_login(loginmsg)
-    #     data = self.get_data(q)
-    #     print(f"login: {data}")
-    #     assert data is not None
-    
-    def test_login(self, td_api, loginmsg):
-        td_api.on_login(loginmsg)
-        print(f"client_id : {td_api.client_id}")
-        assert td_api.client_id is not None
+    #     td_api.on_login(loginmsg)
+    #     print(f"client_id : {td_api.client_id}")
+    #     assert td_api.client_id is not None
 
-    # def test_default(self, td_api, ordermsg):
-    #     q = td_api.on_trade(ordermsg)
-    #     data = self.get_data(q)
+    # def test_order(self, td_api, ordermsg):
+    #     data = td_api.on_trade(ordermsg)
     #     print(data)
     #     assert data is not None
 
     # def test_request(self, td_api, reqmsg):
-    #     q = td_api.on_request(reqmsg)
-    #     data = self.get_data(q)
+    #     data = td_api.on_request(reqmsg)
     #     print(data)
     #     assert data is not None
 
-    # def test_timer(self, td_api, timermsg):
-    #     q = td_api.on_timer(timermsg)    
-    #     data = self.get_data(q)
-    #     print(data)
-    #     assert data is not None
+    def test_timer(self, td_api, timermsg):
+        data = td_api.on_timer(timermsg)    
+        print(data)
+        assert data is not None
