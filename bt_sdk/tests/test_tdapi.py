@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*- 
 
 import pytest
-from core.lib.tdapi import *
+from core.cerebro.tdapi import *
 from core.model import *
 from core.constant import *
 
@@ -75,17 +75,22 @@ class TestTdApi:
     #     print(f"login: {data}")
     #     assert data is not None
     
+    def test_login(self, td_api, loginmsg):
+        td_api.on_login(loginmsg)
+        print(f"client_id : {td_api.client_id}")
+        assert td_api.client_id is not None
+
     # def test_default(self, td_api, ordermsg):
     #     q = td_api.on_trade(ordermsg)
     #     data = self.get_data(q)
     #     print(data)
     #     assert data is not None
 
-    def test_request(self, td_api, reqmsg):
-        q = td_api.on_request(reqmsg)
-        data = self.get_data(q)
-        print(data)
-        assert data is not None
+    # def test_request(self, td_api, reqmsg):
+    #     q = td_api.on_request(reqmsg)
+    #     data = self.get_data(q)
+    #     print(data)
+    #     assert data is not None
 
     # def test_timer(self, td_api, timermsg):
     #     q = td_api.on_timer(timermsg)    

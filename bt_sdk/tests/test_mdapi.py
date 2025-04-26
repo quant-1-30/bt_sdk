@@ -2,26 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-from core.lib.mdapi import *
+from core.cerebro.mdapi import *
 from core.model import *
 
 
 class TestMdApi:
-    def get_data(self, q):
-        data = []
-        while True:
-            item = q.get()
-            if item == "eof":
-                break
-            data.append(item)
-        return data
     
     @pytest.fixture
     def md_api(self):
         return MdApi(addr=("127.0.0.1", 10000))
     
     @pytest.fixture
-    def req_calendar(self):
+    def request(self):
         return RequestMsg(topic="calendar", 
                           msg=ReqMeta(
                               client_id="test",
@@ -33,4 +25,9 @@ class TestMdApi:
                               start_time=19900101, 
                               end_time=20241008,
                               sids = ['603676']))
-    
+
+    def test_request(self, md_api, request):
+        q = md_api.on_request(request)
+        data = self.get_data(q)
+        print(data)
+        assert data is not None
