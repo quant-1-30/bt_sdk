@@ -67,7 +67,7 @@ class TestTdApi:
                         msg=TimerMeta(
                               client_id=client_id,
                               timer="eos",
-                              body={'session': "20241008"})
+                              body={'session': 20241008})
                               )
     
     # def test_login(self, td_api, loginmsg):
@@ -80,12 +80,12 @@ class TestTdApi:
     #     print(data)
     #     assert data is not None
 
-    # def test_request(self, td_api, reqmsg):
-    #     data = td_api.on_request(reqmsg)
+    # def test_timer(self, td_api, timermsg):
+    #     data = td_api.on_timer(timermsg)    
     #     print(data)
     #     assert data is not None
 
-    def test_timer(self, td_api, timermsg):
-        data = td_api.on_timer(timermsg)    
+    def test_request(self, td_api, reqmsg):
+        data = td_api.on_request(reqmsg)
         print(data)
         assert data is not None

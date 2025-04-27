@@ -6,12 +6,11 @@ import struct
 from typing import Any
 
 
-
 struct_format = {
     # tdapi
     "login": "!16s",
     # order_bit
-    "order": "!iiff",
+    "order": ">iiff",
     "position": "!6sifiif16s",
     "account": "!iffii16s",
     "timer": "!f",
@@ -32,3 +31,4 @@ def unpack(msg_type: str, msg: bytes) -> Any:
             uuid_obj = uuid.UUID(bytes=unpacked[0])
             return str(uuid_obj)
         return unpacked
+    return ''

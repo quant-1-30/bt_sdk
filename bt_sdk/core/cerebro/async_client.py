@@ -188,10 +188,16 @@ class AsyncStreamClient(AsyncClient):
         print("writer.drain")
 
         chunks = b""
+        stats = 0
         while self._running:
             try:
                 recv_message = await reader.read(self.buffer_size)
-                print("recv_message", recv_message)
+                # recv_message = await reader.read(100)
+                import pdb
+                # pdb.set_trace()
+                print("recv_message ", len(recv_message), recv_message)
+                stats += len(recv_message)
+                print("stats ", stats)
 
                 if not recv_message:
                     print("recv_message is empty", recv_message)
@@ -200,10 +206,13 @@ class AsyncStreamClient(AsyncClient):
                     break
 
                 chunks = chunks + recv_message 
-                if recv_message[-8:] == b"sentinel": 
-                    decoded = unpack(topic, chunks[:-8])
-                    print("decoded", decoded)
-                    yield decoded
+                if recv_message[-8:] == b"sentinel":
+                    # split chunkes by sentinel
+                    splits = chunks.split(b'sentinel')
+                    for chunk in splits:
+                        decoded = unpack(topic, chunk)
+                        print("decoded", decoded)
+                        yield decoded
                     chunks = b""
 
                 elif recv_message[-8:] == b"shutdown":
