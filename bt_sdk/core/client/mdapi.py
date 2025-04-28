@@ -11,7 +11,6 @@ class MdApi(Api):
     params = (("protocol", "udp"),)
 
     def __init__(self, addr: Tuple[str, int]=()):
-
         self.addr = addr
 
 __all__ = ["MdApi"]

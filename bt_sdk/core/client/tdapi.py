@@ -32,25 +32,28 @@ class TdApi(Api):
     def __init__(self, addr: Tuple[str, int]=()):
         self.addr = addr
     
-    def on_login(self, msg: LoginMsg):
+    def on_login(self, meta: LoginMeta):
         """
             login
         """
+        msg = LoginMsg(topic="login", msg=meta)
         q = self.async_client.run(msg.model_dump())
         self.client_id = self.get_data(q)[0]
 
-    def on_trade(self, msg: OrderMsg):
+    def on_trade(self, meta: OrderMeta, auth: AuthMeta):
         """
             execution order in queue
         """
+        msg = OrderMsg(topic="order", msg=meta, auth=auth)
         q = self.async_client.run(msg.model_dump())
         trades = self.get_data(q)[0]
         return trades
         
-    def on_timer(self, msg: TimerMsg):
+    def on_timer(self, meta: TimerMeta, auth: AuthMeta):
         """
             sync position / account / fund
         """
+        msg = TimerMsg(topic="timer", msg=meta, auth=auth)
         q = self.async_client.run(msg.model_dump())
         timers = self.get_data(q)[0]
         return timers

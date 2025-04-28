@@ -14,7 +14,7 @@ from time import time
 from functools import lru_cache
 from typing import Dict, Any
 
-from utils.packer import unpack
+from utils.packer import td_unpack, md_unpack
 from core.exception import RemoteException
 
 
@@ -118,16 +118,11 @@ class AsyncClient:
         self.sock.close()
         print("client socket stopped.")
         """Clean up resources and close the loop."""
+        # exit
         self.loop.run_until_complete(self.loop.shutdown_asyncgens())
         self.loop.close()
         print("Closing event loop")
     
-    # def on_exit(self):
-    #     """Clean up resources and close the loop."""
-    #     print("Closing event loop")
-    #     self.loop.run_until_complete(self.loop.shutdown_asyncgens())
-    #     self.loop.close()
-
 
 class AsyncDatagramClient(AsyncClient):
         
@@ -145,19 +140,24 @@ class AsyncDatagramClient(AsyncClient):
         while self._running:
             try:
                 recv_message = await self.loop.sock_recv(self.sock, self.buffer_size)
-                # print("recv_message", recv_message)
+
+                if not recv_message:
+                    print("recv_message is empty", recv_message)
+                    yield "eof"
+                    break
 
                 chunks += recv_message
-                if recv_message == b"sentinel":
+                if chunks[-8:] == b"sentinel":
                     print("Sentinel received, processing chunks...")
                     try:
-                        received = pickle.loads(chunks[:-8])
+                        # received = pickle.loads(chunks[:-8])
+                        received = md_unpack(message["topic"], chunks[:-8])
                         yield received
                     except Exception as e:
                         print(f"[Unpickle Error] {e}")
                         print(f"Chunks content: {chunks}")
                     chunks = b""
-                elif recv_message == b"shutdown":
+                elif chunks[-8:] == b"shutdown":
                     print("Shutdown signal received")
                     yield "eof"
                     break
@@ -178,7 +178,7 @@ class AsyncStreamClient(AsyncClient):
 
     async def get_data(self, message):
 
-        topic = message["msg"].get("sub_topic", message["topic"])
+        topic = message["topic"].split("_")[-1]
 
         serialize_msg = pickle.dumps(message)
         reader, writer = await asyncio.open_connection(host=self.host, port=self.port)
@@ -194,7 +194,6 @@ class AsyncStreamClient(AsyncClient):
                 recv_message = await reader.read(self.buffer_size)
                 # recv_message = await reader.read(100)
                 import pdb
-                # pdb.set_trace()
                 print("recv_message ", len(recv_message), recv_message)
                 stats += len(recv_message)
                 print("stats ", stats)
@@ -210,7 +209,7 @@ class AsyncStreamClient(AsyncClient):
                     # split chunkes by sentinel
                     splits = chunks.split(b'sentinel')
                     for chunk in splits:
-                        decoded = unpack(topic, chunk)
+                        decoded = td_unpack(topic, chunk)
                         print("decoded", decoded)
                         yield decoded
                     chunks = b""

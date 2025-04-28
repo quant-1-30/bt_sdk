@@ -3,7 +3,7 @@
 
 from meta import MetaParams, with_metaclass
 from .async_client import AsyncDatagramClient, AsyncStreamClient
-from core.model import RequestMsg
+from core.model import ReqMeta, AuthMeta, RequestMsg
 
 
 class MetaApi(MetaParams):
@@ -45,10 +45,11 @@ class Api(with_metaclass(MetaApi, object)):
                 break
             yield item
 
-    def on_request(self, msg: RequestMsg):
+    def on_request(self, topic: str, msg: ReqMeta, auth: AuthMeta):
         """
             request
         """
+        msg = RequestMsg(topic=topic, msg=msg, auth=auth)
         q = self.async_client.run(msg.model_dump())
         data = self.get_data(q)
         return data

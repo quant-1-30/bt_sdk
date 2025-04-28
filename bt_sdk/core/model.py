@@ -6,6 +6,22 @@ import pydantic
 from pydantic import Field, field_validator, ConfigDict
 from typing import List, Union, Tuple, Mapping, Any
 
+
+class AuthMeta(pydantic.BaseModel):
+    client_id: str = Field(default="")
+    token: str = Field(default="")
+
+
+class ReqMeta(pydantic.BaseModel):
+    start_date: int = Field(default=19900101)
+    end_date: int = Field(default=30000101)
+    sid: List[str] = Field(default=[])
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True
+    )
+
 class LoginMeta(pydantic.BaseModel):
     user_id: str
     phone: int
@@ -23,7 +39,6 @@ class LoginMeta(pydantic.BaseModel):
         return v
 
 class OrderMeta(pydantic.BaseModel):
-    client_id: str
     sid: str
     size: int = Field(default=0)
     price: int
@@ -44,27 +59,17 @@ class OrderMeta(pydantic.BaseModel):
         frozen=True
     )
 
-class ReqMeta(pydantic.BaseModel):
-    client_id: str
-    sub_topic: str
-    start_time: int = Field(default=19900101)
-    end_time: int = Field(default=30000101)
-    sids: List[str] = Field(default=[])
 
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True
-    )
 
 class TimerMeta(pydantic.BaseModel):
-    client_id: str
     timer: str
-    body: Mapping[str, Any]
+    session: int
 
     model_config = ConfigDict(
         extra="forbid",
         frozen=True
     )
+
 
 class LoginMsg(pydantic.BaseModel):
     topic: str = Field(default="login")
@@ -78,6 +83,7 @@ class LoginMsg(pydantic.BaseModel):
 class OrderMsg(pydantic.BaseModel):
     topic: str = Field(default="order")
     msg: OrderMeta
+    auth: AuthMeta = Field(default=AuthMeta())
 
     model_config = ConfigDict(
         extra="forbid",
@@ -88,6 +94,7 @@ class RequestMsg(pydantic.BaseModel):
 
     topic: str = Field(default="query")
     msg: ReqMeta
+    auth: AuthMeta = Field(default=AuthMeta())
 
     model_config = ConfigDict(
         extra="forbid",
@@ -98,6 +105,7 @@ class TimerMsg(pydantic.BaseModel):
 
     topic: str = Field(default="timer")
     msg: TimerMeta
+    auth: AuthMeta = Field(default=AuthMeta())
 
     model_config = ConfigDict(
         extra="forbid",
@@ -105,6 +113,6 @@ class TimerMsg(pydantic.BaseModel):
     )
 
 
-__all__ = ["LoginMeta", "OrderMeta", "ReqMeta", "TimerMeta", 
+__all__ = ["LoginMeta", "OrderMeta", "ReqMeta", "TimerMeta", "AuthMeta",
            "OrderMsg", "RequestMsg", "TimerMsg", "LoginMsg"]
 
