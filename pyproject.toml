@@ -17,7 +17,16 @@ pytest = "^8.3.5"
 pydantic = "^2.10.6"
 pytest-asyncio = "^0.26.0"
 msgpack = "^1.1.0"
+devpi-client = "^7.2.0"
 
+[tool.poetry.repositories]
+devpi = { url = "http://localhost:3141/bt_sdk/dev/+simple/" }
+
+[tool.poetry.source]
+name = "devpi"
+url = "http://localhost:3141/bt_sdk/dev/+simple/"
+# optional: make this your default source for all installs
+default = true
 
 [build-system]
 requires = ["poetry-core"]
