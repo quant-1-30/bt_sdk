@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*- 
 
 import pytest
-from core.client.tdapi import *
-from core.model import *
-from core.constant import *
+from bt_sdk.core.client import TdApi
+from bt_sdk.core.model import *
+from bt_sdk.core.constant import *
 
 class TestTdApi:
 

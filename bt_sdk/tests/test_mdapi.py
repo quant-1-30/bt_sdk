@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-from core.client.mdapi import *
-from core.model import *
+from bt_sdk.core.client import MdApi
+from bt_sdk.core.model import *
 
 
 class TestMdApi:
@@ -29,7 +29,7 @@ class TestMdApi:
                       end_date = 1728351060,
                       sid = ['603676'])
 
-    def test_request(self, md_api, req):
-        data = md_api.on_request(req)
+    def test_request(self, md_api, req_topic, reqmeta):
+        data = md_api.on_request(req_topic, reqmeta)
         print("data: ", data)
         assert data is not None

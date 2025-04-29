@@ -5,12 +5,17 @@ Created on Sat Feb 16 13:56:19 2019
 
 @author: python
 """
+import sys
+import weakref
+import pandas as pd
 import contextlib
-import functools, logging, pdb, time
+import functools
+import logging
+import pdb
+import time
 import warnings
 from functools import wraps
 from contextlib import contextmanager
-import sys, weakref
 
 
 def _deprecated_getitem_method(name, attrs):
@@ -267,7 +272,7 @@ def except_debug(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            pdb.set_trace()
+            # pdb.set_trace()
             print(e)
             # 再来一遍用s跟踪进去
             return func(*args, **kwargs)
@@ -590,7 +595,7 @@ class Context(contextlib.ContextDecorator):
 
     def __init__(self, how_used):
         self.how_used = how_used
-        print(f'__init__({how_used})')
+        # print(f'__init__({how_used})')
 
     def __enter__(self):
         print(f'__enter__({self.how_used})')

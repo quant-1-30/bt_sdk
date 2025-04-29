@@ -1,9 +1,9 @@
 # /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from meta import MetaParams, with_metaclass
-from .async_client import AsyncDatagramClient, AsyncStreamClient
-from core.model import ReqMeta, AuthMeta, RequestMsg
+from bt_sdk.meta import MetaParams, with_metaclass
+from bt_sdk.core.client.async_client import AsyncDatagramClient, AsyncStreamClient
+from bt_sdk.core.model import ReqMeta, AuthMeta, RequestMsg
 
 
 class MetaApi(MetaParams):
@@ -12,7 +12,6 @@ class MetaApi(MetaParams):
         """
             async_client / addr / client_id
         """
-        
         _obj, args, kwargs = super(MetaApi, cls).donew(*args, **kwargs)
         
         if not hasattr(_obj, "get_data"):
@@ -45,7 +44,7 @@ class Api(with_metaclass(MetaApi, object)):
                 break
             yield item
 
-    def on_request(self, topic: str, msg: ReqMeta, auth: AuthMeta):
+    def on_request(self, topic: str, msg: ReqMeta, auth: AuthMeta=AuthMeta()):
         """
             request
         """

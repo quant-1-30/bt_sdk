@@ -4,13 +4,26 @@ Created on Tue Mar 12 15:37:47 2019
 
 @author: python
 """
+import os
+import pickle
+import errno
+import pandas as pd
 from collections import MutableMapping
 from functools import partial
-from distutils import dir_util
 from shutil import rmtree, move
 from tempfile import mkdtemp, NamedTemporaryFile
-import os, pickle, errno, pandas as pd
-from util.paths import ensure_directory
+
+
+def ensure_directory(path):
+    """
+    Ensure that a directory named "path" exists.
+    """
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if os.path.isdir(path):
+            return
+        raise
 
 
 # cacheObject --- bar_reader

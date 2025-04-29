@@ -9,3 +9,8 @@ tradeApi --- https
 #     body = metadata.pop("body")
 #     decode = {k: base64.b64decode(v) for k, v in body.items()}
 #     decode = {k: json.loads(v.decode("utf-8")) for k, v in decode.items()}
+
+# msgpack / struct 
+# zlib --- stream data / gzip --- file
+
+poetry build --format wheel (import path must be absolute path)

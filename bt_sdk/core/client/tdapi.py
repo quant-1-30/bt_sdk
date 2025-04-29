@@ -3,9 +3,9 @@
 
 from typing import Dict, Any, Tuple, Mapping, Union
 
-from core.model import *
-from utils.wrapper import singleton
-from .api import Api
+from bt_sdk.core.model import *
+from bt_sdk.utils.wrapper import singleton
+from bt_sdk.core.client.api import Api
 
 
 # @singleton
