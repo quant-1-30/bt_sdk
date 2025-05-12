@@ -31,14 +31,7 @@ class Timer(Enum):
     daily = "daily"
     eos = "eos"
 
-class UnpackType(Enum):
-    login = "!16s"
-    trade = "!DIff"
-    order = "!DIff"
-    position = "!DIff"
-    account = "!DIff"
 
-# # instrument
 # class ContractType(Enum):
 #     Future = 0
 #     Option = 1

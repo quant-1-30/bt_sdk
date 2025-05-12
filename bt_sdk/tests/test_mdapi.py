@@ -10,7 +10,7 @@ class TestMdApi:
     
     @pytest.fixture
     def md_api(self):
-        return MdApi(addr=("127.0.0.1", 10000))
+        return MdApi(addr=("127.0.0.1", 8888))
     
     @pytest.fixture
     def req_topic(self):
