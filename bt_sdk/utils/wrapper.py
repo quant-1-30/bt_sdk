@@ -16,6 +16,7 @@ import time
 import warnings
 from functools import wraps
 from contextlib import contextmanager
+from .context_tricks import get_algo_instance
 
 
 def _deprecated_getitem_method(name, attrs):
@@ -64,7 +65,7 @@ class Deprecated(object):
         self.tip_info = tip_info
 
     def __call__(self, obj):
-        if isinstance(obj, six.class_types):
+        if isinstance(obj, type):
             # 针对类装饰
             return self._decorate_class(obj)
         else:
@@ -123,23 +124,6 @@ class Deprecated(object):
         return func_doc
 
 
-def warnings_filter(func):
-    """
-        作用范围：函数装饰器 (模块函数或者类函数)
-        功能：被装饰的函数上的警告不会打印，忽略
-    """
-
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        warnings.simplefilter('ignore')
-        ret = func(*args, **kwargs)
-        if not ABuEnv.g_ignore_all_warnings:
-            # 如果env中的设置不是忽略所有才恢复
-            warnings.simplefilter('default')
-        return ret
-    return wrapper
-
-
 def singleton(cls):
     """
         作用范围：类装饰器
@@ -154,37 +138,6 @@ def singleton(cls):
         return instances[cls]
     return get_instance
 
-
-def params_to_pandas(func):
-    """
-        函数装饰器: 不定参数装饰器,定参数转换使用ABuScalerUtil中的装饰器arr_to_pandas(func)
-        将被装饰函数中的参数中所有可以迭代的序列转换为pd.DataFrame或者pd.Series
-    """
-    @functools.wraps(func)
-    def wrapper(*arg, **kwargs):
-        # 把arg中的可迭代序列转换为pd.DataFrame或者pd.Series
-        arg_list = [arr_to_pandas(param) for param in arg]
-        # 把kwargs中的可迭代序列转换为pd.DataFrame或者pd.Series
-        arg_dict = {param_key: arr_to_pandas(kwargs[param_key]) for param_key in kwargs}
-        return func(*arg_list, **arg_dict)
-
-    return wrapper
-
-
-def params_to_numpy(func):
-    """
-        函数装饰器: 不定参数装饰器,定参数转换使用ABuScalerUtil中的装饰器arr_to_numpy(func)
-        将被装饰函数中的参数中所有可以迭代的序列转换为np.array
-    """
-    @functools.wraps(func)
-    def wrapper(*arg, **kwargs):
-        # 把arg中的可迭代序列转换为np.array
-        arg_list = [arr_to_numpy(param) for param in arg]
-        # 把kwargs中的可迭代序列转换为np.array
-        arg_dict = {param_key: arr_to_numpy(kwargs[param_key]) for param_key in kwargs}
-        return func(*arg_list, **arg_dict)
-
-    return wrapper
 
 
 def catch_error(return_val=None, log=True):
@@ -235,7 +188,7 @@ def consume_time(func):
 def empty_wrapper(func):
     """
     作用范围：函数装饰器 (模块函数或者类函数)
-    功能：空装饰器，为fix版本问题使用，或者分逻辑功能实现使用
+    功能: 空装饰器 为fix版本问题使用或者分逻辑功能实现使用
     """
 
     @functools.wraps(func)
@@ -529,30 +482,6 @@ def remove_na(f):
             result.dropna(inplace=True)
         return result
     return wrapper
-
-
-def coerce_numbers_to_my_dtype(f):
-    """
-    A decorator for methods whose signature is f(self, other) that coerces
-    ``other`` to ``self.dtype``.
-
-    This is used to make comparison operations between numbers and `Factor`
-    instances work independently of whether the user supplies a float or
-    integer literal.
-
-    For example, if I write::
-
-        my_filter = my_factor > 3
-
-    my_factor probably has dtype float64, but 3 is an int, so we want to coerce
-    to float64 before doing the comparison.
-    """
-    @wraps(f)
-    def method(self, other):
-        if isinstance(other, Number):
-            other = coerce_to_dtype(self.dtype, other)
-        return f(self, other)
-    return method
 
 
 # 基于api_method 将方法注册到api

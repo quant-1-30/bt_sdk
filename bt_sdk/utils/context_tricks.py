@@ -20,6 +20,7 @@ def get_algo_instance():
 def set_algo_instance(algo):
     context.algorithm = algo
 
+
 @object.__new__
 class nop_context(object):
     """A nop context manager.

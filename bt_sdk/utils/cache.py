@@ -13,6 +13,14 @@ from functools import partial
 from shutil import rmtree, move
 from tempfile import mkdtemp, NamedTemporaryFile
 
+from collections import Sequence
+from itertools import compress
+# 弱引用 以及沙盒函数需要研究一下 、gcc回收机制
+from weakref import WeakKeyDictionary, ref
+from threading import Lock
+from functools import wraps
+from toolz.sandbox import unzip
+
 
 def ensure_directory(path):
     """
@@ -282,20 +290,6 @@ class lazyproperty:
             value = self.func(instance)
             setattr(instance, self.func.__name__, value)
             return value
-
-# -*- coding : utf-8 -*-
-"""
-Created on Tue Mar 12 15:37:47 2019
-
-@author: python
-"""
-from collections import Sequence
-from itertools import compress
-# 弱引用 以及沙盒函数需要研究一下 、gcc回收机制
-from weakref import WeakKeyDictionary, ref
-from threading import Lock
-from functools import wraps
-from toolz.sandbox import unzip
 
 
 class _WeakArgs(Sequence):
