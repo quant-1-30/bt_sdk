@@ -26,6 +26,7 @@ setup(
         'devpi-web',
         'devpi-client',
         'poetry',
+        'ping3>=4.0.0',
     ],
     extras_require={
         'dev': [

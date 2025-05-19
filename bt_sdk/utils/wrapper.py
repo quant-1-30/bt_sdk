@@ -625,6 +625,21 @@ def make_context():
         print(f"{err=}")
 
 
-# if __name__ == "__main__":
-#     # print("---------------")
-#     func('作为装饰器运行')
+def retry_connection(max_attempts=3, delay=1):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):  # 注意这里需要接收 self 参数
+            attempts = 0
+            while attempts < max_attempts:
+                try:
+                    return func(self, *args, **kwargs)  # 调用时传入 self
+                # except ConnectionError as e:
+                except Exception as e:
+                    attempts += 1
+                    if attempts == max_attempts:
+                        raise e
+                    print(f"Connection failed. Retrying in {delay} seconds... (Attempt {attempts}/{max_attempts})")
+                    time.sleep(delay)
+            return None
+        return wrapper
+    return decorator

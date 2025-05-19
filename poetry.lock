@@ -747,6 +747,25 @@ url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 reference = "tuna"
 
 [[package]]
+name = "ping3"
+version = "4.0.8"
+description = "A pure python3 version of ICMP ping implementation using raw socket."
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "ping3-4.0.8-py3-none-any.whl", hash = "sha256:b5c294851968b4229e9af69d252778241cb84221594b436a8677419c31925594"},
+    {file = "ping3-4.0.8.tar.gz", hash = "sha256:9ab460eb57f006b71f977a693d157215aabd6bbcbc6cd6428b6951eaae0c2875"},
+]
+
+[package.extras]
+dev = ["build", "twine"]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+reference = "tuna"
+
+[[package]]
 name = "pkginfo"
 version = "1.12.1.2"
 description = "Query metadata from sdists / bdists / installed packages."
@@ -1321,4 +1340,4 @@ reference = "tuna"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "793091a54c1f6f614935f44d95818e3c3f1755b5f79f8c789921366122987f11"
+content-hash = "f57852adc9076d3b33ef81e16996fda2ec560a9bcaa62b0648a217e5dbc29487"

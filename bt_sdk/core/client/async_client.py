@@ -5,35 +5,24 @@ import socket
 import asyncio
 import pickle
 import threading
-import collections
-import itertools
 from queue import Queue
 from typing import Dict, Any
 
-from bt_sdk.utils.packer import td_unpack, md_unpack
+from bt_sdk.utils.pack import msg_unpack
 
 
 class AsyncClient:
 
     _instance = None
     _lock_instance = threading.Lock()
-    # transport sendto / abort
-    # transport.sendto(message, self.addr)
-    # sock = transport.get_extra_info("socket")
-    # transport.close()
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             with cls._lock_instance:
                 if not cls._instance:
                     cls._instance = super(AsyncClient, cls).__new__(cls)
-                    cls._instance.qs = collections.OrderedDict()  # key: tickerId -> queues
-                    # cls._instance.ts = collections.OrderedDict()  # key: queue -> t
-                    cls._instance._lock_q = threading.Lock()
-                    cls._instance._tickerId = itertools.count()
                     cls._instance._running = True  # Flag to control the running state
-                    cls._instance.buffer_size = 1024
-
+                    cls._instance.buffer_size = int(kwargs.get("buffer_size", 1024))
                     # # Initialize the event loop
                     loop = asyncio.new_event_loop()
                     cls.activte_event_loop(loop)
@@ -51,56 +40,26 @@ class AsyncClient:
         t = threading.Thread(target=run_loop, daemon=True)
         t.start()
     
-    def reuseQueue(self, tickerId):
-        '''Reuses queue for tickerId, returning the new tickerId and q'''
-        with self._lock_q:
-            # Invalidate tickerId in qs (where it is a key)
-            q = self.qs.pop(tickerId, None)  # invalidate old
-            iscash = self.iscash.pop(tickerId, None)
-
-            # Update ts: q -> ticker
-            tickerId = self.nextTickerId()  # get new tickerId
-            self.ts[q] = tickerId  # Update ts: q -> tickerId
-            self.qs[tickerId] = q  # Update qs: tickerId -> q
-            self.iscash[tickerId] = iscash
-
-        return tickerId, q
-
-    def getTickQueue(self, start=False):
-        '''Creates tick/Queue for data delivery to a data feed'''
-        q = Queue()
-        if start:
-            q.put(None)
-            return q
-
-        with self._lock_q:
-            tickerId = next(self._tickerId)
-            self.qs[tickerId] = q
-
-        return tickerId
-    
-    async def on_receive(self, message: Dict[str, Any], tickerId: int):
+    async def on_receive(self, message: Dict[str, Any], req_q: Queue):
         try:
             async for data in self.get_data(message):
                 print("on_receive ", data)
-                self.qs[tickerId].put(data)
+                req_q.put(data)
                 if data == "eof":
                     print("on_receive done")
                     break
+
         except Exception as e:
             print(f"Error in on_receive: {e}")
-            self.qs[tickerId].put("eof")
+            req_q.put("eof")
 
-    def run(self, req):
-        tickerId = self.getTickQueue()
-        print("run ", tickerId)
-        # asyncio.create_task(self.on_receive(req, tickerId)) # asyncio.run
-        # self.loop.run_in_executor(None, self.on_receive, req, tickerId) # cpu-bound task
-        coro = self.on_receive(req, tickerId)
+    def run(self, req, req_q):
+        print("run ", req_q)
+        coro = self.on_receive(req, req_q)
         future = asyncio.run_coroutine_threadsafe(coro, self.loop)
+        # self.loop.run_in_executor(None, self.on_receive, req, tickerId) # cpu-bound task
         # Callback function to handle the result
         future.add_done_callback(lambda f: print("[CALLBACK TRIGGERED] ", f.result()))
-        return self.qs[tickerId]
     
     def stop(self):
         """Stop the UDP / TCP client by setting the running flag to False and closing the socket."""
@@ -115,6 +74,9 @@ class AsyncClient:
     
 
 class AsyncDatagramClient(AsyncClient):
+    
+    # transport sendto / abort sendto(message, self.addr)
+    # sock = transport.get_extra_info("socket")
         
     def __init__(self, addr):
         self.addr = addr
@@ -141,7 +103,7 @@ class AsyncDatagramClient(AsyncClient):
                     print("Sentinel received, processing chunks...")
                     try:
                         # received = pickle.loads(chunks[:-8])
-                        received = md_unpack(message["topic"], chunks[:-8])
+                        received = msg_unpack('md', message["topic"], chunks[:-8])
                         yield received
                     except Exception as e:
                         print(f"[Unpickle Error] {e}")
@@ -199,7 +161,7 @@ class AsyncStreamClient(AsyncClient):
                     # split chunkes by sentinel
                     splits = chunks.split(b'sentinel')
                     for chunk in splits:
-                        decoded = td_unpack(topic, chunk)
+                        decoded = msg_unpack('td', topic, chunk)
                         print("decoded", decoded)
                         yield decoded
                     chunks = b""

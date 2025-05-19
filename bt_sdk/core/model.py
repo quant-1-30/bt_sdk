@@ -1,15 +1,9 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import re
 import pydantic
 from pydantic import Field, field_validator, ConfigDict
 from typing import List, Union, Tuple, Mapping, Any
-
-
-class AuthMeta(pydantic.BaseModel):
-    client_id: str = Field(default="")
-    token: str = Field(default="")
 
 
 class ReqMeta(pydantic.BaseModel):
@@ -22,21 +16,6 @@ class ReqMeta(pydantic.BaseModel):
         frozen=True
     )
 
-class LoginMeta(pydantic.BaseModel):
-    user_id: str
-    phone: int
-    auto_register: bool = Field(default=True)
-
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True
-    )
-
-    @field_validator('phone')
-    def validate_phone(cls, v):
-        if not re.match(r'1[3-9]\d{9}$', str(v)):
-            raise ValueError('Invalid phone number')
-        return v
 
 class OrderMeta(pydantic.BaseModel):
     sid: str
@@ -59,60 +38,39 @@ class OrderMeta(pydantic.BaseModel):
         frozen=True
     )
 
-
-
 class TimerMeta(pydantic.BaseModel):
-    timer: str
+    timer: str = Field(default="start")
     session: int
 
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True
-    )
-
-
-class LoginMsg(pydantic.BaseModel):
-    topic: str = Field(default="login")
-    msg: LoginMeta
-
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True
-    )
 
 class OrderMsg(pydantic.BaseModel):
     topic: str = Field(default="order")
+    client_id: str = Field(default="")
     msg: OrderMeta
-    auth: AuthMeta = Field(default=AuthMeta())
 
     model_config = ConfigDict(
         extra="forbid",
         frozen=True
     )
+
 
 class RequestMsg(pydantic.BaseModel):
 
     topic: str = Field(default="query")
+    client_id: str = Field(default="")
     msg: ReqMeta
-    auth: AuthMeta = Field(default=AuthMeta())
 
     model_config = ConfigDict(
         extra="forbid",
         frozen=True
     )
 
-class TimerMsg(pydantic.BaseModel):
 
-    topic: str = Field(default="timer")
+class SyncMsg(pydantic.BaseModel):
+    topic: str = Field(default="sync")
+    client_id: str = Field(default="")
     msg: TimerMeta
-    auth: AuthMeta = Field(default=AuthMeta())
-
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True
-    )
 
 
-__all__ = ["LoginMeta", "OrderMeta", "ReqMeta", "TimerMeta", "AuthMeta",
-           "OrderMsg", "RequestMsg", "TimerMsg", "LoginMsg"]
+__all__ = [ "ReqMeta", "RequestMsg", "OrderMeta","OrderMsg", "TimerMeta","SyncMsg"]
 

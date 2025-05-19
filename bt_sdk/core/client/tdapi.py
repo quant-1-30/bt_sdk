@@ -4,7 +4,6 @@
 from typing import Dict, Any, Tuple, Mapping, Union
 
 from bt_sdk.core.model import *
-from bt_sdk.utils.wrapper import singleton
 from bt_sdk.core.client.api import Api
 
 
@@ -29,34 +28,54 @@ class TdApi(Api):
     """
     params = (("protocol", "tcp"),)
 
-    def __init__(self, addr: Tuple[str, int]=()):
+    def __init__(self, addr: Tuple[str, int]=(), client_id: str=""):
         self.addr = addr
-    
-    def on_login(self, meta: LoginMeta):
-        """
-            login
-        """
-        msg = LoginMsg(topic="login", msg=meta)
-        q = self.async_client.run(msg.model_dump())
-        self.client_id = self.get_data(q)[0]
+        self.client_id = client_id
 
-    def on_trade(self, meta: OrderMeta, auth: AuthMeta):
+    def on_trade(self, meta: OrderMeta):
         """
             execution order in queue
         """
-        msg = OrderMsg(topic="order", msg=meta, auth=auth)
-        q = self.async_client.run(msg.model_dump())
-        trades = self.get_data(q)[0]
-        return trades
-        
-    def on_timer(self, meta: TimerMeta, auth: AuthMeta):
+        msg = OrderMsg(topic="trade", msg=meta, client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        return q
+    
+    def reqOrder(self, meta: ReqMeta):
         """
-            sync position / account / fund
+            request order
         """
-        msg = TimerMsg(topic="timer", msg=meta, auth=auth)
-        q = self.async_client.run(msg.model_dump())
-        timers = self.get_data(q)[0]
-        return timers
+        msg = RequestMsg(topic="query_order", msg=meta, client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        return q
+    
+    def reqPosition(self, meta: ReqMeta):
+        """
+            request position
+        """
+        msg = RequestMsg(topic="query_position", msg=meta, client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        return q
+    
+    def reqAccount(self, meta: ReqMeta):
+        """
+            request account
+        """
+        msg = RequestMsg(topic="query_account", msg=meta, client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        return q
+    
+    def on_sync(self, meta: TimerMeta):
+        """
+            sync position / account on end of session
+        """
+        msg = SyncMsg(topic="sync", msg=meta, client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        return q
 
 
 __all__ = ["TdApi"]

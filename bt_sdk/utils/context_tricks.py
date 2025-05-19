@@ -5,12 +5,20 @@ Created on Tue Mar 12 15:37:47 2019
 
 @author: python
 """
+import threading
 from warnings import (
     catch_warnings,
     filterwarnings,
 )
 from contextlib import contextmanager
 
+context = threading.local()
+
+def get_algo_instance():
+    return getattr(context, 'algorithm', None)
+
+def set_algo_instance(algo):
+    context.algorithm = algo
 
 @object.__new__
 class nop_context(object):
@@ -120,19 +128,6 @@ def ignore_pandas_nan_categorical_warning():
             category=FutureWarning,
         )
         yield
-
-
-import threading
-
-context = threading.local()
-
-
-def get_algo_instance():
-    return getattr(context, 'algorithm', None)
-
-
-def set_algo_instance(algo):
-    context.algorithm = algo
 
 
 class AlgoAPI(object):
