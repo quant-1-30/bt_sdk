@@ -8,7 +8,9 @@ config devpi
 # server 
 poetry add devp-server devpi-web devpi-client
 
-devpi-init --serverdir ~/.devpi 
+# devpi in-memory database 
+devpi use --h # for help
+devpi-init --serverdir ~/.devpi/server 
 
 devpi-server --serverdir ~/.devpi --host 0.0.0.0 --port 3141
 
@@ -17,12 +19,18 @@ devpi use http://localhost:3141/
 # default
 devpi login root --password ''
 # create bt_sdk
-devpi user -c bt_sdk password=YOUR_SECRET email=bt_sdk@example.com
-devpi login bt_sdk --password YOUR_SECRET
+devpi user -c bt_sdk password=20210718 email=bt_sdk@example.com
+devpi login bt_sdk --password 20210718
+
 # create channel
 devpi index -c bt_sdk/dev  bases=root/pypi
-devpi use bt_sdk/dev
-devpi use list ( devpi use --h)
+devpi use bt_sdk/dev 
+
+# upload
+devpi upload dist/*
+
+# list
+devpi list bt_sdk
 
 # pip
 # ~/.pip/pip.conf
@@ -37,3 +45,4 @@ poetry config repositories.devpi http://localhost:3141/bt_sdk/dev/+simple/
 poetry config http-basic.devpi bt_sdk YOUR_SECRET_PASSWORD
 
 poetry cache clear pypi --all
+

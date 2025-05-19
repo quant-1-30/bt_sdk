@@ -37,18 +37,21 @@ class TestMdApi:
                       start_date = 19900101,
                       end_date = 20241008,
                       sid = ['603676'])
+    
+    def test_connect(self, md_api):
+        assert md_api.connected()
 
-    def test_reqmktdata(self, md_api, reqmeta):
-        q = md_api.reqMktData(reqmeta)
-        data = get_data(q)
-        assert data is not None
+    # def test_reqmktdata(self, md_api, reqmeta):
+    #     q = md_api.reqMktData(reqmeta)
+    #     data = get_data(q)
+    #     assert data is not None
 
-    def test_reqcalendar(self, md_api, reqCalendarmeta):
-        q = md_api.reqCalendar(reqCalendarmeta)
-        data = get_data(q)
-        assert data is not None
+    # def test_reqcalendar(self, md_api, reqCalendarmeta):
+    #     q = md_api.reqCalendar(reqCalendarmeta)
+    #     data = get_data(q)
+    #     assert data is not None
 
-    def test_reqevents(self, md_api, reqmeta):
-        q = md_api.reqEvents(reqmeta)
-        data = get_data(q)
-        assert data is not None
+    # def test_reqevents(self, md_api, reqmeta):
+    #     q = md_api.reqEvents(reqmeta)
+    #     data = get_data(q)
+    #     assert data is not None

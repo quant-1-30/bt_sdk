@@ -36,7 +36,11 @@ class MetaApi(MetaParams):
 
 class Api(with_metaclass(MetaApi, object)):
 
-    params = (("client_id", ""), ("addr", ""), ("delay", "ms"))
+    params = (
+        ("addr", ("127.0.0.1", 8888)),  # Default address tuple
+        ("delay", "ms"),
+        ("protocol", "")
+    )
     
     def __enter__(self):
         return self
@@ -73,6 +77,7 @@ class Api(with_metaclass(MetaApi, object)):
         """
             self.async_client.connected on ping
         """
+        print("connected", self.p.addr[0], self.p.delay)
         return on_ping(self.p.addr[0], self.p.delay)
     
     def disconnected(self):

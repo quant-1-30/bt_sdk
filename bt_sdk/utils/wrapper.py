@@ -561,8 +561,8 @@ def retry_connection(max_attempts=3, delay=1):
             attempts = 0
             while attempts < max_attempts:
                 try:
-                    return func(self, *args, **kwargs)  # 调用时传入 self
-                # except ConnectionError as e:
+                    print("retry_connection", self, *args, **kwargs)
+                    return func(self, *args, **kwargs)  # Actually call the decorated function
                 except Exception as e:
                     attempts += 1
                     if attempts == max_attempts:
