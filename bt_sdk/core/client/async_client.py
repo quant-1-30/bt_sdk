@@ -43,10 +43,10 @@ class AsyncClient:
     async def on_receive(self, message: Dict[str, Any], req_q: Queue):
         try:
             async for data in self.get_data(message):
-                print("on_receive ", data)
+                # print("on_receive ", data)
                 req_q.put(data)
                 if data == "eof":
-                    print("on_receive done")
+                    # print("on_receive done")
                     break
 
         except Exception as e:
@@ -54,7 +54,6 @@ class AsyncClient:
             req_q.put("eof")
 
     def run(self, req, req_q):
-        print("run ", req_q)
         coro = self.on_receive(req, req_q)
         future = asyncio.run_coroutine_threadsafe(coro, self.loop)
         # self.loop.run_in_executor(None, self.on_receive, req, tickerId) # cpu-bound task

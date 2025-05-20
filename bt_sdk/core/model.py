@@ -3,7 +3,7 @@
 
 import pydantic
 from pydantic import Field, field_validator, ConfigDict
-from typing import List, Union, Tuple, Mapping, Any
+from typing import List, Union, Tuple, Mapping, Any, Dict
 
 
 class ReqMeta(pydantic.BaseModel):
@@ -38,10 +38,6 @@ class OrderMeta(pydantic.BaseModel):
         frozen=True
     )
 
-class TimerMeta(pydantic.BaseModel):
-    timer: str = Field(default="start")
-    session: int
-
 
 class OrderMsg(pydantic.BaseModel):
     topic: str = Field(default="order")
@@ -58,7 +54,7 @@ class RequestMsg(pydantic.BaseModel):
 
     topic: str = Field(default="query")
     client_id: str = Field(default="")
-    msg: ReqMeta
+    msg: Union[ReqMeta, Dict[str, Any]]
 
     model_config = ConfigDict(
         extra="forbid",
@@ -66,11 +62,11 @@ class RequestMsg(pydantic.BaseModel):
     )
 
 
-class SyncMsg(pydantic.BaseModel):
-    topic: str = Field(default="sync")
+class TimerMsg(pydantic.BaseModel):
+    topic: str = Field(default="timer")
     client_id: str = Field(default="")
-    msg: TimerMeta
+    msg: int 
 
 
-__all__ = [ "ReqMeta", "RequestMsg", "OrderMeta","OrderMsg", "TimerMeta","SyncMsg"]
+__all__ = [ "ReqMeta", "RequestMsg", "OrderMeta","OrderMsg", "TimerMsg"]
 

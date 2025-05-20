@@ -1,6 +1,7 @@
 # /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import warnings
 from typing import Dict, Any, Tuple, Mapping, Union
 
 from bt_sdk.core.model import *
@@ -32,7 +33,25 @@ class TdApi(Api):
         self.addr = addr
         self.client_id = client_id
 
-    def on_trade(self, meta: OrderMeta):
+    def get_account(self):
+        """
+            latest account_info fundvalue and cash
+        """
+        msg = RequestMsg(topic="get_account", msg={}, client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        return q
+    
+    def get_position(self):
+        """
+            latest position_info 
+        """
+        msg = RequestMsg(topic="get_position", msg={}, client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        return q
+    
+    def placeOrder(self, meta: OrderMeta):
         """
             execution order in queue
         """
@@ -40,6 +59,10 @@ class TdApi(Api):
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
         return q
+    
+    def cancelOrder(self, vtorder_id: str): 
+        warnings.warn("cancelOrder not supported")
+        raise NotImplementedError("cancelOrder not implemented")
     
     def reqOrder(self, meta: ReqMeta):
         """
@@ -68,15 +91,15 @@ class TdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def on_sync(self, meta: TimerMeta):
+    def on_timer(self, session):
         """
             sync position / account on end of session
         """
-        msg = SyncMsg(topic="sync", msg=meta, client_id=self.client_id)
+        msg = TimerMsg(topic="timer", msg=session, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
         return q
-
+    
 
 __all__ = ["TdApi"]
 

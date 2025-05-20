@@ -572,3 +572,32 @@ def retry_connection(max_attempts=3, delay=1):
             return None
         return wrapper
     return decorator
+
+
+def retry_pypi_connection(max_attempts=3, delay=1):
+    """
+    Decorator for handling PyPI connection issues with retry logic.
+    
+    Parameters
+    ----------
+    max_attempts : int
+        Maximum number of retry attempts
+    delay : int
+        Delay in seconds between retries
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            attempts = 0
+            while attempts < max_attempts:
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    attempts += 1
+                    if attempts == max_attempts:
+                        raise e
+                    print(f"PyPI connection failed. Retrying in {delay} seconds... (Attempt {attempts}/{max_attempts})")
+                    time.sleep(delay)
+            return None
+        return wrapper
+    return decorator
