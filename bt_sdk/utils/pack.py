@@ -14,11 +14,9 @@ struct_fmt = {
             "rightment": "",
     },
     "td": {
-            "trade": ">iiff",
             "order": ">iiff",
             "position": "!6sifiif16s",
-            "account": "!iffii16s",
-            "sync": "!f",
+            "account": "!ff",
     },
 }
 
@@ -34,7 +32,6 @@ def msg_unpack(_type: str, msg_type, msg: bytes) -> Any:
     # zlib --- stream data / gzip --- file
     #  uuid_obj = uuid.UUID(bytes=unpacked[0])
     #  return str(uuid_obj)
-    msg_type = "order" if msg_type == "trade" else msg_type
     if msg:
         unpacked = struct.unpack(struct_fmt[_type][msg_type], msg)
         return unpacked

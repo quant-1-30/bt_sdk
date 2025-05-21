@@ -46,3 +46,5 @@ poetry config http-basic.devpi bt_sdk YOUR_SECRET_PASSWORD
 
 poetry cache clear pypi --all
 
+poetry env info --path
+

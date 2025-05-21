@@ -82,7 +82,7 @@ class TdApi(Api):
         """
             execution order in queue
         """
-        msg = OrderMsg(topic="trade", msg=meta, client_id=self.client_id)
+        msg = OrderMsg(topic="order", msg=meta, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
         return q
@@ -91,7 +91,7 @@ class TdApi(Api):
         warnings.warn("cancelOrder not supported")
         raise NotImplementedError("cancelOrder not implemented")
     
-    def on_timer(self, session):
+    def on_timer(self, session: int):
         """
             sync position / account on end of session
         """
