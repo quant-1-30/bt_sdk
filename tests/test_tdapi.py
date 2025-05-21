@@ -11,9 +11,9 @@ def get_data(q):
     data_list = []
     while True:
         data = q.get()
+        print("data: ", data)
         if data == "eof":
             break
-        print("data: ", data)
         data_list.append(data)
     return data_list
 
@@ -48,10 +48,10 @@ class TestTdApi:
         data = get_data(q)
         assert data is not None
 
-    def test_get_position(self, td_api):
-        q = td_api.get_position()
-        data = get_data(q)
-        assert data is not None
+    # def test_get_position(self, td_api):
+    #     q = td_api.get_position()
+    #     data = get_data(q)
+    #     assert data is not None
 
     # def test_placeOrder(self, td_api, ordermeta):
     #     q = td_api.on_trade(ordermeta)

@@ -22,11 +22,20 @@ class MdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def get_instrument(self, msg=ReqMeta()):
+    def get_instrument(self, session: int):
         """
             request instruments
         """
-        msg = RequestMsg(topic='instrument', msg=msg, client_id=self.client_id)
+        msg = RequestMsg(topic='instrument', msg=ReqMeta(end_date=session), client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        return q
+    
+    def get_events(self, session: int):
+        """
+            request adjustment and right events  
+        """
+        msg = RequestMsg(topic='adjustment', msg=ReqMeta(end_date=session), client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
         return q
@@ -36,15 +45,6 @@ class MdApi(Api):
             request market data
         """
         msg = RequestMsg(topic='tick', msg=msg, client_id=self.client_id)
-        q = self.getTickQueue()
-        self.async_client.run(msg.model_dump(), q)
-        return q
-    
-    def reqEvents(self, msg: ReqMeta):
-        """
-            request adjustment and right events  
-        """
-        msg = RequestMsg(topic='adjustment', msg=msg, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
         return q

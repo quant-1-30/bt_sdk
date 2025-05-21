@@ -23,7 +23,8 @@ class AsyncClient:
                     cls._instance = super(AsyncClient, cls).__new__(cls)
                     cls._instance._running = True  # Flag to control the running state
                     cls._instance.buffer_size = int(kwargs.get("buffer_size", 1024))
-                    # # Initialize the event loop
+                    cls._instance._tasks = set()  # Track active tasks
+                    # Initialize the event loop
                     loop = asyncio.new_event_loop()
                     cls.activte_event_loop(loop)
                     cls._instance.loop = loop
@@ -48,29 +49,66 @@ class AsyncClient:
                 if data == "eof":
                     # print("on_receive done")
                     break
-
         except Exception as e:
             print(f"Error in on_receive: {e}")
             req_q.put("eof")
+        finally:
+            # Ensure we clean up any resources
+            if hasattr(self, '_tasks'):
+                self._tasks.discard(asyncio.current_task())
 
     def run(self, req, req_q):
         coro = self.on_receive(req, req_q)
         future = asyncio.run_coroutine_threadsafe(coro, self.loop)
         # self.loop.run_in_executor(None, self.on_receive, req, tickerId) # cpu-bound task
-        # Callback function to handle the result
-        future.add_done_callback(lambda f: print("[CALLBACK TRIGGERED] ", f.result()))
+
+        # Store the task for cleanup
+        self._tasks.add(future)
+        # Callback function to handle the result and cleanup
+        def cleanup_callback(f):
+            try:
+                print("[CALLBACK TRIGGERED] ", f.result())
+            except Exception as e:
+                print(f"[CALLBACK ERROR] {e}")
+            finally:
+                self._tasks.discard(f)
+        
+        future.add_done_callback(cleanup_callback)
     
     def stop(self):
-        """Stop the UDP / TCP client by setting the running flag to False and closing the socket."""
+        """Stop the client and clean up all resources."""
         self._running = False
-        self.sock.close()
-        print("client socket stopped.")
-        """Clean up resources and close the loop."""
-        # exit
-        self.loop.run_until_complete(self.loop.shutdown_asyncgens())
-        self.loop.close()
+        
+        # Cancel all pending tasks
+        for task in self._tasks:
+            if not task.done():
+                task.cancel()
+        
+        # Close socket if it exists
+        if hasattr(self, 'sock'):
+            self.sock.close()
+            print("client socket stopped.")
+        
+        # Clean up the event loop
+        async def cleanup():
+            # Cancel all tasks
+            tasks = [t for t in asyncio.all_tasks(self.loop) if t is not asyncio.current_task()]
+            for task in tasks:
+                task.cancel()
+            # Wait for all tasks to complete
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
+            # Shutdown async generators
+            await self.loop.shutdown_asyncgens()
+        
+        # Run cleanup in the event loop
+        if self.loop.is_running():
+            asyncio.run_coroutine_threadsafe(cleanup(), self.loop)
+        
+        # Close the loop
+        self.loop.call_soon_threadsafe(self.loop.stop)
         print("Closing event loop")
-    
+
 
 class AsyncDatagramClient(AsyncClient):
     
@@ -99,7 +137,7 @@ class AsyncDatagramClient(AsyncClient):
 
                 chunks += recv_message
                 if chunks[-8:] == b"sentinel":
-                    print("Sentinel received, processing chunks...")
+                    # print("Sentinel received, processing chunks...")
                     try:
                         # received = pickle.loads(chunks[:-8])
                         received = msg_unpack('md', message["topic"], chunks[:-8])
