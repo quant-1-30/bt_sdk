@@ -172,23 +172,18 @@ class AsyncStreamClient(AsyncClient):
         serialize_msg = pickle.dumps(message)
         reader, writer = await asyncio.open_connection(host=self.host, port=self.port)
         writer.write(serialize_msg)
-        print("writer.write", serialize_msg)
+        # print("writer.write", serialize_msg)
         await writer.drain()
-        print("writer.drain")
+        # print("writer.drain")
 
         chunks = b""
         stats = 0
         while self._running:
             try:
                 recv_message = await reader.read(self.buffer_size)
-                # recv_message = await reader.read(100)
-                import pdb
-                print("recv_message ", len(recv_message), recv_message)
                 stats += len(recv_message)
-                print("stats ", stats)
 
                 if not recv_message:
-                    print("recv_message is empty", recv_message)
                     yield "eof"
                     await writer.wait_closed()
                     break
@@ -199,8 +194,8 @@ class AsyncStreamClient(AsyncClient):
                     splits = chunks.split(b'sentinel')
                     for chunk in splits:
                         decoded = msg_unpack('td', topic, chunk)
-                        print("decoded", decoded)
-                        yield decoded
+                        if decoded:
+                            yield decoded
                     chunks = b""
 
                 elif recv_message[-8:] == b"shutdown":

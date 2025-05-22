@@ -65,5 +65,3 @@ class TestMdApi:
         q = md_api.reqMktData(reqMktDataMeta)
         data = get_data(q)
         assert data is not None
-
-

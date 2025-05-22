@@ -1,6 +1,6 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import uuid
 import struct
 from typing import Any
 
@@ -14,9 +14,9 @@ struct_fmt = {
             "rightment": "",
     },
     "td": {
-            "order": ">iiff",
-            "position": "!6sifiif16s",
-            "account": "!ff",
+            "order": ">IIdd",
+            "position": ">6sIIdId16s",
+            "account": ">ff",
     },
 }
 
@@ -33,8 +33,13 @@ def msg_unpack(_type: str, msg_type, msg: bytes) -> Any:
     #  uuid_obj = uuid.UUID(bytes=unpacked[0])
     #  return str(uuid_obj)
     if msg:
-        unpacked = struct.unpack(struct_fmt[_type][msg_type], msg)
-        return unpacked
+        try:
+            unpacked = struct.unpack(struct_fmt[_type][msg_type], msg)
+            # uuid.UUID(bytes=unpacked[-1]) / byte.decode("utf-8")
+            return unpacked
+        except Exception as e:
+            print("msg_unpack error: ", e)
+            return ''
     return ''
 
 
