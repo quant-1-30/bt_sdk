@@ -78,9 +78,8 @@ class TdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def cancel(self, vtorder_id: str): 
-        warnings.warn("cancelOrder not supported")
-        raise NotImplementedError("cancelOrder not implemented")
+    def cancel(self, q):
+        super().cancel(q)
 
 
 __all__ = ["TdApi"]

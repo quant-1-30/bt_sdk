@@ -48,3 +48,4 @@ poetry cache clear pypi --all
 
 poetry env info --path
 
+pytest 中执行多个测试用例时，每个测试用例都会创建新的 Api 实例
