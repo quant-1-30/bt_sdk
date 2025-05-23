@@ -49,5 +49,8 @@ class MdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
+    def cancel(self):
+        raise NotImplementedError("cancel not implemented")
+    
 
 __all__ = ["MdApi"]

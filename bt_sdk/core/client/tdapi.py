@@ -50,30 +50,12 @@ class TdApi(Api):
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
         return q
-      
-    def subscribeOrder(self, meta: ReqMeta):
+          
+    def subscribe(self, topic: str, meta: ReqMeta):
         """
-            request order
+            subscribe topic order / position / account
         """
-        msg = RequestMsg(topic="query_order", msg=meta, client_id=self.client_id)
-        q = self.getTickQueue()
-        self.async_client.run(msg.model_dump(), q)
-        return q
-    
-    def subscribePosition(self, meta: ReqMeta):
-        """
-            request position
-        """
-        msg = RequestMsg(topic="query_position", msg=meta, client_id=self.client_id)
-        q = self.getTickQueue()
-        self.async_client.run(msg.model_dump(), q)
-        return q
-    
-    def subscribeAccount(self, meta: ReqMeta):
-        """
-            request account
-        """
-        msg = RequestMsg(topic="query_account", msg=meta, client_id=self.client_id)
+        msg = RequestMsg(topic=f'query_{topic}', msg=meta, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
         return q
@@ -87,10 +69,6 @@ class TdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def cancel(self, vtorder_id: str): 
-        warnings.warn("cancelOrder not supported")
-        raise NotImplementedError("cancelOrder not implemented")
-    
     def onTimer(self, session: int):
         """
             sync position / account on end of session
@@ -100,6 +78,10 @@ class TdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
+    def cancel(self, vtorder_id: str): 
+        warnings.warn("cancelOrder not supported")
+        raise NotImplementedError("cancelOrder not implemented")
+
 
 __all__ = ["TdApi"]
 

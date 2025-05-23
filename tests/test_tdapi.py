@@ -58,21 +58,20 @@ class TestTdApi:
         print("test_get_position: ", data)
         assert data is not None
 
-
-    def test_subscribeOrder(self, td_api, reqmeta):
-        q = td_api.subscribeOrder(reqmeta)
+    def test_sub_Order(self, td_api, reqmeta):
+        q = td_api.subscribe("order", reqmeta)
         data = get_data(q)
         print("test_reqOrder: ", data)
         assert data is not None
 
-    def test_subscribePosition(self, td_api, reqmeta):
-        q = td_api.subscribePosition(reqmeta)
+    def test_sub_Position(self, td_api, reqmeta):
+        q = td_api.subscribe("position", reqmeta)
         data = get_data(q)
         print("test_reqPosition: ", data)
         assert data is not None
 
-    def test_subscribeAccount(self, td_api, reqmeta):
-        q = td_api.subscribeAccount(reqmeta)
+    def test_sub_Account(self, td_api, reqmeta):
+        q = td_api.subscribe("account", reqmeta)
         data = get_data(q)
         print("test_reqAccount: ", data)
         assert data is not None
