@@ -33,7 +33,7 @@ class TdApi(Api):
         self.addr = addr
         self.client_id = client_id
 
-    def get_account(self):
+    def getAccount(self):
         """
             latest account_info fundvalue and cash
         """
@@ -42,7 +42,7 @@ class TdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def get_position(self):
+    def getPosition(self):
         """
             latest position_info 
         """
@@ -51,7 +51,7 @@ class TdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
       
-    def reqOrder(self, meta: ReqMeta):
+    def subscribeOrder(self, meta: ReqMeta):
         """
             request order
         """
@@ -60,7 +60,7 @@ class TdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def reqPosition(self, meta: ReqMeta):
+    def subscribePosition(self, meta: ReqMeta):
         """
             request position
         """
@@ -69,7 +69,7 @@ class TdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def reqAccount(self, meta: ReqMeta):
+    def subscribeAccount(self, meta: ReqMeta):
         """
             request account
         """
@@ -87,11 +87,11 @@ class TdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def cancelOrder(self, vtorder_id: str): 
+    def cancel(self, vtorder_id: str): 
         warnings.warn("cancelOrder not supported")
         raise NotImplementedError("cancelOrder not implemented")
     
-    def on_timer(self, session: int):
+    def onTimer(self, session: int):
         """
             sync position / account on end of session
         """

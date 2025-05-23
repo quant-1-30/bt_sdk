@@ -46,33 +46,33 @@ class TestTdApi:
                        start_date=1728351060, 
                        end_date=1728351060)
     
-    def test_get_account(self, td_api):
-        q = td_api.get_account()
+    def test_getAccount(self, td_api):
+        q = td_api.getAccount()
         data = get_data(q)
         print("test_get_account: ", data)
         assert data is not None
 
-    def test_get_position(self, td_api):
-        q = td_api.get_position()
+    def test_getPosition(self, td_api):
+        q = td_api.getPosition()
         data = get_data(q)
         print("test_get_position: ", data)
         assert data is not None
 
 
-    def test_reqOrder(self, td_api, reqmeta):
-        q = td_api.reqOrder(reqmeta)
+    def test_subscribeOrder(self, td_api, reqmeta):
+        q = td_api.subscribeOrder(reqmeta)
         data = get_data(q)
         print("test_reqOrder: ", data)
         assert data is not None
 
-    def test_reqPosition(self, td_api, reqmeta):
-        q = td_api.reqPosition(reqmeta)
+    def test_subscribePosition(self, td_api, reqmeta):
+        q = td_api.subscribePosition(reqmeta)
         data = get_data(q)
         print("test_reqPosition: ", data)
         assert data is not None
 
-    def test_reqAccount(self, td_api, reqmeta):
-        q = td_api.reqAccount(reqmeta)
+    def test_subscribeAccount(self, td_api, reqmeta):
+        q = td_api.subscribeAccount(reqmeta)
         data = get_data(q)
         print("test_reqAccount: ", data)
         assert data is not None
@@ -83,8 +83,8 @@ class TestTdApi:
         print("test_placeOrder: ", data)
         assert data is not None
 
-    def test_timer(self, td_api):
-        q = td_api.on_timer(1728351060)
+    def test_onTimer(self, td_api):
+        q = td_api.onTimer(1728351060)
         data = q.get()
         assert data is not None
 

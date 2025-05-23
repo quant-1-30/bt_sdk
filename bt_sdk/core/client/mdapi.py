@@ -13,7 +13,7 @@ class MdApi(Api):
         self.addr = addr
         self.client_id = client_id
     
-    def get_calendar(self): 
+    def getCalendar(self): 
         """
             request calendar
         """
@@ -22,7 +22,7 @@ class MdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def get_instrument(self, session: int):
+    def getInstrument(self, session: int):
         """
             request instruments
         """
@@ -31,7 +31,7 @@ class MdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def get_events(self, session: int):
+    def getEvent(self, session: int):
         """
             request adjustment and right events  
         """
@@ -40,7 +40,7 @@ class MdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def reqMktData(self, msg: ReqMeta):
+    def subscribe(self, msg: ReqMeta):
         """
             request market data
         """

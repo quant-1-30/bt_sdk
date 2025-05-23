@@ -79,11 +79,6 @@ class AsyncClient:
         """Stop the client and clean up all resources."""
         self._running = False
         
-        # Cancel all pending tasks
-        for task in self._tasks:
-            if not task.done():
-                task.cancel()
-        
         # Close socket if it exists
         if hasattr(self, 'sock'):
             self.sock.close()
@@ -91,23 +86,37 @@ class AsyncClient:
         
         # Clean up the event loop
         async def cleanup():
-            # Cancel all tasks
-            tasks = [t for t in asyncio.all_tasks(self.loop) if t is not asyncio.current_task()]
-            for task in tasks:
-                task.cancel()
-            # Wait for all tasks to complete
-            if tasks:
-                await asyncio.gather(*tasks, return_exceptions=True)
-            # Shutdown async generators
-            await self.loop.shutdown_asyncgens()
+            try:
+                # Create a copy of tasks to avoid modification during iteration // iter set ,callback may remove task from set 
+                # Cancel all tasks including those in self._tasks
+                tasks = [t for t in asyncio.all_tasks(self.loop) if t is not asyncio.current_task()]
+                for task in tasks:
+                    if not task.done():
+                        task.cancel()
+                # Wait for all tasks to complete
+                if tasks:
+                    await asyncio.gather(*tasks, return_exceptions=True)
+                # Shutdown async generators
+                await self.loop.shutdown_asyncgens()
+            except Exception as e:
+                print(f"Error during cleanup: {e}")
         
-        # Run cleanup in the event loop
+        # Run cleanup in the event loop and wait for it to complete
         if self.loop.is_running():
-            asyncio.run_coroutine_threadsafe(cleanup(), self.loop)
+            # to avoid task was destroyed but is still pending
+            future = asyncio.run_coroutine_threadsafe(cleanup(), self.loop)
+            try:
+                # Wait for cleanup to complete with a timeout
+                future.result(timeout=5.0)
+            except Exception as e:
+                print(f"Error waiting for cleanup: {e}")
         
-        # Close the loop
-        self.loop.call_soon_threadsafe(self.loop.stop)
-        print("Closing event loop")
+        # Stop the event loop
+        try:
+            self.loop.call_soon_threadsafe(self.loop.stop)
+            print("Closing event loop")
+        except Exception as e:
+            print(f"Error stopping event loop: {e}")
 
 
 class AsyncDatagramClient(AsyncClient):
@@ -131,7 +140,6 @@ class AsyncDatagramClient(AsyncClient):
                 recv_message = await self.loop.sock_recv(self.sock, self.buffer_size)
 
                 if not recv_message:
-                    print("recv_message is empty", recv_message)
                     yield "eof"
                     break
 
@@ -144,7 +152,6 @@ class AsyncDatagramClient(AsyncClient):
                         yield received
                     except Exception as e:
                         print(f"[Unpickle Error] {e}")
-                        print(f"Chunks content: {chunks}")
                     chunks = b""
                 elif chunks[-8:] == b"shutdown":
                     print("Shutdown signal received")
