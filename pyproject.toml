@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.3.6"
+version = "0.3.7"
 description = "revise coro was destroyed but is still pending"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"

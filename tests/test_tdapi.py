@@ -8,13 +8,14 @@ from bt_sdk.core.constant import *
 
 
 def get_data(q):
-    data_list = []
+    data = []
     while True:
-        data = q.get()
-        if data == "eof":
+        msg = q.get()
+        if msg == "eof":
+            q.reset()
             break
-        data_list.append(data)
-    return data_list
+        data.append(msg)
+    return data
 
 
 class TestTdApi:

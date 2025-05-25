@@ -3,10 +3,10 @@
 
 import itertools
 import threading
-import collections
 from queue import Queue
+import time
 
-from bt_sdk.meta import MetaParams, with_metaclass
+from bt_sdk.meta import with_metaclass, MetaSingleton
 from bt_sdk.core.client.async_client import AsyncDatagramClient, AsyncStreamClient
 from bt_sdk.utils.wrapper import retry_connection, singleton
 from bt_sdk.utils.diagnosal import on_ping
@@ -21,27 +21,34 @@ class StatedQueue(Queue):
         super().__init__()
         self._is_consumed = False
         self._ticker_id = None
+        self._lock = threading.Lock()  # 添加锁来保护状态修改
+
+    def mark_consumed(self):
+        """Mark this queue as consumed"""
+        with self._lock:
+            self._is_consumed = True
 
     def is_consumed(self):
-        """Mark this queue as consumed"""
-        self._is_consumed = True
+        """Check if this queue has been consumed"""
+        with self._lock:
+            return self._is_consumed
 
     def on_tracking(self, ticker_id):
         """Set tracking information"""
-        print("on_tracking ", ticker_id)
         self._ticker_id = ticker_id
 
     def reset(self):
         """Reset queue state for reuse"""
-        self._is_consumed = False
-        self._ticker_id = None
-        # Clear any remaining items
-        while not self.empty():
-            try:
-                # nonblock method return data or raise error
-                self.get_nowait()
-            except:
-                pass
+        with self._lock:
+            # print("Resetting queue, old state:", self._is_consumed)
+            self._is_consumed = False
+            # # Clear any remaining items
+            while not self.empty():
+                try:
+                    self.get_nowait()
+                except:
+                    pass
+            # print("Queue reset complete, new state:", self._is_consumed)
 
 
 class QueuePool:
@@ -53,7 +60,6 @@ class QueuePool:
     def __init__(self, max_size=10):
         self._pool = []
         self._max_size = max_size
-        # with Condition to acquire lock and  wait to release lock and wait for notify / condition has inner lock
         # Use Condition's lock for all synchronization
         self._available = threading.Condition()
         # Pre-initialize queues
@@ -80,10 +86,11 @@ class QueuePool:
         """
         with self._available:
             while not self._pool:
+                # with Condition to acquire lock and  wait to release lock and wait for notify / condition has inner lock
                 if not self._available.wait(timeout):
                     raise TimeoutError("Timeout waiting for available queue")
             q = self._pool.pop()
-            q.reset()
+            q.mark_consumed()
             return q
 
     def put(self, q):
@@ -101,7 +108,6 @@ class QueuePool:
             if len(self._pool) >= self._max_size:
                 raise ValueError("queue pool cannot be greater than max_size")
                 
-            q.reset()
             self._pool.append(q)
             self._available.notify()
 
@@ -128,7 +134,7 @@ class QueuePool:
             self._available.notify_all()
 
 
-class MetaApi(MetaParams):
+class MetaApi(MetaSingleton):
     
     def donew(cls, *args, **kwargs):
         """
@@ -141,11 +147,11 @@ class MetaApi(MetaParams):
 
         async_client = AsyncDatagramClient if _obj.p.protocol == "udp" else AsyncStreamClient
         _obj.async_client = async_client(addr=_obj.p.addr)
+
         # Initialize queue pool
         _obj._queue_pool = QueuePool(max_size=kwargs.get('queue_pool_size', 10))
         _obj._lock_q = threading.Lock()
         _obj._active_q = set()
-        _obj.qs = collections.OrderedDict()  # key: tickerId -> queue
         _obj.nextTickerId = itertools.count(0)
         # Initialize cycle event
         _obj._cycle_event = threading.Event()
@@ -155,15 +161,7 @@ class MetaApi(MetaParams):
 
         _obj, args, kwargs = super(MetaApi, cls).dopostinit(_obj, *args, **kwargs)
         
-        # Initialize cycle thread
-        _obj._cycle_thread = threading.Thread(
-            target=_obj.on_cycle,
-            daemon=True,
-            name=f"cycle_worker_{id(_obj)}"
-        )
-        _obj._cycle_thread.start()
         return _obj, args, kwargs
-
 
 
 class Api(with_metaclass(MetaApi, object)):
@@ -174,35 +172,33 @@ class Api(with_metaclass(MetaApi, object)):
         ("protocol", ""),
         ("queue_pool_size", 10),  # Add pool size parameter
         ("checksum", "eof"),
-        ("cycle_interval", 1.0),  # Cycle check interval in seconds
+        ("cycle_interval", 0.1),  # Cycle check interval in seconds
     )
     
     def __enter__(self):
         return self
+
+    def _init(self):
+        # Initialize cycle thread
+        self._cycle_thread = threading.Thread(
+            target=self.on_cycle,
+            daemon=True,  # 使用 daemon 线程，允许程序在中断时退出
+            # daemon=False, # 使用非守护线程，确保资源被正确清理 / wait 会阻塞
+            name=f"cycle_worker_{id(self)}"
+        )
+        self._cycle_thread.start()
     
     def getTickQueue(self):
         '''Creates or reuses a Queue for data delivery to a data feed'''
         q = self._queue_pool.get()
-        q.is_consumed()
-        self._active_q.add(q)
-
         with self._lock_q:
             tickerId = next(self.nextTickerId)
-            print("getTickQueue tickerId", tickerId)
             q.on_tracking(tickerId)
-            self.qs[tickerId] = q
+            self._active_q.add(q)
+            # print("Added queue to active_q:", q, "tickerId:", tickerId)
+            # 确保队列初始状态为已消费
+            q.mark_consumed()
         return q
-    
-    def cancel(self, q):
-        """
-        Cancel data subscription by putting EOF into the queue and marking it for reuse.
-        The queue will be available for reuse only after it's fully consumed.
-        """
-        # Return to pool if consumed
-        with self._lock_q:
-            q.reset()
-            # del self.qs[q._ticker_id]
-            self._queue_pool.put(q)
     
     @retry_connection(max_attempts=3, delay=1)
     def connected(self):
@@ -211,32 +207,66 @@ class Api(with_metaclass(MetaApi, object)):
         """
         print("connected", self.p.addr[0], self.p.delay)
         return on_ping(self.p.addr[0], self.p.delay)
-    
-    def disconnected(self):
-        """
-            disconnect from the server
-        """
-        self.async_client.stop()
-        # Stop the cycle thread
-        self._cycle_event.set()
-        if self._cycle_thread.is_alive():
-            self._cycle_thread.join(timeout=1.0)
-    
+     
     def on_cycle(self):
         """
-            on cycle
+        Cycle worker that checks and cleans up non-consumed queues.
+        Runs in a daemon thread.
         """
-        print("enter on_cycle", self._active_q)
-        reset_q = [q for q in self._active_q if not q.is_consumed()]
-        for q in reset_q:
-            print("tickerId", q._ticker_id)
-            self.cancel(q)
-   
-    def __exit__(self, exc_type, exc_value, traceback):
-        
-        self.async_client.stop()
-        # Clear all queues
+        print("enter on_cycle")
+        while not self._cycle_event.is_set():
+            try:
+                # 获取需要处理的队列
+                reset_q = []
+                with self._lock_q:
+                    reset_q = [q for q in self._active_q if not q.is_consumed()]
+                
+                # 处理队列（不需要持有锁）
+                if reset_q:
+                    for q in reset_q:
+                        print("Recycling non-consumed queue tickerId:", q._ticker_id)
+                        self.cancel(q)
+                else:
+                    # 如果没有需要处理的队列，使用事件等待 / time.sleep 会暂用cpu
+                    self._cycle_event.wait(timeout=0.1)  # 100ms 超时内释放CPU / 循环检查
+                    
+            except Exception as e:
+                print(f"Error in cycle worker: {e}")
+                self._cycle_event.wait(timeout=1.0)  # 错误时等待更长时间
+
+    def cancel(self, q):
+        """
+        Cancel data subscription by putting EOF into the queue and marking it for reuse.
+        The queue will be available for reuse only after it's fully consumed.
+        """
         with self._lock_q:
-            self.qs.clear()
-        # Clear the queue pool
-        self._queue_pool.clear()
+            if q in self._active_q:
+                self._active_q.remove(q)
+            self._queue_pool.put(q)
+
+    def disconnected(self):
+        """
+        disconnect from the server
+        """
+        try:
+            self._cycle_event.set()
+            # 等待线程结束
+            if hasattr(self, '_cycle_thread') and self._cycle_thread.is_alive():
+                self._cycle_thread.join(timeout=1.0)
+                
+            self.async_client.stop()
+            # Clear all queues
+            with self._lock_q:
+                self._active_q.clear()
+            # Clear the queue pool
+            self._queue_pool.clear()
+        except:
+            pass  # 忽略清理时的错误
+
+    def __del__(self):
+        """gc"""
+        self.disconnected()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """退出上下文时清理资源"""
+        self.disconnected()

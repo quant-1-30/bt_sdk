@@ -9,12 +9,12 @@ from bt_sdk.core.model import *
 def get_data(q):
     data = []
     while True:
-        ele = q.get()
-        if ele == "eof":
+        msg = q.get()
+        if msg == "eof":
+            q.reset()
             break
-        data.append(ele)
+        data.append(msg)
     return data
-
 
 class TestMdApi:
     

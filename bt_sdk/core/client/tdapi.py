@@ -32,6 +32,7 @@ class TdApi(Api):
     def __init__(self, addr: Tuple[str, int]=(), client_id: str=""):
         self.addr = addr
         self.client_id = client_id
+        self._init()
 
     def getAccount(self):
         """
