@@ -25,12 +25,12 @@ ping3 = "^4.0.8"
 [[tool.poetry.source]]
 name = "tuna"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-default = true   
+priority = "default"  
 
 [[tool.poetry.source]]
 name = "devpi"
 url = "http://localhost:3141/bt_sdk/dev/+simple/"
-secondary = true
+priority = "secondary"
 
 [build-system]
 requires = ["poetry-core"]
