@@ -1,17 +1,16 @@
 # /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import itertools
 import threading
-from queue import Queue, Empty
-import time
-import os
 from collections import deque
+from queue import Queue, Empty
 
 from bt_sdk.meta import with_metaclass, MetaSingleton
 from bt_sdk.core.client.async_client import AsyncDatagramClient, AsyncStreamClient
 from bt_sdk.utils.wrapper import retry_connection, singleton
-from bt_sdk.utils.diagnosal import on_ping
+from bt_sdk.utils.net_util import on_ping
 
 
 class StatedQueue(Queue):
@@ -62,37 +61,19 @@ class StatedQueue(Queue):
         with self._lock:
             self._is_active = False  # 重置为非活跃状态
             
-            # Strategy 1: Direct internal queue manipulation (fastest)
-            try:
-                # Access Queue's internal deque directly for maximum performance
-                with self._qlock:  # Queue's internal lock
-                    self.queue.clear()  # Clear internal deque
-                    self.unfinished_tasks = 0
-                    # Wake up any threads waiting on task_done()
-                    if hasattr(self, 'all_tasks_done'):
-                        self.all_tasks_done.notify_all()
-                return
-            except (AttributeError, RuntimeError):
-                # Fall back to safe method if internal access fails
-                pass
-            
-            # Strategy 2: Optimized drain with Empty exception (safe fallback)
-            try:
-                # Use single exception handling instead of item-by-item
-                batch_count = 0
-                while batch_count < 1000:  # Prevent infinite loops
-                    self.get_nowait()
-                    batch_count += 1
-            except Empty:
-                # Expected - queue is now empty
-                pass
-            
-            # Strategy 3: If queue is extremely large, use task_done reset
-            if hasattr(self, 'unfinished_tasks') and self.unfinished_tasks > 0:
-                with self._qlock:
-                    self.unfinished_tasks = 0
-                    if hasattr(self, 'all_tasks_done'):
-                        self.all_tasks_done.notify_all()
+        # Strategy 1: Direct internal queue manipulation (fastest)
+        try:
+            # Access Queue's internal deque directly for maximum performance
+            with self.mutex:  # Queue's internal lock
+                self.queue.clear()  # Clear internal deque
+                self.unfinished_tasks = 0
+                # Wake up any threads waiting on task_done()
+                if hasattr(self, 'all_tasks_done'):
+                    self.all_tasks_done.notify_all()
+            return
+        except (AttributeError, RuntimeError):
+            # Fall back to safe method if internal access fails
+            pass
 
 
 class QueuePool:

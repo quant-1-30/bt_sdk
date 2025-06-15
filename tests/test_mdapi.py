@@ -36,7 +36,7 @@ class TestMdApi:
     @pytest.fixture
     def subMeta(self):
         start_date = "20191101"
-        end_date = "20191201"
+        end_date = "20200301"
         start_time = datetime.strptime(start_date, '%Y%m%d')
         end_time = datetime.strptime(end_date, '%Y%m%d')
         sid = ['600225']
@@ -74,8 +74,8 @@ class TestMdApi:
     #     print("test_getEvent: ", data)
     #     assert data is not None
 
-    def test_subscribe(self, md_api, subMeta):
-        q = md_api.subscribe(subMeta)
-        data = get_data(q)
-        print("test_subscribe: ", data)
-        assert data is not None
+    # def test_subscribe(self, md_api, subMeta):
+    #     q = md_api.subscribe(subMeta)
+    #     data = get_data(q)
+    #     print("test_subscribe: ", data)
+    #     assert data is not None

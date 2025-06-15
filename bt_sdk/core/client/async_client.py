@@ -3,7 +3,6 @@
 
 import socket
 import asyncio
-import msgpack
 import threading
 import time
 import os
@@ -12,7 +11,7 @@ from typing import Dict, Any, Set, Optional
 from collections import deque, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
-from bt_sdk.utils.pack import msg_unpack
+from bt_sdk.utils.serialize import pack, unpack
 
 
 class AsyncClient:
@@ -401,7 +400,7 @@ class AsyncDatagramClient(AsyncClient):
     async def get_data(self, message):
         """优化的UDP数据获取"""
         try:
-            serialize_msg = msgpack.packb(message, use_bin_type=True)
+            serialize_msg = pack(message["topic"], message["msg"])
             
             # 异步发送数据
             await self.loop.run_in_executor(
@@ -429,7 +428,7 @@ class AsyncDatagramClient(AsyncClient):
                     # 检查结束标志
                     if chunks[-8:] == b"sentinel":
                         try:
-                            received = msg_unpack('md', message["topic"], bytes(chunks[:-8]))
+                            received = unpack(bytes(chunks[:-8]))
                             yield received
                         except Exception as e:
                             print(f"[Unpack Error] {e}")
@@ -460,61 +459,77 @@ class AsyncStreamClient(AsyncClient):
     def __init__(self, addr):
         self.host, self.port = addr
         self._connection_cache = {}  # 连接复用缓存
+        self.LENGTH_BYTES = 4
+        self.chunk_size = 4096 # 4KB / 8192 8KB
+        self.timeout = 10.0
+
+    async def recv_message(self,reader: asyncio.StreamReader):
+        """
+        支持大消息分块读取 + 自动解压 gzip + 自动 msgpack 解码
+        """
+        chunks = bytearray()  # 使用bytearray提升内存效率
+        batch_count = 0
+        try:
+            length_bytes = await asyncio.wait_for(reader.readexactly(self.LENGTH_BYTES), self.timeout)
+            msg_len = int.from_bytes(length_bytes, byteorder='big')
+    
+            while msg_len > 0:
+                batch_count += 1
+                reader_size = min(self.chunk_size, msg_len)
+                chunk_bytes = await asyncio.wait_for(reader.readexactly(reader_size), self.timeout)
+                chunks.extend(chunk_bytes) # append multiple bytes to a bytearray
+                msg_len -= len(chunk_bytes)
+
+                if batch_count % 100 == 0: # 定期让出控制权
+                    await asyncio.sleep(0)
+
+            data = bytes(chunks) # expand decompress
+            return data
+    
+        except (asyncio.IncompleteReadError, asyncio.TimeoutError):
+            print("[recv_message] timeout or incomplete")
+            return None
+        except Exception as e:
+            print(f"[recv_message error] {e}")
+            return None
 
     async def get_data(self, message):
-        """优化的TCP数据获取"""
-        topic = message["topic"].split("_")[-1]
+        """优化的TCP数据获取 采用reader.readexactly读取长度 然后根据长度读取数据 不需要sentinel或者shutdown标识"""
         connection_key = f"{self.host}:{self.port}"
         
         try:
-            serialize_msg = msgpack.packb(message, use_bin_type=True)
+            serialize_msg = pack(message["topic"], message["msg"])
+            reader, writer = await self._get_connection(connection_key) # 连接复用逻辑
             
-            # 连接复用逻辑
-            reader, writer = await self._get_connection(connection_key)
-            
-            # 发送数据
+            msg_len = len(serialize_msg)
+            writer.write(msg_len.to_bytes(self.LENGTH_BYTES, byteorder='big'))
             writer.write(serialize_msg)
             await writer.drain()
 
-            chunks = bytearray()  # 使用bytearray提升内存效率
-            stats = 0
-            batch_count = 0
-            
             while self._running:
-                try:
-                    # 优化的读取逻辑
-                    recv_message = await reader.read(self.buffer_size)
-                    if not recv_message:
-                        yield "eof"
-                        await self._close_connection(writer, connection_key)
-                        break
+                recv_message = await self.recv_message(reader)
 
-                    chunks.extend(recv_message)
-                    stats += len(recv_message)
-                    batch_count += 1
-                    
-                    # 处理数据
-                    if recv_message[-8:] == b"sentinel":
-                        # 优化的数据分割和解包
-                        await self._process_chunks(chunks, topic)
-                        chunks.clear()
-                        
-                    elif recv_message[-8:] == b"shutdown":
-                        print("Shutdown signal received")
-                        yield "eof"
-                        break
-                    
-                    # 定期让出控制权
-                    if batch_count % 100 == 0:
-                        await asyncio.sleep(0)
-
-                except Exception as e:
-                    print(f"[TCP Recv Error] {e}")
+                if not recv_message:
+                    yield "eof"
+                    await self._close_connection(writer, connection_key)
                     break
-                    
+
+                async for chunk in self._process_chunks(recv_message):
+                    yield chunk
+
         except Exception as e:
             print(f"[TCP Error] {e}")
             # 直接yield而不是put到队列，避免阻塞
+            yield "eof"
+    
+    async def _process_chunks(self, chunks):
+        """优化的数据块处理"""
+        try:
+            decoded = unpack(chunks)
+            if decoded:
+                yield decoded
+        except Exception as e:
+            print(f"[Process Chunks Error] {e}")
             yield "eof"
     
     async def _get_connection(self, connection_key):
@@ -556,15 +571,3 @@ class AsyncStreamClient(AsyncClient):
         except Exception as e:
             print(f"Error closing connection: {e}")
     
-    async def _process_chunks(self, chunks, topic):
-        """优化的数据块处理"""
-        try:
-            # 分割数据块
-            splits = bytes(chunks).split(b'sentinel')
-            for chunk in splits:
-                if chunk:  # 跳过空块
-                    decoded = msg_unpack('td', topic, chunk)
-                    if decoded:
-                        yield decoded
-        except Exception as e:
-            print(f"[Process Chunks Error] {e}")

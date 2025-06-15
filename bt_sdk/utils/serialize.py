@@ -1,9 +1,11 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import uuid
+import msgpack
 import struct
 from typing import Any
 
+
+# ------------------------------------------struct----------------------------------------------
 
 struct_fmt = {
     "md": {
@@ -43,4 +45,10 @@ def msg_unpack(_type: str, msg_type, msg: bytes) -> Any:
     return ''
 
 
-__all__ = ["msg_unpack"]
+# --------------------------------------------msgpack---------------------------------------------
+
+def pack(rpc_type: str, payload: dict) -> bytes:
+    return msgpack.packb({"topic": rpc_type, "msg": payload}, use_bin_type=True)
+
+def unpack(data: bytes) -> dict:
+    return msgpack.unpackb(data, raw=False)
