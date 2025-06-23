@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*- 
 
 import pytest
+from datetime import datetime
 from bt_sdk.core.client import TdApi
 from bt_sdk.core.model import *
 from bt_sdk.core.constant import *
@@ -22,7 +23,7 @@ class TestTdApi:
 
     @pytest.fixture
     def client_id(self):
-        return "3b2ca071-4599-4d66-948d-67ee9de0db6a"
+        return "2038c248-abc6-4e40-b1d4-d77962ad94a8"
 
     @pytest.fixture
     def td_api(self, client_id):
@@ -31,21 +32,29 @@ class TestTdApi:
     
     @pytest.fixture
     def ordermeta(self):
-        order_type = OrderType.Sell
+        order_type = OrderType.Buy
+        created_str = "2022-03-01 09:40:30"
+        created_dt = datetime.strptime(created_str, '%Y-%m-%d %H:%M:%S')
         return OrderMeta(sid="603676", 
                          price=97,
                          size=100,
                          sizer_cash=10000,
                          pricelimit=102,
-                         created_at=1728351060, 
+                         created_at=created_dt.timestamp(), 
                          exec_type=ExecType.Open,
                          order_type = order_type)
     
-    @pytest.fixture 
+    @pytest.fixture
     def reqmeta(self):
-        return ReqMeta(sid=["603676"], 
-                       start_date=1728351060, 
-                       end_date=1728351060)
+        start_date = "20221101"
+        end_date = "20220301"
+        start_time = datetime.strptime(start_date, '%Y%m%d')
+        end_time = datetime.strptime(end_date, '%Y%m%d')
+        sid = ['603676']
+        return ReqMeta(
+                      start_date = start_time.timestamp(),
+                      end_date = end_time.timestamp(),
+                      sid = sid)
     
     # def test_getAccount(self, td_api):
     #     q = td_api.getAccount()
@@ -82,9 +91,3 @@ class TestTdApi:
         data = get_data(q)
         print("test_placeOrder: ", data)
         assert data is not None
-
-    # def test_onTimer(self, td_api):
-    #     q = td_api.onTimer(1728351060)
-    #     data = q.get()
-    #     assert data is not None
-

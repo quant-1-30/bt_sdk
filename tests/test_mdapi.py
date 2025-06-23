@@ -35,8 +35,8 @@ class TestMdApi:
 
     @pytest.fixture
     def subMeta(self):
-        start_date = "20191101"
-        end_date = "20200301"
+        start_date = "20221101"
+        end_date = "20220301"
         start_time = datetime.strptime(start_date, '%Y%m%d')
         end_time = datetime.strptime(end_date, '%Y%m%d')
         sid = ['600225']
@@ -44,14 +44,6 @@ class TestMdApi:
                       start_date = start_time.timestamp(),
                       end_date = end_time.timestamp(),
                       sid = sid)
-    
-    @pytest.fixture
-    def reqmeta(self):
-        return ReqMeta(
-                      start_date = 19900101,
-                      end_date = 20241008,
-                    #   sid = ['603676'])
-                      sid =[]) 
     
     def test_connect(self, md_api):
         assert md_api.connected()

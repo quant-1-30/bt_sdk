@@ -188,42 +188,27 @@ class AsyncClient:
         """确保EOF最终被投递 - 使用持久化后台线程"""
         def eof_delivery_worker():
             """EOF投递工作线程 - 不放弃直到成功"""
-            max_attempts = 100  # 最多尝试100次
+            max_attempts = 3  # 减少最大尝试次数到3次
             attempt = 0
-            base_delay = 0.01   # 起始延迟10ms
+            base_delay = 0.001   # 减少起始延迟到1ms
             
             while attempt < max_attempts and not end_event.is_set():
                 try:
                     # 策略1: 非阻塞尝试
                     if hasattr(req_q, 'put_nowait'):
                         req_q.put_nowait("eof")
-                        print(f"EOF delivered successfully (attempt {attempt + 1})")
                         return True
-                except Exception as e:
-                    print(f"Error in eof_delivery_worker: {e}")
+                except Exception:
                     pass
                 
-                # try:
-                #     # 策略2: 短超时尝试
-                #     req_q.put("eof", timeout=0.001)  # 1ms超时
-                #     print(f"EOF delivered successfully (attempt {attempt + 1})")
-                #     return True
-                # except:
-                #     pass
-                
-                # 指数退避延迟，但不超过100ms
-                delay = min(base_delay * (2 ** attempt), 0.1)
+                # 线性退避延迟，但不超过10ms
+                delay = min(base_delay * (attempt + 1), 0.01)
                 time.sleep(delay)
                 attempt += 1
             
-            # # 最后的绝望尝试 - 较长超时
-            # try:
-            #     req_q.put("eof", timeout=1.0)
-            #     print("EOF delivered with final attempt")
-            #     return True
-            # except Exception as e:
-            #     print(f"CRITICAL: Failed to deliver EOF after all attempts: {e}")
-            #     return False
+            # 如果还是失败，强制设置结束事件
+            end_event.set()
+            return False
         
         # 在后台线程中执行，不阻塞主线程
         if hasattr(self, '_executor'):
@@ -305,6 +290,11 @@ class AsyncClient:
         print("Stopping AsyncClient...")
         self._running = False
         
+        # 立即设置所有活跃任务的结束事件
+        for task in self._tasks:
+            if not task.done():
+                task.cancel()
+        
         # 关闭连接池
         self._close_connection_pool()
         
@@ -316,20 +306,20 @@ class AsyncClient:
             except Exception as e:
                 print(f"Error closing socket: {e}")
         
-        # 异步清理
+        # 异步清理 - 减少超时时间
         if hasattr(self, 'loop') and self.loop.is_running():
             cleanup_future = asyncio.run_coroutine_threadsafe(
                 self._async_cleanup(), self.loop
             )
             try:
-                cleanup_future.result(timeout=5.0)
+                cleanup_future.result(timeout=1.0)  # 减少超时时间到1秒
             except Exception as e:
                 print(f"Error during async cleanup: {e}")
         
-        # 关闭线程池
+        # 关闭线程池 - 减少等待时间
         if hasattr(self, '_executor'):
             try:
-                self._executor.shutdown(wait=True, timeout=3.0)
+                self._executor.shutdown(wait=True, timeout=1.0)  # 减少超时时间到1秒
             except Exception as e:
                 print(f"Error shutting down executor: {e}")
         
@@ -365,9 +355,9 @@ class AsyncClient:
                 self.loop.call_soon_threadsafe(self.loop.stop)
                 print("Event loop stop requested")
                 
-                # 等待循环线程结束
+                # 等待循环线程结束 - 减少等待时间
                 if hasattr(self, '_loop_thread') and self._loop_thread.is_alive():
-                    self._loop_thread.join(timeout=3.0)
+                    self._loop_thread.join(timeout=1.0)  # 减少超时时间到1秒
                     
             except Exception as e:
                 print(f"Error stopping event loop: {e}")
@@ -461,22 +451,38 @@ class AsyncStreamClient(AsyncClient):
         self._connection_cache = {}  # 连接复用缓存
         self.LENGTH_BYTES = 4
         self.chunk_size = 4096 # 4KB / 8192 8KB
-        self.timeout = 10.0
+        self.timeout = 5.0
 
     async def recv_message(self,reader: asyncio.StreamReader):
         """
         支持大消息分块读取 + 自动解压 gzip + 自动 msgpack 解码
+        无数据时立即返回，避免超时等待
         """
         chunks = bytearray()  # 使用bytearray提升内存效率
         batch_count = 0
+        
         try:
-            length_bytes = await asyncio.wait_for(reader.readexactly(self.LENGTH_BYTES), self.timeout)
+            # 检查连接是否已关闭
+            if reader.at_eof():
+                print("[recv_message] connection is on eof")
+                return None
+                
+            # 尝试非阻塞地读取长度字节
+            try:
+                length_bytes = await reader.readexactly(self.LENGTH_BYTES)
+            except asyncio.IncompleteReadError: # 无数据时立即返回
+                return None
+                
             msg_len = int.from_bytes(length_bytes, byteorder='big')
     
             while msg_len > 0:
                 batch_count += 1
                 reader_size = min(self.chunk_size, msg_len)
-                chunk_bytes = await asyncio.wait_for(reader.readexactly(reader_size), self.timeout)
+                try:
+                    chunk_bytes = await reader.readexactly(reader_size)
+                except asyncio.IncompleteReadError:
+                    return None
+                    
                 chunks.extend(chunk_bytes) # append multiple bytes to a bytearray
                 msg_len -= len(chunk_bytes)
 
@@ -486,9 +492,6 @@ class AsyncStreamClient(AsyncClient):
             data = bytes(chunks) # expand decompress
             return data
     
-        except (asyncio.IncompleteReadError, asyncio.TimeoutError):
-            print("[recv_message] timeout or incomplete")
-            return None
         except Exception as e:
             print(f"[recv_message error] {e}")
             return None
@@ -498,7 +501,7 @@ class AsyncStreamClient(AsyncClient):
         connection_key = f"{self.host}:{self.port}"
         
         try:
-            serialize_msg = pack(message["topic"], message["msg"])
+            serialize_msg = pack(message["topic"], message["msg"], message["client_id"])
             reader, writer = await self._get_connection(connection_key) # 连接复用逻辑
             
             msg_len = len(serialize_msg)
@@ -506,20 +509,25 @@ class AsyncStreamClient(AsyncClient):
             writer.write(serialize_msg)
             await writer.drain()
 
-            while self._running:
-                recv_message = await self.recv_message(reader)
+            # 只尝试读取一次响应
+            recv_message = await self.recv_message(reader)
+            if not recv_message:
+                await self._close_connection(writer, connection_key)
+                yield "eof"
+                return  # 直接返回，不再继续循环
 
-                if not recv_message:
-                    yield "eof"
-                    await self._close_connection(writer, connection_key)
-                    break
-
-                async for chunk in self._process_chunks(recv_message):
-                    yield chunk
+            async for chunk in self._process_chunks(recv_message):
+                yield chunk
+            
+            # 数据处理完成后，关闭连接并返回EOF
+            await self._close_connection(writer, connection_key)
+            yield "eof"
 
         except Exception as e:
             print(f"[TCP Error] {e}")
-            # 直接yield而不是put到队列，避免阻塞
+            if connection_key in self._connection_cache:
+                writer = self._connection_cache[connection_key][1]
+                await self._close_connection(writer, connection_key)
             yield "eof"
     
     async def _process_chunks(self, chunks):

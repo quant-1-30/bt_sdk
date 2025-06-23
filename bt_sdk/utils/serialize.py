@@ -47,8 +47,8 @@ def msg_unpack(_type: str, msg_type, msg: bytes) -> Any:
 
 # --------------------------------------------msgpack---------------------------------------------
 
-def pack(rpc_type: str, payload: dict) -> bytes:
-    return msgpack.packb({"topic": rpc_type, "msg": payload}, use_bin_type=True)
+def pack(rpc_type: str, payload: dict, client_id: str="") -> bytes:
+    return msgpack.packb({"topic": rpc_type, "msg": payload, "client_id": client_id}, use_bin_type=True)
 
 def unpack(data: bytes) -> dict:
     return msgpack.unpackb(data, raw=False)

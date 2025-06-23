@@ -70,15 +70,6 @@ class TdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def onTimer(self, session: int):
-        """
-            sync position / account on end of session
-        """
-        msg = TimerMsg(topic="timer", msg=session, client_id=self.client_id)
-        q = self.getTickQueue()
-        self.async_client.run(msg.model_dump(), q)
-        return q
-    
     def cancel(self, q):
         super().cancel(q)
 
