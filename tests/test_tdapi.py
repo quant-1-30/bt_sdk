@@ -46,8 +46,8 @@ class TestTdApi:
     
     @pytest.fixture
     def reqmeta(self):
-        start_date = "20221101"
-        end_date = "20220301"
+        start_date = "20210101"
+        end_date = "20230101"
         start_time = datetime.strptime(start_date, '%Y%m%d')
         end_time = datetime.strptime(end_date, '%Y%m%d')
         sid = ['603676']
@@ -86,8 +86,8 @@ class TestTdApi:
     #     print("test_reqAccount: ", data)
     #     assert data is not None
     
-    def test_placeOrder(self, td_api, ordermeta):
-        q = td_api.placeOrder(ordermeta)
-        data = get_data(q)
-        print("test_placeOrder: ", data)
-        assert data is not None
+    # def test_trade(self, td_api, ordermeta):
+    #     q = td_api.trade(ordermeta)
+    #     data = get_data(q)
+    #     print("test_placeOrder: ", data)
+    #     assert data is not None

@@ -4,6 +4,9 @@
 from enum import Enum
 
 
+CHUNK_HEADER_FORMAT = ">HB"
+
+
 class OrderType(Enum):
     Buy = 0
     Sell = 1

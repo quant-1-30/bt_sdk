@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
+import time
+import struct
 import socket
 import asyncio
 import threading
-import time
-import os
 from queue import Queue
 from typing import Dict, Any, Set, Optional
 from collections import deque, defaultdict
 from concurrent.futures import ThreadPoolExecutor
+from bt_sdk.core.constant import CHUNK_HEADER_FORMAT
 
 from bt_sdk.utils.serialize import pack, unpack
 
@@ -40,7 +42,7 @@ class AsyncClient:
         
         self._initialized = True
         self._running = True
-        self.buffer_size = int(kwargs.get("buffer_size", 8192))  # 增大默认缓冲区
+        self.buffer_size = int(kwargs.get("buffer_size", 512))  # 默认缓冲区改为512B，适合流式处理
         
         # 高性能任务管理
         self._tasks = set()
@@ -272,7 +274,6 @@ class AsyncClient:
         if tasks_to_cancel:
             for task in tasks_to_cancel:
                 task.cancel()
-            
             # 等待任务完成，但有超时
             try:
                 await asyncio.wait_for(
@@ -305,7 +306,6 @@ class AsyncClient:
                 print("Socket closed.")
             except Exception as e:
                 print(f"Error closing socket: {e}")
-        
         # 异步清理 - 减少超时时间
         if hasattr(self, 'loop') and self.loop.is_running():
             cleanup_future = asyncio.run_coroutine_threadsafe(
@@ -315,7 +315,6 @@ class AsyncClient:
                 cleanup_future.result(timeout=1.0)  # 减少超时时间到1秒
             except Exception as e:
                 print(f"Error during async cleanup: {e}")
-        
         # 关闭线程池 - 减少等待时间
         if hasattr(self, '_executor'):
             try:
@@ -341,10 +340,8 @@ class AsyncClient:
         try:
             # 批量清理任务
             await self._batch_cleanup_tasks()
-            
             # 清理其他异步资源
             await self.loop.shutdown_asyncgens()
-            
         except Exception as e:
             print(f"Error during async cleanup: {e}")
     
@@ -354,7 +351,6 @@ class AsyncClient:
             try:
                 self.loop.call_soon_threadsafe(self.loop.stop)
                 print("Event loop stop requested")
-                
                 # 等待循环线程结束 - 减少等待时间
                 if hasattr(self, '_loop_thread') and self._loop_thread.is_alive():
                     self._loop_thread.join(timeout=1.0)  # 减少超时时间到1秒
@@ -368,79 +364,100 @@ class AsyncDatagramClient(AsyncClient):
     
     def __init__(self, addr):
         self.addr = addr
+        self.HEADER_SIZE = struct.calcsize(CHUNK_HEADER_FORMAT)
         self._init_socket()
     
     def _init_socket(self):
         """优化的socket初始化"""
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.setblocking(False)
-        
-        # 优化socket参数
         try:
-            # 设置socket缓冲区大小
-            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, self.buffer_size * 4)
-            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.buffer_size * 4)
-            
-            # 启用地址重用
-            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            # 设置更小的socket缓冲区大小，提高响应速度
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, self.buffer_size)  # 发送缓冲区
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.buffer_size)  # 接收缓冲区
+            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # 启用地址重用
             
         except Exception as e:
             print(f"Socket optimization warning: {e}")
 
     async def get_data(self, message):
-        """优化的UDP数据获取"""
+        """优化的UDP数据获取不拆包 --- 服务端row返回 应该不超过mtu 1472 """
         try:
             serialize_msg = pack(message["topic"], message["msg"])
             
-            # 异步发送数据
-            await self.loop.run_in_executor(
+            await self.loop.run_in_executor( # 使用线程池异步发送数据
                 self._executor, 
                 self.sock.sendto, 
                 serialize_msg, 
                 self.addr
             )
-
-            chunks = bytearray()  # 使用bytearray提升性能
-            chunk_count = 0
-            
             while self._running:
                 try:
-                    # 优化的接收逻辑
                     recv_message = await self.loop.sock_recv(self.sock, self.buffer_size)
-
                     if not recv_message:
                         yield "eof"
                         break
 
-                    chunks.extend(recv_message)
-                    chunk_count += 1
-                    
-                    # 检查结束标志
-                    if chunks[-8:] == b"sentinel":
-                        try:
-                            received = unpack(bytes(chunks[:-8]))
-                            yield received
-                        except Exception as e:
-                            print(f"[Unpack Error] {e}")
-                        chunks.clear()
+                    if recv_message[-8:] == b'sentinel':
+                       try:
+                           received = unpack(recv_message[:-8])
+                           yield received
+                       except Exception as e:
+                           print(f"[Unpack Error] {e}")
+                       finally:
+                           continue  # 清空缓冲区，准备接收下一批数据
                         
-                    elif chunks[-8:] == b"shutdown":
+                    if recv_message == b"shutdown":
                         print("Shutdown signal received")
                         yield "eof"
                         break
-                    
-                    # 批量处理优化
-                    if chunk_count % 50 == 0:
-                        await asyncio.sleep(0)
-
                 except Exception as e:
                     print(f"[Recv Error] {e}")
                     break
                     
         except Exception as e:
             print(f"[UDP Error] {e}")
-            # 直接yield而不是put到队列，避免阻塞
             yield "eof"
+    
+    # async def get_data(self, message):
+    #     # """优化的UDP数据获取拆包 --- 广播无序发送需要定义header组装"""
+    #     # 假设每个 UDP 包：
+    #     # | 2字节 chunk_id | 1字节 is_last | n字节 payload |
+    #     serialize_msg = pack(message["topic"], message["msg"])
+    #     await self.loop.run_in_executor(self._executor, self.sock.sendto, serialize_msg, self.addr)
+
+    #     chunks = {}
+    #     try:
+    #         while self._running:
+    #             data = await self.loop.sock_recv(self.sock, self.buffer_size)
+
+    #             # 如果收到了特定内容，就退出：
+    #             if data == b"shutdown":
+    #                 print("Received shutdown signal")
+    #                 yield "eof"
+    #                 break
+
+    #             if len(data) < self.HEADER_SIZE:
+    #                 continue
+
+    #             chunk_id, is_last = struct.unpack(CHUNK_HEADER_FORMAT, data[:self.HEADER_SIZE])
+    #             payload = data[self.HEADER_SIZE:]
+    #             chunks[chunk_id] = payload
+    #
+    #             if is_last:
+    #                 ordered = [chunks[i] for i in sorted(chunks)]
+    #                 full_data = b"".join(ordered)
+    #                 try:
+    #                     obj = unpack(full_data)
+    #                     yield obj
+    #                 except Exception as e:
+    #                     print(f"[Unpack Error] {e}")
+    #                 finally:
+    #                     chunks.clear()
+
+    #     except Exception as e:
+    #         print(f"[UDP Error] {e}")
+    #         yield "eof"
 
 
 class AsyncStreamClient(AsyncClient):
@@ -450,7 +467,6 @@ class AsyncStreamClient(AsyncClient):
         self.host, self.port = addr
         self._connection_cache = {}  # 连接复用缓存
         self.LENGTH_BYTES = 4
-        self.chunk_size = 4096 # 4KB / 8192 8KB
         self.timeout = 5.0
 
     async def recv_message(self,reader: asyncio.StreamReader):
@@ -460,28 +476,27 @@ class AsyncStreamClient(AsyncClient):
         """
         chunks = bytearray()  # 使用bytearray提升内存效率
         batch_count = 0
-        
         try:
             # 检查连接是否已关闭
             if reader.at_eof():
                 print("[recv_message] connection is on eof")
                 return None
-                
-            # 尝试非阻塞地读取长度字节
             try:
-                length_bytes = await reader.readexactly(self.LENGTH_BYTES)
+                length_bytes = await reader.readexactly(self.LENGTH_BYTES) # 尝试非阻塞地读取长度字节
             except asyncio.IncompleteReadError: # 无数据时立即返回
                 return None
                 
             msg_len = int.from_bytes(length_bytes, byteorder='big')
+            if msg_len == 0:  # 如果长度为0，则返回EOF
+                return "eof"
     
             while msg_len > 0:
                 batch_count += 1
-                reader_size = min(self.chunk_size, msg_len)
+                reader_size = min(self.buffer_size, msg_len)
                 try:
                     chunk_bytes = await reader.readexactly(reader_size)
                 except asyncio.IncompleteReadError:
-                    return None
+                    return  None # 直接返回，不再继续循环
                     
                 chunks.extend(chunk_bytes) # append multiple bytes to a bytearray
                 msg_len -= len(chunk_bytes)
@@ -509,19 +524,17 @@ class AsyncStreamClient(AsyncClient):
             writer.write(serialize_msg)
             await writer.drain()
 
-            # 只尝试读取一次响应
-            recv_message = await self.recv_message(reader)
-            if not recv_message:
-                await self._close_connection(writer, connection_key)
-                yield "eof"
-                return  # 直接返回，不再继续循环
+            while True:
+                recv_message = await self.recv_message(reader)
+                if recv_message == "eof":
+                    await self._close_connection(writer, connection_key)
+                    break
 
-            async for chunk in self._process_chunks(recv_message):
-                yield chunk
-            
+                async for chunk in self._process_chunks(recv_message):
+                    yield chunk
             # 数据处理完成后，关闭连接并返回EOF
-            await self._close_connection(writer, connection_key)
             yield "eof"
+            await self._close_connection(writer, connection_key)
 
         except Exception as e:
             print(f"[TCP Error] {e}")

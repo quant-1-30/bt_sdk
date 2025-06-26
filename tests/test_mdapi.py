@@ -12,6 +12,7 @@ def get_data(q):
     data = []
     while True:
         msg = q.get()
+        print(f"[get_data] {msg}")
         if msg == "eof":
             q.reset()
             break
@@ -32,11 +33,16 @@ class TestMdApi:
     @pytest.fixture
     def session(self):
         return 20241008
+    
+    @pytest.fixture
+    def event_type(self):
+        # return "adjustment"
+        return "rightment"
 
     @pytest.fixture
     def subMeta(self):
-        start_date = "20221101"
-        end_date = "20220301"
+        start_date = "20220101"
+        end_date = "20230301"
         start_time = datetime.strptime(start_date, '%Y%m%d')
         end_time = datetime.strptime(end_date, '%Y%m%d')
         sid = ['600225']
@@ -51,7 +57,7 @@ class TestMdApi:
     # def test_getCalendar(self, md_api):
     #     q = md_api.getCalendar()
     #     data = get_data(q)
-    #     print("test_getCalendar: ", data)
+    #     # print("test_getCalendar: ", data)
     #     assert data is not None
 
     # def test_getInstrument(self, md_api, session):
@@ -60,14 +66,12 @@ class TestMdApi:
     #     print("test_getInstrument: ", data)
     #     assert data is not None
 
-    # def test_getEvent(self, md_api, session):
-    #     q = md_api.getEvent(session)
-    #     data = get_data(q)
-    #     print("test_getEvent: ", data)
-    #     assert data is not None
+    def test_getEvent(self, md_api, session, event_type):
+        q = md_api.getEvent(session, event_type)
+        data = get_data(q)
+        assert data is not None
 
     # def test_subscribe(self, md_api, subMeta):
     #     q = md_api.subscribe(subMeta)
     #     data = get_data(q)
-    #     print("test_subscribe: ", data)
     #     assert data is not None

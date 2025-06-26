@@ -32,11 +32,11 @@ class MdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def getEvent(self, session: int):
+    def getEvent(self, session: int, event_type: str):
         """
             request adjustment and right events  
         """
-        msg = RequestMsg(topic='adjustment', msg=ReqMeta(end_date=session), client_id=self.client_id)
+        msg = RequestMsg(topic=event_type, msg=ReqMeta(end_date=session), client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
         return q

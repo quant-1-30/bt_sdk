@@ -61,7 +61,7 @@ class TdApi(Api):
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def placeOrder(self, meta: OrderMeta):
+    def trade(self, meta: OrderMeta):
         """
             execution order in queue
         """
