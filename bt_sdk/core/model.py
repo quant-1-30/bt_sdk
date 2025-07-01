@@ -65,7 +65,7 @@ class RequestMsg(pydantic.BaseModel):
 class TimerMsg(pydantic.BaseModel):
     topic: str = Field(default="timer")
     client_id: str = Field(default="")
-    msg: int 
+    msg: Dict[str, Any]
 
 
 __all__ = [ "ReqMeta", "RequestMsg", "OrderMeta","OrderMsg", "TimerMsg"]

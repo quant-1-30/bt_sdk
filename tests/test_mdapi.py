@@ -41,11 +41,11 @@ class TestMdApi:
 
     @pytest.fixture
     def subMeta(self):
-        start_date = "20220101"
-        end_date = "20230301"
+        start_date = "20210101"
+        end_date = "20210301"
         start_time = datetime.strptime(start_date, '%Y%m%d')
         end_time = datetime.strptime(end_date, '%Y%m%d')
-        sid = ['600225']
+        sid = ['600000']
         return ReqMeta(
                       start_date = start_time.timestamp(),
                       end_date = end_time.timestamp(),
@@ -54,24 +54,24 @@ class TestMdApi:
     def test_connect(self, md_api):
         assert md_api.connected()
 
-    # def test_getCalendar(self, md_api):
-    #     q = md_api.getCalendar()
-    #     data = get_data(q)
-    #     # print("test_getCalendar: ", data)
-    #     assert data is not None
+    def test_getCalendar(self, md_api):
+        q = md_api.getCalendar()
+        data = get_data(q)
+        # print("test_getCalendar: ", data)
+        assert data is not None
 
-    # def test_getInstrument(self, md_api, session):
-    #     q = md_api.getInstrument(session)
-    #     data = get_data(q)
-    #     print("test_getInstrument: ", data)
-    #     assert data is not None
+    def test_getInstrument(self, md_api, session):
+        q = md_api.getInstrument(session)
+        data = get_data(q)
+        print("test_getInstrument: ", data)
+        assert data is not None
 
     def test_getEvent(self, md_api, session, event_type):
         q = md_api.getEvent(session, event_type)
         data = get_data(q)
         assert data is not None
 
-    # def test_subscribe(self, md_api, subMeta):
-    #     q = md_api.subscribe(subMeta)
-    #     data = get_data(q)
-    #     assert data is not None
+    def test_subscribe(self, md_api, subMeta):
+        q = md_api.subscribe(subMeta)
+        data = get_data(q)
+        assert data is not None

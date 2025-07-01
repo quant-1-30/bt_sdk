@@ -33,7 +33,7 @@ class TestTdApi:
     @pytest.fixture
     def ordermeta(self):
         order_type = OrderType.Buy
-        created_str = "2022-03-01 09:40:30"
+        created_str = "2021-03-01 09:40:30"
         created_dt = datetime.strptime(created_str, '%Y-%m-%d %H:%M:%S')
         return OrderMeta(sid="603676", 
                          price=97,
@@ -41,7 +41,9 @@ class TestTdApi:
                          sizer_cash=10000,
                          pricelimit=102,
                          created_at=created_dt.timestamp(), 
-                         exec_type=ExecType.Open,
+                         exec_type=ExecType.Open, # oco
+                        #  exec_type=ExecType.Close, # oco
+                        #  exec_type=ExecType.Market, # oco
                          order_type = order_type)
     
     @pytest.fixture
@@ -55,6 +57,28 @@ class TestTdApi:
                       start_date = start_time.timestamp(),
                       end_date = end_time.timestamp(),
                       sid = sid)
+    
+    @pytest.fixture
+    def timer_msg(self):
+        return {"timer": "end", "session": 20201206}
+    
+    # def test_set_cash(self, td_api):
+    #     q = td_api.set_cash(19901210, 1000000)
+    #     data = get_data(q)
+    #     print("test_set_cash: ", data)
+    #     assert data is not None
+
+    # def test_trade(self, td_api, ordermeta):
+    #     q = td_api.trade(ordermeta)
+    #     data = get_data(q)
+    #     print("test_placeOrder: ", data)
+    #     assert data is not None
+    
+    def test_pesudo_timer(self, td_api, timer_msg):
+        q = td_api.pesudo_timer(timer_msg)
+        data = get_data(q)
+        print("test_pesudo_trade: ", data)
+        assert data is not None
     
     # def test_getAccount(self, td_api):
     #     q = td_api.getAccount()
@@ -80,14 +104,9 @@ class TestTdApi:
     #     print("test_reqPosition: ", data)
     #     assert data is not None
 
-    # def test_sub_Account(self, td_api, reqmeta):
-    #     q = td_api.subscribe("account", reqmeta)
-    #     data = get_data(q)
-    #     print("test_reqAccount: ", data)
-    #     assert data is not None
+    def test_sub_Account(self, td_api, reqmeta):
+        q = td_api.subscribe("account", reqmeta)
+        data = get_data(q)
+        print("test_reqAccount: ", data)
+        assert data is not None
     
-    # def test_trade(self, td_api, ordermeta):
-    #     q = td_api.trade(ordermeta)
-    #     data = get_data(q)
-    #     print("test_placeOrder: ", data)
-    #     assert data is not None

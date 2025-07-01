@@ -101,30 +101,21 @@ class AsyncClient:
         finally:
             print("[loop] Event loop stopped")
     
-    # @classmethod
-    # def activte_event_loop(cls, loop):
-    #     """兼容性方法（已弃用）"""
-    #     print("Warning: activte_event_loop is deprecated")
-    #     pass
-    
     async def on_receive(self, message: Dict[str, Any], req_q: Queue, end_event: threading.Event = None):
         """优化的消息接收处理 - 支持结束事件"""
         task = asyncio.current_task()
         try:
             data_count = 0
             async for data in self.get_data(message):
-                # 检查是否需要提前结束
-                if end_event and end_event.is_set():
+                if end_event and end_event.is_set(): # 检查是否需要提前结束
                     break
                     
                 req_q.put(data)
                 data_count += 1
-                
                 if data == "eof":
                     break
                     
-                # 批量处理优化：每100条消息让出控制权
-                if data_count % 100 == 0:
+                if data_count % 100 == 0: # 批量处理优化：每100条消息让出控制权
                     await asyncio.sleep(0)
                     
         except asyncio.CancelledError:
@@ -137,8 +128,7 @@ class AsyncClient:
             self._task_stats['failed'] += 1
             if end_event:
                 end_event.set()
-        finally:
-            # 清理任务引用
+        finally: # 不管try or except 存在return / raise 都会执行
             if hasattr(self, '_tasks') and task:
                 self._tasks.discard(task)
             # 确保结束事件被设置
@@ -146,26 +136,22 @@ class AsyncClient:
                 end_event.set()
 
     def run(self, req, req_q):
-        """优化的任务执行方法 - 使用结束事件机制"""
-        # 创建结束事件，避免依赖队列EOF
+        """优化的任务执行方法 - 使用结束事件 避免依赖队列EOF"""
+       
+        self._task_stats['created'] += 1
         end_event = threading.Event()
         
         if not self._running:
             print("Client is not running")
             end_event.set()  # 立即设置结束事件
-            # 启动后台线程确保EOF被放入
-            self._ensure_eof_delivery(req_q, end_event)
+            self._ensure_eof_delivery(req_q, end_event) # 创建结束事件，避免依赖队列EOF
             return
-        
+
         try:
             coro = self.on_receive(req, req_q, end_event)
             future = asyncio.run_coroutine_threadsafe(coro, self.loop)
-            
-            # 更新统计
-            self._task_stats['created'] += 1
             self._tasks.add(future)
             
-            # 优化的回调处理
             def cleanup_callback(f):
                 try:
                     result = f.result()
@@ -178,7 +164,6 @@ class AsyncClient:
                     # 确保结束事件被设置
                     end_event.set()
                     self._ensure_eof_delivery(req_q, end_event)
-            
             future.add_done_callback(cleanup_callback)
             
         except Exception as e:
@@ -187,7 +172,7 @@ class AsyncClient:
             self._ensure_eof_delivery(req_q, end_event)
     
     def _ensure_eof_delivery(self, req_q, end_event):
-        """确保EOF最终被投递 - 使用持久化后台线程"""
+        
         def eof_delivery_worker():
             """EOF投递工作线程 - 不放弃直到成功"""
             max_attempts = 3  # 减少最大尝试次数到3次
@@ -196,62 +181,29 @@ class AsyncClient:
             
             while attempt < max_attempts and not end_event.is_set():
                 try:
-                    # 策略1: 非阻塞尝试
                     if hasattr(req_q, 'put_nowait'):
                         req_q.put_nowait("eof")
                         return True
                 except Exception:
                     pass
                 
-                # 线性退避延迟，但不超过10ms
-                delay = min(base_delay * (attempt + 1), 0.01)
+                delay = min(base_delay * (attempt + 1), 0.01) # 线性退避延迟，但不超过10ms
                 time.sleep(delay)
                 attempt += 1
             
-            # 如果还是失败，强制设置结束事件
-            end_event.set()
+            end_event.set() # 如果还是失败，强制设置结束事件        
             return False
         
-        # 在后台线程中执行，不阻塞主线程
-        if hasattr(self, '_executor'):
-            self._executor.submit(eof_delivery_worker)
-        else:
-            # 备用方案：创建临时线程
-            thread = threading.Thread(target=eof_delivery_worker, daemon=True)
+        try:
+            # self._executor.submit(eof_delivery_worker) # main thread finshed and submit will cause schedule new futures after interpreter shutdown
+            loop = loop or asyncio.get_event_loop()
+            if loop.is_closed():
+                raise RuntimeError("Loop already closed")
+            loop.call_soon_threadsafe(eof_delivery_worker) # 提交到 asyncio 主线程事件循环中
+        except Exception as e:
+            thread = threading.Thread(target=eof_delivery_worker, daemon=True) # 兜底方案：启用后台线程
             thread.start()
-    
-    def run_with_timeout(self, req, req_q, timeout=30.0):
-        """
-        带超时的运行方法，确保消费者不会无限等待
-        
-        Args:
-            req: 请求消息
-            req_q: 结果队列  
-            timeout: 超时时间（秒）
-            
-        Returns:
-            bool: 是否在超时前完成
-        """
-        end_event = threading.Event()
-        
-        # 启动数据获取
-        self.run(req, req_q)
-        
-        # 启动超时监控
-        def timeout_monitor():
-            if end_event.wait(timeout):
-                return  # 正常完成
-            
-            # 超时了，强制结束
-            print(f"Task timeout after {timeout} seconds, forcing EOF")
-            end_event.set()
-            self._ensure_eof_delivery(req_q, end_event)
-        
-        timeout_thread = threading.Thread(target=timeout_monitor, daemon=True)
-        timeout_thread.start()
-        
-        return end_event
-    
+
     def get_performance_stats(self):
         """获取性能统计信息"""
         active_tasks = len(self._tasks)
@@ -263,6 +215,24 @@ class AsyncClient:
             'connection_stats': dict(self._connection_stats),
             'message_queue_size': len(self._message_queue)
         }
+    
+    def _close_connection_pool(self):
+        """关闭连接池"""
+        for conn in self._connection_pool.values():
+            try:
+                if hasattr(conn, 'close'):
+                    conn.close()
+            except Exception as e:
+                print(f"Error closing connection: {e}")
+        self._connection_pool.clear()
+    
+    async def _async_cleanup(self):
+        """异步清理资源"""
+        try:
+            await self._batch_cleanup_tasks()
+            await self.loop.shutdown_asyncgens()
+        except Exception as e:
+            print(f"Error during async cleanup: {e}")
     
     async def _batch_cleanup_tasks(self):
         """批量清理任务"""
@@ -283,68 +253,6 @@ class AsyncClient:
             except asyncio.TimeoutError:
                 print("Warning: Some tasks did not complete within timeout")
     
-    def stop(self):
-        """优化的停止方法"""
-        if not self._running:
-            return
-            
-        print("Stopping AsyncClient...")
-        self._running = False
-        
-        # 立即设置所有活跃任务的结束事件
-        for task in self._tasks:
-            if not task.done():
-                task.cancel()
-        
-        # 关闭连接池
-        self._close_connection_pool()
-        
-        # 关闭socket
-        if hasattr(self, 'sock'):
-            try:
-                self.sock.close()
-                print("Socket closed.")
-            except Exception as e:
-                print(f"Error closing socket: {e}")
-        # 异步清理 - 减少超时时间
-        if hasattr(self, 'loop') and self.loop.is_running():
-            cleanup_future = asyncio.run_coroutine_threadsafe(
-                self._async_cleanup(), self.loop
-            )
-            try:
-                cleanup_future.result(timeout=1.0)  # 减少超时时间到1秒
-            except Exception as e:
-                print(f"Error during async cleanup: {e}")
-        # 关闭线程池 - 减少等待时间
-        if hasattr(self, '_executor'):
-            try:
-                self._executor.shutdown(wait=True, timeout=1.0)  # 减少超时时间到1秒
-            except Exception as e:
-                print(f"Error shutting down executor: {e}")
-        
-        # 停止事件循环
-        self._stop_event_loop()
-    
-    def _close_connection_pool(self):
-        """关闭连接池"""
-        for conn in self._connection_pool.values():
-            try:
-                if hasattr(conn, 'close'):
-                    conn.close()
-            except Exception as e:
-                print(f"Error closing connection: {e}")
-        self._connection_pool.clear()
-    
-    async def _async_cleanup(self):
-        """异步清理资源"""
-        try:
-            # 批量清理任务
-            await self._batch_cleanup_tasks()
-            # 清理其他异步资源
-            await self.loop.shutdown_asyncgens()
-        except Exception as e:
-            print(f"Error during async cleanup: {e}")
-    
     def _stop_event_loop(self):
         """停止事件循环"""
         if hasattr(self, 'loop'):
@@ -354,10 +262,45 @@ class AsyncClient:
                 # 等待循环线程结束 - 减少等待时间
                 if hasattr(self, '_loop_thread') and self._loop_thread.is_alive():
                     self._loop_thread.join(timeout=1.0)  # 减少超时时间到1秒
-                    
             except Exception as e:
                 print(f"Error stopping event loop: {e}")
+    
+    def stop(self):
+        """优化的停止方法"""
+        if not self._running:
+            return
+            
+        print("Stopping AsyncClient...")
+        self._running = False
+        
+        for task in self._tasks: # 立即设置所有活跃任务的结束事件
+            if not task.done():
+                task.cancel()
+        
+        self._close_connection_pool()
+        if hasattr(self, 'sock'):
+            try:
+                self.sock.close()
+                print("Socket closed.")
+            except Exception as e:
+                print(f"Error closing socket: {e}")
 
+        if hasattr(self, 'loop') and self.loop.is_running(): # 异步清理 - 减少超时时间
+            cleanup_future = asyncio.run_coroutine_threadsafe(
+                self._async_cleanup(), self.loop
+            )
+            try:
+                cleanup_future.result(timeout=1.0)  # 减少超时时间到1秒
+            except Exception as e:
+                print(f"Error during async cleanup: {e}")
+
+        if hasattr(self, '_executor'): # 关闭线程池 - 减少等待时间
+            try:
+                self._executor.shutdown(wait=True, timeout=1.0)  # 减少超时时间到1秒
+            except Exception as e:
+                print(f"Error shutting down executor: {e}")     
+        self._stop_event_loop()
+    
 
 class AsyncDatagramClient(AsyncClient):
     """优化的UDP客户端"""

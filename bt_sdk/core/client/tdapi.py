@@ -34,6 +34,16 @@ class TdApi(Api):
         self.client_id = client_id
         self._init()
 
+    def set_cash(self, session: int, cash: float):
+        """
+            set cash
+        """
+        msg = {"session": session, "cash": cash}
+        msg = RequestMsg(topic="set_cash", msg=msg, client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        return q
+
     def getAccount(self):
         """
             latest account_info fundvalue and cash
@@ -66,6 +76,15 @@ class TdApi(Api):
             execution order in queue
         """
         msg = OrderMsg(topic="order", msg=meta, client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        return q
+    
+    def pesudo_timer(self, msg):
+        """
+            pesudo timer --- process event on open / update account on close
+        """
+        msg = TimerMsg(topic="timer", msg=msg, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
         return q
