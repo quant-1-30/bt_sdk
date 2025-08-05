@@ -3,7 +3,7 @@
 
 from typing import Tuple
 from bt_sdk.core.client.api import Api
-from bt_sdk.core.model import ReqMeta, RequestMsg
+from bt_sdk.core.model import ReqMeta, Request
 
 
 class MdApi(Api):
@@ -14,38 +14,31 @@ class MdApi(Api):
         self.client_id = client_id
         self._init()
     
-    def getCalendar(self): 
+    def get_calendar(self): 
         """
             request calendar
         """
-        msg = RequestMsg(topic='calendar', msg=ReqMeta(), client_id=self.client_id)
+        msg = Request(topic='calendar', msg={}, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
-        return q
+        cals = self.get_data(q)
+        return cals
     
-    def getInstrument(self, session: int):
+    def get_instrument(self):
         """
             request instruments
         """
-        msg = RequestMsg(topic='instrument', msg=ReqMeta(end_date=session), client_id=self.client_id)
+        msg = Request(topic='instrument', msg={}, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
-        return q
-    
-    def getEvent(self, session: int, event_type: str):
-        """
-            request adjustment and right events  
-        """
-        msg = RequestMsg(topic=event_type, msg=ReqMeta(end_date=session), client_id=self.client_id)
-        q = self.getTickQueue()
-        self.async_client.run(msg.model_dump(), q)
-        return q
+        instruments = self.get_data(q)
+        return instruments  
     
     def subscribe(self, msg: ReqMeta):
         """
             request market data
         """
-        msg = RequestMsg(topic='tick', msg=msg, client_id=self.client_id)
+        msg = Request(topic='tick', msg=msg, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
         return q

@@ -8,7 +8,6 @@ from bt_sdk.core.model import *
 from bt_sdk.core.client.api import Api
 
 
-# @singleton
 class TdApi(Api):
     """
     # How to implement a tradeApi:
@@ -39,55 +38,70 @@ class TdApi(Api):
             set cash
         """
         msg = {"session": session, "cash": cash}
-        msg = RequestMsg(topic="set_cash", msg=msg, client_id=self.client_id)
+        msg = Request(topic="set_cash", msg=msg, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
-        return q
+        status = self.get_data(q)
+        return status
 
-    def getAccount(self):
+    def get_account(self):
         """
             latest account_info fundvalue and cash
         """
-        msg = RequestMsg(topic="get_account", msg={}, client_id=self.client_id)
+        msg = Request(topic="get_account", msg={}, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
-        return q
+        act = self.get_data(q)
+        return act
     
-    def getPosition(self):
+    def get_position(self):
         """
             latest position_info 
         """
-        msg = RequestMsg(topic="get_position", msg={}, client_id=self.client_id)
+        msg = Request(topic="get_position", msg={}, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
-        return q
-          
-    def subscribe(self, topic: str, meta: ReqMeta):
-        """
-            subscribe topic order / position / account
-        """
-        msg = RequestMsg(topic=f'query_{topic}', msg=meta, client_id=self.client_id)
-        q = self.getTickQueue()
-        self.async_client.run(msg.model_dump(), q)
-        return q
-    
+        pos = self.get_data(q)
+        return pos
+           
     def trade(self, meta: OrderMeta):
         """
             execution order in queue
         """
-        msg = OrderMsg(topic="order", msg=meta, client_id=self.client_id)
+        msg = Request(topic="order", msg=meta, client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        trades = self.get_data(q)
+        return trades
+    
+    def subscribe(self, topic: str, meta: ReqMeta):
+        """
+            subscribe topic order / position / account
+        """
+        msg = Request(topic=f'query_{topic}', msg=meta, client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
         return q
     
-    def pesudo_timer(self, msg):
+    def check(self, sdate, edate):
         """
-            pesudo timer --- process event on open / update account on close
+            check event_data and sync_account
         """
-        msg = TimerMsg(topic="timer", msg=msg, client_id=self.client_id)
+        msg = Request(topic="check", msg=[sdate, edate], client_id=self.client_id)
         q = self.getTickQueue()
         self.async_client.run(msg.model_dump(), q)
-        return q
+        status = self.get_data(q)
+        return status
+    
+    def patch(self, session):
+        """
+            amend position which asset is on delist
+        """
+        msg = Request(topic="patch", msg=session, client_id=self.client_id)
+        q = self.getTickQueue()
+        self.async_client.run(msg.model_dump(), q)
+        status = self.get_data(q)
+        return status
     
     def cancel(self, q):
         super().cancel(q)

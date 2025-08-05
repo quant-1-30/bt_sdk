@@ -55,20 +55,13 @@ class TestMdApi:
         assert md_api.connected()
 
     def test_getCalendar(self, md_api):
-        q = md_api.getCalendar()
-        data = get_data(q)
-        # print("test_getCalendar: ", data)
+        data = md_api.get_calendar()
+        print("test_getCalendar: ", data)
         assert data is not None
 
-    def test_getInstrument(self, md_api, session):
-        q = md_api.getInstrument(session)
-        data = get_data(q)
+    def test_getInstrument(self, md_api):
+        data = md_api.get_instrument()
         print("test_getInstrument: ", data)
-        assert data is not None
-
-    def test_getEvent(self, md_api, session, event_type):
-        q = md_api.getEvent(session, event_type)
-        data = get_data(q)
         assert data is not None
 
     def test_subscribe(self, md_api, subMeta):
