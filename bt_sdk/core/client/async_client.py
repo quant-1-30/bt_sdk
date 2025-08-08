@@ -11,7 +11,7 @@ from queue import Queue
 from typing import Dict, Any, Set, Optional
 from collections import deque, defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from bt_sdk.core.model import CHUNK_HEADER_FORMAT
+from bt_sdk.core.constant import CHUNK_HEADER_FORMAT
 
 from bt_sdk.utils.serialize import pack, unpack
 
@@ -210,7 +210,7 @@ class AsyncClient:
 
         if hasattr(self, '_executor'):
             try:
-                self._executor.shutdown(wait=True, timeout=1.0) 
+                self._executor.shutdown(wait=True) 
             except Exception as e:
                 print(f"Error shutting down executor: {e}")     
         self._stop_event_loop()

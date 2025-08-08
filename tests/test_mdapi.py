@@ -14,7 +14,7 @@ def get_data(q):
         msg = q.get()
         print(f"[get_data] {msg}")
         if msg == "eof":
-            q.reset()
+            q.recycle()
             break
         data.append(msg)
     return data
@@ -23,12 +23,8 @@ def get_data(q):
 class TestMdApi:
     
     @pytest.fixture
-    def client_id(self):
-        return "efe4eaee-0406-46e3-a395-91dc4502c4a3"
-    
-    @pytest.fixture
-    def md_api(self, client_id):
-        return MdApi(addr=("127.0.0.1", 8888), client_id=client_id)
+    def md_api(self):
+        return MdApi(addr=("127.0.0.1", 8888))
     
     @pytest.fixture
     def session(self):

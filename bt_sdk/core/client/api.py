@@ -31,6 +31,7 @@ class MetaApi(MetaSingleton):
     def dopostinit(cls, _obj, *args, **kwargs):
 
         _obj, args, kwargs = super(MetaApi, cls).dopostinit(_obj, *args, **kwargs)
+        _obj._post_init()
         return _obj, args, kwargs
     
    
@@ -42,14 +43,13 @@ class Api(with_metaclass(MetaApi, object)):
         ("pool_size", 10),  # Add pool size parameter
         ("checksum", "eof"),
         ("timeout", -1),  # Default timeout for queue operations
-        ("retry_delay", "ms"),
+        ("unit", "ms"),
     )
     
     def __enter__(self):
         return self
 
-    def __init__(self):
-        super(Api, self).__init__()
+    def _post_init(self):
         # Initialize cycle thread
         self._poll_thread = threading.Thread(
             target=self.poll.poll,
@@ -68,16 +68,17 @@ class Api(with_metaclass(MetaApi, object)):
         while True:
             msg = q.get(self.p.timeout)
             if msg == self.p.checksum:  # EOF
+                q.recycle()
                 break
             data.append(msg)
         return data
  
-    @retry_connection(max_attempts=3, retry_delay=1)
+    @retry_connection(max_attempts=3, delay=1)
     def connected(self):
         """
             self.async_client.connected on ping
         """
-        return on_ping(self.p.addr[0], self.p.retry_delay)
+        return on_ping(self.p.addr[0], self.p.unit)
     
     def disconnected(self):
         """

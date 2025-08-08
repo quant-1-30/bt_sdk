@@ -20,7 +20,7 @@ class MetaPoll(MetaSingleton):
         _obj, args, kwargs = super(MetaPoll, cls).donew(*args, **kwargs)
 
         # Initialize queue pool
-        _obj._queue_pool = QueuePool(max_size=kwargs.get('pool_size', 10))
+        _obj._queue_pool = QueuePool(pool_size=kwargs.get('pool_size', 10))
         
         # 分片锁优化: 将_active_q拆分为多个分片，减少锁竞争
         _obj._shard_count = max(4, os.cpu_count()) 
@@ -98,7 +98,7 @@ class _Poll(with_metaclass(MetaPoll, object)):
                 else:
                     consecutive_empty_polls += 1
                     wait_time = min(self.p.poll_interval + consecutive_empty_polls * 0.05, 1.0) # adaptive
-                    self._on_event.wait(timeout=wait_time)
+                    self._poll_event.wait(timeout=wait_time)
             except Exception as e:
                 print(f"Error in cycle worker: {e}")
                 consecutive_empty_polls = 0

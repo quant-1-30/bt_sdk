@@ -2,28 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import pydantic
-from enum import Enum
 from pydantic import Field, field_validator, ConfigDict
 from typing import List, Union, Tuple, Mapping, Any, Dict
 
 
-__all__ = [  "OrderType", "ExecType", "OrderMeta", "ReqMeta", "Request"]
-
-
-CHUNK_HEADER_FORMAT = ">HB"
-
-class OrderType(Enum):
-    Buy = 0
-    Sell = 1
-
-
-class ExecType(Enum):
-    Open = 0
-    Market = 1
-    Close = 2
-    Limit = 3
-    Stop = 4
-    StopLimit = 5
+__all__ = [ "OrderMeta", "ReqMeta", "Request"]
 
 
 class OrderMeta(pydantic.BaseModel):
@@ -56,10 +39,9 @@ class ReqMeta(pydantic.BaseModel):
 
 class Request(pydantic.BaseModel):
 
-    # topic: str = Field(default="query")
     topic: str
-    client_id: str
-    msg: Union[ReqMeta, OrderMeta, Dict[str, Any]]
+    msg: Union[ReqMeta, OrderMeta, Any]
+    client_id: str = Field(default="")
 
     model_config = ConfigDict(
         extra="forbid",

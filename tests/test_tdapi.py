@@ -4,6 +4,7 @@
 import pytest
 from datetime import datetime
 from bt_sdk.core.client import TdApi
+from bt_sdk.core.constant import *
 from bt_sdk.core.model import *
 
 
@@ -11,8 +12,9 @@ def get_data(q):
     data = []
     while True:
         msg = q.get()
+        print(f"[get_data] {msg}")
         if msg == "eof":
-            q.reset()
+            q.recycle()
             break
         data.append(msg)
     return data
@@ -32,13 +34,13 @@ class TestTdApi:
     @pytest.fixture
     def ordermeta(self):
         order_type = OrderType.Buy
-        created_str = "2021-03-01 09:40:30"
+        created_str = "2025-04-22 09:40:30"
         created_dt = datetime.strptime(created_str, '%Y-%m-%d %H:%M:%S')
-        return OrderMeta(sid="603676", 
-                         price=97,
-                         size=100,
+        return OrderMeta(sid="002750", 
+                         price=122,
+                         size=1000,
                          sizer_cash=10000,
-                         pricelimit=102,
+                         pricelimit=130,
                          created_at=created_dt.timestamp(), 
                          exec_type=ExecType.Open, # oco
                         #  exec_type=ExecType.Close, # oco
@@ -58,41 +60,50 @@ class TestTdApi:
                       sid = sid)
     
     
-    def test_set_cash(self, td_api):
-        data = td_api.set_cash(19901210, 1000000)
-        print("test_set_cash: ", data)
-        assert data is not None
+    # def test_set_cash(self, td_api):
+    #     data = td_api.set_cash(19901210, 100000)
+    #     print("test_set_cash: ", data)
+    #     assert data is not None
 
-    def test_trade(self, td_api, ordermeta):
-        data = td_api.trade(ordermeta)
-        print("test_placeOrder: ", data)
-        assert data is not None
+    # def test_getAccount(self, td_api):
+    #     data = td_api.fetch_data("account")
+    #     print("test_get_account: ", data)
+    #     assert data is not None
+
+    # def test_getPosition(self, td_api):
+    #     data = td_api.fetch_data("position")
+    #     print("test_get_position: ", data)
+    #     assert data is not None
+
+    # def test_subscirbe_order(self, td_api, reqmeta):
+    #     q = td_api.subscribe("order", reqmeta)
+    #     data = get_data(q)
+    #     print("test_reqOrder: ", data)
+    #     assert data is not None
+
+    # def test_subscribe_position(self, td_api, reqmeta):
+    #     q = td_api.subscribe("position", reqmeta)
+    #     data = get_data(q)
+    #     print("test_reqPosition: ", data)
+    #     assert data is not None
+
+    # def test_subscribe_account(self, td_api, reqmeta):
+    #     q = td_api.subscribe("account", reqmeta)
+    #     data = get_data(q)
+    #     print("test_reqAccount: ", data)
+    #     assert data is not None
     
-    def test_getAccount(self, td_api):
-        data = td_api.get_account()
-        print("test_get_account: ", data)
+    # def test_trade(self, td_api, ordermeta):
+    #     data = td_api.trade(ordermeta)
+    #     print("test_placeOrder: ", data)
+    #     assert data is not None
+
+    def test_check(self, td_api):
+        data = td_api.check(20250601, 20250627)
+        print("test_check: ", data)
         assert data is not None
 
-    def test_getPosition(self, td_api):
-        data = td_api.get_position()
-        print("test_get_position: ", data)
-        assert data is not None
-
-    def test_subscirbe_order(self, td_api, reqmeta):
-        q = td_api.subscribe("order", reqmeta)
-        data = get_data(q)
-        print("test_reqOrder: ", data)
-        assert data is not None
-
-    def test_subscribe_position(self, td_api, reqmeta):
-        q = td_api.subscribe("position", reqmeta)
-        data = get_data(q)
-        print("test_reqPosition: ", data)
-        assert data is not None
-
-    def test_subscribe_account(self, td_api, reqmeta):
-        q = td_api.subscribe("account", reqmeta)
-        data = get_data(q)
-        print("test_reqAccount: ", data)
-        assert data is not None
-    
+    # def test_final(self, td_api):
+    #     data = td_api.final(20250627)
+    #     print("test_patch: ", data)
+    #     assert data is not None

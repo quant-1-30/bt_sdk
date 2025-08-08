@@ -93,7 +93,7 @@ class QueuePool:
                 # Remove excess queues using clear and extend / clear and [] different
                 self._pool.clear()
                 self._pool.extend([PesudoQueue() for _ in range(new_pool_size)])
-            self._max_size = new_pool_size
+            self.pool_size = new_pool_size
 
     def get(self, timeout=None):
         """
@@ -135,7 +135,7 @@ class QueuePool:
             bool: True if queue was added to pool, False if pool was full
         """
         with self._available:
-            if len(self._pool) >= self._max_size:
+            if len(self._pool) >= self.pool_size:
                 raise ValueError("queue pool cannot be greater than max_size")
             
             # Pre-validate queue state before adding to pool
