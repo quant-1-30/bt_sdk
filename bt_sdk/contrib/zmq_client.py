@@ -8,7 +8,7 @@ import threading
 import time
 from functools import lru_cache
 from typing import Any
-from bt_sdk.core.exception import RemoteException
+from bt_sdk.exception import RemoteException
 
 HEARTBEAT_TOPIC = "heartbeat"
 HEARTBEAT_INTERVAL = 10

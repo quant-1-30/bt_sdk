@@ -1,11 +1,9 @@
 # /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import itertools
 import threading
 
-from bt_sdk.meta import with_metaclass, MetaSingleton
+from bt_sdk.core.meta import with_metaclass, MetaSingleton
 from bt_sdk.core.client.async_client import AsyncDatagramClient, AsyncStreamClient
 from bt_sdk.utils.wrapper import retry_connection
 from bt_sdk.utils.net_util import on_ping

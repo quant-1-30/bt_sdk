@@ -11,7 +11,7 @@ from queue import Queue
 from typing import Dict, Any, Set, Optional
 from collections import deque, defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from bt_sdk.core.constant import CHUNK_HEADER_FORMAT
+from bt_sdk.constant import CHUNK_HEADER_FORMAT
 
 from bt_sdk.utils.serialize import pack, unpack
 

@@ -26,66 +26,54 @@ class TdApi(Api):
     params = (
         ("protocol", "tcp"),
         ("client_id", "")
-              )
+        )
 
-    def set_cash(self, session: int, cash: float):
+    def set_cash(self, msg: CashMeta):
         """
             set cash
         """
-        msg = {"session": session, "cash": cash}
-        msg = Request(topic="set_cash", msg=msg, client_id=self.p.client_id)
+        rq = Request(topic="set_cash", msg=msg, client_id=self.p.client_id)
         _c = self.getChan()
-        self.async_client.run(msg.model_dump(), _c)
+        self.async_client.run(rq.model_dump(), _c)
         status = self.get_data(_c)
         return status
 
-    def fetch_data(self, name):
+    def fetch(self, topic):
         """
-            get newest position and account 
+            get n position and account 
         """
-        topic = f"get_{name}"
-        msg = Request(topic=topic, msg={}, client_id=self.p.client_id)
+        topic = f"get_{topic}"
+        rq = Request(topic=topic, msg=ReqMeta(), client_id=self.p.client_id)
         _c = self.getChan()
-        self.async_client.run(msg.model_dump(), _c)
-        pos = self.get_data(_c)
-        return pos
+        self.async_client.run(rq.model_dump(), _c)
+        data = self.get_data(_c)
+        return data
            
-    def subscribe(self, topic: str, meta: ReqMeta):
+    def subscribe(self, topic, msg:ReqMeta):
         """
             subscribe topic order / position / account
         """
-        msg = Request(topic=f'query_{topic}', msg=meta, client_id=self.p.client_id)
+        rq = Request(topic=f'query_{topic}', msg=msg, client_id=self.p.client_id)
         _c = self.getChan()
-        self.async_client.run(msg.model_dump(), _c)
+        self.async_client.run(rq.model_dump(), _c)
         return _c
     
     def trade(self, meta: OrderMeta):
         """
             execution order in queue
         """
-        msg = Request(topic="order", msg=meta, client_id=self.p.client_id)
+        rq = Request(topic="order", msg=meta, client_id=self.p.client_id)
         _c = self.getChan()
-        self.async_client.run(msg.model_dump(), _c)
+        self.async_client.run(rq.model_dump(), _c)
         trades = self.get_data(_c)
         return trades
     
-    def check(self, sdate, edate):
-        """
-            check event_data and sync_account
-        """
-        msg = Request(topic="check", msg=[sdate, edate], client_id=self.p.client_id)
+    def check(self, msg: ReqMeta):
+        # a. check event_data and sync_account between sdate and edate
+        # b. sync last date in case of asset delist
+        rq = Request(topic="check", msg=msg, client_id=self.p.client_id)
         _c = self.getChan()
-        self.async_client.run(msg.model_dump(), _c)
-        status = self.get_data(_c)
-        return status
-    
-    def final(self, session):
-        """
-            amend position which asset is on delist
-        """
-        msg = Request(topic="patch", msg=session, client_id=self.p.client_id)
-        _c = self.getChan()
-        self.async_client.run(msg.model_dump(), _c)
+        self.async_client.run(rq.model_dump(), _c)
         status = self.get_data(_c)
         return status
     

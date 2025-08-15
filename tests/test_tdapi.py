@@ -4,7 +4,7 @@
 import pytest
 from datetime import datetime
 from bt_sdk.core.client import TdApi
-from bt_sdk.core.constant import *
+from bt_sdk.constant import *
 from bt_sdk.core.model import *
 
 
@@ -12,7 +12,6 @@ def get_data(q):
     data = []
     while True:
         msg = q.get()
-        print(f"[get_data] {msg}")
         if msg == "eof":
             q.recycle()
             break
@@ -32,6 +31,24 @@ class TestTdApi:
         return api
     
     @pytest.fixture
+    def cashMeta(self):
+        session = 19901210
+        cash = 100000
+        return CashMeta(session=session, cash=cash)
+     
+    @pytest.fixture
+    def reqmeta(self):
+        start_date = "20210101"
+        end_date = "20250815"
+        start_time = datetime.strptime(start_date, '%Y%m%d')
+        end_time = datetime.strptime(end_date, '%Y%m%d')
+        sid = ['002750']
+        return ReqMeta(
+                      start_date = start_time.timestamp(),
+                      end_date = end_time.timestamp(),
+                      sid = sid)
+    
+    @pytest.fixture
     def ordermeta(self):
         order_type = OrderType.Buy
         created_str = "2025-04-22 09:40:30"
@@ -46,32 +63,19 @@ class TestTdApi:
                         #  exec_type=ExecType.Close, # oco
                         #  exec_type=ExecType.Market, # oco
                          order_type = order_type)
-    
-    @pytest.fixture
-    def reqmeta(self):
-        start_date = "20210101"
-        end_date = "20230101"
-        start_time = datetime.strptime(start_date, '%Y%m%d')
-        end_time = datetime.strptime(end_date, '%Y%m%d')
-        sid = ['603676']
-        return ReqMeta(
-                      start_date = start_time.timestamp(),
-                      end_date = end_time.timestamp(),
-                      sid = sid)
-    
-    
-    # def test_set_cash(self, td_api):
-    #     data = td_api.set_cash(19901210, 100000)
+
+    # def test_set_cash(self, td_api, cashMeta):
+    #     data = td_api.set_cash(cashMeta)
     #     print("test_set_cash: ", data)
     #     assert data is not None
 
     # def test_getAccount(self, td_api):
-    #     data = td_api.fetch_data("account")
+    #     data = td_api.fetch("account")
     #     print("test_get_account: ", data)
     #     assert data is not None
 
     # def test_getPosition(self, td_api):
-    #     data = td_api.fetch_data("position")
+    #     data = td_api.fetch("position")
     #     print("test_get_position: ", data)
     #     assert data is not None
 
@@ -95,15 +99,11 @@ class TestTdApi:
     
     # def test_trade(self, td_api, ordermeta):
     #     data = td_api.trade(ordermeta)
-    #     print("test_placeOrder: ", data)
+    #     print("test_trade: ", data)
     #     assert data is not None
 
-    def test_check(self, td_api):
-        data = td_api.check(20250601, 20250627)
+    def test_check(self, td_api, reqmeta):
+        data = td_api.check(reqmeta)
         print("test_check: ", data)
         assert data is not None
 
-    # def test_final(self, td_api):
-    #     data = td_api.final(20250627)
-    #     print("test_patch: ", data)
-    #     assert data is not None
