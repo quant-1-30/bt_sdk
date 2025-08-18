@@ -18,6 +18,7 @@ devpi-server --serverdir ~/.devpi --host 0.0.0.0 --port 3141
 devpi use http://localhost:3141/
 # default
 devpi login root --password ''
+
 # create bt_sdk
 devpi user -c bt_sdk password=20210718 email=bt_sdk@example.com
 devpi login bt_sdk --password 20210718

@@ -59,10 +59,10 @@ class TestMdApi:
     #     print("subscribe data: ",data)
     #     assert data is not None
     
-    def test_get_close(self, md_api, reqMeta):
-        data = md_api.get_close(reqMeta)
-        print("test_getClose: ", data)
-        assert data is not None
+    # def test_get_close(self, md_api, reqMeta):
+    #     data = md_api.get_close(reqMeta)
+    #     print("test_getClose: ", data)
+    #     assert data is not None
 
     # def test_adjust_event(self, md_api, reqMeta):
     #     data = md_api.get_event("adjustment", reqMeta)

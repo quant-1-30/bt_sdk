@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import pydantic
+from datetime import datetime
 from pydantic import Field, field_validator, ConfigDict
-from typing import List, Union
+from typing import List, Union, Optional, Mapping
 
 
 __all__ = ["ReqMeta", "CashMeta",  "OrderMeta", "Request"]
@@ -11,7 +12,7 @@ __all__ = ["ReqMeta", "CashMeta",  "OrderMeta", "Request"]
 
 class ReqMeta(pydantic.BaseModel):
     start_date: int = Field(default=0)
-    end_date: int = Field(default=0)
+    end_date: int = Field(default=int(datetime.now().strftime("%Y%m%d")))
     sid: List[str] = Field(default=[])
 
     model_config = ConfigDict(
@@ -45,7 +46,7 @@ class OrderMeta(pydantic.BaseModel):
 class Request(pydantic.BaseModel):
 
     topic: str
-    msg: Union[ReqMeta, CashMeta, OrderMeta] = Field(default={})
+    msg: Union[ReqMeta, CashMeta, OrderMeta]
     client_id: str = Field(default="")
 
     model_config = ConfigDict(

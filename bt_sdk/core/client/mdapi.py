@@ -14,7 +14,7 @@ class MdApi(Api):
         """
             request calendar
         """
-        msg = Request(topic='calendar')
+        msg = Request(topic='calendar', msg=ReqMeta())
         _c = self.getChan()
         self.async_client.run(msg.model_dump(), _c)
         cals = self.get_data(_c)
@@ -24,7 +24,7 @@ class MdApi(Api):
         """
             request instruments
         """
-        msg = Request(topic='instrument')
+        msg = Request(topic='instrument', msg=ReqMeta())
         _c = self.getChan()
         self.async_client.run(msg.model_dump(), _c)
         instruments = self.get_data(_c)
