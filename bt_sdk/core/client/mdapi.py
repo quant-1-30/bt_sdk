@@ -1,7 +1,7 @@
 # /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import datetime
+from contextlib import contextmanager
 from bt_sdk.core.client.api import Api
 from bt_sdk.core.model import ReqMeta, Request
 from bt_sdk.utils.dt_utility import num2date
@@ -15,9 +15,9 @@ class MdApi(Api):
             request calendar
         """
         msg = Request(topic='calendar', msg=ReqMeta())
-        _c = self.getChan()
-        self.async_client.run(msg.model_dump(), _c)
-        cals = self.get_data(_c)
+        chan = self.get_channel()
+        self.async_client.run(msg.model_dump(), chan)
+        cals = self.get_data(chan)
         return cals
     
     def get_instrument(self):
@@ -25,19 +25,23 @@ class MdApi(Api):
             request instruments
         """
         msg = Request(topic='instrument', msg=ReqMeta())
-        _c = self.getChan()
-        self.async_client.run(msg.model_dump(), _c)
-        instruments = self.get_data(_c)
+        chan = self.get_channel()
+        self.async_client.run(msg.model_dump(), chan)
+        instruments = self.get_data(chan)
         return instruments 
 
+    @contextmanager
     def subscribe(self, msg:ReqMeta):
         """
             request market data
         """
         rq = Request(topic='tick', msg=msg)
-        _c = self.getChan()
-        self.async_client.run(rq.model_dump(), _c)
-        return _c
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump(), chan)
+        try:
+            yield chan
+        finally:
+            self.cancel(chan)
     
     def get_event(self, topic, msg:ReqMeta):
         """
@@ -50,9 +54,9 @@ class MdApi(Api):
             sid=msg.sid
         )
         rq = Request(topic=topic, msg=_msg)
-        _c = self.getChan()
-        self.async_client.run(rq.model_dump(), _c)
-        events = self.get_data(_c)
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump(), chan)
+        events = self.get_data(chan)
         return events 
     
     def get_close(self, msg: ReqMeta):
@@ -60,9 +64,9 @@ class MdApi(Api):
             request instruments
         """
         rq = Request(topic='close', msg=msg)
-        _c = self.getChan()
-        self.async_client.run(rq.model_dump(), _c)
-        closes = self.get_data(_c)
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump(), chan)
+        closes = self.get_data(chan)
         return closes
 
     def factor(self, msg: ReqMeta): # sid

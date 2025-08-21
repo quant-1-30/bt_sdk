@@ -22,8 +22,8 @@ class AsyncClient:
     """
 
     _instance = None
-    _lock_instance = threading.RLock()  # 使用RLock提升性能
     _initialization_complete = False
+    _lock_instance = threading.RLock()  # 使用RLock提升性能
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -59,7 +59,16 @@ class AsyncClient:
     def _init_event_loop(self):
         """优化的事件循环初始化"""
         self.loop = asyncio.new_event_loop()
-        
+
+        # 定义一个普通的同步函数，用于创建需要绑定到循环的资源
+        def init_loop_resources():
+            # 确保 _async_reader_lock 被正确地绑定到 self.loop。
+            self._async_reader_lock = asyncio.Lock()
+            # 还有其他 asyncio 对象，也应该在这里创建
+
+        future = self.loop.run_in_executor(None, init_loop_resources)
+        self.loop.run_until_complete(future)
+
         if hasattr(self.loop, 'set_debug'):
             self.loop.set_debug(False)  # 生产环境关闭调试
         
@@ -298,7 +307,8 @@ class AsyncDatagramClient(AsyncClient):
             )
             while self._running:
                 try:
-                    recv_message = await self.loop.sock_recv(self.sock, self.buffer_size)
+                    async with self._async_reader_lock:
+                        recv_message = await self.loop.sock_recv(self.sock, self.buffer_size)
                     if not recv_message:
                         yield "eof"
                         break
@@ -347,9 +357,11 @@ class AsyncStreamClient(AsyncClient):
                 print("[recv_message] connection is on eof")
                 return None
             try:
-                length_bytes = await reader.readexactly(self.LENGTH_BYTES) # 尝试非阻塞地读取长度字节
+                async with self._async_reader_lock:
+                    length_bytes = await reader.readexactly(self.LENGTH_BYTES) # 尝试非阻塞地读取长度字节
             except asyncio.IncompleteReadError: # 无数据时立即返回
-                return None
+                # return None
+                return "eof"
                 
             msg_len = int.from_bytes(length_bytes, byteorder='big')
             if msg_len == 0:  # 如果长度为0，则返回EOF
@@ -359,9 +371,11 @@ class AsyncStreamClient(AsyncClient):
                 batch_count += 1
                 reader_size = min(self.buffer_size, msg_len)
                 try:
-                    chunk_bytes = await reader.readexactly(reader_size)
+                    async with self._async_reader_lock:
+                        chunk_bytes = await reader.readexactly(reader_size)
                 except asyncio.IncompleteReadError:
-                    return  None # 直接返回，不再继续循环
+                    # return  None 
+                    return "eof"
                     
                 chunks.extend(chunk_bytes) # append multiple bytes to a bytearray
                 msg_len -= len(chunk_bytes)

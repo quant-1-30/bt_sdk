@@ -13,7 +13,7 @@ class PesudoQueue(Queue):
     """
     def __init__(self, maxsize=10):
         super().__init__(maxsize)
-        self._is_active = False  # 改名：是否正在使用中
+        self._is_active = False 
         self._ticker_id = None
         self._lock = threading.Lock()  # 添加锁来保护状态修改
 

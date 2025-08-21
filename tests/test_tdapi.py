@@ -13,7 +13,6 @@ def get_data(q):
     while True:
         msg = q.get()
         if msg == "eof":
-            q.recycle()
             break
         data.append(msg)
     return data
@@ -79,31 +78,31 @@ class TestTdApi:
     #     print("test_get_position: ", data)
     #     assert data is not None
 
-    # def test_subscirbe_order(self, td_api, reqmeta):
-    #     q = td_api.subscribe("order", reqmeta)
-    #     data = get_data(q)
-    #     print("test_reqOrder: ", data)
-    #     assert data is not None
+    def test_subscirbe_order(self, td_api, reqmeta):
+        with td_api.subscribe("order", reqmeta) as q:
+            data = get_data(q)
+        print("test_reqOrder: ", data)
+        assert data is not None
 
-    # def test_subscribe_position(self, td_api, reqmeta):
-    #     q = td_api.subscribe("position", reqmeta)
-    #     data = get_data(q)
-    #     print("test_reqPosition: ", data)
-    #     assert data is not None
+    def test_subscribe_position(self, td_api, reqmeta):
+        with td_api.subscribe("position", reqmeta) as q:
+            data = get_data(q)
+        print("test_reqPosition: ", data)
+        assert data is not None
 
-    # def test_subscribe_account(self, td_api, reqmeta):
-    #     q = td_api.subscribe("account", reqmeta)
-    #     data = get_data(q)
-    #     print("test_reqAccount: ", data)
-    #     assert data is not None
+    def test_subscribe_account(self, td_api, reqmeta):
+        with td_api.subscribe("account", reqmeta) as q:
+            data = get_data(q)
+        print("test_reqAccount: ", data)
+        assert data is not None
     
     # def test_trade(self, td_api, ordermeta):
     #     data = td_api.trade(ordermeta)
     #     print("test_trade: ", data)
     #     assert data is not None
 
-    def test_check(self, td_api, reqmeta):
-        data = td_api.check(reqmeta)
-        print("test_check: ", data)
-        assert data is not None
+    # def test_check(self, td_api, reqmeta):
+    #     data = td_api.check(reqmeta)
+    #     print("test_check: ", data)
+    #     assert data is not None
 

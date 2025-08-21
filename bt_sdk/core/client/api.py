@@ -44,9 +44,6 @@ class Api(with_metaclass(MetaApi, object)):
         ("unit", "ms"),
     )
     
-    def __enter__(self):
-        return self
-
     def _post_init(self):
         # Initialize cycle thread
         self._poll_thread = threading.Thread(
@@ -57,19 +54,9 @@ class Api(with_metaclass(MetaApi, object)):
         )
         self._poll_thread.start()
     
-    def getChan(self):
+    def get_channel(self):
         chan = self.poll.getTickQueue()
         return chan
-    
-    def get_data(self, q): # queue.Empty
-        data = []
-        while True:
-            msg = q.get(self.p.timeout)
-            if msg == self.p.checksum:  # EOF
-                q.recycle()
-                break
-            data.append(msg)
-        return data
  
     @retry_connection(max_attempts=3, delay=1)
     def connected(self):
@@ -77,6 +64,23 @@ class Api(with_metaclass(MetaApi, object)):
             self.async_client.connected on ping
         """
         return on_ping(self.p.addr[0], self.p.unit)
+    
+    def cancel(self, q):
+        """
+        Cancel data subscription by putting EOF into the queue and marking it for reuse.
+        The queue will be available for reuse only after it's fully consumed.
+        """
+        self.poll.cancel(q)
+    
+    def get_data(self, q): # queue.Empty
+        data = []
+        while True:
+            msg = q.get(self.p.timeout)
+            if msg == self.p.checksum:  # EOF
+                self.cancel(q)
+                break
+            data.append(msg)
+        return data
     
     def disconnected(self):
         """
@@ -91,18 +95,3 @@ class Api(with_metaclass(MetaApi, object)):
             self.poll.dispose()
         except:
             pass  # 忽略清理时的错误
-
-    def cancel(self, q):
-        """
-        Cancel data subscription by putting EOF into the queue and marking it for reuse.
-        The queue will be available for reuse only after it's fully consumed.
-        """
-        self.obj.poll.cancel(q)
-
-    def __del__(self):
-        """gc"""
-        self.disconnected()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        """退出上下文时清理资源"""
-        self.disconnected()

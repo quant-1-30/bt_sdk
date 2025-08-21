@@ -1,5 +1,6 @@
 # /usr/bin/env python3
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
 
 from bt_sdk.core.model import *
 from bt_sdk.core.client.api import Api
@@ -33,7 +34,7 @@ class TdApi(Api):
             set cash
         """
         rq = Request(topic="set_cash", msg=msg, client_id=self.p.client_id)
-        _c = self.getChan()
+        _c = self.get_channel()
         self.async_client.run(rq.model_dump(), _c)
         status = self.get_data(_c)
         return status
@@ -44,37 +45,41 @@ class TdApi(Api):
         """
         topic = f"get_{topic}"
         rq = Request(topic=topic, msg=ReqMeta(), client_id=self.p.client_id)
-        _c = self.getChan()
-        self.async_client.run(rq.model_dump(), _c)
-        data = self.get_data(_c)
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump(), chan)
+        data = self.get_data(chan)
         return data
-           
+
+    @contextmanager   
     def subscribe(self, topic, msg:ReqMeta):
         """
             subscribe topic order / position / account
         """
         rq = Request(topic=f'query_{topic}', msg=msg, client_id=self.p.client_id)
-        _c = self.getChan()
-        self.async_client.run(rq.model_dump(), _c)
-        return _c
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump(), chan)
+        try:
+            yield chan
+        finally:
+            self.cancel(chan)
     
     def trade(self, meta: OrderMeta):
         """
             execution order in queue
         """
         rq = Request(topic="order", msg=meta, client_id=self.p.client_id)
-        _c = self.getChan()
-        self.async_client.run(rq.model_dump(), _c)
-        trades = self.get_data(_c)
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump(), chan)
+        trades = self.get_data(chan)
         return trades
     
     def check(self, msg: ReqMeta):
         # a. check event_data and sync_account between sdate and edate
         # b. sync last date in case of asset delist
         rq = Request(topic="check", msg=msg, client_id=self.p.client_id)
-        _c = self.getChan()
-        self.async_client.run(rq.model_dump(), _c)
-        status = self.get_data(_c)
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump(), chan)
+        status = self.get_data(chan)
         return status
     
     def cancel(self, q):
