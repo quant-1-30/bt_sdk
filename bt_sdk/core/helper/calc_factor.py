@@ -29,10 +29,10 @@ def right2struct(data):
     return event
 
 def calc_factor(close, adjust, right, forward=True):
-    vector_trading = [c["msg"]["line"][0][0] for c in close]
-    vector_close = [c["msg"]["line"][0][1] for c in close]
-    vector_adjust_event = [adjust2struct(data["msg"]) for data in adjust]
-    vector_right_event = [right2struct(data["msg"]) for data in right]
+    vector_trading = [c["body"]["line"][0][0] for c in close]
+    vector_close = [c["body"]["line"][0][1] for c in close]
+    vector_adjust_event = [adjust2struct(data["body"]) for data in adjust]
+    vector_right_event = [right2struct(data["body"]) for data in right]
 
     factor_type = adj_factor.AdjustType.Forward if forward else adj_factor.AdjustType.Backward 
 

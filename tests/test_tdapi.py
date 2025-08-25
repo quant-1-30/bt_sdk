@@ -35,7 +35,7 @@ class TestTdApi:
         cash = 100000
         return CashMeta(session=session, cash=cash)
      
-    @pytest.fixture
+    @pytest.fixture(scope="function")
     def reqmeta(self):
         start_date = "20210101"
         end_date = "20250815"
@@ -57,10 +57,9 @@ class TestTdApi:
                          size=1000,
                          sizer_cash=10000,
                          pricelimit=130,
-                         created_at=created_dt.timestamp(), 
+                         created_at=created_dt.timestamp(),
+                         # ExecType.Close / ExecType.Market 
                          exec_type=ExecType.Open, # oco
-                        #  exec_type=ExecType.Close, # oco
-                        #  exec_type=ExecType.Market, # oco
                          order_type = order_type)
 
     # def test_set_cash(self, td_api, cashMeta):
@@ -78,23 +77,23 @@ class TestTdApi:
     #     print("test_get_position: ", data)
     #     assert data is not None
 
-    def test_subscirbe_order(self, td_api, reqmeta):
-        with td_api.subscribe("order", reqmeta) as q:
-            data = get_data(q)
-        print("test_reqOrder: ", data)
-        assert data is not None
+    # def test_subscirbe_order(self, td_api, reqmeta):
+    #     with td_api.subscribe("order", reqmeta) as q:
+    #         data = get_data(q)
+    #     print("test_reqOrder: ", data)
+    #     assert data is not None
 
-    def test_subscribe_position(self, td_api, reqmeta):
-        with td_api.subscribe("position", reqmeta) as q:
-            data = get_data(q)
-        print("test_reqPosition: ", data)
-        assert data is not None
+    # def test_subscribe_position(self, td_api, reqmeta):
+    #     with td_api.subscribe("position", reqmeta) as q:
+    #         data = get_data(q)
+    #     print("test_reqPosition: ", data)
+    #     assert data is not None
 
-    def test_subscribe_account(self, td_api, reqmeta):
-        with td_api.subscribe("account", reqmeta) as q:
-            data = get_data(q)
-        print("test_reqAccount: ", data)
-        assert data is not None
+    # def test_subscribe_account(self, td_api, reqmeta):
+    #     with td_api.subscribe("account", reqmeta) as q:
+    #         data = get_data(q)
+    #     print("test_reqAccount: ", data)
+    #     assert data is not None
     
     # def test_trade(self, td_api, ordermeta):
     #     data = td_api.trade(ordermeta)

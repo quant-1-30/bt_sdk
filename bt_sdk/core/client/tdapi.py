@@ -29,14 +29,14 @@ class TdApi(Api):
         ("client_id", "")
         )
 
-    def set_cash(self, msg: CashMeta):
+    def set_cash(self, meta: CashMeta):
         """
             set cash
         """
-        rq = Request(topic="set_cash", msg=msg, client_id=self.p.client_id)
-        _c = self.get_channel()
-        self.async_client.run(rq.model_dump(), _c)
-        status = self.get_data(_c)
+        rq = Request(topic="set_cash", body=meta, client_id=self.p.client_id)
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump(), chan)
+        status = self.get_data(chan)
         return status
 
     def fetch(self, topic):
@@ -44,18 +44,18 @@ class TdApi(Api):
             get n position and account 
         """
         topic = f"get_{topic}"
-        rq = Request(topic=topic, msg=ReqMeta(), client_id=self.p.client_id)
+        rq = Request(topic=topic, body=ReqMeta(), client_id=self.p.client_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         data = self.get_data(chan)
         return data
 
     @contextmanager   
-    def subscribe(self, topic, msg:ReqMeta):
+    def subscribe(self, topic, meta:ReqMeta):
         """
             subscribe topic order / position / account
         """
-        rq = Request(topic=f'query_{topic}', msg=msg, client_id=self.p.client_id)
+        rq = Request(topic=f'query_{topic}', body=meta, client_id=self.p.client_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         try:
@@ -67,16 +67,16 @@ class TdApi(Api):
         """
             execution order in queue
         """
-        rq = Request(topic="order", msg=meta, client_id=self.p.client_id)
+        rq = Request(topic="order", body=meta, client_id=self.p.client_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         trades = self.get_data(chan)
         return trades
     
-    def check(self, msg: ReqMeta):
+    def check(self, meta: ReqMeta):
         # a. check event_data and sync_account between sdate and edate
         # b. sync last date in case of asset delist
-        rq = Request(topic="check", msg=msg, client_id=self.p.client_id)
+        rq = Request(topic="check", body=meta, client_id=self.p.client_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         status = self.get_data(chan)

@@ -46,7 +46,7 @@ class OrderMeta(pydantic.BaseModel):
 class Request(pydantic.BaseModel):
 
     topic: str
-    msg: Union[ReqMeta, CashMeta, OrderMeta]
+    body: Union[ReqMeta, CashMeta, OrderMeta]
     client_id: str = Field(default="")
 
     model_config = ConfigDict(

@@ -44,11 +44,14 @@ def msg_unpack(_type: str, msg_type, msg: bytes) -> Any:
             return ''
     return ''
 
-
 # --------------------------------------------msgpack---------------------------------------------
 
-def pack(rpc_type: str, payload: dict, client_id: str="") -> bytes:
-    return msgpack.packb({"topic": rpc_type, "msg": payload, "client_id": client_id}, use_bin_type=True)
+def pack(topic: str, body: dict, client_id: str="", request_id="") -> bytes:
+    return msgpack.packb({"topic": topic, "body": body, "client_id": client_id, "request_id":request_id}, use_bin_type=True)
 
 def unpack(data: bytes) -> dict:
-    return msgpack.unpackb(data, raw=False)
+    # import pdb; pdb.set_trace()
+    data = msgpack.unpackb(data, raw=False)
+    print("unpack data :", data)
+    request_id = data.pop("request_id")
+    return request_id, data

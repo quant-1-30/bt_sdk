@@ -14,7 +14,7 @@ class MdApi(Api):
         """
             request calendar
         """
-        msg = Request(topic='calendar', msg=ReqMeta())
+        msg = Request(topic='calendar', body=ReqMeta())
         chan = self.get_channel()
         self.async_client.run(msg.model_dump(), chan)
         cals = self.get_data(chan)
@@ -24,18 +24,18 @@ class MdApi(Api):
         """
             request instruments
         """
-        msg = Request(topic='instrument', msg=ReqMeta())
+        rq = Request(topic='instrument', body=ReqMeta())
         chan = self.get_channel()
-        self.async_client.run(msg.model_dump(), chan)
+        self.async_client.run(rq.model_dump(), chan)
         instruments = self.get_data(chan)
         return instruments 
 
     @contextmanager
-    def subscribe(self, msg:ReqMeta):
+    def subscribe(self, meta:ReqMeta):
         """
             request market data
         """
-        rq = Request(topic='tick', msg=msg)
+        rq = Request(topic='tick', body=meta)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         try:
@@ -43,36 +43,36 @@ class MdApi(Api):
         finally:
             self.cancel(chan)
     
-    def get_event(self, topic, msg:ReqMeta):
+    def get_event(self, topic, meta:ReqMeta):
         """
             request instruments
         """
         # import pdb; pdb.set_trace()
-        _msg = ReqMeta(
-            start_date=int(num2date(msg.start_date).strftime("%Y%m%d")), 
-            end_date=int(num2date(msg.end_date).strftime("%Y%m%d")),
-            sid=msg.sid
+        trans_meta = ReqMeta(
+            start_date=int(num2date(meta.start_date).strftime("%Y%m%d")), 
+            end_date=int(num2date(meta.end_date).strftime("%Y%m%d")),
+            sid=meta.sid
         )
-        rq = Request(topic=topic, msg=_msg)
+        rq = Request(topic=topic, body=meta)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         events = self.get_data(chan)
         return events 
     
-    def get_close(self, msg: ReqMeta):
+    def get_close(self, meta: ReqMeta):
         """
             request instruments
         """
-        rq = Request(topic='close', msg=msg)
+        rq = Request(topic='close', body=meta)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         closes = self.get_data(chan)
         return closes
 
-    def factor(self, msg: ReqMeta): # sid
-        close = self.get_close(msg)
-        adjust = self.get_event("adjustment", msg)
-        right = self.get_event("rightment", msg)
+    def factor(self, meta: ReqMeta): # sid
+        close = self.get_close(meta)
+        adjust = self.get_event("adjustment", meta)
+        right = self.get_event("rightment", meta)
         from bt_sdk.core.helper.calc_factor import calc_factor
         factors = calc_factor(close, adjust, right)
         return factors

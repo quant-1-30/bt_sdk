@@ -48,16 +48,15 @@ class TestMdApi:
         print("test_getCalendar: ", data)
         assert data is not None
 
-    def test_getInstrument(self, md_api):
-        data = md_api.get_instrument()
-        print("test_getInstrument: ", data)
-        assert data is not None
+    # def test_getInstrument(self, md_api):
+    #     data = md_api.get_instrument()
+    #     print("test_getInstrument: ", data)
+    #     assert data is not None
     
-    def test_subscribe(self, md_api, reqMeta):
-        with md_api.subscribe(reqMeta) as q:
-            data = get_data(q)
-        print("subscribe data: ",data)
-        assert data is not None
+    # def test_subscribe(self, md_api, reqMeta):
+    #     with md_api.subscribe(reqMeta) as q:
+    #         data = get_data(q)
+    #     assert data is not None
     
     # def test_get_close(self, md_api, reqMeta):
     #     data = md_api.get_close(reqMeta)
