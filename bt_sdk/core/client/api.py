@@ -4,7 +4,7 @@
 import threading
 
 from bt_sdk.core.meta import with_metaclass, MetaSingleton
-from bt_sdk.core.client.async_client import AsyncDatagramClient, AsyncStreamClient
+from bt_sdk.core.client.async_client import AsyncZmqClient, AsyncStreamClient
 from bt_sdk.utils.wrapper import retry_connection
 from bt_sdk.utils.net_util import on_ping
 from bt_sdk.core.com import _Poll
@@ -18,7 +18,7 @@ class MetaApi(MetaSingleton):
         """
         _obj, args, kwargs = super(MetaApi, cls).donew(*args, **kwargs)
         
-        async_client = AsyncDatagramClient if _obj.p.protocol == "udp" else AsyncStreamClient
+        async_client = AsyncStreamClient if _obj.p.protocol == "tcp" else AsyncZmqClient
         _obj.async_client = async_client(addr=_obj.p.addr)
 
         # initialize poll 
@@ -27,7 +27,6 @@ class MetaApi(MetaSingleton):
         return _obj, args, kwargs
     
     def dopostinit(cls, _obj, *args, **kwargs):
-
         _obj, args, kwargs = super(MetaApi, cls).dopostinit(_obj, *args, **kwargs)
         _obj._post_init()
         return _obj, args, kwargs

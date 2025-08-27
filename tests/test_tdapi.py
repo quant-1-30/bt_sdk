@@ -67,10 +67,10 @@ class TestTdApi:
     #     print("test_set_cash: ", data)
     #     assert data is not None
 
-    # def test_getAccount(self, td_api):
-    #     data = td_api.fetch("account")
-    #     print("test_get_account: ", data)
-    #     assert data is not None
+    def test_getAccount(self, td_api):
+        data = td_api.fetch("account")
+        print("test_get_account: ", data)
+        assert data is not None
 
     # def test_getPosition(self, td_api):
     #     data = td_api.fetch("position")

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.6.0"
-description = "revise poll and queue bug"
+version = "0.7.0"
+description = "replace udp with zmq dealer mode"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 packages = [

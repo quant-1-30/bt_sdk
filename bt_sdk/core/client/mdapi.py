@@ -8,7 +8,7 @@ from bt_sdk.utils.dt_utility import num2date
 
 
 class MdApi(Api):
-    params = (("protocol", "udp"),)
+    params = (("protocol", "zmq"),)
 
     def get_calendar(self): 
         """
@@ -73,7 +73,7 @@ class MdApi(Api):
         close = self.get_close(meta)
         adjust = self.get_event("adjustment", meta)
         right = self.get_event("rightment", meta)
-        from bt_sdk.core.helper.calc_factor import calc_factor
+        from bt_sdk.core.helper.factor import calc_factor
         factors = calc_factor(close, adjust, right)
         return factors
     

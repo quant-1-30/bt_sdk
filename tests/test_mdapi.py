@@ -23,7 +23,8 @@ class TestMdApi:
     
     @pytest.fixture
     def md_api(self):
-        return MdApi(addr=("127.0.0.1", 8888))
+        # return MdApi(addr=("127.0.0.1", 8889))
+        return MdApi(addr="tcp://127.0.0.1:9000")
     
     @pytest.fixture
     def session(self):
@@ -43,37 +44,37 @@ class TestMdApi:
         sid = ['603676']
         return ReqMeta(start_date = start_time ,end_date = end_time, sid = sid)
     
-    def test_getCalendar(self, md_api):
-        data = md_api.get_calendar()
-        print("test_getCalendar: ", data)
+    # def test_getCalendar(self, md_api):
+    #     data = md_api.get_calendar()
+    #     print("test_getCalendar: ", data)
+    #     assert data is not None
+
+    def test_getInstrument(self, md_api):
+        data = md_api.get_instrument()
+        print("test_getInstrument: ", data)
+        assert data is not None
+    
+    def test_subscribe(self, md_api, reqMeta):
+        with md_api.subscribe(reqMeta) as q:
+            data = get_data(q)
+        assert data is not None
+    
+    def test_get_close(self, md_api, reqMeta):
+        data = md_api.get_close(reqMeta)
+        print("test_getClose: ", data)
         assert data is not None
 
-    # def test_getInstrument(self, md_api):
-    #     data = md_api.get_instrument()
-    #     print("test_getInstrument: ", data)
-    #     assert data is not None
+    def test_adjust_event(self, md_api, reqMeta):
+        data = md_api.get_event("adjustment", reqMeta)
+        print("test_getEvent: ", data)
+        assert data is not None
     
-    # def test_subscribe(self, md_api, reqMeta):
-    #     with md_api.subscribe(reqMeta) as q:
-    #         data = get_data(q)
-    #     assert data is not None
-    
-    # def test_get_close(self, md_api, reqMeta):
-    #     data = md_api.get_close(reqMeta)
-    #     print("test_getClose: ", data)
-    #     assert data is not None
+    def test_right_event(self, md_api, reqMeta):
+        data = md_api.get_event("rightment", reqMeta)
+        print("test_getEvent: ", data)
+        assert data is not None
 
-    # def test_adjust_event(self, md_api, reqMeta):
-    #     data = md_api.get_event("adjustment", reqMeta)
-    #     print("test_getEvent: ", data)
-    #     assert data is not None
-    
-    # def test_right_event(self, md_api, reqMeta):
-    #     data = md_api.get_event("rightment", reqMeta)
-    #     print("test_getEvent: ", data)
-    #     assert data is not None
-
-    # def test_factor(self, md_api, reqMeta):
-    #     data = md_api.factor(reqMeta)
-    #     print("test_getClose: ", data)
-    #     assert data is not None
+    def test_factor(self, md_api, reqMeta):
+        data = md_api.factor(reqMeta)
+        print("test_getClose: ", data)
+        assert data is not None

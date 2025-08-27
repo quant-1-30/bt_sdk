@@ -52,6 +52,6 @@ def pack(topic: str, body: dict, client_id: str="", request_id="") -> bytes:
 def unpack(data: bytes) -> dict:
     # import pdb; pdb.set_trace()
     data = msgpack.unpackb(data, raw=False)
-    print("unpack data :", data)
+    # print("unpack data :", data)
     request_id = data.pop("request_id")
     return request_id, data

@@ -8,14 +8,14 @@ import socket
 import asyncio
 import threading
 import uuid
+import zmq
+import zmq.asyncio
 from queue import Queue
 from typing import Dict, Any, Set, Optional
 from collections import deque, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from bt_sdk.constant import CHUNK_HEADER_FORMAT
 
-# 假设的序列化函数，现在必须能处理 request_id
-# 您需要根据您的实际情况调整 pack 和 unpack 函数
 from bt_sdk.utils.serialize import pack, unpack
 
 
@@ -61,13 +61,13 @@ class AsyncClient:
         """优化的事件循环初始化"""
         self.loop = asyncio.new_event_loop()
 
-        # 在事件循环线程中创建需要绑定到循环的资源
-        def init_loop_resources():
-            # self._async_reader_lock 不再需要在多个协程间共享读取，因此可以移除
-            pass
+        # # 在事件循环线程中创建需要绑定到循环的资源
+        # def init_loop_resources():
+        #     # self._async_reader_lock 不再需要在多个协程间共享读取，因此可以移除
+        #     pass
         
-        future = self.loop.run_in_executor(None, init_loop_resources)
-        self.loop.run_until_complete(future)
+        # future = self.loop.run_in_executor(None, init_loop_resources)
+        # self.loop.run_until_complete(future)
 
         if hasattr(self.loop, 'set_debug'):
             self.loop.set_debug(False)
@@ -172,107 +172,6 @@ class AsyncClient:
             thread.start()
 
 
-class AsyncDatagramClient(AsyncClient):
-    """
-    优化的UDP客户端 - 重构以支持安全的并发请求
-    """
-    
-    def __init__(self, addr):
-        # 确保基类初始化只在第一次发生
-        if not self._initialization_complete:
-            super()._initialize()
-        
-        self.addr = addr
-        self.HEADER_SIZE = struct.calcsize(CHUNK_HEADER_FORMAT)
-        self._init_socket()
-        
-        # 这个任务在客户端实例化时启动，并一直运行
-        if hasattr(self, 'loop') and self.loop.is_running():
-            self._receive_task = asyncio.run_coroutine_threadsafe(self._receive_loop(), self.loop)
-        else:
-            # 如果事件循环尚未完全启动，则延迟创建
-            self.loop.call_soon_threadsafe(lambda: asyncio.create_task(self._receive_loop()))
-
-    def _init_socket(self):
-        """优化的socket初始化"""
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.setblocking(False)
-        try:
-            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, self.buffer_size)
-            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.buffer_size)
-            self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        except Exception as e:
-            print(f"Socket optimization warning: {e}")
-
-    async def _receive_loop(self):
-        """
-            后台接收循环持续监听socket request_id 分发到对应的请求队列
-        """
-        print("[UDP] Receiver loop started.")
-        while self._running:
-            try:
-                recv_message, _ = await self.loop.sock_recvfrom(self.sock, self.buffer_size)
-                if not recv_message:
-                    continue
-
-                request_id, received_data = unpack(recv_message[:-8])
-
-                if request_id in self._pending_requests:
-                    await self._pending_requests[request_id].put(received_data)
-                else:
-                    print(f"[UDP Warning] Received message for unknown request_id: {request_id}")
-
-            except asyncio.CancelledError:
-                break
-            except Exception as e:
-                print(f"[UDP Recv Loop Error] {e}")
-                await asyncio.sleep(0.01) # 发生错误时短暂暂停避免CPU空转
-        print("[UDP] Receiver loop stopped.")
-
-    async def get_data(self, message):
-        """
-        现在此方法负责发送请求，并从专属队列中异步地获取响应。
-        """
-        request_id = str(uuid.uuid4())
-        response_queue = asyncio.Queue()
-        self._pending_requests[request_id] = response_queue
-        try:
-            serialize_msg = pack(message["topic"], message["body"], request_id=request_id)
-        
-            await self.loop.run_in_executor(
-                self._executor, 
-                self.sock.sendto, 
-                serialize_msg, 
-                self.addr
-            )
-
-            while True:
-                try:
-                    data = await asyncio.wait_for(response_queue.get(), timeout=10.0)
-
-                    # if data == "sentinel" or data == "shutdown":
-                    if data["body"] == b"shutdown":
-                        yield "eof"
-                        break
-
-                    yield data
-
-                except asyncio.TimeoutError:
-                    print(f"[UDP Timeout] No response for request {request_id} within timeout period.")
-                    yield "eof"
-                    break
-                except asyncio.CancelledError:
-                    raise
-        
-        except Exception as e:
-            print(f"[UDP Send Error] {e} for request {request_id}")
-            yield "eof"
-            
-        finally:
-            # *** 重要 ***: 清理请求，避免内存泄漏
-            self._pending_requests.pop(request_id, None)
-
-
 class AsyncStreamClient(AsyncClient):
     """
     优化的TCP客户端 - 重构以支持在单一连接上安全地进行请求复用
@@ -304,7 +203,7 @@ class AsyncStreamClient(AsyncClient):
 
                 # 解包并分发
                 request_id, payload = unpack(complete_message)
-                print("payload :", payload)
+                # print("payload :", payload)
 
                 if request_id in self._pending_requests:
                     await self._pending_requests[request_id].put(payload)
@@ -370,7 +269,7 @@ class AsyncStreamClient(AsyncClient):
             while True:
                 try:
                     data = await asyncio.wait_for(response_queue.get(), timeout=10.0)
-                    print("get_data :", data)
+                    # print("get_data :", data)
                     # import pdb; pdb.set_trace()
                     if data["body"] == "eof":
                         break
@@ -379,7 +278,6 @@ class AsyncStreamClient(AsyncClient):
                 except asyncio.TimeoutError:
                     print(f"[TCP Timeout] No response for request {request_id} within timeout period.")
                     break
-            
             yield "eof"
 
         except Exception as e:
@@ -403,3 +301,377 @@ class AsyncStreamClient(AsyncClient):
             await writer.wait_closed()
         except Exception as e:
             print(f"Error closing connection: {e}")
+
+
+# class AsyncDatagramClient(AsyncClient):
+#     """
+#     优化的UDP客户端 - 重构以支持安全的并发请求
+#     """
+    
+#     def __init__(self, addr):
+#         # 确保基类初始化只在第一次发生
+#         if not self._initialization_complete:
+#             super()._initialize()
+        
+#         self.addr = addr
+#         self.HEADER_SIZE = struct.calcsize(CHUNK_HEADER_FORMAT)
+#         self._init_socket()
+        
+#         # 这个任务在客户端实例化时启动，并一直运行
+#         if hasattr(self, 'loop') and self.loop.is_running():
+#             self._receive_task = asyncio.run_coroutine_threadsafe(self._receive_loop(), self.loop)
+#         else:
+#             # 如果事件循环尚未完全启动，则延迟创建
+#             self.loop.call_soon_threadsafe(lambda: asyncio.create_task(self._receive_loop()))
+
+#     def _init_socket(self):
+#         """优化的socket初始化"""
+#         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+#         self.sock.setblocking(False)
+#         try:
+#             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, self.buffer_size)
+#             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.buffer_size)
+#             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+#         except Exception as e:
+#             print(f"Socket optimization warning: {e}")
+
+#     async def _receive_loop(self):
+#         """
+#             后台接收循环持续监听socket request_id 分发到对应的请求队列
+#         """
+#         print("[UDP] Receiver loop started.")
+#         while self._running:
+#             try:
+#                 recv_message, _ = await self.loop.sock_recvfrom(self.sock, self.buffer_size)
+#                 if not recv_message:
+#                     continue
+
+#                 request_id, received_data = unpack(recv_message[:-8])
+
+#                 if request_id in self._pending_requests:
+#                     await self._pending_requests[request_id].put(received_data)
+#                 else:
+#                     print(f"[UDP Warning] Received message for unknown request_id: {request_id}")
+
+#             except asyncio.CancelledError:
+#                 break
+#             except Exception as e:
+#                 print(f"[UDP Recv Loop Error] {e}")
+#                 await asyncio.sleep(0.01) # 发生错误时短暂暂停避免CPU空转
+#         print("[UDP] Receiver loop stopped.")
+
+#     async def get_data(self, message):
+#         """
+#         现在此方法负责发送请求，并从专属队列中异步地获取响应。
+#         """
+#         request_id = str(uuid.uuid4())
+#         response_queue = asyncio.Queue()
+#         self._pending_requests[request_id] = response_queue
+#         try:
+#             serialize_msg = pack(message["topic"], message["body"], request_id=request_id)
+        
+#             await self.loop.run_in_executor(
+#                 self._executor, 
+#                 self.sock.sendto, 
+#                 serialize_msg, 
+#                 self.addr
+#             )
+
+#             while True:
+#                 try:
+#                     data = await asyncio.wait_for(response_queue.get(), timeout=10.0)
+
+#                     # if data == "sentinel" or data == "shutdown":
+#                     if data["body"] == b"shutdown":
+#                         yield "eof"
+#                         break
+
+#                     yield data
+
+#                 except asyncio.TimeoutError:
+#                     print(f"[UDP Timeout] No response for request {request_id} within timeout period.")
+#                     yield "eof"
+#                     break
+#                 except asyncio.CancelledError:
+#                     raise
+        
+#         except Exception as e:
+#             print(f"[UDP Send Error] {e} for request {request_id}")
+#             yield "eof"
+            
+#         finally:
+#             # *** 重要 ***: 清理请求，避免内存泄漏
+#             self._pending_requests.pop(request_id, None)
+
+
+class AsyncZmqClient(AsyncClient):
+    """
+    High-performance asynchronous ZMQ client using a DEALER socket.
+    This client is designed to communicate with a ZMQ ROUTER server.
+    It maintains the singleton pattern and supports concurrent requests.
+    """
+
+    # _instance = None
+    # _initialization_complete = False
+    # _lock_instance = threading.RLock()
+
+    # def __new__(cls, *args, **kwargs):
+    #     if cls._instance is None:
+    #         with cls._lock_instance:
+    #             if cls._instance is None:
+    #                 cls._instance = super(ZmqClient, cls).__new__(cls)
+    #                 cls._instance._initialize(*args, **kwargs)
+    #                 cls._initialization_complete = True
+    #     return cls._instance
+
+    def __init__(self, addr):
+        if not self._initialization_complete:
+            super()._initialize()
+
+        self.addr = addr
+        
+        # Initialize ZMQ context and socket within the loop
+        future = asyncio.run_coroutine_threadsafe(self._init_zmq(), self.loop)
+        future.result() # Wait for ZMQ initialization to complete
+
+    async def _init_zmq(self):
+        """Initializes ZMQ context and socket. Must be called from within the event loop."""
+        self.context = zmq.asyncio.Context()
+        self.socket = self.context.socket(zmq.DEALER)
+        
+        # Set a unique identity for this client for easier debugging on the server
+        client_id = f"client-{uuid.uuid4()}".encode('utf-8')
+        self.socket.setsockopt(zmq.IDENTITY, client_id)
+        
+        # Set high-water mark to prevent excessive memory usage
+        self.socket.set_hwm(1000)
+        
+        print(f"[ZMQ] Connecting to server at {self.addr}")
+        self.socket.connect(self.addr)
+        
+        # Start the background task to listen for all incoming messages
+        self._receive_task = self.loop.create_task(self._receive_loop())
+
+    # def _init_event_loop(self):
+    #     """Initializes and starts the asyncio event loop in a separate thread."""
+    #     self.loop = asyncio.new_event_loop()
+
+    #     if hasattr(self.loop, 'set_debug'):
+    #         self.loop.set_debug(False)
+        
+    #     self._loop_thread = threading.Thread(
+    #         target=self._run_event_loop,
+    #         daemon=True,
+    #         name="ZmqClient-EventLoop"
+    #     )
+    #     self._loop_thread.start()
+        
+    #     timeout = 5.0
+    #     start_time = time.time()
+    #     while not self.loop.is_running() and (time.time() - start_time) < timeout:
+    #         time.sleep(0.01)
+
+    # def _run_event_loop(self):
+    #     asyncio.set_event_loop(self.loop)
+    #     print("[loop] Event loop started")
+    #     try:
+    #         self.loop.run_forever()
+    #     except Exception as e:
+    #         print(f"Event loop error: {e}")
+    #     finally:
+    #         print("[loop] Event loop stopped")
+
+    # def run(self, req: Dict[str, Any], req_q: Queue):
+    #     """
+    #     Public method to submit a request. This is thread-safe.
+    #     """
+    #     if not self._running:
+    #         self._ensure_eof(req_q)
+    #         return
+        
+    #     coro = self.on_receive(req, req_q)
+    #     future = asyncio.run_coroutine_threadsafe(coro, self.loop)
+    #     self._tasks.add(future)
+        
+    #     def cleanup_callback(f):
+    #         try:
+    #             f.result()
+    #         except Exception as e:
+    #             print(f"[CALLBACK ERROR] {e}")
+    #         finally:
+    #             self._tasks.discard(f)
+    #             self._ensure_eof(req_q)
+
+    #     future.add_done_callback(cleanup_callback)
+
+    # async def on_receive(self, message: Dict[str, Any], req_q: Queue):
+    #     """Coroutine that wraps the get_data generator to feed the synchronous queue."""
+    #     try:
+    #         data_count = 0
+    #         async for data in self.get_data(message):
+    #             req_q.put(data)
+    #             if data == "eof":
+    #                 break
+                
+    #             data_count += 1
+    #             if data_count % 100 == 0:
+    #                 await asyncio.sleep(0)
+                    
+    #     except asyncio.CancelledError:
+    #         print("on_receive task cancelled.")
+    #         raise
+    #     except Exception as e:
+    #         print(f"Error in on_receive: {e}")
+
+    async def _receive_loop(self):
+        """
+        A single, continuous background task that receives all messages from the ZMQ socket
+        and dispatches them to the correct pending request queue based on request_id.
+        """
+        print("[ZMQ] Receiver loop started.")
+        while self._running:
+            try:
+                # A DEALER socket receives messages without the server's identity frame
+                recv_message = await self.socket.recv()
+                
+                # The payload contains our custom-packed data with the request_id
+                request_id, received_data = unpack(recv_message[:-8]) # Assuming checksum is appended
+
+                if request_id in self._pending_requests:
+                    await self._pending_requests[request_id].put(received_data)
+                else:
+                    print(f"[ZMQ Warning] Received message for unknown request_id: {request_id}")
+
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                print(f"[ZMQ Recv Loop Error] {e}")
+                await asyncio.sleep(0.01)
+        print("[ZMQ] Receiver loop stopped.")
+
+    async def get_data(self, message: Dict[str, Any]):
+        """
+        Sends a request via the ZMQ DEALER socket and asynchronously yields responses
+        from a dedicated queue populated by the central `_receive_loop`.
+        """
+        request_id = str(uuid.uuid4())
+        response_queue = asyncio.Queue()
+        self._pending_requests[request_id] = response_queue
+
+        try:
+            serialize_msg = pack(message["topic"], message["body"], request_id=request_id)
+            print("zmq send ", serialize_msg)
+            
+            # Send the message asynchronously. ZMQ handles the non-blocking I/O.
+            await self.socket.send(serialize_msg)
+
+            while True:
+                try:
+                    # Wait for a response to appear in this request's specific queue
+                    data = await asyncio.wait_for(response_queue.get(), timeout=10.0)
+                    # print("receive data", data)
+
+                    # Check for the server's shutdown/completion signal
+                    if data.get("body") == b"shutdown":
+                        yield "eof"
+                        break
+                    yield data
+
+                except asyncio.TimeoutError:
+                    print(f"[ZMQ Timeout] No response for request {request_id} within timeout period.")
+                    yield "eof"
+                    break
+                except asyncio.CancelledError:
+                    raise
+        
+        except Exception as e:
+            print(f"[ZMQ Send Error] {e} for request {request_id}")
+            yield "eof"
+            
+        finally:
+            # Crucial: Clean up the pending request to prevent memory leaks
+            self._pending_requests.pop(request_id, None)
+
+    # def close(self):
+    #     """Gracefully shuts down the client."""
+    #     if not self._running:
+    #         return
+        
+    #     print("[ZMQ] Shutting down client...")
+    #     self._running = False
+
+    #     def shutdown_async_resources():
+    #         if hasattr(self, '_receive_task') and self._receive_task:
+    #             self._receive_task.cancel()
+    #         if hasattr(self, 'socket'):
+    #             self.socket.close()
+    #         if hasattr(self, 'context'):
+    #             self.context.term()
+
+    #     # Schedule the cleanup on the event loop
+    #     self.loop.call_soon_threadsafe(shutdown_async_resources)
+        
+    #     # Stop the event loop itself
+    #     self.loop.call_soon_threadsafe(self.loop.stop)
+    #     self._loop_thread.join(timeout=2)
+    #     self._executor.shutdown(wait=True)
+    #     print("[ZMQ] Client shutdown complete.")
+
+    # def _ensure_eof(self, req_q: Queue):
+    #     """Thread-safe way to put 'eof' into the queue."""
+    #     try:
+    #         if self.loop.is_running():
+    #             self.loop.call_soon_threadsafe(req_q.put, "eof")
+    #         else:
+    #             req_q.put("eof") # Fallback for already closed loop
+    #     except Exception:
+    #         # If all else fails, use a thread
+    #         threading.Thread(target=req_q.put, args=("eof",), daemon=True).start()
+
+# # Example usage
+# if __name__ == '__main__':
+#     SERVER_ADDR = "tcp://127.0.0.1:8888"
+    
+#     # The singleton pattern ensures we only get one instance
+#     client = ZmqClient(addr=SERVER_ADDR)
+    
+#     # --- Simulate making two concurrent requests ---
+    
+#     def make_request(request_id: int):
+#         print(f"\n--- Making request #{request_id} ---")
+#         # Each request needs its own synchronous queue for results
+#         result_queue = Queue()
+        
+#         # Define the request payload
+#         request = {
+#             "topic": "echo_service",
+#             "body": f"Hello from request {request_id}"
+#         }
+        
+#         # The `run` method is non-blocking
+#         client.run(req=request, req_q=result_queue)
+        
+#         # Block and retrieve results from the queue
+#         print(f"Waiting for results for request #{request_id}...")
+#         while True:
+#             result = result_queue.get()
+#             if result == "eof":
+#                 print(f"End of stream for request #{request_id}.")
+#                 break
+#             print(f"Result for #{request_id}: {result}")
+#         print(f"--- Finished request #{request_id} ---")
+
+#     # Use threads to simulate concurrent callers
+#     thread1 = threading.Thread(target=make_request, args=(1,))
+#     thread2 = threading.Thread(target=make_request, args=(2,))
+    
+#     thread1.start()
+#     time.sleep(0.1) # Stagger start slightly
+#     thread2.start()
+    
+#     thread1.join()
+#     thread2.join()
+    
+#     # Gracefully close the client
+#     client.close()
+
