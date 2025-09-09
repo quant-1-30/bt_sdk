@@ -19,7 +19,7 @@ class MetaApi(MetaSingleton):
         _obj, args, kwargs = super(MetaApi, cls).donew(*args, **kwargs)
         
         async_client = AsyncStreamClient if _obj.p.protocol == "tcp" else AsyncZmqClient
-        _obj.async_client = async_client(addr=_obj.p.addr)
+        _obj.async_client = async_client(addr=_obj.p.addr, timeout=_obj.p.timeout)
 
         # initialize poll 
         _obj._poll_event = threading.Event()
@@ -63,14 +63,7 @@ class Api(with_metaclass(MetaApi, object)):
             self.async_client.connected on ping
         """
         return on_ping(self.p.addr[0], self.p.unit)
-    
-    def cancel(self, q):
-        """
-        Cancel data subscription by putting EOF into the queue and marking it for reuse.
-        The queue will be available for reuse only after it's fully consumed.
-        """
-        self.poll.cancel(q)
-    
+     
     def get_data(self, q): # queue.Empty
         data = []
         while True:
@@ -81,6 +74,13 @@ class Api(with_metaclass(MetaApi, object)):
             data.append(msg)
         return data
     
+    def cancel(self, q):
+        """
+        Cancel data subscription by putting EOF into the queue and marking it for reuse.
+        The queue will be available for reuse only after it's fully consumed.
+        """
+        self.poll.cancel(q)
+    
     def disconnected(self):
         """
         disconnect from the server - optimized cleanup with sharded locks
@@ -90,7 +90,7 @@ class Api(with_metaclass(MetaApi, object)):
             if hasattr(self, '_poll_thread') and self._poll_thread.is_alive():
                 self._poll_thread.join(timeout=1.0)
             if hasattr(self, 'async_client'):
-                self.async_client.stop()
+                self.async_client.close()
             self.poll.dispose()
         except:
             pass  # 忽略清理时的错误

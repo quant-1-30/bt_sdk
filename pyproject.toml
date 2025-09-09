@@ -1,11 +1,17 @@
+[build-system]
+requires = ["poetry-core", "wheel", "pybind11", "cmake"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "bt-sdk"
-version = "0.7.0"
-description = "replace udp with zmq dealer mode"
+version = "0.7.4"
+description = "solve poetry and pybind pack bug"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
-packages = [
-  { include = "bt_sdk"}
+include = [
+    "bt_sdk/core/lib/factor/lib/*.so",
+    "bt_sdk/core/lib/factor/lib/*.dylib",
+    "bt_sdk/core/lib/factor/lib/*.pyd"
 ]
 
 [tool.poetry.dependencies]
@@ -17,12 +23,25 @@ pytest-asyncio = "^0.26.0"
 msgpack = "^1.1.0"
 devpi-client = "^7.2.0"
 pyzmq = "^26.4.0"
-pydantic = "^2.6"
 typing-inspection = "^0.4.0"
-pydantic-core = "^2.16"
+pydantic-core = "2.16.3"
 ping3 = "^4.0.8"
 typing-extensions = "^4.14.1"
 annotated-types = "^0.7.0"
+setuptools-cmake-helper = "^0.1.2"
+pygments = "^2.19.2"
+pydantic = "2.6.4"
+
+[tool.poetry.group.build.dependencies]
+setuptools = "^68.0.0"
+wheel = "^0.41.0"
+cmake = "^3.26.0"
+pybind11 ="^3.0.1"
+ninja = "^1.11.1"
+
+#[tool.poetry.build]
+#pre-build-script = "scripts/pre_build.py"  # 构建前运行
+#post-build-script = "scripts/post_build.py" # 构建后运行
 
 [[tool.poetry.source]]
 name = "tuna"
@@ -34,6 +53,3 @@ name = "devpi"
 url = "http://localhost:3141/bt_sdk/dev/+simple/"
 priority = "supplemental"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

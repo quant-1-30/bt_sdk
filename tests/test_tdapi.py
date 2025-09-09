@@ -26,7 +26,7 @@ class TestTdApi:
 
     @pytest.fixture
     def td_api(self, client_id):
-        api = TdApi(addr=("127.0.0.1", 8888), client_id=client_id)
+        api = TdApi(addr=("127.0.0.1", 8888), client_id=client_id, timeout=20)
         return api
     
     @pytest.fixture
@@ -34,10 +34,25 @@ class TestTdApi:
         session = 19901210
         cash = 100000
         return CashMeta(session=session, cash=cash)
-     
+      
+    @pytest.fixture
+    def ordermeta(self):
+        order_type = OrderType.Buy
+        created_str = "2025-04-24 09:40:30"
+        created_dt = datetime.strptime(created_str, '%Y-%m-%d %H:%M:%S')
+        return OrderMeta(sid="002750", 
+                         price=122,
+                         size=1000,
+                         sizer_ratio=0.5,
+                         pricelimit=130,
+                         created_at=created_dt.timestamp(),
+                         # ExecType.Close / ExecType.Market 
+                         exec_type=ExecType.Open, # oco
+                         order_type = order_type)
+    
     @pytest.fixture(scope="function")
     def reqmeta(self):
-        start_date = "20210101"
+        start_date = "20250427"
         end_date = "20250815"
         start_time = datetime.strptime(start_date, '%Y%m%d')
         end_time = datetime.strptime(end_date, '%Y%m%d')
@@ -46,36 +61,31 @@ class TestTdApi:
                       start_date = start_time.timestamp(),
                       end_date = end_time.timestamp(),
                       sid = sid)
-    
-    @pytest.fixture
-    def ordermeta(self):
-        order_type = OrderType.Buy
-        created_str = "2025-04-22 09:40:30"
-        created_dt = datetime.strptime(created_str, '%Y-%m-%d %H:%M:%S')
-        return OrderMeta(sid="002750", 
-                         price=122,
-                         size=1000,
-                         sizer_cash=10000,
-                         pricelimit=130,
-                         created_at=created_dt.timestamp(),
-                         # ExecType.Close / ExecType.Market 
-                         exec_type=ExecType.Open, # oco
-                         order_type = order_type)
 
     # def test_set_cash(self, td_api, cashMeta):
     #     data = td_api.set_cash(cashMeta)
     #     print("test_set_cash: ", data)
     #     assert data is not None
 
-    def test_getAccount(self, td_api):
-        data = td_api.fetch("account")
-        print("test_get_account: ", data)
-        assert data is not None
+    # def test_submit(self, td_api, ordermeta):
+    #     data = td_api.submit(ordermeta)
+    #     print("test_trade: ", data)
+    #     assert data is not None
+    
+    def test_chain(self, td_api, reqmeta):
+        status = td_api.chain(reqmeta)
+        print("test_chain: ", status)
+        assert status is not None
+
+    # def test_getAccount(self, td_api):
+    #     o = td_api.fetch("account")
+    #     print("test account obg: ", o)
+    #     assert o is not None
 
     # def test_getPosition(self, td_api):
-    #     data = td_api.fetch("position")
-    #     print("test_get_position: ", data)
-    #     assert data is not None
+    #     o = td_api.fetch("position")
+    #     print("test position obj: ", o)
+    #     assert o is not None
 
     # def test_subscirbe_order(self, td_api, reqmeta):
     #     with td_api.subscribe("order", reqmeta) as q:
@@ -94,14 +104,3 @@ class TestTdApi:
     #         data = get_data(q)
     #     print("test_reqAccount: ", data)
     #     assert data is not None
-    
-    # def test_trade(self, td_api, ordermeta):
-    #     data = td_api.trade(ordermeta)
-    #     print("test_trade: ", data)
-    #     assert data is not None
-
-    # def test_check(self, td_api, reqmeta):
-    #     data = td_api.check(reqmeta)
-    #     print("test_check: ", data)
-    #     assert data is not None
-

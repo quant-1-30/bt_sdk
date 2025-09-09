@@ -3,8 +3,6 @@
 
 import os
 import time
-import struct
-import socket
 import asyncio
 import threading
 import uuid
@@ -12,9 +10,7 @@ import zmq
 import zmq.asyncio
 from queue import Queue
 from typing import Dict, Any, Set, Optional
-from collections import deque, defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from bt_sdk.constant import CHUNK_HEADER_FORMAT
 
 from bt_sdk.utils.serialize import pack, unpack
 
@@ -176,7 +172,7 @@ class AsyncStreamClient(AsyncClient):
     """
     优化的TCP客户端 - 重构以支持在单一连接上安全地进行请求复用
     """
-    def __init__(self, addr):
+    def __init__(self, addr, timeout=5.0):
         if not self._initialization_complete:
             super()._initialize()
             
@@ -184,7 +180,7 @@ class AsyncStreamClient(AsyncClient):
         # reader, writer, reader_task
         self._connection_cache: Dict[str, tuple] = {} 
         self.LENGTH_BYTES = 4
-        self.timeout = 5.0
+        self.timeout = timeout
 
     async def _receive_loop(self, reader: asyncio.StreamReader, connection_key: str):
         """
@@ -210,7 +206,7 @@ class AsyncStreamClient(AsyncClient):
                 else:
                     print(f"[TCP Warning] Received message for unknown request_id: {request_id}")
 
-            except (asyncio.IncompleteReadError, ConnectionResetError):
+            except (asyncio.IncompleteReadError, ConnectionResetError): # retry logic
                 print(f"[TCP] Connection {connection_key} closed.")
                 break
             except asyncio.CancelledError:
@@ -220,9 +216,7 @@ class AsyncStreamClient(AsyncClient):
                 break
         
         print(f"[TCP] Reader for {connection_key} stopped.")
-        # 连接断开后，通知所有还在等待此连接响应的请求
-        # (这是一个简化处理，更复杂的系统可能需要重试逻辑)
-        # 此处我们通过关闭连接来触发get_data中的异常处理
+        
         if connection_key in self._connection_cache:
             _, writer, _ = self._connection_cache[connection_key]
             await self._close_connection(writer, connection_key)
@@ -270,7 +264,6 @@ class AsyncStreamClient(AsyncClient):
                 try:
                     data = await asyncio.wait_for(response_queue.get(), timeout=10.0)
                     # print("get_data :", data)
-                    # import pdb; pdb.set_trace()
                     if data["body"] == "eof":
                         break
                     yield data
@@ -283,6 +276,7 @@ class AsyncStreamClient(AsyncClient):
         except Exception as e:
             print(f"[TCP Error] {e} for request {request_id}")
             yield "eof"
+
             if connection_key in self._connection_cache:
                 writer = self._connection_cache[connection_key][1]
                 await self._close_connection(writer, connection_key)
@@ -296,112 +290,62 @@ class AsyncStreamClient(AsyncClient):
         if connection_key in self._connection_cache:
             _, _, reader_task = self._connection_cache.pop(connection_key)
             reader_task.cancel() # 取消后台任务
-        try:
-            writer.close()
-            await writer.wait_closed()
-        except Exception as e:
-            print(f"Error closing connection: {e}")
+            try:
+                await asyncio.wait_for(reader_task, timeout=1.0)
+            except (asyncio.TimeoutError, asyncio.CancelledError):
+                pass
 
+            try:
+                writer.close()
+                # await writer.wait_closed()
+                await asyncio.wait_for(writer.wait_closed(), timeout=1.0)
+            except Exception as e:
+                print(f"Error closing connection: {e}")
 
-# class AsyncDatagramClient(AsyncClient):
-#     """
-#     优化的UDP客户端 - 重构以支持安全的并发请求
-#     """
-    
-#     def __init__(self, addr):
-#         # 确保基类初始化只在第一次发生
-#         if not self._initialization_complete:
-#             super()._initialize()
+    async def close_async(self):
+        """
+        异步关闭所有连接和资源
+        """
+        if not self._running:
+            return
         
-#         self.addr = addr
-#         self.HEADER_SIZE = struct.calcsize(CHUNK_HEADER_FORMAT)
-#         self._init_socket()
+        print("[TCP] Shutting down client...")
+        self._running = False
         
-#         # 这个任务在客户端实例化时启动，并一直运行
-#         if hasattr(self, 'loop') and self.loop.is_running():
-#             self._receive_task = asyncio.run_coroutine_threadsafe(self._receive_loop(), self.loop)
-#         else:
-#             # 如果事件循环尚未完全启动，则延迟创建
-#             self.loop.call_soon_threadsafe(lambda: asyncio.create_task(self._receive_loop()))
-
-#     def _init_socket(self):
-#         """优化的socket初始化"""
-#         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#         self.sock.setblocking(False)
-#         try:
-#             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, self.buffer_size)
-#             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, self.buffer_size)
-#             self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-#         except Exception as e:
-#             print(f"Socket optimization warning: {e}")
-
-#     async def _receive_loop(self):
-#         """
-#             后台接收循环持续监听socket request_id 分发到对应的请求队列
-#         """
-#         print("[UDP] Receiver loop started.")
-#         while self._running:
-#             try:
-#                 recv_message, _ = await self.loop.sock_recvfrom(self.sock, self.buffer_size)
-#                 if not recv_message:
-#                     continue
-
-#                 request_id, received_data = unpack(recv_message[:-8])
-
-#                 if request_id in self._pending_requests:
-#                     await self._pending_requests[request_id].put(received_data)
-#                 else:
-#                     print(f"[UDP Warning] Received message for unknown request_id: {request_id}")
-
-#             except asyncio.CancelledError:
-#                 break
-#             except Exception as e:
-#                 print(f"[UDP Recv Loop Error] {e}")
-#                 await asyncio.sleep(0.01) # 发生错误时短暂暂停避免CPU空转
-#         print("[UDP] Receiver loop stopped.")
-
-#     async def get_data(self, message):
-#         """
-#         现在此方法负责发送请求，并从专属队列中异步地获取响应。
-#         """
-#         request_id = str(uuid.uuid4())
-#         response_queue = asyncio.Queue()
-#         self._pending_requests[request_id] = response_queue
-#         try:
-#             serialize_msg = pack(message["topic"], message["body"], request_id=request_id)
+        # 取消所有pending请求
+        for request_id in list(self._pending_requests.keys()):
+            queue = self._pending_requests.pop(request_id, None)
+            if queue:
+                await queue.put({"body": "eof"})
         
-#             await self.loop.run_in_executor(
-#                 self._executor, 
-#                 self.sock.sendto, 
-#                 serialize_msg, 
-#                 self.addr
-#             )
-
-#             while True:
-#                 try:
-#                     data = await asyncio.wait_for(response_queue.get(), timeout=10.0)
-
-#                     # if data == "sentinel" or data == "shutdown":
-#                     if data["body"] == b"shutdown":
-#                         yield "eof"
-#                         break
-
-#                     yield data
-
-#                 except asyncio.TimeoutError:
-#                     print(f"[UDP Timeout] No response for request {request_id} within timeout period.")
-#                     yield "eof"
-#                     break
-#                 except asyncio.CancelledError:
-#                     raise
+        # 关闭所有连接
+        connection_keys = list(self._connection_cache.keys())
+        for connection_key in connection_keys:
+            if connection_key in self._connection_cache:
+                _, writer, _ = self._connection_cache[connection_key]
+                await self._close_connection(writer, connection_key)
         
-#         except Exception as e:
-#             print(f"[UDP Send Error] {e} for request {request_id}")
-#             yield "eof"
-            
-#         finally:
-#             # *** 重要 ***: 清理请求，避免内存泄漏
-#             self._pending_requests.pop(request_id, None)
+        self._connection_cache.clear()
+        self._pending_requests.clear()
+        print("[TCP] Client shutdown complete.")
+
+    def close(self):
+        """
+        同步关闭方法（如果需要在非异步上下文中调用）
+        """
+        if not self._running:
+            return
+        
+        # 在事件循环中运行异步关闭
+        if hasattr(self, 'loop') and self.loop.is_running():
+            future = asyncio.run_coroutine_threadsafe(self.close_async(), self.loop)
+            try:
+                future.result(timeout=5.0)
+            except Exception as e:
+                print(f"Error during client shutdown: {e}")
+        else:
+            # 如果没有运行的事件循环，直接运行
+            asyncio.run(self.close_async())
 
 
 class AsyncZmqClient(AsyncClient):
@@ -411,24 +355,12 @@ class AsyncZmqClient(AsyncClient):
     It maintains the singleton pattern and supports concurrent requests.
     """
 
-    # _instance = None
-    # _initialization_complete = False
-    # _lock_instance = threading.RLock()
-
-    # def __new__(cls, *args, **kwargs):
-    #     if cls._instance is None:
-    #         with cls._lock_instance:
-    #             if cls._instance is None:
-    #                 cls._instance = super(ZmqClient, cls).__new__(cls)
-    #                 cls._instance._initialize(*args, **kwargs)
-    #                 cls._initialization_complete = True
-    #     return cls._instance
-
-    def __init__(self, addr):
+    def __init__(self, addr, timeout=5.0):
         if not self._initialization_complete:
             super()._initialize()
 
         self.addr = addr
+        self.timeout = timeout
         
         # Initialize ZMQ context and socket within the loop
         future = asyncio.run_coroutine_threadsafe(self._init_zmq(), self.loop)
@@ -451,77 +383,6 @@ class AsyncZmqClient(AsyncClient):
         
         # Start the background task to listen for all incoming messages
         self._receive_task = self.loop.create_task(self._receive_loop())
-
-    # def _init_event_loop(self):
-    #     """Initializes and starts the asyncio event loop in a separate thread."""
-    #     self.loop = asyncio.new_event_loop()
-
-    #     if hasattr(self.loop, 'set_debug'):
-    #         self.loop.set_debug(False)
-        
-    #     self._loop_thread = threading.Thread(
-    #         target=self._run_event_loop,
-    #         daemon=True,
-    #         name="ZmqClient-EventLoop"
-    #     )
-    #     self._loop_thread.start()
-        
-    #     timeout = 5.0
-    #     start_time = time.time()
-    #     while not self.loop.is_running() and (time.time() - start_time) < timeout:
-    #         time.sleep(0.01)
-
-    # def _run_event_loop(self):
-    #     asyncio.set_event_loop(self.loop)
-    #     print("[loop] Event loop started")
-    #     try:
-    #         self.loop.run_forever()
-    #     except Exception as e:
-    #         print(f"Event loop error: {e}")
-    #     finally:
-    #         print("[loop] Event loop stopped")
-
-    # def run(self, req: Dict[str, Any], req_q: Queue):
-    #     """
-    #     Public method to submit a request. This is thread-safe.
-    #     """
-    #     if not self._running:
-    #         self._ensure_eof(req_q)
-    #         return
-        
-    #     coro = self.on_receive(req, req_q)
-    #     future = asyncio.run_coroutine_threadsafe(coro, self.loop)
-    #     self._tasks.add(future)
-        
-    #     def cleanup_callback(f):
-    #         try:
-    #             f.result()
-    #         except Exception as e:
-    #             print(f"[CALLBACK ERROR] {e}")
-    #         finally:
-    #             self._tasks.discard(f)
-    #             self._ensure_eof(req_q)
-
-    #     future.add_done_callback(cleanup_callback)
-
-    # async def on_receive(self, message: Dict[str, Any], req_q: Queue):
-    #     """Coroutine that wraps the get_data generator to feed the synchronous queue."""
-    #     try:
-    #         data_count = 0
-    #         async for data in self.get_data(message):
-    #             req_q.put(data)
-    #             if data == "eof":
-    #                 break
-                
-    #             data_count += 1
-    #             if data_count % 100 == 0:
-    #                 await asyncio.sleep(0)
-                    
-    #     except asyncio.CancelledError:
-    #         print("on_receive task cancelled.")
-    #         raise
-    #     except Exception as e:
-    #         print(f"Error in on_receive: {e}")
 
     async def _receive_loop(self):
         """
@@ -560,7 +421,7 @@ class AsyncZmqClient(AsyncClient):
 
         try:
             serialize_msg = pack(message["topic"], message["body"], request_id=request_id)
-            print("zmq send ", serialize_msg)
+            # print("zmq send ", serialize_msg)
             
             # Send the message asynchronously. ZMQ handles the non-blocking I/O.
             await self.socket.send(serialize_msg)
@@ -592,86 +453,27 @@ class AsyncZmqClient(AsyncClient):
             # Crucial: Clean up the pending request to prevent memory leaks
             self._pending_requests.pop(request_id, None)
 
-    # def close(self):
-    #     """Gracefully shuts down the client."""
-    #     if not self._running:
-    #         return
+    def close(self):
+        """Gracefully shuts down the client."""
+        if not self._running:
+            return
         
-    #     print("[ZMQ] Shutting down client...")
-    #     self._running = False
+        print("[ZMQ] Shutting down client...")
+        self._running = False
 
-    #     def shutdown_async_resources():
-    #         if hasattr(self, '_receive_task') and self._receive_task:
-    #             self._receive_task.cancel()
-    #         if hasattr(self, 'socket'):
-    #             self.socket.close()
-    #         if hasattr(self, 'context'):
-    #             self.context.term()
+        def shutdown_async_resources():
+            if hasattr(self, '_receive_task') and self._receive_task:
+                self._receive_task.cancel()
+            if hasattr(self, 'socket'):
+                self.socket.close()
+            if hasattr(self, 'context'):
+                self.context.term()
 
-    #     # Schedule the cleanup on the event loop
-    #     self.loop.call_soon_threadsafe(shutdown_async_resources)
+        # Schedule the cleanup on the event loop
+        self.loop.call_soon_threadsafe(shutdown_async_resources)
         
-    #     # Stop the event loop itself
-    #     self.loop.call_soon_threadsafe(self.loop.stop)
-    #     self._loop_thread.join(timeout=2)
-    #     self._executor.shutdown(wait=True)
-    #     print("[ZMQ] Client shutdown complete.")
-
-    # def _ensure_eof(self, req_q: Queue):
-    #     """Thread-safe way to put 'eof' into the queue."""
-    #     try:
-    #         if self.loop.is_running():
-    #             self.loop.call_soon_threadsafe(req_q.put, "eof")
-    #         else:
-    #             req_q.put("eof") # Fallback for already closed loop
-    #     except Exception:
-    #         # If all else fails, use a thread
-    #         threading.Thread(target=req_q.put, args=("eof",), daemon=True).start()
-
-# # Example usage
-# if __name__ == '__main__':
-#     SERVER_ADDR = "tcp://127.0.0.1:8888"
-    
-#     # The singleton pattern ensures we only get one instance
-#     client = ZmqClient(addr=SERVER_ADDR)
-    
-#     # --- Simulate making two concurrent requests ---
-    
-#     def make_request(request_id: int):
-#         print(f"\n--- Making request #{request_id} ---")
-#         # Each request needs its own synchronous queue for results
-#         result_queue = Queue()
-        
-#         # Define the request payload
-#         request = {
-#             "topic": "echo_service",
-#             "body": f"Hello from request {request_id}"
-#         }
-        
-#         # The `run` method is non-blocking
-#         client.run(req=request, req_q=result_queue)
-        
-#         # Block and retrieve results from the queue
-#         print(f"Waiting for results for request #{request_id}...")
-#         while True:
-#             result = result_queue.get()
-#             if result == "eof":
-#                 print(f"End of stream for request #{request_id}.")
-#                 break
-#             print(f"Result for #{request_id}: {result}")
-#         print(f"--- Finished request #{request_id} ---")
-
-#     # Use threads to simulate concurrent callers
-#     thread1 = threading.Thread(target=make_request, args=(1,))
-#     thread2 = threading.Thread(target=make_request, args=(2,))
-    
-#     thread1.start()
-#     time.sleep(0.1) # Stagger start slightly
-#     thread2.start()
-    
-#     thread1.join()
-#     thread2.join()
-    
-#     # Gracefully close the client
-#     client.close()
-
+        # Stop the event loop itself
+        self.loop.call_soon_threadsafe(self.loop.stop)
+        self._loop_thread.join(timeout=2)
+        self._executor.shutdown(wait=True)
+        print("[ZMQ] Client shutdown complete.")

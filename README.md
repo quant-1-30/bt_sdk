@@ -50,3 +50,5 @@ poetry cache clear pypi --all
 poetry env info --path
 
 pytest 中执行多个测试用例时，每个测试用例都会创建新的 Api 实例
+
+# poetry 不会自动打包pybind  需要手动cmake构建 / pyproject.toml 配置 include

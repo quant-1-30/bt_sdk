@@ -26,6 +26,7 @@ class TdApi(Api):
     """
     params = (
         ("protocol", "tcp"),
+        ("timeout", 5.0),  # Default timeout 
         ("client_id", "")
         )
 
@@ -43,40 +44,45 @@ class TdApi(Api):
         """
             get n position and account 
         """
-        topic = f"get_{topic}"
-        rq = Request(topic=topic, body=ReqMeta(), client_id=self.p.client_id)
+        rq = Request(topic=f"get_{topic}", body=ReqMeta(), client_id=self.p.client_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
-        data = self.get_data(chan)
-        return data
+        raw_data = self.get_data(chan)
+        if not raw_data:
+            return None
+        o = Account(**raw_data[0]["body"]) if topic == "account" else Position(**raw_data[0]["body"])
+        return o
 
     @contextmanager   
     def subscribe(self, topic, meta:ReqMeta):
-        """
-            subscribe topic order / position / account
-        """
-        rq = Request(topic=f'query_{topic}', body=meta, client_id=self.p.client_id)
-        chan = self.get_channel()
-        self.async_client.run(rq.model_dump(), chan)
-        try:
-            yield chan
-        finally:
-            self.cancel(chan)
+       """
+           subscribe topic order / position / account
+       """
+       rq = Request(topic=f'query_{topic}', body=meta, client_id=self.p.client_id)
+       chan = self.get_channel()
+       self.async_client.run(rq.model_dump(), chan)
+       try:
+           yield chan
+       finally:
+           self.cancel(chan)
     
-    def trade(self, meta: OrderMeta):
+    def submit(self, meta: OrderMeta):
         """
             execution order in queue
         """
         rq = Request(topic="order", body=meta, client_id=self.p.client_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
-        trades = self.get_data(chan)
-        return trades
+        raw_data = self.get_data(chan)
+        if not raw_data:
+            return None
+        bits = [OrderBit(**d["body"]) for d in raw_data]
+        return bits
     
-    def check(self, meta: ReqMeta):
+    def chain(self, meta: ReqMeta):
         # a. check event_data and sync_account between sdate and edate
         # b. sync last date in case of asset delist
-        rq = Request(topic="check", body=meta, client_id=self.p.client_id)
+        rq = Request(topic="chain", body=meta, client_id=self.p.client_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         status = self.get_data(chan)
