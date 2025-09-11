@@ -51,12 +51,12 @@ class MdApi(Api):
             request instruments
         """
         # import pdb; pdb.set_trace()
-        trans_meta = ReqMeta(
+        event_meta = ReqMeta(
             start_date=int(num2date(meta.start_date).strftime("%Y%m%d")), 
             end_date=int(num2date(meta.end_date).strftime("%Y%m%d")),
             sid=meta.sid
         )
-        rq = Request(topic=topic, body=meta)
+        rq = Request(topic=topic, body=event_meta)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         events = self.get_data(chan)

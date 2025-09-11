@@ -35,7 +35,6 @@ def calc_factor(close, adjust, right, forward=True):
     vector_right_event = [right2struct(data["body"]) for data in right]
 
     factor_type = adj_factor.AdjustType.Forward if forward else adj_factor.AdjustType.Backward 
-
     factors = adj_factor.calc_adjust_factors(
         vector_trading, 
         vector_close, 

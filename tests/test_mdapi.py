@@ -36,7 +36,7 @@ class TestMdApi:
 
     @pytest.fixture
     def reqMeta(self):
-        start_date = "20240108 9:30:00"
+        start_date = "20100108 9:30:00"
         end_date = "20240108 15:00:00"
         start_time = datetime.strptime(start_date, '%Y%m%d %H:%M:%S').timestamp()
         end_time = datetime.strptime(end_date, '%Y%m%d %H:%M:%S').timestamp()
@@ -75,5 +75,5 @@ class TestMdApi:
 
     def test_factor(self, md_api, reqMeta):
         data = md_api.factor(reqMeta)
-        print("test_getClose: ", data)
+        print("test_get_factors: ", data.raw_factors, data.adj_factors)
         assert data is not None
