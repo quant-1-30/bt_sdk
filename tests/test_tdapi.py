@@ -26,7 +26,7 @@ class TestTdApi:
 
     @pytest.fixture
     def td_api(self, client_id):
-        api = TdApi(addr=("127.0.0.1", 8888), client_id=client_id, timeout=20)
+        api = TdApi(addr=("192.168.2.100", 8888), client_id=client_id, timeout=20)
         return api
     
     @pytest.fixture
@@ -62,20 +62,20 @@ class TestTdApi:
                       end_date = end_time.timestamp(),
                       sid = sid)
 
-    # def test_set_cash(self, td_api, cashMeta):
-    #     data = td_api.set_cash(cashMeta)
-    #     print("test_set_cash: ", data)
-    #     assert data is not None
+    def test_set_cash(self, td_api, cashMeta):
+        data = td_api.set_cash(cashMeta)
+        print("test_set_cash: ", data)
+        assert data is not None
 
     # def test_submit(self, td_api, ordermeta):
     #     data = td_api.submit(ordermeta)
     #     print("test_trade: ", data)
     #     assert data is not None
     
-    def test_chain(self, td_api, reqmeta):
-        status = td_api.chain(reqmeta)
-        print("test_chain: ", status)
-        assert status is not None
+    # def test_chain(self, td_api, reqmeta):
+    #     status = td_api.chain(reqmeta)
+    #     print("test_chain: ", status)
+    #     assert status is not None
 
     # def test_getAccount(self, td_api):
     #     o = td_api.fetch("account")

@@ -10,7 +10,7 @@ from bt_sdk.utils.dt_utility import num2date
 class MdApi(Api):
     params = (
             ("protocol", "zmq"),
-            ("timeout", 5.0),  # Default timeout
+            ("timeout", -1),  # Default timeout
               )
 
     def get_calendar(self): 

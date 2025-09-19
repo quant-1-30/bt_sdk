@@ -12,7 +12,7 @@ poetry add devp-server devpi-web devpi-client
 devpi use --h # for help
 devpi-init --serverdir ~/.devpi/server 
 
-devpi-server --serverdir ~/.devpi --host 0.0.0.0 --port 3141
+devpi-server --serverdir ~/.devpi --host 192.168.2.100 --port 3141
 
 # client
 devpi use http://localhost:3141/
