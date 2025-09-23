@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.7.5"
+version = "0.7.6"
 description = "solve poetry and pybind pack bug"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
@@ -31,6 +31,7 @@ annotated-types = "^0.7.0"
 setuptools-cmake-helper = "^0.1.2"
 pygments = "^2.19.2"
 pydantic = "2.6.4"
+urllib3 = "^2.5.0"
 
 [tool.poetry.group.build.dependencies]
 setuptools = "^68.0.0"

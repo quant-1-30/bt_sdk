@@ -20,6 +20,13 @@ fi
 
 echo "Starting server in Poetry environment..."
 
-poetry run devpi use http://192.168.2.100:3141/ && poetry run devpi login bt_sdk --password 20210718 && rm -rf dist/ 
-poetry run poertry build --foramt=wheel && poetry run devpi upload dist/*
+poetry run devpi use http://192.168.2.100:3141/ 
+
+# create user and channel for first time
+# poetry run devpi user -c bt_sdk password=20210718 email=bt_sdk@example.com && poetry run devpi index -c bt_sdk/dev  bases=root/pypi && 
+
+# use channel / login / upload
+poetry run devpi use bt_sdk/dev 
+poetry run devpi login bt_sdk --password 20210718 && rm -rf dist/ 
+poetry run poetry build --format=wheel && poetry run devpi upload dist/*
 
