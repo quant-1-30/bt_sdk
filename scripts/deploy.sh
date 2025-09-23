@@ -20,6 +20,6 @@ fi
 
 echo "Starting server in Poetry environment..."
 
-poetry run devpi login bt_sdk --password 20210718 && rm -rf dist/ 
+poetry run devpi use http://192.168.2.100:3141/ && poetry run devpi login bt_sdk --password 20210718 && rm -rf dist/ 
 poetry run poertry build --foramt=wheel && poetry run devpi upload dist/*
 
