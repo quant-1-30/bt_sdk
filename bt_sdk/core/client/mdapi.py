@@ -32,6 +32,16 @@ class MdApi(Api):
         self.async_client.run(rq.model_dump(), chan)
         instruments = self.get_data(chan)
         return instruments 
+    
+    def get_benchmark(self, index='000001'):
+        """
+            request index 000001 000680 399006 399001
+        """
+        rq = Request(topic='index', body=ReqMeta(sid=[index]))
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump(), chan)
+        index = self.get_data(chan)
+        return index 
 
     @contextmanager
     def subscribe(self, meta:ReqMeta):

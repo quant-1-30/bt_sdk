@@ -22,11 +22,12 @@ class TestTdApi:
 
     @pytest.fixture
     def client_id(self):
-        return "2038c248-abc6-4e40-b1d4-d77962ad94a8"
+        return "551df926-74e0-4606-b3cc-82de49821b96"
 
     @pytest.fixture
     def td_api(self, client_id):
-        api = TdApi(addr=("192.168.2.100", 8888), client_id=client_id, timeout=20)
+        api = TdApi(addr=("localhost", 8888), client_id=client_id, timeout=20)
+        # api = TdApi(addr=("192.168.2.100", 8888), client_id=client_id, timeout=20)
         return api
     
     @pytest.fixture
