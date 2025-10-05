@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import msgpack
 import struct
-from typing import Any
+from typing import Any, Mapping
 
 
 # ------------------------------------------struct----------------------------------------------
@@ -46,12 +46,13 @@ def msg_unpack(_type: str, msg_type, msg: bytes) -> Any:
 
 # --------------------------------------------msgpack---------------------------------------------
 
-def pack(topic: str, body: dict, client_id: str="", request_id="") -> bytes:
-    return msgpack.packb({"topic": topic, "body": body, "client_id": client_id, "request_id":request_id}, use_bin_type=True)
+def pack(msg: Mapping) -> bytes:
+    # msg_c = msg.copy()
+    # msg_c["request_id"] = request_id
+    # return msgpack.packb({"topic": topic, "body": body, "experiment_id": experiment_id, "request_id":request_id}, use_bin_type=True)
+    return msgpack.packb(msg, use_bin_type=True)
 
 def unpack(data: bytes) -> dict:
-    # import pdb; pdb.set_trace()
     data = msgpack.unpackb(data, raw=False)
-    # print("unpack data :", data)
     request_id = data.pop("request_id")
     return request_id, data

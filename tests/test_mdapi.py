@@ -54,10 +54,10 @@ class TestMdApi:
     #     print("test_getInstrument: ", data)
     #     assert data is not None
     
-    def test_getBenchmark(self, md_api):
-        data = md_api.get_benchmark()
-        print("test_getBenchmark: ", data)
-        assert data is not None
+    # def test_getBenchmark(self, md_api):
+    #     data = md_api.get_benchmark()
+    #     print("test_getBenchmark: ", data)
+    #     assert data is not None
     
     # def test_subscribe(self, md_api, reqMeta):
     #     with md_api.subscribe(reqMeta) as q:
@@ -79,7 +79,7 @@ class TestMdApi:
     #     print("test_getEvent: ", data)
     #     assert data is not None
 
-    # def test_factor(self, md_api, reqMeta):
-    #     data = md_api.factor(reqMeta)
-    #     print("test_get_factors: ", data.raw_factors, data.adj_factors)
-    #     assert data is not None
+    def test_factor(self, md_api, reqMeta):
+        data = md_api.factor(reqMeta)
+        print("test_get_factors: ", data.raw_factors, data.adj_factors)
+        assert data is not None

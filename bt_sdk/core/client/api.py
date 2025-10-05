@@ -29,6 +29,7 @@ class MetaApi(MetaSingleton):
     def dopostinit(cls, _obj, *args, **kwargs):
         _obj, args, kwargs = super(MetaApi, cls).dopostinit(_obj, *args, **kwargs)
         _obj._post_init()
+        _obj.experiment_id = '' # record 
         return _obj, args, kwargs
     
    

@@ -4,18 +4,19 @@
 import pydantic
 from dataclasses import dataclass
 from datetime import datetime
+from uuid import UUID, uuid4
 from pydantic import Field, field_validator, ConfigDict
-from typing import List, Union, Optional, Mapping
+from typing import List, Union, Any, Dict
 
 
-__all__ = ["ReqMeta", "CashMeta",  "OrderMeta", "Request", "OrderBit", "Position", "Account"]
+__all__ = ["ExpMeta", "CashMeta",  "OrderMeta", "ReqMeta", "Request", "OrderBit", "Position", "Account"]
 
 
-class ReqMeta(pydantic.BaseModel):
-    start_date: int = Field(default=0)
-    end_date: int = Field(default=int(datetime.now().strftime("%Y%m%d")))
-    sid: List[str] = Field(default=[])
-
+class ExpMeta(pydantic.BaseModel):
+    strategy: str
+    client_id: str
+    assets: str
+    
     model_config = ConfigDict(
         extra="forbid",
         frozen=True
@@ -25,6 +26,11 @@ class ReqMeta(pydantic.BaseModel):
 class CashMeta(pydantic.BaseModel):
     session: int
     cash: int = Field(default=0)
+    
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True
+    )
 
 
 class OrderMeta(pydantic.BaseModel):
@@ -44,11 +50,31 @@ class OrderMeta(pydantic.BaseModel):
     )
 
 
+class ReqMeta(pydantic.BaseModel):
+    start_date: int = Field(default=0)
+    end_date: int = Field(default=int(datetime.now().strftime("%Y%m%d")))
+    sid: List[str] = Field(default=[])
+
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True
+    )
+
+
 class Request(pydantic.BaseModel):
 
     topic: str
-    body: Union[ReqMeta, CashMeta, OrderMeta]
-    client_id: str = Field(default="")
+    body: Union[ExpMeta, CashMeta, OrderMeta, ReqMeta]
+    experiment_id: str = Field(default="default")
+    request_id: UUID = Field(default_factory=uuid4)
+
+    def model_dump(self, *args, **kwargs) -> Dict[str, Any]:
+       """重写 model_dump 方法，将 UUID 转为字符串"""
+       data = super().model_dump(*args, **kwargs)
+       # 处理 UUID 字段
+       if 'request_id' in data and isinstance(data['request_id'], UUID):
+           data['request_id'] = str(data['request_id'])        
+       return data
 
     model_config = ConfigDict(
         extra="forbid",
@@ -88,5 +114,5 @@ class Account(pydantic.BaseModel):
     cash: float
     leverage: int
     margin: float
-    client_id: str
+    experiment_id: str
 

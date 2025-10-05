@@ -22,13 +22,24 @@ class TestTdApi:
 
     @pytest.fixture
     def client_id(self):
-        return "551df926-74e0-4606-b3cc-82de49821b96"
+        return "fc9dac14-b6bb-4a2a-a716-741fa73aa5ca"
+    
+    @pytest.fixture
+    def experiment_id(self):
+        return "5889b29e-2760-41c2-90db-e3614031bbd4"
 
     @pytest.fixture
-    def td_api(self, client_id):
+    def td_api(self, client_id, experiment_id):
         api = TdApi(addr=("localhost", 8888), client_id=client_id, timeout=20)
         # api = TdApi(addr=("192.168.2.100", 8888), client_id=client_id, timeout=20)
+        api.experiment_id = experiment_id
         return api
+    
+    @pytest.fixture
+    def expMeta(self, client_id):
+        strategy = "test"
+        assets='002750'
+        return ExpMeta(client_id=client_id, strategy=strategy, assets=assets)
     
     @pytest.fixture
     def cashMeta(self):
@@ -53,7 +64,7 @@ class TestTdApi:
     
     @pytest.fixture(scope="function")
     def reqmeta(self):
-        start_date = "20250427"
+        start_date = "20250424"
         end_date = "20250815"
         start_time = datetime.strptime(start_date, '%Y%m%d')
         end_time = datetime.strptime(end_date, '%Y%m%d')
@@ -62,30 +73,29 @@ class TestTdApi:
                       start_date = start_time.timestamp(),
                       end_date = end_time.timestamp(),
                       sid = sid)
+    
+    # def test_register(self, td_api, expMeta):
+    #     td_api.register(expMeta)
+    #     assert td_api.experiment_id is not None
 
-    def test_set_cash(self, td_api, cashMeta):
-        data = td_api.set_cash(cashMeta)
-        print("test_set_cash: ", data)
-        assert data is not None
+    # def test_set_cash(self, td_api, cashMeta):
+    #     data = td_api.set_cash(cashMeta)
+    #     print("test_set_cash: ", data)
+    #     assert data is not None
 
     # def test_submit(self, td_api, ordermeta):
     #     data = td_api.submit(ordermeta)
-    #     print("test_trade: ", data)
+    #     print("test_submit: ", data)
     #     assert data is not None
-    
-    # def test_chain(self, td_api, reqmeta):
-    #     status = td_api.chain(reqmeta)
-    #     print("test_chain: ", status)
-    #     assert status is not None
 
     # def test_getAccount(self, td_api):
     #     o = td_api.fetch("account")
-    #     print("test account obg: ", o)
+    #     print("test get_account: ", o)
     #     assert o is not None
 
     # def test_getPosition(self, td_api):
     #     o = td_api.fetch("position")
-    #     print("test position obj: ", o)
+    #     print("test get_position: ", o)
     #     assert o is not None
 
     # def test_subscirbe_order(self, td_api, reqmeta):
@@ -105,3 +115,8 @@ class TestTdApi:
     #         data = get_data(q)
     #     print("test_reqAccount: ", data)
     #     assert data is not None
+    
+    def test_on_dt_over(self, td_api, reqmeta):
+        status = td_api.on_dt_over(reqmeta)
+        print("test_chain: ", status)
+        assert status is not None

@@ -90,13 +90,13 @@ class AsyncClient:
         finally:
             print("[loop] Event loop stopped")
 
-    def run(self, req, req_q):
+    def run(self, msg, msg_q):
        
         if not self._running:
-            self._ensure_eof(req_q) # 创建结束事件，避免依赖队列EOF
+            self._ensure_eof(msg_q) # 创建结束事件，避免依赖队列EOF
             return
         try:
-            coro = self.on_receive(req, req_q)
+            coro = self.on_receive(msg, msg_q)
             future = asyncio.run_coroutine_threadsafe(coro, self.loop)
             self._tasks.add(future)
             
@@ -107,21 +107,21 @@ class AsyncClient:
                     print(f"[CALLBACK ERROR] {e}")
                 finally:
                     self._tasks.discard(f)
-                    self._ensure_eof(req_q)
+                    self._ensure_eof(msg_q)
 
             future.add_done_callback(cleanup_callback)
             
         except Exception as e:
             print(f"Error starting task: {e}")
-            self._ensure_eof(req_q)
+            self._ensure_eof(msg_q)
     
-    async def on_receive(self, message: Dict[str, Any], req_q: Queue):
+    async def on_receive(self, message: Dict[str, Any], msg_q: Queue):
         """优化的消息接收处理 - 支持结束事件"""
         task = asyncio.current_task()
         try:
             data_count = 0
             async for data in self.get_data(message):
-                req_q.put(data)
+                msg_q.put(data)
                 data_count += 1
 
                 if data == "eof":
@@ -244,7 +244,8 @@ class AsyncStreamClient(AsyncClient):
         """
             通过请求ID在共享的TCP连接上安全地发送和接收数据。
         """
-        request_id = str(uuid.uuid4())
+        # request_id = str(uuid.uuid4())
+        request_id=message["request_id"]
         response_queue = asyncio.Queue()
         self._pending_requests[request_id] = response_queue
         connection_key = f"{self.host}:{self.port}"
@@ -253,7 +254,8 @@ class AsyncStreamClient(AsyncClient):
             _, writer = await self._get_connection(connection_key) # cache
             
             # 假设 pack 函数现在接受 request_id
-            serialize_msg = pack(**message, request_id=request_id)
+            # serialize_msg = pack(**message, request_id=request_id)
+            serialize_msg = pack(message)
             
             msg_len = len(serialize_msg)
             writer.write(msg_len.to_bytes(self.LENGTH_BYTES, byteorder='big'))
@@ -415,12 +417,14 @@ class AsyncZmqClient(AsyncClient):
         Sends a request via the ZMQ DEALER socket and asynchronously yields responses
         from a dedicated queue populated by the central `_receive_loop`.
         """
-        request_id = str(uuid.uuid4())
+        # request_id = str(uuid.uuid4())
+        request_id=message["request_id"]
         response_queue = asyncio.Queue()
         self._pending_requests[request_id] = response_queue
 
         try:
-            serialize_msg = pack(message["topic"], message["body"], request_id=request_id)
+            # serialize_msg = pack(message["topic"], message["body"], request_id=request_id)
+            serialize_msg = pack(message)
             # print("zmq send ", serialize_msg)
             
             # Send the message asynchronously. ZMQ handles the non-blocking I/O.
