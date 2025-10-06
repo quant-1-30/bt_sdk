@@ -91,7 +91,7 @@ class TdApi(Api):
     def on_dt_over(self, meta: ReqMeta):
         # a. check event_data and sync_account between sdate and edate
         # b. sync last date in case of asset delist
-        rq = Request(topic="chain", body=meta, experiment_id=self.experiment_id)
+        rq = Request(topic="on_dt_over", body=meta, experiment_id=self.experiment_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         resp = self.get_data(chan)

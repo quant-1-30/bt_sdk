@@ -59,10 +59,10 @@ class TestMdApi:
     #     print("test_getBenchmark: ", data)
     #     assert data is not None
     
-    # def test_subscribe(self, md_api, reqMeta):
-    #     with md_api.subscribe(reqMeta) as q:
-    #         data = get_data(q)
-    #     assert data is not None
+    def test_subscribe(self, md_api, reqMeta):
+        with md_api.subscribe(reqMeta) as q:
+            data = get_data(q)
+        assert data is not None
     
     # def test_get_close(self, md_api, reqMeta):
     #     data = md_api.get_close(reqMeta)
@@ -71,12 +71,12 @@ class TestMdApi:
 
     # def test_adjust_event(self, md_api, reqMeta):
     #     data = md_api.get_event("adjustment", reqMeta)
-    #     print("test_getEvent: ", data)
+    #     print("test_adjEvent: ", data)
     #     assert data is not None
     
     # def test_right_event(self, md_api, reqMeta):
     #     data = md_api.get_event("rightment", reqMeta)
-    #     print("test_getEvent: ", data)
+    #     print("test_rgtEvent: ", data)
     #     assert data is not None
 
     def test_factor(self, md_api, reqMeta):

@@ -88,35 +88,35 @@ class TestTdApi:
     #     print("test_submit: ", data)
     #     assert data is not None
 
-    # def test_getAccount(self, td_api):
-    #     o = td_api.fetch("account")
-    #     print("test get_account: ", o)
-    #     assert o is not None
+    def test_getAccount(self, td_api):
+        o = td_api.fetch("account")
+        print("test get_account: ", o)
+        assert o is not None
 
-    # def test_getPosition(self, td_api):
-    #     o = td_api.fetch("position")
-    #     print("test get_position: ", o)
-    #     assert o is not None
+    def test_getPosition(self, td_api):
+        o = td_api.fetch("position")
+        print("test get_position: ", o)
+        assert o is not None
 
-    # def test_subscirbe_order(self, td_api, reqmeta):
-    #     with td_api.subscribe("order", reqmeta) as q:
-    #         data = get_data(q)
-    #     print("test_reqOrder: ", data)
-    #     assert data is not None
+    def test_subscirbe_order(self, td_api, reqmeta):
+        with td_api.subscribe("order", reqmeta) as q:
+            data = get_data(q)
+        print("test_reqOrder: ", data)
+        assert data is not None
 
-    # def test_subscribe_position(self, td_api, reqmeta):
-    #     with td_api.subscribe("position", reqmeta) as q:
-    #         data = get_data(q)
-    #     print("test_reqPosition: ", data)
-    #     assert data is not None
+    def test_subscribe_position(self, td_api, reqmeta):
+        with td_api.subscribe("position", reqmeta) as q:
+            data = get_data(q)
+        print("test_reqPosition: ", data)
+        assert data is not None
 
-    # def test_subscribe_account(self, td_api, reqmeta):
-    #     with td_api.subscribe("account", reqmeta) as q:
-    #         data = get_data(q)
-    #     print("test_reqAccount: ", data)
-    #     assert data is not None
+    def test_subscribe_account(self, td_api, reqmeta):
+        with td_api.subscribe("account", reqmeta) as q:
+            data = get_data(q)
+        print("test_reqAccount: ", data)
+        assert data is not None
     
     def test_on_dt_over(self, td_api, reqmeta):
         status = td_api.on_dt_over(reqmeta)
-        print("test_chain: ", status)
+        print("test_on_dt_over: ", status)
         assert status is not None
