@@ -361,7 +361,7 @@ class AsyncZmqClient(AsyncClient):
         if not self._initialization_complete:
             super()._initialize()
 
-        self.addr = addr
+        self.addr = f"tcp://{addr[0]}:{addr[1]}"
         self.timeout = timeout
         
         # Initialize ZMQ context and socket within the loop
