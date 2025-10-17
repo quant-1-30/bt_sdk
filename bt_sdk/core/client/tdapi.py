@@ -1,8 +1,11 @@
 # /usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 from contextlib import contextmanager
 
+from typing import List, Dict, Any, Union
 from bt_sdk.core.model import *
+from bt_sdk.core.data import *
 from bt_sdk.core.client.api import Api
 
 
@@ -30,30 +33,28 @@ class TdApi(Api):
         ("client_id", "")
         )
     
-    def register(self, meta: ExpMeta):
-        rq = Request(topic="register", body=meta) 
-        chan = self.get_channel()
-        self.async_client.run(rq.model_dump(), chan)
-        resp = self.get_data(chan)
-        print("register resp ", resp)
-        if "experiment_id" in resp[0]["body"]:
-            self.experiment_id = resp[0]["body"]["experiment_id"] 
-
-    def set_cash(self, meta: CashMeta):
-        """
-            set cash
-        """
-        rq = Request(topic="set_cash", body=meta, experiment_id=self.experiment_id)
+    def register(self, meta: ExpMeta)-> List[Dict[str, Any]]:
+        rq = Request(topic="register", body=meta, experiment_id="register")  # use api method as experiment_id where is null
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         resp = self.get_data(chan)
         return resp
 
-    def fetch(self, topic):
+    def set_cash(self, meta: CashMeta, experiment_id)-> List[Dict[str, Any]]:
+        """
+            set cash
+        """
+        rq = Request(topic="set_cash", body=meta, experiment_id=experiment_id)
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump(), chan)
+        resp = self.get_data(chan)
+        return resp
+
+    def getvalue(self, topic, experiment_id="null")-> Union[Account, Position]:
         """
             get n position and account 
         """
-        rq = Request(topic=f"get_{topic}", body=ReqMeta(), experiment_id=self.experiment_id)
+        rq = Request(topic=f"get_{topic}", body=ReqMeta(), experiment_id=experiment_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         resp = self.get_data(chan)
@@ -63,11 +64,11 @@ class TdApi(Api):
         return o
 
     @contextmanager   
-    def subscribe(self, topic, meta:ReqMeta):
+    def subscribe(self, topic, meta:ReqMeta, experiment_id):
        """
            subscribe topic order / position / account
        """
-       rq = Request(topic=f'query_{topic}', body=meta, experiment_id=self.experiment_id)
+       rq = Request(topic=f'query_{topic}', body=meta, experiment_id=experiment_id)
        chan = self.get_channel()
        self.async_client.run(rq.model_dump(), chan)
        try:
@@ -75,11 +76,11 @@ class TdApi(Api):
        finally:
            self.cancel(chan)
     
-    def submit(self, meta: OrderMeta):
+    def submit(self, meta: OrderMeta, experiment_id)-> List[OrderBit]:
         """
             execution order in queue
         """
-        rq = Request(topic="submit", body=meta, experiment_id=self.experiment_id)
+        rq = Request(topic="submit", body=meta, experiment_id=experiment_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         resp = self.get_data(chan)
@@ -88,10 +89,10 @@ class TdApi(Api):
         bits = [OrderBit(**d["body"]) for d in resp]
         return bits
     
-    def on_dt_over(self, meta: ReqMeta):
+    def on_dt_over(self, meta: ReqMeta, experiment_id:str)-> List[Dict[str, Any]]:
         # a. check event_data and sync_account between sdate and edate
         # b. sync last date in case of asset delist
-        rq = Request(topic="on_dt_over", body=meta, experiment_id=self.experiment_id)
+        rq = Request(topic="on_dt_over", body=meta, experiment_id=experiment_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         resp = self.get_data(chan)

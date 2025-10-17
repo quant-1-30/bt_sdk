@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import pydantic
-from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID, uuid4
 from pydantic import Field, field_validator, ConfigDict
 from typing import List, Union, Any, Dict
 
 
-__all__ = ["ExpMeta", "CashMeta",  "OrderMeta", "ReqMeta", "Request", "OrderBit", "Position", "Account"]
+__all__ = ["ExpMeta", "CashMeta",  "OrderMeta", "ReqMeta", "Request"]
 
 
 class ExpMeta(pydantic.BaseModel):
@@ -60,12 +59,35 @@ class ReqMeta(pydantic.BaseModel):
         frozen=True
     )
 
+    @field_validator('start_date', 'end_date', mode='before')
+    def validate_date(cls, v):
+        if isinstance(v, str):
+            try:
+                dt = datetime.strptime(v, '%Y%m%d')
+                return int(dt.timestamp())
+            except ValueError:
+                raise ValueError(f"Invalid date format: {v}. Expected 'YYYYMMDD'.")
+        elif isinstance(v, int):
+            # Assuming the integer is in YYYYMMDD format
+            try:
+                dt = datetime.strptime(str(v), '%Y%m%d')
+                return int(dt.timestamp())
+            except ValueError:
+                raise ValueError(f"Invalid date format: {v}. Expected 'YYYYMMDD'.")
+        elif isinstance(v, float):
+            return int(v)
+        elif isinstance(v, datetime):
+            return int(v.timestamp())
+        else:
+            raise TypeError(f"Unsupported type for date: {type(v)}. Expected str, int, float, or datetime.")
+
 
 class Request(pydantic.BaseModel):
 
     topic: str
     body: Union[ExpMeta, CashMeta, OrderMeta, ReqMeta]
-    experiment_id: str = Field(default="default")
+    # experiment_id: str = Field(default="default")
+    experiment_id: str
     request_id: UUID = Field(default_factory=uuid4)
 
     def model_dump(self, *args, **kwargs) -> Dict[str, Any]:
@@ -80,39 +102,3 @@ class Request(pydantic.BaseModel):
         extra="forbid",
         frozen=True
     )
-
-# ------------------------------------------------------------------- return obj -------------------------------------------------------------
-
-class OrderBit(pydantic.BaseModel):
-
-        executed_at: int
-        executed_size: int
-        executed_price: float
-        comm: float
-        direction: bool
-
-
-class Position(pydantic.BaseModel):
-    sid: str
-    datetime: int
-    size: int
-    available: int
-    price: float
-    pnl: float
-
-    def justopen(self):
-         return self.size > 0 and self.available == 0
-    
-    def isclosd(self):
-         return self.size == 0
-
-
-# @dataclass(frozen=True)
-class Account(pydantic.BaseModel):
-    datetime: int
-    portfolio_value: float
-    cash: float
-    leverage: int
-    margin: float
-    experiment_id: str
-
