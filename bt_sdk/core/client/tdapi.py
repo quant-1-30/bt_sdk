@@ -50,7 +50,7 @@ class TdApi(Api):
         resp = self.get_data(chan)
         return resp
 
-    def getvalue(self, topic, experiment_id="null")-> Union[Account, Position]:
+    def getvalue(self, topic, experiment_id='')-> Union[Account, Position]:
         """
             get n position and account 
         """

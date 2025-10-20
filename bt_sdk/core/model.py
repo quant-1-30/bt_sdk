@@ -14,7 +14,7 @@ __all__ = ["ExpMeta", "CashMeta",  "OrderMeta", "ReqMeta", "Request"]
 class ExpMeta(pydantic.BaseModel):
     strategy: str
     client_id: str
-    assets: str
+    appendix: str
     
     model_config = ConfigDict(
         extra="forbid",
@@ -80,14 +80,13 @@ class ReqMeta(pydantic.BaseModel):
             return int(v.timestamp())
         else:
             raise TypeError(f"Unsupported type for date: {type(v)}. Expected str, int, float, or datetime.")
-
+        
 
 class Request(pydantic.BaseModel):
 
     topic: str
     body: Union[ExpMeta, CashMeta, OrderMeta, ReqMeta]
-    # experiment_id: str = Field(default="default")
-    experiment_id: str
+    experiment_id: str = Field(default="null") # default is used for mdapi
     request_id: UUID = Field(default_factory=uuid4)
 
     def model_dump(self, *args, **kwargs) -> Dict[str, Any]:

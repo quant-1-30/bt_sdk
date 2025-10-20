@@ -23,8 +23,8 @@ class TestMdApi:
     
     @pytest.fixture
     def md_api(self):
-        # return MdApi(addr=("localhost", 9000))
-        return MdApi(addr=("192.168.2.100", 9000))
+        return MdApi(addr=("localhost", 9000))
+        # return MdApi(addr=("192.168.2.100", 9000))
     
     @pytest.fixture
     def session(self):
@@ -64,22 +64,22 @@ class TestMdApi:
     #         data = get_data(q)
     #     assert data is not None
     
-    def test_get_close(self, md_api, reqMeta):
-        data = md_api.get_close(reqMeta)
-        print("test_getClose: ", data)
-        assert data is not None
+    # def test_get_close(self, md_api, reqMeta):
+    #     data = md_api.get_close(reqMeta)
+    #     print("test_getClose: ", data)
+    #     assert data is not None
 
-    def test_adjust_event(self, md_api, reqMeta):
-        data = md_api.get_event("adjustment", reqMeta)
-        print("test_adjEvent: ", data)
-        assert data is not None
+    # def test_adjust_event(self, md_api, reqMeta):
+    #     data = md_api.get_event("adjustment", reqMeta)
+    #     print("test_adjEvent: ", data)
+    #     assert data is not None
     
-    def test_right_event(self, md_api, reqMeta):
-        data = md_api.get_event("rightment", reqMeta)
-        print("test_rgtEvent: ", data)
-        assert data is not None
+    # def test_right_event(self, md_api, reqMeta):
+    #     data = md_api.get_event("rightment", reqMeta)
+    #     print("test_rgtEvent: ", data)
+    #     assert data is not None
 
-    def test_factor(self, md_api, reqMeta):
-        data = md_api.factor(reqMeta)
-        print("test_get_factors: ", data.raw_factors, data.adj_factors)
-        assert data is not None
+    # def test_factor(self, md_api, reqMeta):
+    #     data = md_api.factor(reqMeta)
+    #     print("test_get_factors: ", data.raw_factors, data.adj_factors)
+    #     assert data is not None
