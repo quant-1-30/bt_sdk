@@ -4,25 +4,16 @@
 from dataclasses import dataclass
 
 
-__all__ = ["OrderBit", "Position", "Account"]
+__all__ = ["Resp", "Trade", "Position", "Account"]
 
 
 @dataclass(frozen=True)
-class Order:
-
-    sid: str
-    size: int
-    price: int
-    pricelimit: int
-    exec_type: int
-    order_type: int
-    created_at: int
-    sizer_ratio: float
+class Resp:
+    body: dict
 
 
 @dataclass(frozen=True)
-class OrderBit:
-
+class Trade:
     executed_at: int
     executed_size: int
     executed_price: float
@@ -32,7 +23,6 @@ class OrderBit:
 
 @dataclass(frozen=True)
 class Position:
-
     sid: str
     datetime: int
     size: int
@@ -44,7 +34,6 @@ class Position:
 
 @dataclass(frozen=True)
 class Account:
-
     datetime: int
     portfolio_value: float
     cash: float

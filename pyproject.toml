@@ -4,8 +4,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.7.9"
-description = "solve poetry and pybind pack bug"
+version = "0.8.1"
+description = "add typing and revise api bug"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [
