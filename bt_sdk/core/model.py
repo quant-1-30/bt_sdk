@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import pydantic
+import hashlib
 from datetime import datetime
 from uuid import UUID, uuid4
-from pydantic import Field, field_validator, ConfigDict
+from pydantic import Field, ConfigDict, computed_field, field_validator, field_serializer
 from typing import List, Union, Any, Dict
 
 
@@ -13,23 +14,52 @@ __all__ = ["Experiment", "Cash",  "Order", "Query", "Request"]
 
 class Experiment(pydantic.BaseModel):
     strategy: str
+    extra_info: str
     client_id: str
-    appendix: str
     
     model_config = ConfigDict(
         extra="forbid",
         frozen=True
     )
 
+    @computed_field
+    @property
+    def identity(self) -> bytes:
+        identity_str = f"{self.strategy},{self.extra_info}"
+        md5_obj = hashlib.md5()
+        md5_obj.update(identity_str.encode("utf-8"))
+        return md5_obj.digest()
+    
+    def __repr__(self): # __repr__ / __str__
+        return f"Experiment(strategy={self.strategy!r}, extra_info={self.extra_info!r}, client_id={self.client_id!r})" 
 
-class Cash(pydantic.BaseModel):
-    session: int
-    cash: int = Field(default=0)
+
+class Cash(pydantic.BaseModel): # 
+    session: datetime
+    cash: int
     
     model_config = ConfigDict(
         extra="forbid",
         frozen=True
     )
+
+    @field_validator('session', mode='before') # validate return datetime and seperate from serialize
+    def validate_date(cls, v):
+        if isinstance(v, datetime):
+            return v
+        else:
+            v = datetime.strptime(v, "%Y%m%d")
+        return v
+    
+    @field_serializer("session")
+    def serialize_session(self, session: datetime, _info) -> int:
+        """序列化：将整数转换回日期字符串"""
+        # session_int = int(session.strftime("%Y%m%d")) 
+        session_timestamp = session.timestamp() # datetime -> timestamp 自动处理utc转换 / timestamp ---> datetime 需要转时区
+        return session_timestamp
+
+    def __repr__(self): # __repr__ / __str__
+        return f"Cash(session={self.session!r}, cash={self.cash})" 
 
 
 class Order(pydantic.BaseModel):
@@ -47,10 +77,14 @@ class Order(pydantic.BaseModel):
         frozen=True
     )
 
+    def __repr__(self): # __repr__ / __str__
+        return f"Order(sid={self.sid!r}, size={self.size!r}, price={self.price!r}, pricelimit={self.pricelimit!r}, \
+            exec_type={self.exec_type!r}, order_type={self.order_type!r}, created_at={self.created_at!r}, sizer_ratio={self.sizer_ratio!r})" 
+
 
 class Query(pydantic.BaseModel):
-    start_date: int = Field(default=19900101)
-    end_date: int = Field(default=int(datetime.now().strftime("%Y%m%d")))
+    start_date: datetime = Field(default=datetime(1990, 1, 1))
+    end_date: datetime = Field(default=datetime.now())
     sid: List[str] = Field(default=[])
 
     model_config = ConfigDict(
@@ -58,27 +92,23 @@ class Query(pydantic.BaseModel):
         frozen=True
     )
 
-    @field_validator('start_date', 'end_date', mode='before')
+    @field_validator('start_date', 'end_date', mode="before")
     def validate_date(cls, v):
-        if isinstance(v, str):
-            try:
-                dt = datetime.strptime(v, '%Y%m%d')
-                return int(dt.timestamp())
-            except ValueError:
-                raise ValueError(f"Invalid date format: {v}. Expected 'YYYYMMDD'.")
-        elif isinstance(v, int):
-            # Assuming the integer is in YYYYMMDD format
-            try:
-                dt = datetime.strptime(str(v), '%Y%m%d')
-                return int(dt.timestamp())
-            except ValueError:
-                raise ValueError(f"Invalid date format: {v}. Expected 'YYYYMMDD'.")
-        elif isinstance(v, float):
-            return int(v)
-        elif isinstance(v, datetime):
-            return int(v.timestamp())
+        if isinstance(v, datetime):
+            return v
+        elif isinstance(v, str): 
+            v = datetime.strptime(v, '%Y%m%d')
+        elif isinstance(v, int) and v > 0:
+            v = datetime.fromtimestamp(v) if len(str(v)) > 8 else datetime.strptime(str(v), '%Y%m%d') 
         else:
             raise TypeError(f"Unsupported type for date: {type(v)}. Expected str, int, float, or datetime.")
+        
+    @field_serializer("start_date", "end_date")
+    def serialize_dt(self, v: datetime, _info) -> int:
+        return int(v.timestamp())
+             
+    def __repr__(self): # __repr__ / __str__
+        return f"Query(sid={self.sid!r}, start_date={self.start_date!r}, end_date={self.end_date!r})" 
         
 
 class Request(pydantic.BaseModel):
@@ -98,3 +128,6 @@ class Request(pydantic.BaseModel):
         extra="forbid",
         frozen=True
     )
+
+    def __repr__(self): # __repr__ / __str__
+        return f"Request(topic={self.topic!r}, body={self.body!r}, experiment_id={self.experiment_id!r}, request_id={self.request_id!r})"

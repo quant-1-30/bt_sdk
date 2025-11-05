@@ -11,6 +11,7 @@ import pytz
 import math
 import time as _time
 import pandas as pd
+import numpy as np
 from datetime import timedelta
 
 
@@ -358,7 +359,7 @@ UTC = _UTC()
 TZLocal = _LocalTimezone()
 
 
-def num2date(x, tz=None, naive=True, ordinal=False):
+def num2date(x, tz='Asia/Shanghai', naive=True):
     # Same as matplotlib except if tz is None a naive datetime object
     # will be returned.
     """
@@ -373,43 +374,14 @@ def num2date(x, tz=None, naive=True, ordinal=False):
     If *x* is a sequence, a sequence of :class:`datetime` objects will
     be returned.
     """
-    tzinfo = pytz.timezone("Asia/Shanghai") if naive else pytz.utc
-    if not ordinal:
-        # timestamp
-        tzinfo = pytz.timezone("Asia/Shanghai") if naive else pytz.utc
-        dt = datetime.datetime.fromtimestamp(x, tz=tzinfo)
-        return dt
+    tzinfo = pytz.timezone(tz) if isinstance(tz, str) else tz
+    if np.isnan(x):
+        return 0
 
-    ix = int(x)
-    dt = datetime.datetime.fromordinal(ix)
-    remainder = float(x) - ix
-    hour, remainder = divmod(HOURS_PER_DAY * remainder, 1)
-    minute, remainder = divmod(MINUTES_PER_HOUR * remainder, 1)
-    second, remainder = divmod(SECONDS_PER_MINUTE * remainder, 1)
-    microsecond = int(MUSECONDS_PER_SECOND * remainder)
-    if microsecond < 10:
-        microsecond = 0  # compensate for rounding errors
-
-    # if True and tz is not None:
-    #     dt = datetime.datetime(
-    #         dt.year, dt.month, dt.day, int(hour), int(minute), int(second),
-    #         microsecond, tzinfo=UTC)
-    #     dt = dt.astimezone(tz)
-    #     if naive:
-    #         dt = dt.replace(tzinfo=None)
-    # else:
-    #     # If not tz has been passed return a non-timezoned dt
-    #     dt = datetime.datetime(
-    #         dt.year, dt.month, dt.day, int(hour), int(minute), int(second),
-    #         microsecond)
-    
-    dt = datetime.datetime(
-        dt.year, dt.month, dt.day, int(hour), int(minute), int(second),
-        microsecond, tzinfo=tzinfo)
-
-    if microsecond > 999990:  # compensate for rounding errors
-        dt += datetime.timedelta(microseconds=1e6 - microsecond)
-    return dt
+    # dt = datetime.datetime.fromtimestamp(x, tz=pytz.timezone('Asia/Shanghai')) # timestamp under utc 
+    utc_dt = datetime.datetime.fromtimestamp(x, tz=datetime.timezone.utc)
+    dt = utc_dt.astimezone(tzinfo) 
+    return dt # dt.replace(tzinfo=None) 
 
 
 def num2dt(num, tz=None, naive=True):

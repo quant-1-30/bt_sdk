@@ -44,18 +44,37 @@ class MdApi(Api):
         index = self.get_data(chan)
         return index 
 
-    @contextmanager
-    def subscribe(self, body: Query) -> Generator:
-        """
-            request market data
-        """
+    # @contextmanager
+    # def subscribe(self, body: Query) -> Generator:
+    #     """
+    #         request market data
+    #     """
+    #     rq = Request(topic='tick', body=body)
+    #     chan = self.get_channel()
+    #     self.async_client.run(rq.model_dump(), chan)
+    #     try:
+    #         # yield chan
+    #         yield chan
+    #     finally:
+    #         self.cancel(chan)
+
+    def subscribe(self, body: Query):
+        """使用迭代器模式替代上下文管理器"""
         rq = Request(topic='tick', body=body)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
-        try:
-            yield chan
-        finally:
-            self.cancel(chan)
+        
+        def _iterator():
+            try:
+                while True:
+                    data = chan.get()
+                    if data == "eof" or data is None:
+                        break
+                    yield data
+            finally:
+                self.cancel(chan)
+        
+        return _iterator()
     
     def get_event(self, topic, body: Query) -> List[Mapping[str, Any]]:
         """

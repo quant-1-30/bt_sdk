@@ -34,7 +34,7 @@ class TdApi(Api):
         )
     
     def register(self, body: Experiment) -> Resp:
-        rq = Request(topic="register", body=body, experiment_id="register")  # use api method as experiment_id where is null
+        rq = Request(topic="register", body=body)  # use api method as experiment_id where is null
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         datas = self.get_data(chan)
@@ -60,28 +60,49 @@ class TdApi(Api):
         """
             get n position and account 
         """
-        resp = None
         rq = Request(topic=f"get_{topic}", body=Query(), experiment_id=experiment_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         datas = self.get_data(chan)
         if not datas:
             return None
-        resp = [Account(**d[0]["body"]) if topic == "account" else Position(**resp[0]["body"]) for d in datas]
+        resp = [Account(**d["body"]) if topic == "account" else Position(**d["body"]) for d in datas]
         return resp
-
+    
+    # @contextmanager   
+    # def subscribe(self, topic, body:Query, experiment_id) -> Generator[Any, None, None]:
+    #    """
+    #        subscribe topic order / position / account
+    #    """
+    #    rq = Request(topic=f'query_{topic}', body=body, experiment_id=experiment_id)
+    #    chan = self.get_channel()
+    #    self.async_client.run(rq.model_dump(), chan)
+    #    try:
+    #        yield chan
+    #    finally:
+    #        self.cancel(chan)
+    
     @contextmanager   
     def subscribe(self, topic, body:Query, experiment_id) -> Generator[Any, None, None]:
-       """
-           subscribe topic order / position / account
-       """
-       rq = Request(topic=f'query_{topic}', body=body, experiment_id=experiment_id)
-       chan = self.get_channel()
-       self.async_client.run(rq.model_dump(), chan)
-       try:
-           yield chan
-       finally:
-           self.cancel(chan)
+        """
+            使用迭代器模式替代上下文管理器
+            topic: str Union[order, position, account]
+        """
+        rq = Request(topic=f'query_{topic}', body=body, experiment_id=experiment_id)
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump(), chan)
+
+        def _iterator():
+            try:
+                while True:
+                    data = chan.get()
+                    if data == "eof" or data is None:
+                        break
+                    yield data
+            finally:
+                self.cancel(chan)
+        
+        return _iterator()
     
     def submit(self, body: Order, experiment_id) -> List[Trade]:
         """
