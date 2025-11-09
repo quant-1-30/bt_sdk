@@ -82,7 +82,7 @@ class TdApi(Api):
     #    finally:
     #        self.cancel(chan)
     
-    @contextmanager   
+    # @contextmanager   
     def subscribe(self, topic, body:Query, experiment_id) -> Generator[Any, None, None]:
         """
             使用迭代器模式替代上下文管理器

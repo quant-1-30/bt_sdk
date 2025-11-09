@@ -26,7 +26,7 @@ class TestTdApi:
     
     @pytest.fixture
     def patch_experiment_id(self):
-        return "1c3a9bd5-869f-4a26-8b08-dfcfaa48d63b"
+        return "144ff563-07f0-4380-8ab8-a7cc00748b6c"
 
     @pytest.fixture
     def td_api(self, patch_client_id, patch_experiment_id):
@@ -38,8 +38,8 @@ class TestTdApi:
     @pytest.fixture
     def experiment(self, patch_client_id):
         strategy = "test"
-        appendix='002750'
-        return Experiment(client_id=patch_client_id, strategy=strategy, appendix=appendix)
+        extra_info='002750'
+        return Experiment(client_id=patch_client_id, strategy=strategy, extra_info=extra_info)
     
     @pytest.fixture
     def cash(self):
@@ -49,29 +49,22 @@ class TestTdApi:
       
     @pytest.fixture
     def order(self):
-        order_type = OrderType.Buy
-        created_str = "2025-04-24 09:40:30"
+        created_str = "2025-04-24 17:40:30" # asia 8 after utc
         created_dt = datetime.strptime(created_str, '%Y-%m-%d %H:%M:%S')
         return Order(sid="002750", 
-                     price=122,
-                     size=1000,
-                     sizer_ratio=0.5,
-                     pricelimit=130,
-                     created_at=created_dt.timestamp(),
-                     # ExecType.Close / ExecType.Market 
-                     exec_type=ExecType.Open, # oco
-                     order_type = order_type)
+                     pricelimit=2, # / 100
+                     sizer_ratio=80, #  /100
+                     created_dt=created_dt.timestamp(),
+                     order_type = OrderType.Buy.value,
+                     exec_type=ExecType.Limit.value) # market / limit
     
     @pytest.fixture(scope="function")
     def query(self):
-        start_date = "20250424"
-        end_date = "20250424"
-        # end_date = "20250815"
-        start_time = datetime.strptime(start_date, '%Y%m%d')
-        end_time = datetime.strptime(end_date, '%Y%m%d')
+        start_date = "20250420"
+        end_date = "20250425"
         sid = ['002750']
-        return Query(start_date = start_time.timestamp(),
-                     end_date = end_time.timestamp(),
+        return Query(start_date = start_date,
+                     end_date = end_date,
                      sid = sid)
     
     # def test_register(self, td_api, experiment):
@@ -84,10 +77,10 @@ class TestTdApi:
     #     print("test_set_cash: ", data)
     #     assert data is not None
 
-    def test_getvalue(self, td_api, patch_experiment_id):
-        data = td_api.getvalue("account", "null")
-        print("test_getvalue: ", data)
-        assert data is not None
+    # def test_getvalue(self, td_api):
+    #     data = td_api.getvalue("account")
+    #     print("test_getvalue: ", data)
+    #     assert data is not None
 
     # def test_submit(self, td_api, order, patch_experiment_id):
     #     data = td_api.submit(order, patch_experiment_id)
@@ -105,24 +98,42 @@ class TestTdApi:
     #     assert o is not None
 
     # def test_subscirbe_order(self, td_api, query, patch_experiment_id):
-    #     with td_api.subscribe("order", query, patch_experiment_id) as q:
-    #         data = get_data(q)
-    #     print("test_reqOrder: ", data)
-    #     assert data is not None
+    #     res = []
+    #     _iter = td_api.subscribe("order", query, patch_experiment_id)
+    #     while True:
+    #         try:
+    #             data = next(_iter)
+    #             res.append(data)
+    #         except StopIteration:
+    #             break
+    #     print("test_reqOrder: ", res)
+    #     assert res is not None
 
     # def test_subscribe_position(self, td_api, query, patch_experiment_id):
-    #     with td_api.subscribe("position", query, patch_experiment_id) as q:
-    #         data = get_data(q)
-    #     print("test_reqPosition: ", data)
-    #     assert data is not None
+    #     res = []
+    #     _iter = td_api.subscribe("position", query, patch_experiment_id)
+    #     while True:
+    #         try:
+    #             data = next(_iter)
+    #             res.append(data)
+    #         except StopIteration:
+    #             break
+    #     print("test_reqPosition: ", res)
+    #     assert res is not None
 
     # def test_subscribe_account(self, td_api, query, patch_experiment_id):
-    #     with td_api.subscribe("account", query, patch_experiment_id) as q:
-    #         data = get_data(q)
-    #     print("test_reqAccount: ", data)
-    #     assert data is not None
+    #     res = []
+    #     _iter = td_api.subscribe("account", query, patch_experiment_id)
+    #     while True:
+    #         try:
+    #             data = next(_iter)
+    #             res.append(data)
+    #         except StopIteration:
+    #             break
+    #     print("test_reqAccount: ", res)
+    #     assert res is not None
     
-    # def test_on_dt_over(self, td_api, query, patch_experiment_id):
-    #     status = td_api.on_dt_over(query, patch_experiment_id)
-    #     print("test_on_dt_over: ", status)
-    #     assert status is not None
+    def test_on_dt_over(self, td_api, query, patch_experiment_id):
+        status = td_api.on_dt_over(query, patch_experiment_id)
+        print("test_on_dt_over: ", status)
+        assert status is not None

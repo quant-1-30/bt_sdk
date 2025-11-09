@@ -48,14 +48,14 @@ class Cash(pydantic.BaseModel): #
         if isinstance(v, datetime):
             return v
         else:
-            v = datetime.strptime(v, "%Y%m%d")
+            v = datetime.strptime(str(v), "%Y%m%d")
         return v
     
     @field_serializer("session")
     def serialize_session(self, session: datetime, _info) -> int:
         """序列化：将整数转换回日期字符串"""
         # session_int = int(session.strftime("%Y%m%d")) 
-        session_timestamp = session.timestamp() # datetime -> timestamp 自动处理utc转换 / timestamp ---> datetime 需要转时区
+        session_timestamp = int(session.timestamp()) # datetime -> timestamp 自动处理utc转换 / timestamp ---> datetime 需要转时区
         return session_timestamp
 
     def __repr__(self): # __repr__ / __str__
@@ -64,13 +64,11 @@ class Cash(pydantic.BaseModel): #
 
 class Order(pydantic.BaseModel):
     sid: str
-    size: int = Field(default=0)
-    price: int
     pricelimit: int
-    exec_type: int
+    sizer_ratio: int
     order_type: int
-    created_at: int
-    sizer_ratio: float = Field(default=0.0)
+    exec_type: int
+    created_dt: int
 
     model_config = ConfigDict(
         extra="forbid",
@@ -78,8 +76,8 @@ class Order(pydantic.BaseModel):
     )
 
     def __repr__(self): # __repr__ / __str__
-        return f"Order(sid={self.sid!r}, size={self.size!r}, price={self.price!r}, pricelimit={self.pricelimit!r}, \
-            exec_type={self.exec_type!r}, order_type={self.order_type!r}, created_at={self.created_at!r}, sizer_ratio={self.sizer_ratio!r})" 
+        return f"Order(sid={self.sid!r}, pricelimit={self.pricelimit!r}, exec_type={self.exec_type!r}, \
+            order_type={self.order_type!r}, created_at={self.created_dt!r}, sizer_ratio={self.sizer_ratio!r})" 
 
 
 class Query(pydantic.BaseModel):
@@ -98,8 +96,10 @@ class Query(pydantic.BaseModel):
             return v
         elif isinstance(v, str): 
             v = datetime.strptime(v, '%Y%m%d')
+            return v
         elif isinstance(v, int) and v > 0:
             v = datetime.fromtimestamp(v) if len(str(v)) > 8 else datetime.strptime(str(v), '%Y%m%d') 
+            return v
         else:
             raise TypeError(f"Unsupported type for date: {type(v)}. Expected str, int, float, or datetime.")
         

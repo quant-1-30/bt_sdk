@@ -14,7 +14,7 @@ class Resp:
 
 @dataclass(frozen=True)
 class Trade:
-    executed_at: int
+    executed_dt: int
     executed_size: int
     executed_price: float
     comm: float
