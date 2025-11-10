@@ -20,7 +20,8 @@ class MdApi(Api):
         """
         msg = Request(topic='calendar', body=Query())
         chan = self.get_channel()
-        self.async_client.run(msg.model_dump(), chan)
+        # import pdb; pdb.set_trace()
+        self.async_client.run(msg.model_dump_json(), chan)
         cals = self.get_data(chan)
         return cals
     
@@ -30,7 +31,7 @@ class MdApi(Api):
         """
         rq = Request(topic='instrument', body=Query())
         chan = self.get_channel()
-        self.async_client.run(rq.model_dump(), chan)
+        self.async_client.run(rq.model_dump_json(), chan)
         instruments = self.get_data(chan)
         return instruments 
     
@@ -40,24 +41,22 @@ class MdApi(Api):
         """
         rq = Request(topic='index', body=Query(sid=[index]))
         chan = self.get_channel()
-        self.async_client.run(rq.model_dump(), chan)
+        self.async_client.run(rq.model_dump_json(), chan)
         index = self.get_data(chan)
         return index 
+    
+    def get_event(self, topic, body: Query) -> List[Mapping[str, Any]]:
+        """
+            request instruments
+        """
+        rq = Request(topic=topic, body=body)
+        chan = self.get_channel()
+        self.async_client.run(rq.model_dump_json(), chan)
+        events = self.get_data(chan)
+        return events 
 
     # @contextmanager
     # def subscribe(self, body: Query) -> Generator:
-    #     """
-    #         request market data
-    #     """
-    #     rq = Request(topic='tick', body=body)
-    #     chan = self.get_channel()
-    #     self.async_client.run(rq.model_dump(), chan)
-    #     try:
-    #         # yield chan
-    #         yield chan
-    #     finally:
-    #         self.cancel(chan)
-
     def subscribe(self, body: Query):
         """使用迭代器模式替代上下文管理器"""
         rq = Request(topic='tick', body=body)
@@ -75,17 +74,7 @@ class MdApi(Api):
                 self.cancel(chan)
         
         return _iterator()
-    
-    def get_event(self, topic, body: Query) -> List[Mapping[str, Any]]:
-        """
-            request instruments
-        """
-        rq = Request(topic=topic, body=body)
-        chan = self.get_channel()
-        self.async_client.run(rq.model_dump(), chan)
-        events = self.get_data(chan)
-        return events 
-    
+     
     def get_close(self, body: Query) -> List[Mapping[str, Any]]:
         """
             request instruments

@@ -102,14 +102,24 @@ class Query(pydantic.BaseModel):
             return v
         else:
             raise TypeError(f"Unsupported type for date: {type(v)}. Expected str, int, float, or datetime.")
-        
+    
+    # @field_serializer("start_date", "end_date", when_used="json") # always
+    # def serialize_dt(self, v: datetime, _info) -> int:
+    #     return int(v.strftime("%Y%m%d"))
+    
     @field_serializer("start_date", "end_date")
-    def serialize_dt(self, v: datetime, _info) -> int:
-        return int(v.timestamp())
+    def serialize_dt(self, v: datetime, info) -> int:
+        # 根据序列化模式决定格式
+        mode = getattr(info, 'mode', 'python')
+        
+        if mode == 'json':
+            return int(v.strftime("%Y%m%d"))  # JSON 使用 YYYYMMDD
+        else:
+            return int(v.timestamp())  # 其他情况使用时间戳
              
     def __repr__(self): # __repr__ / __str__
         return f"Query(sid={self.sid!r}, start_date={self.start_date!r}, end_date={self.end_date!r})" 
-        
+
 
 class Request(pydantic.BaseModel):
 

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import json
 import time
 import asyncio
 import threading
@@ -244,7 +245,7 @@ class AsyncStreamClient(AsyncClient):
         """
             通过请求ID在共享的TCP连接上安全地发送和接收数据。
         """
-        # request_id = str(uuid.uuid4())
+        message = json.loads(message) if isinstance(message, str) else message 
         request_id=message["request_id"]
         response_queue = asyncio.Queue()
         self._pending_requests[request_id] = response_queue
@@ -265,7 +266,6 @@ class AsyncStreamClient(AsyncClient):
             while True:
                 try:
                     data = await asyncio.wait_for(response_queue.get(), timeout=10.0)
-                    # print("get_data :", data)
                     if data["body"] == "eof":
                         break
                     yield data
@@ -417,7 +417,7 @@ class AsyncZmqClient(AsyncClient):
         Sends a request via the ZMQ DEALER socket and asynchronously yields responses
         from a dedicated queue populated by the central `_receive_loop`.
         """
-        # request_id = str(uuid.uuid4())
+        message = json.loads(message) if isinstance(message, str) else message 
         request_id=message["request_id"]
         response_queue = asyncio.Queue()
         self._pending_requests[request_id] = response_queue
