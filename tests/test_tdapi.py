@@ -26,7 +26,7 @@ class TestTdApi:
     
     @pytest.fixture
     def patch_experiment_id(self):
-        return "144ff563-07f0-4380-8ab8-a7cc00748b6c"
+        return "1858e9cd-11ad-4426-a988-edd0d80dd92d"
 
     @pytest.fixture
     def td_api(self, patch_client_id, patch_experiment_id):
@@ -82,11 +82,6 @@ class TestTdApi:
     #     print("test_submit: ", data)
     #     assert data is not None
 
-    def test_getvalue(self, td_api):
-        data = td_api.getvalue("account")
-        print("test_getvalue: ", data)
-        assert data is not None
-
     def test_getAccount(self, td_api, patch_experiment_id):
         o = td_api.getvalue("account", patch_experiment_id)
         print("test get_account: ", o)
@@ -133,7 +128,7 @@ class TestTdApi:
         print("test_reqAccount: ", res)
         assert res is not None
     
-    # def test_on_dt_over(self, td_api, query, patch_experiment_id):
-    #     status = td_api.on_dt_over(query, patch_experiment_id)
-    #     print("test_on_dt_over: ", status)
-    #     assert status is not None
+    def test_on_dt_over(self, td_api, query, patch_experiment_id):
+        status = td_api.on_dt_over(query, patch_experiment_id)
+        print("test_on_dt_over: ", status)
+        assert status is not None

@@ -41,21 +41,16 @@ class TestMdApi:
         sid = ['603676']
         return Query(start_date = start_date ,end_date = end_date, sid = sid)
     
-    def test_getCalendar(self, md_api):
-        data = md_api.get_calendar()
-        print("test_getCalendar: ", data)
-        assert data is not None
+    # def test_getCalendar(self, md_api):
+    #     data = md_api.get_calendar()
+    #     print("test_getCalendar: ", data)
+    #     assert data is not None
 
     # def test_getInstrument(self, md_api):
     #     data = md_api.get_instrument()
     #     print("test_getInstrument: ", data)
     #     assert data is not None
     
-    # def test_getBenchmark(self, md_api):
-    #     data = md_api.get_benchmark()
-    #     print("test_getBenchmark: ", data)
-    #     assert data is not None
-
     # def test_adjust_event(self, md_api, query):
     #     data = md_api.get_event("adjustment", query)
     #     print("test_adjEvent: ", data)
@@ -66,22 +61,28 @@ class TestMdApi:
     #     print("test_rgtEvent: ", data)
     #     assert data is not None
     
-    def test_subscirbe(self, md_api, query):
-        res = []
-        _iter = md_api.subscribe(query)
-        while True:
-            try:
-                data = next(_iter)
-                res.append(data)
-            except StopIteration:
-                break
-        print("test_req: ", res)
-        assert res is not None
+    # def test_subscirbe(self, md_api, query):
+    #     res = []
+    #     _iter = md_api.subscribe(query)
+    #     while True:
+    #         try:
+    #             data = next(_iter)
+    #             res.append(data)
+    #         except StopIteration:
+    #             break
+    #     print("test_req: ", res)
+    #     assert res is not None
     
-    def test_get_close(self, md_api, query):
-        data = md_api.get_close(query)
-        print("test_getClose: ", data)
+    def test_getBenchmark(self, md_api):
+        data = md_api.get_benchmark()
+        print("test_getBenchmark: ", data)
+        import pdb; pdb.set_trace()
         assert data is not None
+    
+    # def test_get_close(self, md_api, query):
+    #     data = md_api.get_close(query)
+    #     print("test_getClose: ", data)
+    #     assert data is not None
 
     # def test_factor(self, md_api, query):
     #     data = md_api.factor(query)

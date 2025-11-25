@@ -56,11 +56,8 @@ class TdApi(Api):
         resp = Resp(datas[0]["body"])
         return resp
 
-    def getvalue(self, topic, experiment_id='') -> List[Union[Account, Position]]:
-        """
-            get n position and account 
-        """
-        rq = Request(topic=f"get_{topic}", body=Query(), experiment_id=experiment_id)
+    def getvalue(self, topic: str, experiment_id='') -> List[Union[Account, Position]]:
+        rq = Request(topic="get_data", body=Query(), experiment_id=experiment_id, request_type=topic)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         datas = self.get_data(chan)
@@ -70,25 +67,12 @@ class TdApi(Api):
         return resp
     
     # @contextmanager   
-    # def subscribe(self, topic, body:Query, experiment_id) -> Generator[Any, None, None]:
-    #    """
-    #        subscribe topic order / position / account
-    #    """
-    #    rq = Request(topic=f'query_{topic}', body=body, experiment_id=experiment_id)
-    #    chan = self.get_channel()
-    #    self.async_client.run(rq.model_dump(), chan)
-    #    try:
-    #        yield chan
-    #    finally:
-    #        self.cancel(chan)
-    
-    # @contextmanager   
     def subscribe(self, topic, body:Query, experiment_id) -> Generator[Any, None, None]:
         """
             使用迭代器模式替代上下文管理器
             topic: str Union[order, position, account]
         """
-        rq = Request(topic=f'query_{topic}', body=body, experiment_id=experiment_id)
+        rq = Request(topic='subscribe', body=body, experiment_id=experiment_id, request_type=topic)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
 
@@ -108,7 +92,7 @@ class TdApi(Api):
         """
             execution order in queue
         """
-        rq = Request(topic="submit", body=body, experiment_id=experiment_id)
+        rq = Request(topic="order", body=body, experiment_id=experiment_id)
         chan = self.get_channel()
         self.async_client.run(rq.model_dump(), chan)
         datas = self.get_data(chan)

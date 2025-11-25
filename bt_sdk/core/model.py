@@ -84,6 +84,7 @@ class Query(pydantic.BaseModel):
     start_date: datetime = Field(default=datetime(1990, 1, 1))
     end_date: datetime = Field(default=datetime.now())
     sid: List[str] = Field(default=[])
+    topic: str = Field(default="")
 
     model_config = ConfigDict(
         extra="forbid",
@@ -118,15 +119,17 @@ class Query(pydantic.BaseModel):
             return int(v.timestamp())  # 其他情况使用时间戳
              
     def __repr__(self): # __repr__ / __str__
-        return f"Query(sid={self.sid!r}, start_date={self.start_date!r}, end_date={self.end_date!r})" 
+        return f"Query(sid={self.sid!r}, start_date={self.start_date!r}, end_date={self.end_date!r}, topic={self.topic!r})" 
 
 
 class Request(pydantic.BaseModel):
 
     topic: str
     body: Union[Experiment, Cash, Order, Query]
-    experiment_id: str = Field(default="null") # default is used for mdapi
+    request_type: str = Field(default="")
+    experiment_id: str = Field(default="") # default is used for mdapi
     request_id: UUID = Field(default_factory=uuid4)
+
 
     def model_dump(self, *args, **kwargs) -> Dict[str, Any]:
        data = super().model_dump(*args, **kwargs)

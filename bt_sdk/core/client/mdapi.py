@@ -42,7 +42,8 @@ class MdApi(Api):
         rq = Request(topic='index', body=Query(sid=[index]))
         chan = self.get_channel()
         self.async_client.run(rq.model_dump_json(), chan)
-        index = self.get_data(chan)
+        data = self.get_data(chan)
+        index = [item["body"]["line"][0] for item in data]
         return index 
     
     def get_event(self, topic, body: Query) -> List[Mapping[str, Any]]:
