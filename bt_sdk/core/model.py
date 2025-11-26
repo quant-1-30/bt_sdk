@@ -84,7 +84,6 @@ class Query(pydantic.BaseModel):
     start_date: datetime = Field(default=datetime(1990, 1, 1))
     end_date: datetime = Field(default=datetime.now())
     sid: List[str] = Field(default=[])
-    topic: str = Field(default="")
 
     model_config = ConfigDict(
         extra="forbid",
