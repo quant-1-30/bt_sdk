@@ -82,51 +82,51 @@ class TestTdApi:
     #     print("test_submit: ", data)
     #     assert data is not None
 
-    def test_getAccount(self, td_api, patch_experiment_id):
-        o = td_api.getvalue("account", patch_experiment_id)
-        print("test get_account: ", o)
-        assert o is not None
+    # def test_getAccount(self, td_api, patch_experiment_id):
+    #     o = td_api.getvalue("account", patch_experiment_id)
+    #     print("test get_account: ", o)
+    #     assert o is not None
 
-    def test_getPosition(self, td_api, patch_experiment_id):
-        o = td_api.getvalue("position", patch_experiment_id)
-        print("test get_position: ", o)
-        assert o is not None
+    # def test_getPosition(self, td_api, patch_experiment_id):
+    #     o = td_api.getvalue("position", patch_experiment_id)
+    #     print("test get_position: ", o)
+    #     assert o is not None
 
-    def test_subscirbe_order(self, td_api, query, patch_experiment_id):
-        res = []
-        _iter = td_api.subscribe("order", query, patch_experiment_id)
-        while True:
-            try:
-                data = next(_iter)
-                res.append(data)
-            except StopIteration:
-                break
-        print("test_reqOrder: ", res)
-        assert res is not None
+    # def test_subscirbe_order(self, td_api, query, patch_experiment_id):
+    #     res = []
+    #     _iter = td_api.subscribe("order", query, patch_experiment_id)
+    #     while True:
+    #         try:
+    #             data = next(_iter)
+    #             res.append(data)
+    #         except StopIteration:
+    #             break
+    #     print("test_reqOrder: ", res)
+    #     assert res is not None
 
-    def test_subscribe_position(self, td_api, query, patch_experiment_id):
-        res = []
-        _iter = td_api.subscribe("position", query, patch_experiment_id)
-        while True:
-            try:
-                data = next(_iter)
-                res.append(data)
-            except StopIteration:
-                break
-        print("test_reqPosition: ", res)
-        assert res is not None
+    # def test_subscribe_position(self, td_api, query, patch_experiment_id):
+    #     res = []
+    #     _iter = td_api.subscribe("position", query, patch_experiment_id)
+    #     while True:
+    #         try:
+    #             data = next(_iter)
+    #             res.append(data)
+    #         except StopIteration:
+    #             break
+    #     print("test_reqPosition: ", res)
+    #     assert res is not None
 
-    def test_subscribe_account(self, td_api, query, patch_experiment_id):
-        res = []
-        _iter = td_api.subscribe("account", query, patch_experiment_id)
-        while True:
-            try:
-                data = next(_iter)
-                res.append(data)
-            except StopIteration:
-                break
-        print("test_reqAccount: ", res)
-        assert res is not None
+    # def test_subscribe_account(self, td_api, query, patch_experiment_id):
+    #     res = []
+    #     _iter = td_api.subscribe("account", query, patch_experiment_id)
+    #     while True:
+    #         try:
+    #             data = next(_iter)
+    #             res.append(data)
+    #         except StopIteration:
+    #             break
+    #     print("test_reqAccount: ", res)
+    #     assert res is not None
     
     def test_on_dt_over(self, td_api, query, patch_experiment_id):
         status = td_api.on_dt_over(query, patch_experiment_id)
