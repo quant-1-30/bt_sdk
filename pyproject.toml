@@ -4,8 +4,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.8.5"
-description = "revise tdapi"
+version = "0.8.6"
+description = "add filler in order"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [

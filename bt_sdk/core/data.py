@@ -27,7 +27,7 @@ class Position:
     datetime: int
     size: int
     available: int
-    price: float
+    cost_basis: float
     pnl: float
     experiment_id: str
 

@@ -69,6 +69,7 @@ class Order(pydantic.BaseModel):
     order_type: int
     exec_type: int
     created_dt: int
+    filler: str # oco / occ / smooth / trend
 
     model_config = ConfigDict(
         extra="forbid",

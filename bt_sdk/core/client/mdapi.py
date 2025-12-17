@@ -35,7 +35,7 @@ class MdApi(Api):
         instruments = self.get_data(chan)
         return instruments 
     
-    def get_benchmark(self, index='000001') -> List[Mapping[str, Any]]:
+    def get_benchmark(self, index) -> List[Mapping[str, Any]]:
         """
             request index 000001 000680 399006 399001
         """
