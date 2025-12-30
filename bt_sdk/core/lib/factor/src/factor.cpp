@@ -43,15 +43,15 @@ FactorResult calc_adjust_factors(
         double preclose = close[idx - 1];
         if (preclose <= 0) continue;
         
-        double stock_ratio = e.bonus_share + e.transfer;
-        double cash_ratio = e.bonus / preclose;
+        double stock_ratio = e.bonus_share / Multiply   + e.transfer / Multiply;
+        double cash_ratio = e.bonus / (Multiply * preclose);
         double factor = (1.0 - cash_ratio) / (1.0 + stock_ratio);
         process_event(e.ex_date, factor);
     }
     
     // process rightment events
     for (const auto& e : right_events) {
-        double factor = 1.0 / (1.0 + e.ratio);
+        double factor = 1.0 / (1.0 + e.ratio / Multiply);
         process_event(e.ex_date, factor);
     }
     

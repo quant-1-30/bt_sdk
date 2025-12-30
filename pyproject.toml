@@ -4,8 +4,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.8.6"
-description = "add filler in order"
+version = "0.8.7"
+description = "revise core/lib C++ logic"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [
@@ -32,6 +32,9 @@ setuptools-cmake-helper = "^0.1.2"
 pygments = "^2.19.2"
 pydantic = "2.6.4"
 urllib3 = "^2.5.0"
+reactivex = "^4.1.0"
+uvloop = "^0.22.1"
+cython = "^3.2.3"
 
 [tool.poetry.group.build.dependencies]
 setuptools = "^68.0.0"

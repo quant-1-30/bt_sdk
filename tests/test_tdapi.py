@@ -26,7 +26,7 @@ class TestTdApi:
     
     @pytest.fixture
     def patch_experiment_id(self):
-        return "1858e9cd-11ad-4426-a988-edd0d80dd92d"
+        return "4f066fe8-e937-437a-abae-0d7d2c541773"
 
     @pytest.fixture
     def td_api(self, patch_client_id, patch_experiment_id):
@@ -49,18 +49,19 @@ class TestTdApi:
       
     @pytest.fixture
     def order(self):
-        created_str = "2025-04-24 17:40:30" # asia 8 after utc
+        created_str = "2025-04-24 9:30:00" # asia 8 after utc
         created_dt = datetime.strptime(created_str, '%Y-%m-%d %H:%M:%S')
         return Order(sid="002750", 
                      pricelimit=2, # / 100
                      sizer_ratio=80, #  /100
                      created_dt=created_dt.timestamp(),
                      order_type = OrderType.Buy.value,
-                     exec_type=ExecType.Limit.value) # market / limit
+                     exec_type=ExecType.Limit.value,
+                     filler="likehood") # oco / occ / smooth / likehood
     
     @pytest.fixture(scope="function")
     def query(self):
-        start_date = "20250420"
+        start_date = "20250424"
         end_date = "20250425"
         sid = ['002750']
         return Query(start_date = start_date,
@@ -77,10 +78,10 @@ class TestTdApi:
     #     print("test_set_cash: ", data)
     #     assert data is not None
     
-    # def test_submit(self, td_api, order, patch_experiment_id):
-    #     data = td_api.submit(order, patch_experiment_id)
-    #     print("test_submit: ", data)
-    #     assert data is not None
+    def test_submit(self, td_api, order, patch_experiment_id):
+        data = td_api.submit(order, patch_experiment_id)
+        print("test_submit: ", data)
+        assert data is not None
 
     # def test_getAccount(self, td_api, patch_experiment_id):
     #     o = td_api.getvalue("account", patch_experiment_id)
@@ -128,7 +129,7 @@ class TestTdApi:
     #     print("test_reqAccount: ", res)
     #     assert res is not None
     
-    def test_on_dt_over(self, td_api, query, patch_experiment_id):
-        status = td_api.on_dt_over(query, patch_experiment_id)
-        print("test_on_dt_over: ", status)
-        assert status is not None
+    # def test_on_dt_over(self, td_api, query, patch_experiment_id):
+    #     status = td_api.on_dt_over(query, patch_experiment_id)
+    #     print("test_on_dt_over: ", status)
+    #     assert status is not None

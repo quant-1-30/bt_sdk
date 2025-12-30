@@ -52,3 +52,38 @@ poetry env info --path
 pytest 中执行多个测试用例时，每个测试用例都会创建新的 Api 实例
 
 # poetry 不会自动打包pybind  需要手动cmake构建 / pyproject.toml 配置 include
+
+# rxpy 响应性编程重构
+# cython 重构 api and client 避免asyncio.queue
+
+
+<!-- def factor(self, body: Query) -> List[Any]: # sid
+    close = self.get_close(body)
+    adjust = self.get_event("adjustment", body)
+    right = self.get_event("rightment", body)
+    from bt_sdk.core.helper.factor import calc_factor
+    factors = calc_factor(close, adjust, right)
+    return factors -->
+
+
+``python
+import pyarrow as pa
+
+def bytes_to_table(data: bytes):
+    # 1. 将 bytes 包装成 BufferReader (Zero-copy)
+    reader = pa.BufferReader(data)
+    
+    # 2. 打开 IPC 流读取器
+    # open_stream 专门用于解析由 new_stream 生成的数据
+    try:
+        with pa.ipc.open_stream(reader) as stream_reader:
+            # 3. 读取所有 Batch 并合并回 Table
+            table = stream_reader.read_all()
+            return table
+    except pa.ArrowInvalid:
+        # 如果数据为空或格式不正确
+        return None
+```
+
+# no nagle on writer 
+# server Delayed ACK / client `TCP_NODELAY`

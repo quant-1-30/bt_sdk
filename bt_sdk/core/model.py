@@ -119,7 +119,7 @@ class Query(pydantic.BaseModel):
             return int(v.timestamp())  # 其他情况使用时间戳
              
     def __repr__(self): # __repr__ / __str__
-        return f"Query(sid={self.sid!r}, start_date={self.start_date!r}, end_date={self.end_date!r}, topic={self.topic!r})" 
+        return f"Query(sid={self.sid!r}, start_date={self.start_date!r}, end_date={self.end_date!r})" 
 
 
 class Request(pydantic.BaseModel):

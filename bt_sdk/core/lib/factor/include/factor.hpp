@@ -6,6 +6,8 @@
 namespace rpc_feed {
 namespace adjust {
 
+const int Multiply = 10 
+
 struct AdjustmentEvent {
     int ex_date;       // ex_date
     double bonus_share; // 送股
@@ -23,6 +25,7 @@ enum class AdjustType {
     Forward,  // 前复权
     Backward  // 后复权
 };
+
 
 // 用于返回两个结果
 struct FactorResult {
