@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 
 cdef class AsyncClient:
-    cdef object _global_bus
+    cdef object _req_subject 
+    cdef object _req_fut 
     cdef bint _running
     cdef object loop
     cdef object _loop_thread
@@ -12,6 +13,10 @@ cdef class AsyncClient:
     cdef void _run_event_loop(self)
 
     cdef void _finalize_task(self, object future)
+    
+    cdef object wrap_protocol(self, bytes req_id, dict msg)
+    
+    cpdef object run(self, bytes req_id, dict msg)
 
     cpdef void close(self)
 
@@ -21,16 +26,18 @@ cdef class AsyncZmqClient(AsyncClient):
     cdef int timeout
     cdef object context
     cdef object socket
+    cdef readonly object listen_task
     
-    cpdef void close(self) # virtual due to cython not supported nested function
+    # virtual due to cython not supported nested function
+    cdef object wrap_protocol(self, bytes req_id, dict msg)
     
-    cdef void shutdown_async_resources(self)
-
-
+    
 cdef class AsyncStreamClient(AsyncClient):
     cdef str host
     cdef int port
     cdef object _connection_cache
     cdef int timeout
+    cdef readonly object listen_task
     
-    cpdef void close(self) # virtual
+    cdef object wrap_protocol(self, bytes req_id, dict msg)
+    

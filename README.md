@@ -87,3 +87,13 @@ def bytes_to_table(data: bytes):
 
 # no nagle on writer 
 # server Delayed ACK / client `TCP_NODELAY`
+# observer filter operate heavy cpu / resp --- bus to avoid filter
+
+# cython not support lambda or nested
+# reactivex subject --- on_next / on_complete / on_error 
+            subject.pipe --- obseverable
+            subscribe --- on_next / on_complete / on_error 
+
+from reactivex.operators import as_iterable # blocking
+
+for table in obs.pipe(as_iterable()):

@@ -1640,20 +1640,21 @@ struct __pyx_t_4core_6client_4data_Account {
  * # -*- coding: utf-8 -*-
  * 
  * cdef class AsyncClient:             # <<<<<<<<<<<<<<
- *     cdef object _global_bus
- *     cdef bint _running
+ *     cdef object _req_subject
+ *     cdef object _req_fut
 */
 struct __pyx_obj_4core_6client_12async_client_AsyncClient {
   PyObject_HEAD
   struct __pyx_vtabstruct_4core_6client_12async_client_AsyncClient *__pyx_vtab;
-  PyObject *_global_bus;
+  PyObject *_req_subject;
+  PyObject *_req_fut;
   int _running;
   PyObject *loop;
   PyObject *_loop_thread;
 };
 
 
-/* "core/client/async_client.pxd":19
+/* "core/client/async_client.pxd":24
  * 
  * 
  * cdef class AsyncZmqClient(AsyncClient):             # <<<<<<<<<<<<<<
@@ -1666,10 +1667,11 @@ struct __pyx_obj_4core_6client_12async_client_AsyncZmqClient {
   int timeout;
   PyObject *context;
   PyObject *socket;
+  PyObject *listen_task;
 };
 
 
-/* "core/client/async_client.pxd":30
+/* "core/client/async_client.pxd":35
  * 
  * 
  * cdef class AsyncStreamClient(AsyncClient):             # <<<<<<<<<<<<<<
@@ -1682,6 +1684,7 @@ struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient {
   int port;
   PyObject *_connection_cache;
   int timeout;
+  PyObject *listen_task;
 };
 
 
@@ -1703,20 +1706,22 @@ struct __pyx_obj_4core_6client_5tdapi_TdApi {
  * # -*- coding: utf-8 -*-
  * 
  * cdef class AsyncClient:             # <<<<<<<<<<<<<<
- *     cdef object _global_bus
- *     cdef bint _running
+ *     cdef object _req_subject
+ *     cdef object _req_fut
 */
 
 struct __pyx_vtabstruct_4core_6client_12async_client_AsyncClient {
   void (*_init_event_loop)(struct __pyx_obj_4core_6client_12async_client_AsyncClient *);
   void (*_run_event_loop)(struct __pyx_obj_4core_6client_12async_client_AsyncClient *);
   void (*_finalize_task)(struct __pyx_obj_4core_6client_12async_client_AsyncClient *, PyObject *);
+  PyObject *(*wrap_protocol)(struct __pyx_obj_4core_6client_12async_client_AsyncClient *, PyObject *, PyObject *);
+  PyObject *(*run)(struct __pyx_obj_4core_6client_12async_client_AsyncClient *, PyObject *, PyObject *, int __pyx_skip_dispatch);
   void (*close)(struct __pyx_obj_4core_6client_12async_client_AsyncClient *, int __pyx_skip_dispatch);
 };
 static struct __pyx_vtabstruct_4core_6client_12async_client_AsyncClient *__pyx_vtabptr_4core_6client_12async_client_AsyncClient;
 
 
-/* "core/client/async_client.pxd":19
+/* "core/client/async_client.pxd":24
  * 
  * 
  * cdef class AsyncZmqClient(AsyncClient):             # <<<<<<<<<<<<<<
@@ -1726,12 +1731,11 @@ static struct __pyx_vtabstruct_4core_6client_12async_client_AsyncClient *__pyx_v
 
 struct __pyx_vtabstruct_4core_6client_12async_client_AsyncZmqClient {
   struct __pyx_vtabstruct_4core_6client_12async_client_AsyncClient __pyx_base;
-  void (*shutdown_async_resources)(struct __pyx_obj_4core_6client_12async_client_AsyncZmqClient *);
 };
 static struct __pyx_vtabstruct_4core_6client_12async_client_AsyncZmqClient *__pyx_vtabptr_4core_6client_12async_client_AsyncZmqClient;
 
 
-/* "core/client/async_client.pxd":30
+/* "core/client/async_client.pxd":35
  * 
  * 
  * cdef class AsyncStreamClient(AsyncClient):             # <<<<<<<<<<<<<<
@@ -5962,8 +5966,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_4core_6client_12async_client_AsyncZmqClient), __PYX_GET_STRUCT_ALIGNMENT_3_2_3(struct __pyx_obj_4core_6client_12async_client_AsyncZmqClient),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_2_3); if (!__pyx_mstate->__pyx_ptype_4core_6client_12async_client_AsyncZmqClient) __PYX_ERR(2, 19, __pyx_L1_error)
-  __pyx_vtabptr_4core_6client_12async_client_AsyncZmqClient = (struct __pyx_vtabstruct_4core_6client_12async_client_AsyncZmqClient*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_4core_6client_12async_client_AsyncZmqClient); if (unlikely(!__pyx_vtabptr_4core_6client_12async_client_AsyncZmqClient)) __PYX_ERR(2, 19, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_2_3); if (!__pyx_mstate->__pyx_ptype_4core_6client_12async_client_AsyncZmqClient) __PYX_ERR(2, 24, __pyx_L1_error)
+  __pyx_vtabptr_4core_6client_12async_client_AsyncZmqClient = (struct __pyx_vtabstruct_4core_6client_12async_client_AsyncZmqClient*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_4core_6client_12async_client_AsyncZmqClient); if (unlikely(!__pyx_vtabptr_4core_6client_12async_client_AsyncZmqClient)) __PYX_ERR(2, 24, __pyx_L1_error)
   __pyx_mstate->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient = __Pyx_ImportType_3_2_3(__pyx_t_1, "core.client.async_client", "AsyncStreamClient",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
   sizeof(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient), __PYX_GET_STRUCT_ALIGNMENT_3_2_3(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient),
@@ -5972,8 +5976,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient), __PYX_GET_STRUCT_ALIGNMENT_3_2_3(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_2_3); if (!__pyx_mstate->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient) __PYX_ERR(2, 30, __pyx_L1_error)
-  __pyx_vtabptr_4core_6client_12async_client_AsyncStreamClient = (struct __pyx_vtabstruct_4core_6client_12async_client_AsyncStreamClient*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient); if (unlikely(!__pyx_vtabptr_4core_6client_12async_client_AsyncStreamClient)) __PYX_ERR(2, 30, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_2_3); if (!__pyx_mstate->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient) __PYX_ERR(2, 35, __pyx_L1_error)
+  __pyx_vtabptr_4core_6client_12async_client_AsyncStreamClient = (struct __pyx_vtabstruct_4core_6client_12async_client_AsyncStreamClient*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient); if (unlikely(!__pyx_vtabptr_4core_6client_12async_client_AsyncStreamClient)) __PYX_ERR(2, 35, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;

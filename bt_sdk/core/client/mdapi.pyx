@@ -14,6 +14,9 @@ cdef class MdApi:
                     int timeout = 5):
         self.async_client = AsyncZmqClient(addr=addr, timeout=timeout)
 
+    def __enter__(self):
+        return self 
+
     cpdef object get_calendar(self): 
         """
             request calendar
@@ -81,8 +84,10 @@ cdef class MdApi:
     #    factors = calc_factor(close, adjust, right)
     #    return factors
     
-    cpdef void close(self):
-        self.client.close()
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is not None:
+            print(f"Error: {exc_type}, {exc_val}, {exc_tb}")
+        self.async_client.close()
 
 
 __all__ = ["MdApi"]
