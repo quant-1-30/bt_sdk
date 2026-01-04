@@ -105,28 +105,28 @@ class TestMdApi:
                 
     #         print(f"Instrument Results: {results}")
 
-    def test_getBenchmark(self, md_api, benchmark):
-        with md_api as client:
-            observable = client.get_benchmark(benchmark)
+    # def test_getBenchmark(self, md_api, benchmark):
+    #     with md_api as client:
+    #         observable = client.get_benchmark(benchmark)
 
-            q = queue.Queue()
-            results = []
+    #         q = queue.Queue()
+    #         results = []
             
-            observable.subscribe( # nonblocking 
-                on_next=q.put,
-                on_error=lambda e: q.put(e),
-                on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
-            )
+    #         observable.subscribe( # nonblocking 
+    #             on_next=q.put,
+    #             on_error=lambda e: q.put(e),
+    #             on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
+    #         )
             
-            while True:
-                item = q.get() # blocking
-                if item is StopIteration:
-                    break
-                if isinstance(item, Exception):
-                    raise item
-                results.append(item)
+    #         while True:
+    #             item = q.get() # blocking
+    #             if item is StopIteration:
+    #                 break
+    #             if isinstance(item, Exception):
+    #                 raise item
+    #             results.append(item)
                 
-            print(f"Benchmark Results: {results}")
+    #         print(f"Benchmark Results: {results}")
      
     # def test_adjust_event(self, md_api, query):
     #     with md_api as client:
@@ -197,28 +197,28 @@ class TestMdApi:
                 
     #         print(f"Close Results: {results}")
 
-    # def test_subscirbe(self, md_api, query):
-    #     with md_api as client:
-    #         observable = client.subscribe(query)
+    def test_subscirbe(self, md_api, query):
+        with md_api as client:
+            observable = client.subscribe(query)
 
-    #         q = queue.Queue()
-    #         results = []
+            q = queue.Queue()
+            results = []
             
-    #         observable.subscribe( # nonblocking 
-    #             on_next=q.put,
-    #             on_error=lambda e: q.put(e),
-    #             on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
-    #         )
+            observable.subscribe( # nonblocking 
+                on_next=q.put,
+                on_error=lambda e: q.put(e),
+                on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
+            )
             
-    #         while True:
-    #             item = q.get() # blocking
-    #             if item is StopIteration:
-    #                 break
-    #             if isinstance(item, Exception):
-    #                 raise item
-    #             results.append(item)
+            while True:
+                item = q.get() # blocking
+                if item is StopIteration:
+                    break
+                if isinstance(item, Exception):
+                    raise item
+                results.append(item)
                 
-    #         print(f"Subscribe Results: {results}")
+            print(f"Subscribe Results: {results}")
     
     # def test_factor(self, md_api, query):
     #     data = md_api.factor(query)

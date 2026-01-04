@@ -80,7 +80,7 @@ cdef class AsyncClient:
     def __init__(self):
         
         self._req_subject = {} # self._global_bus = Subject() # global bus to filter req is heavy cpu operation when max concurrent 
-        self._req_fut = {}
+        self._req_futures = {}
         self._running = True
         
         self._init_event_loop()
@@ -327,7 +327,7 @@ cdef class AsyncStreamClient(AsyncClient):
                 req_id = complete_message[:REQ_ID_SIZE] 
                 payload = unpack(complete_message[REQ_ID_SIZE:]) 
                 
-                fut = self._futures.pop(req_id, None)
+                fut = self._req_futures.pop(req_id, None)
                 if fut and not fut.done():
                     fut.set_result(payload)
             except asyncio.TimeoutError:
@@ -342,18 +342,13 @@ cdef class AsyncStreamClient(AsyncClient):
             
     cdef object wrap_protocol(self, bytes req_id, dict msg): # return future to user to determin await or result block
         """TCP 返回 Coroutine 用户需 await"""
-        return self._async_request(req_id, msg)
-
-    async def _async_request(self, bytes req_id, dict msg):
+        # from concurrent.futures import Future
+        # cdef object fut = Future()
         fut = self.loop.create_future()
-        self._futures[req_id] = fut
+        self._req_futures[req_id] = fut 
         
-        await self.send_request(req_id, msg)
-        try:
-            return await asyncio.wait_for(fut, timeout=10.0)
-        except asyncio.TimeoutError:
-            self._futures.pop(req_id, None)
-            raise TimeoutError("TCP request timeout")
+        asyncio.run_coroutine_threadsafe(self.send_request(req_id, msg), self.loop)
+        return fut # fut.result() / add_done_callback
 
     async def send_request(self, bytes req_id, dict message):
         connection_key = f"{self.host}:{self.port}"

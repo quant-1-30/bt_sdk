@@ -1555,10 +1555,9 @@ struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_4___pyx_base__w
 struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_5_send_request;
 struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_6__async_shutdown;
 struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_7__listen_loop;
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request;
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request;
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection;
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown;
+struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request;
+struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection;
+struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown;
 struct __pyx_obj___pyx_scope_struct____Pyx_CFunc_2c7b9d__4core_6client_12async_client_11AsyncClient_voi__etc_to_py_4self;
 
 /* "core/client/async_client.pxd":4
@@ -1566,13 +1565,13 @@ struct __pyx_obj___pyx_scope_struct____Pyx_CFunc_2c7b9d__4core_6client_12async_c
  * 
  * cdef class AsyncClient:             # <<<<<<<<<<<<<<
  *     cdef object _req_subject
- *     cdef object _req_fut
+ *     cdef object _req_futures
 */
 struct __pyx_obj_4core_6client_12async_client_AsyncClient {
   PyObject_HEAD
   struct __pyx_vtabstruct_4core_6client_12async_client_AsyncClient *__pyx_vtab;
   PyObject *_req_subject;
-  PyObject *_req_fut;
+  PyObject *_req_futures;
   int _running;
   PyObject *loop;
   PyObject *_loop_thread;
@@ -1751,33 +1750,14 @@ struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_7__listen_loop 
 };
 
 
-/* "core/client/async_client.pyx":347
- *         return self._async_request(req_id, msg)
- * 
- *     async def _async_request(self, bytes req_id, dict msg):             # <<<<<<<<<<<<<<
- *         fut = self.loop.create_future()
- *         self._futures[req_id] = fut
-*/
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request {
-  PyObject_HEAD
-  PyObject *__pyx_v_fut;
-  PyObject *__pyx_v_msg;
-  PyObject *__pyx_v_req_id;
-  struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self;
-  PyObject *__pyx_t_0;
-  PyObject *__pyx_t_1;
-  PyObject *__pyx_t_2;
-};
-
-
-/* "core/client/async_client.pyx":358
- *             raise TimeoutError("TCP request timeout")
+/* "core/client/async_client.pyx":353
+ *         return fut # fut.result() / add_done_callback
  * 
  *     async def send_request(self, bytes req_id, dict message):             # <<<<<<<<<<<<<<
  *         connection_key = f"{self.host}:{self.port}"
  *         reader, writer = await self._get_connection(connection_key) # cache
 */
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request {
+struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request {
   PyObject_HEAD
   PyObject *__pyx_v_connection_key;
   PyObject *__pyx_v_message;
@@ -1790,14 +1770,14 @@ struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request 
 };
 
 
-/* "core/client/async_client.pyx":367
+/* "core/client/async_client.pyx":362
  *         await writer.drain()
  * 
  *     async def _get_connection(self, str connection_key):             # <<<<<<<<<<<<<<
  *         """
  * 
 */
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection {
+struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection {
   PyObject_HEAD
   PyObject *__pyx_v_connection_key;
   PyObject *__pyx_v_reader;
@@ -1808,14 +1788,14 @@ struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connect
 };
 
 
-/* "core/client/async_client.pyx":388
+/* "core/client/async_client.pyx":383
  *         return reader, writer
  * 
  *     async def _async_shutdown(self):             # <<<<<<<<<<<<<<
  *         await AsyncClient._async_shutdown()
  * 
 */
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown {
+struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown {
   PyObject_HEAD
   PyObject *__pyx_v_key;
   PyObject *__pyx_v_reader;
@@ -2829,9 +2809,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GetSlice(
 /* PyConnectionError_Check.proto */
 #define __Pyx_PyExc_ConnectionError_Check(obj)  __Pyx_TypeCheck(obj, PyExc_ConnectionError)
 
-/* PyTimeoutError_Check.proto */
-#define __Pyx_PyExc_TimeoutError_Check(obj)  __Pyx_TypeCheck(obj, PyExc_TimeoutError)
-
 /* ImportImpl.export */
 static PyObject *__Pyx__Import(PyObject *name, PyObject *const *imported_names, Py_ssize_t len_imported_names, PyObject *qualname, PyObject *moddict, int level);
 
@@ -3044,9 +3021,9 @@ int __pyx_module_is_main_core__client__async_client = 0;
 static PyObject *__pyx_builtin_print;
 static PyObject *__pyx_builtin_super;
 /* #### Code section: string_decls ### */
-static const char __pyx_k_connection_cache__loop_thread[] = "_connection_cache, _loop_thread, _req_fut, _req_subject, _running, host, listen_task, loop, port, timeout";
-static const char __pyx_k_loop_thread__req_fut__req_subje[] = "_loop_thread, _req_fut, _req_subject, _running, loop";
-static const char __pyx_k_loop_thread__req_fut__req_subje_2[] = "_loop_thread, _req_fut, _req_subject, _running, addr, context, listen_task, loop, socket, timeout";
+static const char __pyx_k_connection_cache__loop_thread[] = "_connection_cache, _loop_thread, _req_futures, _req_subject, _running, host, listen_task, loop, port, timeout";
+static const char __pyx_k_loop_thread__req_futures__req_s[] = "_loop_thread, _req_futures, _req_subject, _running, loop";
+static const char __pyx_k_loop_thread__req_futures__req_s_2[] = "_loop_thread, _req_futures, _req_subject, _running, addr, context, listen_task, loop, socket, timeout";
 /* #### Code section: decls ### */
 static PyObject *__pyx_pf_11cfunc_dot_to_py_83__Pyx_CFunc_2c7b9d__4core_6client_12async_client_11AsyncClient_voi__etc_to_py_4self_wrap(PyObject *__pyx_self, struct __pyx_obj_4core_6client_12async_client_AsyncClient *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_4core_6client_12async_client_scale(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v_data); /* proto */
@@ -3068,13 +3045,12 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
 static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_16__setstate_cython__(struct __pyx_obj_4core_6client_12async_client_AsyncZmqClient *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_pf_4core_6client_12async_client_17AsyncStreamClient___init__(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_addr, int __pyx_v_timeout); /* proto */
 static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_2_listen_loop(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_5_async_request(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_req_id, PyObject *__pyx_v_msg); /* proto */
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_8send_request(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_req_id, PyObject *__pyx_v_message); /* proto */
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_11_get_connection(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_connection_key); /* proto */
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_14_async_shutdown(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_5send_request(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_req_id, PyObject *__pyx_v_message); /* proto */
+static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_8_get_connection(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_connection_key); /* proto */
+static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_11_async_shutdown(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_11listen_task___get__(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__reduce_cython__(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_19__setstate_cython__(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_14__reduce_cython__(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_16__setstate_cython__(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_4core_6client_12async_client_2__pyx_unpickle_AsyncClient(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_4core_6client_12async_client_4__pyx_unpickle_AsyncZmqClient(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_pf_4core_6client_12async_client_6__pyx_unpickle_AsyncStreamClient(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_v___pyx_type, long __pyx_v___pyx_checksum, PyObject *__pyx_v___pyx_state); /* proto */
@@ -3089,10 +3065,9 @@ static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_4_
 static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_5_send_request(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_6__async_shutdown(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_7__listen_loop(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
-static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_8__async_request(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
-static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_9_send_request(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
-static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_10__get_connection(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
-static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_8_send_request(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_9__get_connection(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new___pyx_scope_struct____Pyx_CFunc_2c7b9d__4core_6client_12async_client_11AsyncClient_voi__etc_to_py_4self(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 /* #### Code section: late_includes ### */
 /* #### Code section: module_state ### */
@@ -3125,10 +3100,9 @@ typedef struct {
   PyObject *__pyx_type_4core_6client_12async_client___pyx_scope_struct_5_send_request;
   PyObject *__pyx_type_4core_6client_12async_client___pyx_scope_struct_6__async_shutdown;
   PyObject *__pyx_type_4core_6client_12async_client___pyx_scope_struct_7__listen_loop;
-  PyObject *__pyx_type_4core_6client_12async_client___pyx_scope_struct_8__async_request;
-  PyObject *__pyx_type_4core_6client_12async_client___pyx_scope_struct_9_send_request;
-  PyObject *__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__get_connection;
-  PyObject *__pyx_type_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown;
+  PyObject *__pyx_type_4core_6client_12async_client___pyx_scope_struct_8_send_request;
+  PyObject *__pyx_type_4core_6client_12async_client___pyx_scope_struct_9__get_connection;
+  PyObject *__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown;
   PyObject *__pyx_scope_struct____Pyx_CFunc_2c7b9d__4core_6client_12async_client_11AsyncClient_voi__etc_to_py_4self;
   PyTypeObject *__pyx_ptype_4core_6client_12async_client_AsyncClient;
   PyTypeObject *__pyx_ptype_4core_6client_12async_client_AsyncZmqClient;
@@ -3141,18 +3115,17 @@ typedef struct {
   PyTypeObject *__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_5_send_request;
   PyTypeObject *__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_6__async_shutdown;
   PyTypeObject *__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_7__listen_loop;
-  PyTypeObject *__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request;
-  PyTypeObject *__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request;
-  PyTypeObject *__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection;
-  PyTypeObject *__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown;
+  PyTypeObject *__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request;
+  PyTypeObject *__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection;
+  PyTypeObject *__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown;
   PyTypeObject *__pyx_ptype___pyx_scope_struct____Pyx_CFunc_2c7b9d__4core_6client_12async_client_11AsyncClient_voi__etc_to_py_4self;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_items;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_pop;
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_values;
   PyObject *__pyx_tuple[7];
-  PyObject *__pyx_codeobj_tab[25];
-  PyObject *__pyx_string_tab[291];
-  PyObject *__pyx_number_tab[15];
+  PyObject *__pyx_codeobj_tab[24];
+  PyObject *__pyx_string_tab[287];
+  PyObject *__pyx_number_tab[14];
 /* #### Code section: module_state_contents ### */
 /* CommonTypesMetaclass.module_state_decls */
 PyTypeObject *__pyx_CommonTypesMetaclassType;
@@ -3221,23 +3194,18 @@ int __pyx_freecount_4core_6client_12async_client___pyx_scope_struct_7__listen_lo
 #endif
 
 #if CYTHON_USE_FREELISTS
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request *__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_8__async_request[8];
-int __pyx_freecount_4core_6client_12async_client___pyx_scope_struct_8__async_request;
+struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request *__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_8_send_request[8];
+int __pyx_freecount_4core_6client_12async_client___pyx_scope_struct_8_send_request;
 #endif
 
 #if CYTHON_USE_FREELISTS
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request *__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_9_send_request[8];
-int __pyx_freecount_4core_6client_12async_client___pyx_scope_struct_9_send_request;
+struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection *__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_9__get_connection[8];
+int __pyx_freecount_4core_6client_12async_client___pyx_scope_struct_9__get_connection;
 #endif
 
 #if CYTHON_USE_FREELISTS
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection *__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_10__get_connection[8];
-int __pyx_freecount_4core_6client_12async_client___pyx_scope_struct_10__get_connection;
-#endif
-
-#if CYTHON_USE_FREELISTS
-struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown *__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown[8];
-int __pyx_freecount_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown;
+struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown *__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown[8];
+int __pyx_freecount_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown;
 #endif
 
 #if CYTHON_USE_FREELISTS
@@ -3287,297 +3255,292 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_kp_u_TCP_Heartbeat_received __pyx_string_tab[12]
 #define __pyx_kp_u_TCP_Listen_loop_error __pyx_string_tab[13]
 #define __pyx_kp_u_TCP_Reader_for __pyx_string_tab[14]
-#define __pyx_kp_u_TCP_request_timeout __pyx_string_tab[15]
-#define __pyx_kp_u_TCP_timeout __pyx_string_tab[16]
-#define __pyx_kp_u_ZMQError_2 __pyx_string_tab[17]
-#define __pyx_kp_u_ZMQ_Connecting_to_server_at __pyx_string_tab[18]
-#define __pyx_kp_u_ZMQ_Listener_loop_started __pyx_string_tab[19]
-#define __pyx_kp_u__2 __pyx_string_tab[20]
-#define __pyx_kp_u__3 __pyx_string_tab[21]
-#define __pyx_kp_u__4 __pyx_string_tab[22]
-#define __pyx_kp_u__5 __pyx_string_tab[23]
-#define __pyx_kp_u_add_note __pyx_string_tab[24]
-#define __pyx_kp_u_client __pyx_string_tab[25]
-#define __pyx_kp_u_client_identity __pyx_string_tab[26]
-#define __pyx_kp_u_client_is_not_running __pyx_string_tab[27]
-#define __pyx_kp_u_core_client_async_client_pyx __pyx_string_tab[28]
-#define __pyx_kp_u_disable __pyx_string_tab[29]
-#define __pyx_kp_u_enable __pyx_string_tab[30]
-#define __pyx_kp_u_gc __pyx_string_tab[31]
-#define __pyx_kp_u_isenabled __pyx_string_tab[32]
-#define __pyx_kp_u_r_id_and_size_of_payload __pyx_string_tab[33]
-#define __pyx_kp_u_self__connection_cache_is_not_No __pyx_string_tab[34]
-#define __pyx_kp_u_self__loop_thread_is_not_None_or __pyx_string_tab[35]
-#define __pyx_kp_u_self__loop_thread_is_not_None_or_2 __pyx_string_tab[36]
-#define __pyx_kp_u_send_multiframe __pyx_string_tab[37]
-#define __pyx_kp_u_started __pyx_string_tab[38]
-#define __pyx_kp_u_stringsource __pyx_string_tab[39]
-#define __pyx_kp_u_tcp __pyx_string_tab[40]
-#define __pyx_n_u_AsyncClient __pyx_string_tab[41]
-#define __pyx_n_u_AsyncClient___reduce_cython __pyx_string_tab[42]
-#define __pyx_n_u_AsyncClient___setstate_cython __pyx_string_tab[43]
-#define __pyx_n_u_AsyncClient__async_shutdown __pyx_string_tab[44]
-#define __pyx_n_u_AsyncClient_close __pyx_string_tab[45]
-#define __pyx_n_u_AsyncClient_run __pyx_string_tab[46]
-#define __pyx_n_u_AsyncClient_send_request __pyx_string_tab[47]
-#define __pyx_n_u_AsyncIOScheduler __pyx_string_tab[48]
-#define __pyx_n_u_AsyncStreamClient __pyx_string_tab[49]
-#define __pyx_n_u_AsyncStreamClient___reduce_cytho __pyx_string_tab[50]
-#define __pyx_n_u_AsyncStreamClient___setstate_cyt __pyx_string_tab[51]
-#define __pyx_n_u_AsyncStreamClient__async_request __pyx_string_tab[52]
-#define __pyx_n_u_AsyncStreamClient__async_shutdow __pyx_string_tab[53]
-#define __pyx_n_u_AsyncStreamClient__get_connectio __pyx_string_tab[54]
-#define __pyx_n_u_AsyncStreamClient__listen_loop __pyx_string_tab[55]
-#define __pyx_n_u_AsyncStreamClient_send_request __pyx_string_tab[56]
-#define __pyx_n_u_AsyncZmqClient __pyx_string_tab[57]
-#define __pyx_n_u_AsyncZmqClient___reduce_cython __pyx_string_tab[58]
-#define __pyx_n_u_AsyncZmqClient___setstate_cython __pyx_string_tab[59]
-#define __pyx_n_u_AsyncZmqClient__async_shutdown __pyx_string_tab[60]
-#define __pyx_n_u_AsyncZmqClient__init_zmq __pyx_string_tab[61]
-#define __pyx_n_u_AsyncZmqClient__listen_loop __pyx_string_tab[62]
-#define __pyx_n_u_AsyncZmqClient_send_request __pyx_string_tab[63]
-#define __pyx_n_u_AsyncZmqClient_wrap_protocol_loc __pyx_string_tab[64]
-#define __pyx_n_u_CancelledError __pyx_string_tab[65]
-#define __pyx_n_u_Context __pyx_string_tab[66]
-#define __pyx_n_u_DEALER __pyx_string_tab[67]
-#define __pyx_n_u_ETERM __pyx_string_tab[68]
-#define __pyx_n_u_EventLoopPolicy __pyx_string_tab[69]
-#define __pyx_n_u_IDENTITY __pyx_string_tab[70]
-#define __pyx_n_u_IPPROTO_TCP __pyx_string_tab[71]
-#define __pyx_n_u_LINGER __pyx_string_tab[72]
-#define __pyx_n_u_Pyx_CFunc_2c7b9d__4core_6clien __pyx_string_tab[73]
-#define __pyx_n_u_Pyx_PyDict_NextRef __pyx_string_tab[74]
-#define __pyx_n_u_Subject __pyx_string_tab[75]
-#define __pyx_n_u_TCP_NODELAY __pyx_string_tab[76]
-#define __pyx_n_u_Table __pyx_string_tab[77]
-#define __pyx_n_u_Thread __pyx_string_tab[78]
-#define __pyx_n_u_ThreadPoolExecutor __pyx_string_tab[79]
-#define __pyx_n_u_TimeoutError __pyx_string_tab[80]
-#define __pyx_n_u_ZMQError __pyx_string_tab[81]
-#define __pyx_n_u_add_done_callback __pyx_string_tab[82]
-#define __pyx_n_u_addr __pyx_string_tab[83]
-#define __pyx_n_u_amount __pyx_string_tab[84]
-#define __pyx_n_u_async_request __pyx_string_tab[85]
-#define __pyx_n_u_async_shutdown __pyx_string_tab[86]
-#define __pyx_n_u_asyncio __pyx_string_tab[87]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[88]
-#define __pyx_n_u_at_eof __pyx_string_tab[89]
-#define __pyx_n_u_await __pyx_string_tab[90]
-#define __pyx_n_u_big __pyx_string_tab[91]
-#define __pyx_n_u_bonus __pyx_string_tab[92]
-#define __pyx_n_u_bonus_share __pyx_string_tab[93]
-#define __pyx_n_u_byteorder __pyx_string_tab[94]
-#define __pyx_n_u_call_soon_threadsafe __pyx_string_tab[95]
-#define __pyx_n_u_cancel __pyx_string_tab[96]
-#define __pyx_n_u_cast __pyx_string_tab[97]
-#define __pyx_n_u_cfunc_to_py __pyx_string_tab[98]
-#define __pyx_n_u_class __pyx_string_tab[99]
-#define __pyx_n_u_class_getitem __pyx_string_tab[100]
-#define __pyx_n_u_clear __pyx_string_tab[101]
-#define __pyx_n_u_client_id __pyx_string_tab[102]
-#define __pyx_n_u_cline_in_traceback __pyx_string_tab[103]
-#define __pyx_n_u_close __pyx_string_tab[104]
-#define __pyx_n_u_column __pyx_string_tab[105]
-#define __pyx_n_u_column_names __pyx_string_tab[106]
-#define __pyx_n_u_complete_message __pyx_string_tab[107]
-#define __pyx_n_u_compute __pyx_string_tab[108]
-#define __pyx_n_u_concurrent_futures __pyx_string_tab[109]
-#define __pyx_n_u_connect __pyx_string_tab[110]
-#define __pyx_n_u_connection_key __pyx_string_tab[111]
-#define __pyx_n_u_core_client_async_client __pyx_string_tab[112]
-#define __pyx_n_u_create_future __pyx_string_tab[113]
-#define __pyx_n_u_create_task __pyx_string_tab[114]
-#define __pyx_n_u_daemon __pyx_string_tab[115]
-#define __pyx_n_u_data __pyx_string_tab[116]
-#define __pyx_n_u_dict __pyx_string_tab[117]
-#define __pyx_n_u_dict_2 __pyx_string_tab[118]
-#define __pyx_n_u_done __pyx_string_tab[119]
-#define __pyx_n_u_drain __pyx_string_tab[120]
-#define __pyx_n_u_e __pyx_string_tab[121]
-#define __pyx_n_u_errno __pyx_string_tab[122]
-#define __pyx_n_u_f __pyx_string_tab[123]
-#define __pyx_n_u_frames __pyx_string_tab[124]
-#define __pyx_n_u_from_arrays __pyx_string_tab[125]
-#define __pyx_n_u_from_bytes __pyx_string_tab[126]
-#define __pyx_n_u_func __pyx_string_tab[127]
-#define __pyx_n_u_fut __pyx_string_tab[128]
-#define __pyx_n_u_futures __pyx_string_tab[129]
-#define __pyx_n_u_get_connection __pyx_string_tab[130]
-#define __pyx_n_u_get_extra_info __pyx_string_tab[131]
-#define __pyx_n_u_getstate __pyx_string_tab[132]
-#define __pyx_n_u_high __pyx_string_tab[133]
-#define __pyx_n_u_host __pyx_string_tab[134]
-#define __pyx_n_u_id __pyx_string_tab[135]
-#define __pyx_n_u_index __pyx_string_tab[136]
-#define __pyx_n_u_init __pyx_string_tab[137]
-#define __pyx_n_u_init_zmq __pyx_string_tab[138]
-#define __pyx_n_u_ipc __pyx_string_tab[139]
-#define __pyx_n_u_is_alive __pyx_string_tab[140]
-#define __pyx_n_u_is_closing __pyx_string_tab[141]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[142]
-#define __pyx_n_u_is_running __pyx_string_tab[143]
-#define __pyx_n_u_items __pyx_string_tab[144]
-#define __pyx_n_u_join __pyx_string_tab[145]
-#define __pyx_n_u_json __pyx_string_tab[146]
-#define __pyx_n_u_key __pyx_string_tab[147]
-#define __pyx_n_u_keys __pyx_string_tab[148]
-#define __pyx_n_u_lambda __pyx_string_tab[149]
-#define __pyx_n_u_len_bytes __pyx_string_tab[150]
-#define __pyx_n_u_linger __pyx_string_tab[151]
-#define __pyx_n_u_listen_loop __pyx_string_tab[152]
-#define __pyx_n_u_listen_task __pyx_string_tab[153]
-#define __pyx_n_u_low __pyx_string_tab[154]
-#define __pyx_n_u_main __pyx_string_tab[155]
-#define __pyx_n_u_map __pyx_string_tab[156]
-#define __pyx_n_u_message __pyx_string_tab[157]
-#define __pyx_n_u_module __pyx_string_tab[158]
-#define __pyx_n_u_msg __pyx_string_tab[159]
-#define __pyx_n_u_msg_len __pyx_string_tab[160]
-#define __pyx_n_u_multiply __pyx_string_tab[161]
-#define __pyx_n_u_name __pyx_string_tab[162]
-#define __pyx_n_u_name_2 __pyx_string_tab[163]
-#define __pyx_n_u_names __pyx_string_tab[164]
-#define __pyx_n_u_ndigits __pyx_string_tab[165]
-#define __pyx_n_u_new __pyx_string_tab[166]
-#define __pyx_n_u_new_event_loop __pyx_string_tab[167]
-#define __pyx_n_u_next __pyx_string_tab[168]
-#define __pyx_n_u_of __pyx_string_tab[169]
-#define __pyx_n_u_on_completed __pyx_string_tab[170]
-#define __pyx_n_u_on_next __pyx_string_tab[171]
-#define __pyx_n_u_open __pyx_string_tab[172]
-#define __pyx_n_u_open_connection __pyx_string_tab[173]
-#define __pyx_n_u_open_stream __pyx_string_tab[174]
-#define __pyx_n_u_operators __pyx_string_tab[175]
-#define __pyx_n_u_ops __pyx_string_tab[176]
-#define __pyx_n_u_os __pyx_string_tab[177]
-#define __pyx_n_u_pa __pyx_string_tab[178]
-#define __pyx_n_u_pack __pyx_string_tab[179]
-#define __pyx_n_u_payload __pyx_string_tab[180]
-#define __pyx_n_u_pc __pyx_string_tab[181]
-#define __pyx_n_u_pipe __pyx_string_tab[182]
-#define __pyx_n_u_pop __pyx_string_tab[183]
-#define __pyx_n_u_port __pyx_string_tab[184]
-#define __pyx_n_u_price __pyx_string_tab[185]
-#define __pyx_n_u_print __pyx_string_tab[186]
-#define __pyx_n_u_py_buffer __pyx_string_tab[187]
-#define __pyx_n_u_pyarrow __pyx_string_tab[188]
-#define __pyx_n_u_pyarrow_compute __pyx_string_tab[189]
-#define __pyx_n_u_pyx_checksum __pyx_string_tab[190]
-#define __pyx_n_u_pyx_result __pyx_string_tab[191]
-#define __pyx_n_u_pyx_state __pyx_string_tab[192]
-#define __pyx_n_u_pyx_type __pyx_string_tab[193]
-#define __pyx_n_u_pyx_unpickle_AsyncClient __pyx_string_tab[194]
-#define __pyx_n_u_pyx_unpickle_AsyncStreamClient __pyx_string_tab[195]
-#define __pyx_n_u_pyx_unpickle_AsyncZmqClient __pyx_string_tab[196]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[197]
-#define __pyx_n_u_qualname __pyx_string_tab[198]
-#define __pyx_n_u_r_id __pyx_string_tab[199]
-#define __pyx_n_u_ratio __pyx_string_tab[200]
-#define __pyx_n_u_raw_payload __pyx_string_tab[201]
-#define __pyx_n_u_reactivex __pyx_string_tab[202]
-#define __pyx_n_u_reactivex_operators __pyx_string_tab[203]
-#define __pyx_n_u_reactivex_scheduler_eventloop __pyx_string_tab[204]
-#define __pyx_n_u_reactivex_subject __pyx_string_tab[205]
-#define __pyx_n_u_read_all __pyx_string_tab[206]
-#define __pyx_n_u_reader __pyx_string_tab[207]
-#define __pyx_n_u_readexactly __pyx_string_tab[208]
-#define __pyx_n_u_recv_multipart __pyx_string_tab[209]
-#define __pyx_n_u_reduce __pyx_string_tab[210]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[211]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[212]
-#define __pyx_n_u_req_id __pyx_string_tab[213]
-#define __pyx_n_u_req_subject __pyx_string_tab[214]
-#define __pyx_n_u_result __pyx_string_tab[215]
-#define __pyx_n_u_round __pyx_string_tab[216]
-#define __pyx_n_u_run __pyx_string_tab[217]
-#define __pyx_n_u_run_coroutine_threadsafe __pyx_string_tab[218]
-#define __pyx_n_u_run_forever __pyx_string_tab[219]
-#define __pyx_n_u_scale __pyx_string_tab[220]
-#define __pyx_n_u_schema __pyx_string_tab[221]
-#define __pyx_n_u_self __pyx_string_tab[222]
-#define __pyx_n_u_send __pyx_string_tab[223]
-#define __pyx_n_u_send_multipart __pyx_string_tab[224]
-#define __pyx_n_u_send_request __pyx_string_tab[225]
-#define __pyx_n_u_serialize_msg __pyx_string_tab[226]
-#define __pyx_n_u_set_column __pyx_string_tab[227]
-#define __pyx_n_u_set_debug __pyx_string_tab[228]
-#define __pyx_n_u_set_event_loop __pyx_string_tab[229]
-#define __pyx_n_u_set_event_loop_policy __pyx_string_tab[230]
-#define __pyx_n_u_set_hwm __pyx_string_tab[231]
-#define __pyx_n_u_set_name __pyx_string_tab[232]
-#define __pyx_n_u_set_result __pyx_string_tab[233]
-#define __pyx_n_u_setdefault __pyx_string_tab[234]
-#define __pyx_n_u_setsockopt __pyx_string_tab[235]
-#define __pyx_n_u_setstate __pyx_string_tab[236]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[237]
-#define __pyx_n_u_share __pyx_string_tab[238]
-#define __pyx_n_u_sid __pyx_string_tab[239]
-#define __pyx_n_u_sock __pyx_string_tab[240]
-#define __pyx_n_u_socket __pyx_string_tab[241]
-#define __pyx_n_u_start __pyx_string_tab[242]
-#define __pyx_n_u_state __pyx_string_tab[243]
-#define __pyx_n_u_stop __pyx_string_tab[244]
-#define __pyx_n_u_string __pyx_string_tab[245]
-#define __pyx_n_u_super __pyx_string_tab[246]
-#define __pyx_n_u_table __pyx_string_tab[247]
-#define __pyx_n_u_target __pyx_string_tab[248]
-#define __pyx_n_u_term __pyx_string_tab[249]
-#define __pyx_n_u_test __pyx_string_tab[250]
-#define __pyx_n_u_threading __pyx_string_tab[251]
-#define __pyx_n_u_throw __pyx_string_tab[252]
-#define __pyx_n_u_time __pyx_string_tab[253]
-#define __pyx_n_u_timeout __pyx_string_tab[254]
-#define __pyx_n_u_to_bytes __pyx_string_tab[255]
-#define __pyx_n_u_transfer __pyx_string_tab[256]
-#define __pyx_n_u_unpack __pyx_string_tab[257]
-#define __pyx_n_u_update __pyx_string_tab[258]
-#define __pyx_n_u_use_setstate __pyx_string_tab[259]
-#define __pyx_n_u_utils_serialize __pyx_string_tab[260]
-#define __pyx_n_u_uuid __pyx_string_tab[261]
-#define __pyx_n_u_uuid4 __pyx_string_tab[262]
-#define __pyx_n_u_uvloop __pyx_string_tab[263]
-#define __pyx_n_u_value __pyx_string_tab[264]
-#define __pyx_n_u_values __pyx_string_tab[265]
-#define __pyx_n_u_volume __pyx_string_tab[266]
-#define __pyx_n_u_wait_closed __pyx_string_tab[267]
-#define __pyx_n_u_wait_for __pyx_string_tab[268]
-#define __pyx_n_u_wrap __pyx_string_tab[269]
-#define __pyx_n_u_write __pyx_string_tab[270]
-#define __pyx_n_u_writer __pyx_string_tab[271]
-#define __pyx_n_u_ze __pyx_string_tab[272]
-#define __pyx_n_u_zmq __pyx_string_tab[273]
-#define __pyx_n_u_zmq_asyncio __pyx_string_tab[274]
-#define __pyx_kp_b_iso88591_4_aq __pyx_string_tab[275]
-#define __pyx_kp_b_iso88591_A __pyx_string_tab[276]
-#define __pyx_kp_b_iso88591_AQ_a_5_T_5_T__LPYYbbc_E_vS_gQ_5 __pyx_string_tab[277]
-#define __pyx_kp_b_iso88591_AV1 __pyx_string_tab[278]
-#define __pyx_kp_b_iso88591_A_4t1_L_Qc_j_4vWE_T_k_g_6at_K4tS __pyx_string_tab[279]
-#define __pyx_kp_b_iso88591_A_4t1_aq_T_q_q __pyx_string_tab[280]
-#define __pyx_kp_b_iso88591_T_Kt_kQUUV_G1F_a_vWE_Q_q_q_D_7 __pyx_string_tab[281]
-#define __pyx_kp_b_iso88591_T_Kt_kQUU_jjnn_A_A_H_H_L_L_U_U __pyx_string_tab[282]
-#define __pyx_kp_b_iso88591_T_T_Kt_Z_iimmttx_y_G_G_K_K_R_R __pyx_string_tab[283]
-#define __pyx_kp_b_iso88591__6 __pyx_string_tab[284]
-#define __pyx_kp_b_iso88591__7 __pyx_string_tab[285]
-#define __pyx_kp_b_iso88591_q_0_kQR_7_0_1B_PQ_1 __pyx_string_tab[286]
-#define __pyx_kp_b_iso88591_q_0_kQR_HAQ_7_314H_VW_1 __pyx_string_tab[287]
-#define __pyx_kp_b_iso88591_q_0_kQR_haq_7_QnN_1 __pyx_string_tab[288]
-#define __pyx_kp_b_iso88591_q_a __pyx_string_tab[289]
-#define __pyx_n_b_eof __pyx_string_tab[290]
+#define __pyx_kp_u_TCP_timeout __pyx_string_tab[15]
+#define __pyx_kp_u_ZMQError_2 __pyx_string_tab[16]
+#define __pyx_kp_u_ZMQ_Connecting_to_server_at __pyx_string_tab[17]
+#define __pyx_kp_u_ZMQ_Listener_loop_started __pyx_string_tab[18]
+#define __pyx_kp_u__2 __pyx_string_tab[19]
+#define __pyx_kp_u__3 __pyx_string_tab[20]
+#define __pyx_kp_u__4 __pyx_string_tab[21]
+#define __pyx_kp_u__5 __pyx_string_tab[22]
+#define __pyx_kp_u_add_note __pyx_string_tab[23]
+#define __pyx_kp_u_client __pyx_string_tab[24]
+#define __pyx_kp_u_client_identity __pyx_string_tab[25]
+#define __pyx_kp_u_client_is_not_running __pyx_string_tab[26]
+#define __pyx_kp_u_core_client_async_client_pyx __pyx_string_tab[27]
+#define __pyx_kp_u_disable __pyx_string_tab[28]
+#define __pyx_kp_u_enable __pyx_string_tab[29]
+#define __pyx_kp_u_gc __pyx_string_tab[30]
+#define __pyx_kp_u_isenabled __pyx_string_tab[31]
+#define __pyx_kp_u_r_id_and_size_of_payload __pyx_string_tab[32]
+#define __pyx_kp_u_self__connection_cache_is_not_No __pyx_string_tab[33]
+#define __pyx_kp_u_self__loop_thread_is_not_None_or __pyx_string_tab[34]
+#define __pyx_kp_u_self__loop_thread_is_not_None_or_2 __pyx_string_tab[35]
+#define __pyx_kp_u_send_multiframe __pyx_string_tab[36]
+#define __pyx_kp_u_started __pyx_string_tab[37]
+#define __pyx_kp_u_stringsource __pyx_string_tab[38]
+#define __pyx_kp_u_tcp __pyx_string_tab[39]
+#define __pyx_n_u_AsyncClient __pyx_string_tab[40]
+#define __pyx_n_u_AsyncClient___reduce_cython __pyx_string_tab[41]
+#define __pyx_n_u_AsyncClient___setstate_cython __pyx_string_tab[42]
+#define __pyx_n_u_AsyncClient__async_shutdown __pyx_string_tab[43]
+#define __pyx_n_u_AsyncClient_close __pyx_string_tab[44]
+#define __pyx_n_u_AsyncClient_run __pyx_string_tab[45]
+#define __pyx_n_u_AsyncClient_send_request __pyx_string_tab[46]
+#define __pyx_n_u_AsyncIOScheduler __pyx_string_tab[47]
+#define __pyx_n_u_AsyncStreamClient __pyx_string_tab[48]
+#define __pyx_n_u_AsyncStreamClient___reduce_cytho __pyx_string_tab[49]
+#define __pyx_n_u_AsyncStreamClient___setstate_cyt __pyx_string_tab[50]
+#define __pyx_n_u_AsyncStreamClient__async_shutdow __pyx_string_tab[51]
+#define __pyx_n_u_AsyncStreamClient__get_connectio __pyx_string_tab[52]
+#define __pyx_n_u_AsyncStreamClient__listen_loop __pyx_string_tab[53]
+#define __pyx_n_u_AsyncStreamClient_send_request __pyx_string_tab[54]
+#define __pyx_n_u_AsyncZmqClient __pyx_string_tab[55]
+#define __pyx_n_u_AsyncZmqClient___reduce_cython __pyx_string_tab[56]
+#define __pyx_n_u_AsyncZmqClient___setstate_cython __pyx_string_tab[57]
+#define __pyx_n_u_AsyncZmqClient__async_shutdown __pyx_string_tab[58]
+#define __pyx_n_u_AsyncZmqClient__init_zmq __pyx_string_tab[59]
+#define __pyx_n_u_AsyncZmqClient__listen_loop __pyx_string_tab[60]
+#define __pyx_n_u_AsyncZmqClient_send_request __pyx_string_tab[61]
+#define __pyx_n_u_AsyncZmqClient_wrap_protocol_loc __pyx_string_tab[62]
+#define __pyx_n_u_CancelledError __pyx_string_tab[63]
+#define __pyx_n_u_Context __pyx_string_tab[64]
+#define __pyx_n_u_DEALER __pyx_string_tab[65]
+#define __pyx_n_u_ETERM __pyx_string_tab[66]
+#define __pyx_n_u_EventLoopPolicy __pyx_string_tab[67]
+#define __pyx_n_u_IDENTITY __pyx_string_tab[68]
+#define __pyx_n_u_IPPROTO_TCP __pyx_string_tab[69]
+#define __pyx_n_u_LINGER __pyx_string_tab[70]
+#define __pyx_n_u_Pyx_CFunc_2c7b9d__4core_6clien __pyx_string_tab[71]
+#define __pyx_n_u_Pyx_PyDict_NextRef __pyx_string_tab[72]
+#define __pyx_n_u_Subject __pyx_string_tab[73]
+#define __pyx_n_u_TCP_NODELAY __pyx_string_tab[74]
+#define __pyx_n_u_Table __pyx_string_tab[75]
+#define __pyx_n_u_Thread __pyx_string_tab[76]
+#define __pyx_n_u_ThreadPoolExecutor __pyx_string_tab[77]
+#define __pyx_n_u_TimeoutError __pyx_string_tab[78]
+#define __pyx_n_u_ZMQError __pyx_string_tab[79]
+#define __pyx_n_u_add_done_callback __pyx_string_tab[80]
+#define __pyx_n_u_addr __pyx_string_tab[81]
+#define __pyx_n_u_amount __pyx_string_tab[82]
+#define __pyx_n_u_async_shutdown __pyx_string_tab[83]
+#define __pyx_n_u_asyncio __pyx_string_tab[84]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[85]
+#define __pyx_n_u_at_eof __pyx_string_tab[86]
+#define __pyx_n_u_await __pyx_string_tab[87]
+#define __pyx_n_u_big __pyx_string_tab[88]
+#define __pyx_n_u_bonus __pyx_string_tab[89]
+#define __pyx_n_u_bonus_share __pyx_string_tab[90]
+#define __pyx_n_u_byteorder __pyx_string_tab[91]
+#define __pyx_n_u_call_soon_threadsafe __pyx_string_tab[92]
+#define __pyx_n_u_cancel __pyx_string_tab[93]
+#define __pyx_n_u_cast __pyx_string_tab[94]
+#define __pyx_n_u_cfunc_to_py __pyx_string_tab[95]
+#define __pyx_n_u_class __pyx_string_tab[96]
+#define __pyx_n_u_class_getitem __pyx_string_tab[97]
+#define __pyx_n_u_clear __pyx_string_tab[98]
+#define __pyx_n_u_client_id __pyx_string_tab[99]
+#define __pyx_n_u_cline_in_traceback __pyx_string_tab[100]
+#define __pyx_n_u_close __pyx_string_tab[101]
+#define __pyx_n_u_column __pyx_string_tab[102]
+#define __pyx_n_u_column_names __pyx_string_tab[103]
+#define __pyx_n_u_complete_message __pyx_string_tab[104]
+#define __pyx_n_u_compute __pyx_string_tab[105]
+#define __pyx_n_u_concurrent_futures __pyx_string_tab[106]
+#define __pyx_n_u_connect __pyx_string_tab[107]
+#define __pyx_n_u_connection_key __pyx_string_tab[108]
+#define __pyx_n_u_core_client_async_client __pyx_string_tab[109]
+#define __pyx_n_u_create_future __pyx_string_tab[110]
+#define __pyx_n_u_create_task __pyx_string_tab[111]
+#define __pyx_n_u_daemon __pyx_string_tab[112]
+#define __pyx_n_u_data __pyx_string_tab[113]
+#define __pyx_n_u_dict __pyx_string_tab[114]
+#define __pyx_n_u_dict_2 __pyx_string_tab[115]
+#define __pyx_n_u_done __pyx_string_tab[116]
+#define __pyx_n_u_drain __pyx_string_tab[117]
+#define __pyx_n_u_e __pyx_string_tab[118]
+#define __pyx_n_u_errno __pyx_string_tab[119]
+#define __pyx_n_u_f __pyx_string_tab[120]
+#define __pyx_n_u_frames __pyx_string_tab[121]
+#define __pyx_n_u_from_arrays __pyx_string_tab[122]
+#define __pyx_n_u_from_bytes __pyx_string_tab[123]
+#define __pyx_n_u_func __pyx_string_tab[124]
+#define __pyx_n_u_fut __pyx_string_tab[125]
+#define __pyx_n_u_get_connection __pyx_string_tab[126]
+#define __pyx_n_u_get_extra_info __pyx_string_tab[127]
+#define __pyx_n_u_getstate __pyx_string_tab[128]
+#define __pyx_n_u_high __pyx_string_tab[129]
+#define __pyx_n_u_host __pyx_string_tab[130]
+#define __pyx_n_u_id __pyx_string_tab[131]
+#define __pyx_n_u_index __pyx_string_tab[132]
+#define __pyx_n_u_init __pyx_string_tab[133]
+#define __pyx_n_u_init_zmq __pyx_string_tab[134]
+#define __pyx_n_u_ipc __pyx_string_tab[135]
+#define __pyx_n_u_is_alive __pyx_string_tab[136]
+#define __pyx_n_u_is_closing __pyx_string_tab[137]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[138]
+#define __pyx_n_u_is_running __pyx_string_tab[139]
+#define __pyx_n_u_items __pyx_string_tab[140]
+#define __pyx_n_u_join __pyx_string_tab[141]
+#define __pyx_n_u_json __pyx_string_tab[142]
+#define __pyx_n_u_key __pyx_string_tab[143]
+#define __pyx_n_u_keys __pyx_string_tab[144]
+#define __pyx_n_u_lambda __pyx_string_tab[145]
+#define __pyx_n_u_len_bytes __pyx_string_tab[146]
+#define __pyx_n_u_linger __pyx_string_tab[147]
+#define __pyx_n_u_listen_loop __pyx_string_tab[148]
+#define __pyx_n_u_listen_task __pyx_string_tab[149]
+#define __pyx_n_u_low __pyx_string_tab[150]
+#define __pyx_n_u_main __pyx_string_tab[151]
+#define __pyx_n_u_map __pyx_string_tab[152]
+#define __pyx_n_u_message __pyx_string_tab[153]
+#define __pyx_n_u_module __pyx_string_tab[154]
+#define __pyx_n_u_msg __pyx_string_tab[155]
+#define __pyx_n_u_msg_len __pyx_string_tab[156]
+#define __pyx_n_u_multiply __pyx_string_tab[157]
+#define __pyx_n_u_name __pyx_string_tab[158]
+#define __pyx_n_u_name_2 __pyx_string_tab[159]
+#define __pyx_n_u_names __pyx_string_tab[160]
+#define __pyx_n_u_ndigits __pyx_string_tab[161]
+#define __pyx_n_u_new __pyx_string_tab[162]
+#define __pyx_n_u_new_event_loop __pyx_string_tab[163]
+#define __pyx_n_u_next __pyx_string_tab[164]
+#define __pyx_n_u_of __pyx_string_tab[165]
+#define __pyx_n_u_on_completed __pyx_string_tab[166]
+#define __pyx_n_u_on_next __pyx_string_tab[167]
+#define __pyx_n_u_open __pyx_string_tab[168]
+#define __pyx_n_u_open_connection __pyx_string_tab[169]
+#define __pyx_n_u_open_stream __pyx_string_tab[170]
+#define __pyx_n_u_operators __pyx_string_tab[171]
+#define __pyx_n_u_ops __pyx_string_tab[172]
+#define __pyx_n_u_os __pyx_string_tab[173]
+#define __pyx_n_u_pa __pyx_string_tab[174]
+#define __pyx_n_u_pack __pyx_string_tab[175]
+#define __pyx_n_u_payload __pyx_string_tab[176]
+#define __pyx_n_u_pc __pyx_string_tab[177]
+#define __pyx_n_u_pipe __pyx_string_tab[178]
+#define __pyx_n_u_pop __pyx_string_tab[179]
+#define __pyx_n_u_port __pyx_string_tab[180]
+#define __pyx_n_u_price __pyx_string_tab[181]
+#define __pyx_n_u_print __pyx_string_tab[182]
+#define __pyx_n_u_py_buffer __pyx_string_tab[183]
+#define __pyx_n_u_pyarrow __pyx_string_tab[184]
+#define __pyx_n_u_pyarrow_compute __pyx_string_tab[185]
+#define __pyx_n_u_pyx_checksum __pyx_string_tab[186]
+#define __pyx_n_u_pyx_result __pyx_string_tab[187]
+#define __pyx_n_u_pyx_state __pyx_string_tab[188]
+#define __pyx_n_u_pyx_type __pyx_string_tab[189]
+#define __pyx_n_u_pyx_unpickle_AsyncClient __pyx_string_tab[190]
+#define __pyx_n_u_pyx_unpickle_AsyncStreamClient __pyx_string_tab[191]
+#define __pyx_n_u_pyx_unpickle_AsyncZmqClient __pyx_string_tab[192]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[193]
+#define __pyx_n_u_qualname __pyx_string_tab[194]
+#define __pyx_n_u_r_id __pyx_string_tab[195]
+#define __pyx_n_u_ratio __pyx_string_tab[196]
+#define __pyx_n_u_raw_payload __pyx_string_tab[197]
+#define __pyx_n_u_reactivex __pyx_string_tab[198]
+#define __pyx_n_u_reactivex_operators __pyx_string_tab[199]
+#define __pyx_n_u_reactivex_scheduler_eventloop __pyx_string_tab[200]
+#define __pyx_n_u_reactivex_subject __pyx_string_tab[201]
+#define __pyx_n_u_read_all __pyx_string_tab[202]
+#define __pyx_n_u_reader __pyx_string_tab[203]
+#define __pyx_n_u_readexactly __pyx_string_tab[204]
+#define __pyx_n_u_recv_multipart __pyx_string_tab[205]
+#define __pyx_n_u_reduce __pyx_string_tab[206]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[207]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[208]
+#define __pyx_n_u_req_id __pyx_string_tab[209]
+#define __pyx_n_u_req_subject __pyx_string_tab[210]
+#define __pyx_n_u_result __pyx_string_tab[211]
+#define __pyx_n_u_round __pyx_string_tab[212]
+#define __pyx_n_u_run __pyx_string_tab[213]
+#define __pyx_n_u_run_coroutine_threadsafe __pyx_string_tab[214]
+#define __pyx_n_u_run_forever __pyx_string_tab[215]
+#define __pyx_n_u_scale __pyx_string_tab[216]
+#define __pyx_n_u_schema __pyx_string_tab[217]
+#define __pyx_n_u_self __pyx_string_tab[218]
+#define __pyx_n_u_send __pyx_string_tab[219]
+#define __pyx_n_u_send_multipart __pyx_string_tab[220]
+#define __pyx_n_u_send_request __pyx_string_tab[221]
+#define __pyx_n_u_serialize_msg __pyx_string_tab[222]
+#define __pyx_n_u_set_column __pyx_string_tab[223]
+#define __pyx_n_u_set_debug __pyx_string_tab[224]
+#define __pyx_n_u_set_event_loop __pyx_string_tab[225]
+#define __pyx_n_u_set_event_loop_policy __pyx_string_tab[226]
+#define __pyx_n_u_set_hwm __pyx_string_tab[227]
+#define __pyx_n_u_set_name __pyx_string_tab[228]
+#define __pyx_n_u_set_result __pyx_string_tab[229]
+#define __pyx_n_u_setdefault __pyx_string_tab[230]
+#define __pyx_n_u_setsockopt __pyx_string_tab[231]
+#define __pyx_n_u_setstate __pyx_string_tab[232]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[233]
+#define __pyx_n_u_share __pyx_string_tab[234]
+#define __pyx_n_u_sid __pyx_string_tab[235]
+#define __pyx_n_u_sock __pyx_string_tab[236]
+#define __pyx_n_u_socket __pyx_string_tab[237]
+#define __pyx_n_u_start __pyx_string_tab[238]
+#define __pyx_n_u_state __pyx_string_tab[239]
+#define __pyx_n_u_stop __pyx_string_tab[240]
+#define __pyx_n_u_string __pyx_string_tab[241]
+#define __pyx_n_u_super __pyx_string_tab[242]
+#define __pyx_n_u_table __pyx_string_tab[243]
+#define __pyx_n_u_target __pyx_string_tab[244]
+#define __pyx_n_u_term __pyx_string_tab[245]
+#define __pyx_n_u_test __pyx_string_tab[246]
+#define __pyx_n_u_threading __pyx_string_tab[247]
+#define __pyx_n_u_throw __pyx_string_tab[248]
+#define __pyx_n_u_time __pyx_string_tab[249]
+#define __pyx_n_u_timeout __pyx_string_tab[250]
+#define __pyx_n_u_to_bytes __pyx_string_tab[251]
+#define __pyx_n_u_transfer __pyx_string_tab[252]
+#define __pyx_n_u_unpack __pyx_string_tab[253]
+#define __pyx_n_u_update __pyx_string_tab[254]
+#define __pyx_n_u_use_setstate __pyx_string_tab[255]
+#define __pyx_n_u_utils_serialize __pyx_string_tab[256]
+#define __pyx_n_u_uuid __pyx_string_tab[257]
+#define __pyx_n_u_uuid4 __pyx_string_tab[258]
+#define __pyx_n_u_uvloop __pyx_string_tab[259]
+#define __pyx_n_u_value __pyx_string_tab[260]
+#define __pyx_n_u_values __pyx_string_tab[261]
+#define __pyx_n_u_volume __pyx_string_tab[262]
+#define __pyx_n_u_wait_closed __pyx_string_tab[263]
+#define __pyx_n_u_wait_for __pyx_string_tab[264]
+#define __pyx_n_u_wrap __pyx_string_tab[265]
+#define __pyx_n_u_write __pyx_string_tab[266]
+#define __pyx_n_u_writer __pyx_string_tab[267]
+#define __pyx_n_u_ze __pyx_string_tab[268]
+#define __pyx_n_u_zmq __pyx_string_tab[269]
+#define __pyx_n_u_zmq_asyncio __pyx_string_tab[270]
+#define __pyx_kp_b_iso88591_4_aq __pyx_string_tab[271]
+#define __pyx_kp_b_iso88591_A __pyx_string_tab[272]
+#define __pyx_kp_b_iso88591_AQ_a_5_T_5_T__LPYYbbc_E_vS_gQ_5 __pyx_string_tab[273]
+#define __pyx_kp_b_iso88591_AV1 __pyx_string_tab[274]
+#define __pyx_kp_b_iso88591_A_4t1_L_Qc_j_4vWE_T_k_g_6at_K4tS __pyx_string_tab[275]
+#define __pyx_kp_b_iso88591_A_4t1_aq_T_q_q __pyx_string_tab[276]
+#define __pyx_kp_b_iso88591_T_O4_d_UYYZ_G1F_a_vWE_Q_q_q_D_7 __pyx_string_tab[277]
+#define __pyx_kp_b_iso88591_T_O4_d_UYY_ddnnr_s_A_A_E_E_L_L __pyx_string_tab[278]
+#define __pyx_kp_b_iso88591_T_T_O4_bbmmqqxx_K_K_O_O_V_V_Z_Z __pyx_string_tab[279]
+#define __pyx_kp_b_iso88591__6 __pyx_string_tab[280]
+#define __pyx_kp_b_iso88591__7 __pyx_string_tab[281]
+#define __pyx_kp_b_iso88591_q_0_kQR_7_0_1B_PQ_1 __pyx_string_tab[282]
+#define __pyx_kp_b_iso88591_q_0_kQR_HAQ_7_314H_VW_1 __pyx_string_tab[283]
+#define __pyx_kp_b_iso88591_q_0_kQR_haq_7_QnN_1 __pyx_string_tab[284]
+#define __pyx_kp_b_iso88591_q_a __pyx_string_tab[285]
+#define __pyx_n_b_eof __pyx_string_tab[286]
 #define __pyx_float_1_0 __pyx_number_tab[0]
 #define __pyx_float_2_0 __pyx_number_tab[1]
-#define __pyx_float_10_0 __pyx_number_tab[2]
-#define __pyx_float_1eneg_3 __pyx_number_tab[3]
-#define __pyx_float_1eneg_5 __pyx_number_tab[4]
-#define __pyx_float_30_0 __pyx_number_tab[5]
-#define __pyx_int_0 __pyx_number_tab[6]
-#define __pyx_int_1 __pyx_number_tab[7]
-#define __pyx_int_2 __pyx_number_tab[8]
-#define __pyx_int_42 __pyx_number_tab[9]
-#define __pyx_int_1000 __pyx_number_tab[10]
-#define __pyx_int_10485760 __pyx_number_tab[11]
-#define __pyx_int_11832340 __pyx_number_tab[12]
-#define __pyx_int_67138928 __pyx_number_tab[13]
-#define __pyx_int_267512936 __pyx_number_tab[14]
+#define __pyx_float_1eneg_3 __pyx_number_tab[2]
+#define __pyx_float_1eneg_5 __pyx_number_tab[3]
+#define __pyx_float_30_0 __pyx_number_tab[4]
+#define __pyx_int_0 __pyx_number_tab[5]
+#define __pyx_int_1 __pyx_number_tab[6]
+#define __pyx_int_2 __pyx_number_tab[7]
+#define __pyx_int_42 __pyx_number_tab[8]
+#define __pyx_int_1000 __pyx_number_tab[9]
+#define __pyx_int_10485760 __pyx_number_tab[10]
+#define __pyx_int_70703861 __pyx_number_tab[11]
+#define __pyx_int_176093972 __pyx_number_tab[12]
+#define __pyx_int_264821829 __pyx_number_tab[13]
 /* #### Code section: module_state_clear ### */
 #if CYTHON_USE_MODULE_STATE
 static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
@@ -3614,20 +3577,18 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_6__async_shutdown);
   Py_CLEAR(clear_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_7__listen_loop);
   Py_CLEAR(clear_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_7__listen_loop);
-  Py_CLEAR(clear_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request);
-  Py_CLEAR(clear_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_8__async_request);
-  Py_CLEAR(clear_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request);
-  Py_CLEAR(clear_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_9_send_request);
-  Py_CLEAR(clear_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection);
-  Py_CLEAR(clear_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__get_connection);
-  Py_CLEAR(clear_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown);
-  Py_CLEAR(clear_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown);
+  Py_CLEAR(clear_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request);
+  Py_CLEAR(clear_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_8_send_request);
+  Py_CLEAR(clear_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection);
+  Py_CLEAR(clear_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_9__get_connection);
+  Py_CLEAR(clear_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown);
+  Py_CLEAR(clear_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown);
   Py_CLEAR(clear_module_state->__pyx_ptype___pyx_scope_struct____Pyx_CFunc_2c7b9d__4core_6client_12async_client_11AsyncClient_voi__etc_to_py_4self);
   Py_CLEAR(clear_module_state->__pyx_scope_struct____Pyx_CFunc_2c7b9d__4core_6client_12async_client_11AsyncClient_voi__etc_to_py_4self);
   for (int i=0; i<7; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<25; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<291; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
-  for (int i=0; i<15; ++i) { Py_CLEAR(clear_module_state->__pyx_number_tab[i]); }
+  for (int i=0; i<24; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<287; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<14; ++i) { Py_CLEAR(clear_module_state->__pyx_number_tab[i]); }
 /* #### Code section: module_state_clear_contents ### */
 /* CommonTypesMetaclass.module_state_clear */
 Py_CLEAR(clear_module_state->__pyx_CommonTypesMetaclassType);
@@ -3676,20 +3637,18 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_6__async_shutdown);
   Py_VISIT(traverse_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_7__listen_loop);
   Py_VISIT(traverse_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_7__listen_loop);
-  Py_VISIT(traverse_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request);
-  Py_VISIT(traverse_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_8__async_request);
-  Py_VISIT(traverse_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request);
-  Py_VISIT(traverse_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_9_send_request);
-  Py_VISIT(traverse_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection);
-  Py_VISIT(traverse_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__get_connection);
-  Py_VISIT(traverse_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown);
-  Py_VISIT(traverse_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown);
+  Py_VISIT(traverse_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request);
+  Py_VISIT(traverse_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_8_send_request);
+  Py_VISIT(traverse_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection);
+  Py_VISIT(traverse_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_9__get_connection);
+  Py_VISIT(traverse_module_state->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown);
+  Py_VISIT(traverse_module_state->__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown);
   Py_VISIT(traverse_module_state->__pyx_ptype___pyx_scope_struct____Pyx_CFunc_2c7b9d__4core_6client_12async_client_11AsyncClient_voi__etc_to_py_4self);
   Py_VISIT(traverse_module_state->__pyx_scope_struct____Pyx_CFunc_2c7b9d__4core_6client_12async_client_11AsyncClient_voi__etc_to_py_4self);
   for (int i=0; i<7; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
-  for (int i=0; i<25; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<291; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
-  for (int i=0; i<15; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_number_tab[i]); }
+  for (int i=0; i<24; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
+  for (int i=0; i<287; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<14; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_number_tab[i]); }
 /* #### Code section: module_state_traverse_contents ### */
 /* CommonTypesMetaclass.module_state_traverse */
 Py_VISIT(traverse_module_state->__pyx_CommonTypesMetaclassType);
@@ -4880,7 +4839,7 @@ static int __pyx_pf_4core_6client_12async_client_11AsyncClient___init__(struct _
  *     def __init__(self):
  * 
  *         self._req_subject = {} # self._global_bus = Subject() # global bus to filter req is heavy cpu operation when max concurrent             # <<<<<<<<<<<<<<
- *         self._req_fut = {}
+ *         self._req_futures = {}
  *         self._running = True
 */
   __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
@@ -4894,21 +4853,21 @@ static int __pyx_pf_4core_6client_12async_client_11AsyncClient___init__(struct _
   /* "core/client/async_client.pyx":83
  * 
  *         self._req_subject = {} # self._global_bus = Subject() # global bus to filter req is heavy cpu operation when max concurrent
- *         self._req_fut = {}             # <<<<<<<<<<<<<<
+ *         self._req_futures = {}             # <<<<<<<<<<<<<<
  *         self._running = True
  * 
 */
   __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
-  __Pyx_GOTREF(__pyx_v_self->_req_fut);
-  __Pyx_DECREF(__pyx_v_self->_req_fut);
-  __pyx_v_self->_req_fut = __pyx_t_1;
+  __Pyx_GOTREF(__pyx_v_self->_req_futures);
+  __Pyx_DECREF(__pyx_v_self->_req_futures);
+  __pyx_v_self->_req_futures = __pyx_t_1;
   __pyx_t_1 = 0;
 
   /* "core/client/async_client.pyx":84
  *         self._req_subject = {} # self._global_bus = Subject() # global bus to filter req is heavy cpu operation when max concurrent
- *         self._req_fut = {}
+ *         self._req_futures = {}
  *         self._running = True             # <<<<<<<<<<<<<<
  * 
  *         self._init_event_loop()
@@ -7249,7 +7208,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_12__reduce_
   /* "(tree fragment)":5
  *     cdef object _dict
  *     cdef bint use_setstate
- *     state = (self._loop_thread, self._req_fut, self._req_subject, self._running, self.loop)             # <<<<<<<<<<<<<<
+ *     state = (self._loop_thread, self._req_futures, self._req_subject, self._running, self.loop)             # <<<<<<<<<<<<<<
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None and _dict:
 */
@@ -7260,9 +7219,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_12__reduce_
   __Pyx_INCREF(__pyx_v_self->_loop_thread);
   __Pyx_GIVEREF(__pyx_v_self->_loop_thread);
   if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_v_self->_loop_thread) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
-  __Pyx_INCREF(__pyx_v_self->_req_fut);
-  __Pyx_GIVEREF(__pyx_v_self->_req_fut);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_self->_req_fut) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
+  __Pyx_INCREF(__pyx_v_self->_req_futures);
+  __Pyx_GIVEREF(__pyx_v_self->_req_futures);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_v_self->_req_futures) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->_req_subject);
   __Pyx_GIVEREF(__pyx_v_self->_req_subject);
   if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_v_self->_req_subject) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
@@ -7277,7 +7236,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_12__reduce_
 
   /* "(tree fragment)":6
  *     cdef bint use_setstate
- *     state = (self._loop_thread, self._req_fut, self._req_subject, self._running, self.loop)
+ *     state = (self._loop_thread, self._req_futures, self._req_subject, self._running, self.loop)
  *     _dict = getattr(self, '__dict__', None)             # <<<<<<<<<<<<<<
  *     if _dict is not None and _dict:
  *         state += (_dict,)
@@ -7288,7 +7247,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_12__reduce_
   __pyx_t_2 = 0;
 
   /* "(tree fragment)":7
- *     state = (self._loop_thread, self._req_fut, self._req_subject, self._running, self.loop)
+ *     state = (self._loop_thread, self._req_futures, self._req_subject, self._running, self.loop)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None and _dict:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -7328,12 +7287,12 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_12__reduce_
  *         state += (_dict,)
  *         use_setstate = True             # <<<<<<<<<<<<<<
  *     else:
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.loop is not None',)
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.loop is not None',)
 */
     __pyx_v_use_setstate = 1;
 
     /* "(tree fragment)":7
- *     state = (self._loop_thread, self._req_fut, self._req_subject, self._running, self.loop)
+ *     state = (self._loop_thread, self._req_futures, self._req_subject, self._running, self.loop)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None and _dict:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -7345,9 +7304,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_12__reduce_
   /* "(tree fragment)":11
  *         use_setstate = True
  *     else:
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.loop is not None',)             # <<<<<<<<<<<<<<
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.loop is not None',)             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, None), state
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, None), state
 */
   /*else*/ {
     __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_mstate_global->__pyx_tuple[3]); if (unlikely((__pyx_t_3 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 11, __pyx_L1_error)
@@ -7357,19 +7316,19 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_12__reduce_
 
   /* "(tree fragment)":12
  *     else:
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.loop is not None',)
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.loop is not None',)
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, None), state
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, None), state
  *     else:
 */
   if (__pyx_v_use_setstate) {
 
     /* "(tree fragment)":13
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.loop is not None',)
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.loop is not None',)
  *     if use_setstate:
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, None), state             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, None), state             # <<<<<<<<<<<<<<
  *     else:
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, state)
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, state)
 */
     __Pyx_XDECREF(__pyx_r);
     __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_AsyncClient); if (unlikely(!__pyx_t_1)) __PYX_ERR(1, 13, __pyx_L1_error)
@@ -7379,9 +7338,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_12__reduce_
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_11832340);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_11832340);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_mstate_global->__pyx_int_11832340) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_176093972);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_176093972);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_mstate_global->__pyx_int_176093972) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
     __Pyx_INCREF(Py_None);
     __Pyx_GIVEREF(Py_None);
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, Py_None) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
@@ -7402,17 +7361,17 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_12__reduce_
 
     /* "(tree fragment)":12
  *     else:
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.loop is not None',)
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.loop is not None',)
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, None), state
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, None), state
  *     else:
 */
   }
 
   /* "(tree fragment)":15
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, None), state
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, None), state
  *     else:
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, state)             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, state)             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_AsyncClient__set_state(self, __pyx_state)
 */
@@ -7425,9 +7384,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_12__reduce_
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_11832340);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_11832340);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_mstate_global->__pyx_int_11832340) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_176093972);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_176093972);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_mstate_global->__pyx_int_176093972) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 2, __pyx_v_state) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
@@ -7467,7 +7426,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_12__reduce_
 
 /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, state)
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_AsyncClient__set_state(self, __pyx_state)
 */
@@ -7568,7 +7527,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_14__setstat
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":17
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, state)
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, state)
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_AsyncClient__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
 */
@@ -7586,7 +7545,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_11AsyncClient_14__setstat
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, state)
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_AsyncClient__set_state(self, __pyx_state)
 */
@@ -10320,7 +10279,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
   /* "(tree fragment)":5
  *     cdef object _dict
  *     cdef bint use_setstate
- *     state = (self._loop_thread, self._req_fut, self._req_subject, self._running, self.addr, self.context, self.listen_task, self.loop, self.socket, self.timeout)             # <<<<<<<<<<<<<<
+ *     state = (self._loop_thread, self._req_futures, self._req_subject, self._running, self.addr, self.context, self.listen_task, self.loop, self.socket, self.timeout)             # <<<<<<<<<<<<<<
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None and _dict:
 */
@@ -10333,9 +10292,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
   __Pyx_INCREF(__pyx_v_self->__pyx_base._loop_thread);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._loop_thread);
   if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_v_self->__pyx_base._loop_thread) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
-  __Pyx_INCREF(__pyx_v_self->__pyx_base._req_fut);
-  __Pyx_GIVEREF(__pyx_v_self->__pyx_base._req_fut);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_self->__pyx_base._req_fut) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
+  __Pyx_INCREF(__pyx_v_self->__pyx_base._req_futures);
+  __Pyx_GIVEREF(__pyx_v_self->__pyx_base._req_futures);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_self->__pyx_base._req_futures) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._req_subject);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._req_subject);
   if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_v_self->__pyx_base._req_subject) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
@@ -10365,7 +10324,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
 
   /* "(tree fragment)":6
  *     cdef bint use_setstate
- *     state = (self._loop_thread, self._req_fut, self._req_subject, self._running, self.addr, self.context, self.listen_task, self.loop, self.socket, self.timeout)
+ *     state = (self._loop_thread, self._req_futures, self._req_subject, self._running, self.addr, self.context, self.listen_task, self.loop, self.socket, self.timeout)
  *     _dict = getattr(self, '__dict__', None)             # <<<<<<<<<<<<<<
  *     if _dict is not None and _dict:
  *         state += (_dict,)
@@ -10376,7 +10335,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
   __pyx_t_3 = 0;
 
   /* "(tree fragment)":7
- *     state = (self._loop_thread, self._req_fut, self._req_subject, self._running, self.addr, self.context, self.listen_task, self.loop, self.socket, self.timeout)
+ *     state = (self._loop_thread, self._req_futures, self._req_subject, self._running, self.addr, self.context, self.listen_task, self.loop, self.socket, self.timeout)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None and _dict:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -10416,12 +10375,12 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
  *         state += (_dict,)
  *         use_setstate = True             # <<<<<<<<<<<<<<
  *     else:
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)
 */
     __pyx_v_use_setstate = 1;
 
     /* "(tree fragment)":7
- *     state = (self._loop_thread, self._req_fut, self._req_subject, self._running, self.addr, self.context, self.listen_task, self.loop, self.socket, self.timeout)
+ *     state = (self._loop_thread, self._req_futures, self._req_subject, self._running, self.addr, self.context, self.listen_task, self.loop, self.socket, self.timeout)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None and _dict:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -10433,9 +10392,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
   /* "(tree fragment)":11
  *         use_setstate = True
  *     else:
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)             # <<<<<<<<<<<<<<
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, None), state
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, None), state
 */
   /*else*/ {
     __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_mstate_global->__pyx_tuple[5]); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 11, __pyx_L1_error)
@@ -10445,19 +10404,19 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
 
   /* "(tree fragment)":12
  *     else:
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, None), state
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, None), state
  *     else:
 */
   if (__pyx_v_use_setstate) {
 
     /* "(tree fragment)":13
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)
  *     if use_setstate:
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, None), state             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, None), state             # <<<<<<<<<<<<<<
  *     else:
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, state)
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, state)
 */
     __Pyx_XDECREF(__pyx_r);
     __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_AsyncZmqClient); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 13, __pyx_L1_error)
@@ -10467,9 +10426,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_267512936);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_267512936);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_mstate_global->__pyx_int_267512936) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_70703861);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_70703861);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_mstate_global->__pyx_int_70703861) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
     __Pyx_INCREF(Py_None);
     __Pyx_GIVEREF(Py_None);
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 2, Py_None) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
@@ -10490,17 +10449,17 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
 
     /* "(tree fragment)":12
  *     else:
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, None), state
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, None), state
  *     else:
 */
   }
 
   /* "(tree fragment)":15
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, None), state
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, None), state
  *     else:
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, state)             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, state)             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_AsyncZmqClient__set_state(self, __pyx_state)
 */
@@ -10513,9 +10472,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_267512936);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_267512936);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_mstate_global->__pyx_int_267512936) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_70703861);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_70703861);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_mstate_global->__pyx_int_70703861) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_3, 2, __pyx_v_state) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
@@ -10555,7 +10514,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_14__redu
 
 /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, state)
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_AsyncZmqClient__set_state(self, __pyx_state)
 */
@@ -10656,7 +10615,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_16__sets
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":17
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, state)
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, state)
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_AsyncZmqClient__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
 */
@@ -10674,7 +10633,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_14AsyncZmqClient_16__sets
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, state)
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_AsyncZmqClient__set_state(self, __pyx_state)
 */
@@ -11558,7 +11517,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
  *                 req_id = complete_message[:REQ_ID_SIZE]
  *                 payload = unpack(complete_message[REQ_ID_SIZE:])             # <<<<<<<<<<<<<<
  * 
- *                 fut = self._futures.pop(req_id, None)
+ *                 fut = self._req_futures.pop(req_id, None)
 */
         __pyx_t_7 = NULL;
         __Pyx_GetModuleGlobalName(__pyx_t_16, __pyx_mstate_global->__pyx_n_u_unpack); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 328, __pyx_L11_error)
@@ -11595,20 +11554,17 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
         /* "core/client/async_client.pyx":330
  *                 payload = unpack(complete_message[REQ_ID_SIZE:])
  * 
- *                 fut = self._futures.pop(req_id, None)             # <<<<<<<<<<<<<<
+ *                 fut = self._req_futures.pop(req_id, None)             # <<<<<<<<<<<<<<
  *                 if fut and not fut.done():
  *                     fut.set_result(payload)
 */
-        __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_cur_scope->__pyx_v_self), __pyx_mstate_global->__pyx_n_u_futures); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 330, __pyx_L11_error)
-        __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_16 = __pyx_t_1;
+        __pyx_t_16 = __pyx_cur_scope->__pyx_v_self->__pyx_base._req_futures;
         __Pyx_INCREF(__pyx_t_16);
         __pyx_t_5 = 0;
         {
           PyObject *__pyx_callargs[3] = {__pyx_t_16, __pyx_cur_scope->__pyx_v_req_id, Py_None};
           __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_pop, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
-          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
           if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 330, __pyx_L11_error)
           __Pyx_GOTREF(__pyx_t_4);
         }
@@ -11619,7 +11575,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
 
         /* "core/client/async_client.pyx":331
  * 
- *                 fut = self._futures.pop(req_id, None)
+ *                 fut = self._req_futures.pop(req_id, None)
  *                 if fut and not fut.done():             # <<<<<<<<<<<<<<
  *                     fut.set_result(payload)
  *             except asyncio.TimeoutError:
@@ -11630,13 +11586,13 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
           __pyx_t_9 = __pyx_t_11;
           goto __pyx_L24_bool_binop_done;
         }
-        __pyx_t_1 = __pyx_cur_scope->__pyx_v_fut;
-        __Pyx_INCREF(__pyx_t_1);
+        __pyx_t_16 = __pyx_cur_scope->__pyx_v_fut;
+        __Pyx_INCREF(__pyx_t_16);
         __pyx_t_5 = 0;
         {
-          PyObject *__pyx_callargs[2] = {__pyx_t_1, NULL};
+          PyObject *__pyx_callargs[2] = {__pyx_t_16, NULL};
           __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_done, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-          __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
           if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 331, __pyx_L11_error)
           __Pyx_GOTREF(__pyx_t_4);
         }
@@ -11648,19 +11604,19 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
         if (__pyx_t_9) {
 
           /* "core/client/async_client.pyx":332
- *                 fut = self._futures.pop(req_id, None)
+ *                 fut = self._req_futures.pop(req_id, None)
  *                 if fut and not fut.done():
  *                     fut.set_result(payload)             # <<<<<<<<<<<<<<
  *             except asyncio.TimeoutError:
  *                 print("TCP timeout")
 */
-          __pyx_t_1 = __pyx_cur_scope->__pyx_v_fut;
-          __Pyx_INCREF(__pyx_t_1);
+          __pyx_t_16 = __pyx_cur_scope->__pyx_v_fut;
+          __Pyx_INCREF(__pyx_t_16);
           __pyx_t_5 = 0;
           {
-            PyObject *__pyx_callargs[2] = {__pyx_t_1, __pyx_cur_scope->__pyx_v_payload};
+            PyObject *__pyx_callargs[2] = {__pyx_t_16, __pyx_cur_scope->__pyx_v_payload};
             __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_set_result, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-            __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+            __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
             if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 332, __pyx_L11_error)
             __Pyx_GOTREF(__pyx_t_4);
           }
@@ -11668,7 +11624,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
 
           /* "core/client/async_client.pyx":331
  * 
- *                 fut = self._futures.pop(req_id, None)
+ *                 fut = self._req_futures.pop(req_id, None)
  *                 if fut and not fut.done():             # <<<<<<<<<<<<<<
  *                     fut.set_result(payload)
  *             except asyncio.TimeoutError:
@@ -11702,7 +11658,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
  *                 print("TCP timeout")
  *                 break
 */
-      __Pyx_ErrFetch(&__pyx_t_4, &__pyx_t_1, &__pyx_t_16);
+      __Pyx_ErrFetch(&__pyx_t_4, &__pyx_t_16, &__pyx_t_1);
       __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 333, __pyx_L13_except_error)
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_mstate_global->__pyx_n_u_TimeoutError); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 333, __pyx_L13_except_error)
@@ -11710,13 +11666,13 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       __pyx_t_17 = __Pyx_PyErr_GivenExceptionMatches(__pyx_t_4, __pyx_t_2);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_ErrRestore(__pyx_t_4, __pyx_t_1, __pyx_t_16);
-      __pyx_t_4 = 0; __pyx_t_1 = 0; __pyx_t_16 = 0;
+      __Pyx_ErrRestore(__pyx_t_4, __pyx_t_16, __pyx_t_1);
+      __pyx_t_4 = 0; __pyx_t_16 = 0; __pyx_t_1 = 0;
       if (__pyx_t_17) {
         __Pyx_AddTraceback("core.client.async_client.AsyncStreamClient._listen_loop", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_16, &__pyx_t_1, &__pyx_t_4) < 0) __PYX_ERR(0, 333, __pyx_L13_except_error)
-        __Pyx_XGOTREF(__pyx_t_16);
+        if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_16, &__pyx_t_4) < 0) __PYX_ERR(0, 333, __pyx_L13_except_error)
         __Pyx_XGOTREF(__pyx_t_1);
+        __Pyx_XGOTREF(__pyx_t_16);
         __Pyx_XGOTREF(__pyx_t_4);
 
         /* "core/client/async_client.pyx":334
@@ -11746,8 +11702,8 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
 */
         goto __pyx_L27_except_break;
         __pyx_L27_except_break:;
-        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         goto __pyx_L16_try_break;
       }
@@ -11762,10 +11718,10 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
       __pyx_t_17 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_ConnectionError))));
       if (__pyx_t_17) {
         __Pyx_AddTraceback("core.client.async_client.AsyncStreamClient._listen_loop", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_1, &__pyx_t_16) < 0) __PYX_ERR(0, 336, __pyx_L13_except_error)
+        if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_16, &__pyx_t_1) < 0) __PYX_ERR(0, 336, __pyx_L13_except_error)
         __Pyx_XGOTREF(__pyx_t_4);
-        __Pyx_XGOTREF(__pyx_t_1);
         __Pyx_XGOTREF(__pyx_t_16);
+        __Pyx_XGOTREF(__pyx_t_1);
 
         /* "core/client/async_client.pyx":337
  *                 break
@@ -11795,8 +11751,8 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
         goto __pyx_L29_except_break;
         __pyx_L29_except_break:;
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __Pyx_XDECREF(__pyx_t_16); __pyx_t_16 = 0;
+        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
         goto __pyx_L16_try_break;
       }
 
@@ -11810,13 +11766,13 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
       __pyx_t_17 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
       if (__pyx_t_17) {
         __Pyx_AddTraceback("core.client.async_client.AsyncStreamClient._listen_loop", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_16, &__pyx_t_1, &__pyx_t_4) < 0) __PYX_ERR(0, 339, __pyx_L13_except_error)
-        __Pyx_XGOTREF(__pyx_t_16);
+        if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_16, &__pyx_t_4) < 0) __PYX_ERR(0, 339, __pyx_L13_except_error)
         __Pyx_XGOTREF(__pyx_t_1);
+        __Pyx_XGOTREF(__pyx_t_16);
         __Pyx_XGOTREF(__pyx_t_4);
-        __Pyx_INCREF(__pyx_t_1);
-        __Pyx_GIVEREF(__pyx_t_1);
-        __pyx_cur_scope->__pyx_v_e = __pyx_t_1;
+        __Pyx_INCREF(__pyx_t_16);
+        __Pyx_GIVEREF(__pyx_t_16);
+        __pyx_cur_scope->__pyx_v_e = __pyx_t_16;
         /*try:*/ {
 
           /* "core/client/async_client.pyx":340
@@ -11901,8 +11857,8 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
           }
         }
         __pyx_L31_except_break:;
-        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         goto __pyx_L16_try_break;
       }
@@ -11979,40 +11935,109 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_4gene
  * 
  *     cdef object wrap_protocol(self, bytes req_id, dict msg): # return future to user to determin await or result block             # <<<<<<<<<<<<<<
  *         """TCP  Coroutine  await"""
- *         return self._async_request(req_id, msg)
+ *         # from concurrent.futures import Future
 */
 
 static PyObject *__pyx_f_4core_6client_12async_client_17AsyncStreamClient_wrap_protocol(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_req_id, PyObject *__pyx_v_msg) {
+  PyObject *__pyx_v_fut = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   size_t __pyx_t_3;
+  PyObject *__pyx_t_4 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("wrap_protocol", 0);
 
-  /* "core/client/async_client.pyx":345
- *     cdef object wrap_protocol(self, bytes req_id, dict msg): # return future to user to determin await or result block
- *         """TCP  Coroutine  await"""
- *         return self._async_request(req_id, msg)             # <<<<<<<<<<<<<<
+  /* "core/client/async_client.pyx":347
+ *         # from concurrent.futures import Future
+ *         # cdef object fut = Future()
+ *         fut = self.loop.create_future()             # <<<<<<<<<<<<<<
+ *         self._req_futures[req_id] = fut
  * 
- *     async def _async_request(self, bytes req_id, dict msg):
 */
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = ((PyObject *)__pyx_v_self);
+  __pyx_t_2 = __pyx_v_self->__pyx_base.loop;
   __Pyx_INCREF(__pyx_t_2);
   __pyx_t_3 = 0;
   {
-    PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_v_req_id, __pyx_v_msg};
-    __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_async_request, __pyx_callargs+__pyx_t_3, (3-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
+    __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_create_future, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 345, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 347, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  __pyx_r = __pyx_t_1;
+  __pyx_v_fut = __pyx_t_1;
   __pyx_t_1 = 0;
+
+  /* "core/client/async_client.pyx":348
+ *         # cdef object fut = Future()
+ *         fut = self.loop.create_future()
+ *         self._req_futures[req_id] = fut             # <<<<<<<<<<<<<<
+ * 
+ *         asyncio.run_coroutine_threadsafe(self.send_request(req_id, msg), self.loop)
+*/
+  if (unlikely((PyObject_SetItem(__pyx_v_self->__pyx_base._req_futures, __pyx_v_req_id, __pyx_v_fut) < 0))) __PYX_ERR(0, 348, __pyx_L1_error)
+
+  /* "core/client/async_client.pyx":350
+ *         self._req_futures[req_id] = fut
+ * 
+ *         asyncio.run_coroutine_threadsafe(self.send_request(req_id, msg), self.loop)             # <<<<<<<<<<<<<<
+ *         return fut # fut.result() / add_done_callback
+ * 
+*/
+  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_run_coroutine_threadsafe); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  __pyx_t_6 = ((PyObject *)__pyx_v_self);
+  __Pyx_INCREF(__pyx_t_6);
+  __pyx_t_3 = 0;
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_6, __pyx_v_req_id, __pyx_v_msg};
+    __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_send_request, __pyx_callargs+__pyx_t_3, (3-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 350, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+  }
+  __pyx_t_3 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_5))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_5);
+    assert(__pyx_t_2);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_5);
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_5, __pyx__function);
+    __pyx_t_3 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_t_4, __pyx_v_self->__pyx_base.loop};
+    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_5, __pyx_callargs+__pyx_t_3, (3-__pyx_t_3) | (__pyx_t_3*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 350, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "core/client/async_client.pyx":351
+ * 
+ *         asyncio.run_coroutine_threadsafe(self.send_request(req_id, msg), self.loop)
+ *         return fut # fut.result() / add_done_callback             # <<<<<<<<<<<<<<
+ * 
+ *     async def send_request(self, bytes req_id, dict message):
+*/
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_fut);
+  __pyx_r = __pyx_v_fut;
   goto __pyx_L0;
 
   /* "core/client/async_client.pyx":343
@@ -12020,510 +12045,28 @@ static PyObject *__pyx_f_4core_6client_12async_client_17AsyncStreamClient_wrap_p
  * 
  *     cdef object wrap_protocol(self, bytes req_id, dict msg): # return future to user to determin await or result block             # <<<<<<<<<<<<<<
  *         """TCP  Coroutine  await"""
- *         return self._async_request(req_id, msg)
+ *         # from concurrent.futures import Future
 */
 
   /* function exit code */
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_AddTraceback("core.client.async_client.AsyncStreamClient.wrap_protocol", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_fut);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_7generator7(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "core/client/async_client.pyx":347
- *         return self._async_request(req_id, msg)
- * 
- *     async def _async_request(self, bytes req_id, dict msg):             # <<<<<<<<<<<<<<
- *         fut = self.loop.create_future()
- *         self._futures[req_id] = fut
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_6_async_request(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-static PyMethodDef __pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_6_async_request = {"_async_request", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_6_async_request, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_6_async_request(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_req_id = 0;
-  PyObject *__pyx_v_msg = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[2] = {0,0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("_async_request (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_req_id,&__pyx_mstate_global->__pyx_n_u_msg,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 347, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  2:
-        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 347, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 347, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_async_request", 0) < (0)) __PYX_ERR(0, 347, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_async_request", 1, 2, 2, i); __PYX_ERR(0, 347, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 2)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 347, __pyx_L3_error)
-      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 347, __pyx_L3_error)
-    }
-    __pyx_v_req_id = ((PyObject*)values[0]);
-    __pyx_v_msg = ((PyObject*)values[1]);
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_async_request", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 347, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("core.client.async_client.AsyncStreamClient._async_request", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_req_id), (&PyBytes_Type), 1, "req_id", 1))) __PYX_ERR(0, 347, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_msg), (&PyDict_Type), 1, "msg", 1))) __PYX_ERR(0, 347, __pyx_L1_error)
-  __pyx_r = __pyx_pf_4core_6client_12async_client_17AsyncStreamClient_5_async_request(((struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *)__pyx_v_self), __pyx_v_req_id, __pyx_v_msg);
-
-  /* function exit code */
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __pyx_r = NULL;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  goto __pyx_L7_cleaned_up;
-  __pyx_L0:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __pyx_L7_cleaned_up:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_5_async_request(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_req_id, PyObject *__pyx_v_msg) {
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request *__pyx_cur_scope;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("_async_request", 0);
-  __pyx_cur_scope = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_8__async_request(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request, __pyx_mstate_global->__pyx_empty_tuple, NULL);
-  if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request *)Py_None);
-    __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 347, __pyx_L1_error)
-  } else {
-    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
-  }
-  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
-  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __pyx_cur_scope->__pyx_v_req_id = __pyx_v_req_id;
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_req_id);
-  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_req_id);
-  __pyx_cur_scope->__pyx_v_msg = __pyx_v_msg;
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_msg);
-  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_msg);
-  {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_4core_6client_12async_client_17AsyncStreamClient_7generator7, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_async_request, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient__async_request, __pyx_mstate_global->__pyx_n_u_core_client_async_client); if (unlikely(!gen)) __PYX_ERR(0, 347, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_cur_scope);
-    __Pyx_RefNannyFinishContext();
-    return (PyObject *) gen;
-  }
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_AddTraceback("core.client.async_client.AsyncStreamClient._async_request", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_7generator7(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
-{
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request *__pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request *)__pyx_generator->closure);
-  PyObject *__pyx_r = NULL;
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  size_t __pyx_t_3;
-  __Pyx_PySendResult __pyx_t_4;
-  PyObject *__pyx_t_5 = NULL;
-  PyObject *__pyx_t_6 = NULL;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
-  PyObject *__pyx_t_9 = NULL;
-  PyObject *__pyx_t_10 = NULL;
-  int __pyx_t_11;
-  PyObject *__pyx_t_12 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("_async_request", 0);
-  switch (__pyx_generator->resume_label) {
-    case 0: goto __pyx_L3_first_run;
-    case 1: goto __pyx_L4_resume_from_await;
-    case 2: goto __pyx_L11_resume_from_await;
-    default: /* CPython raises the right error here */
-    __Pyx_RefNannyFinishContext();
-    return NULL;
-  }
-  __pyx_L3_first_run:;
-  if (unlikely(__pyx_sent_value != Py_None)) {
-    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 347, __pyx_L1_error)
-  }
-
-  /* "core/client/async_client.pyx":348
- * 
- *     async def _async_request(self, bytes req_id, dict msg):
- *         fut = self.loop.create_future()             # <<<<<<<<<<<<<<
- *         self._futures[req_id] = fut
- * 
-*/
-  __pyx_t_2 = __pyx_cur_scope->__pyx_v_self->__pyx_base.loop;
-  __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_3 = 0;
-  {
-    PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
-    __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_create_future, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 348, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_fut = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "core/client/async_client.pyx":349
- *     async def _async_request(self, bytes req_id, dict msg):
- *         fut = self.loop.create_future()
- *         self._futures[req_id] = fut             # <<<<<<<<<<<<<<
- * 
- *         await self.send_request(req_id, msg)
-*/
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_cur_scope->__pyx_v_self), __pyx_mstate_global->__pyx_n_u_futures); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 349, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely((PyObject_SetItem(__pyx_t_1, __pyx_cur_scope->__pyx_v_req_id, __pyx_cur_scope->__pyx_v_fut) < 0))) __PYX_ERR(0, 349, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "core/client/async_client.pyx":351
- *         self._futures[req_id] = fut
- * 
- *         await self.send_request(req_id, msg)             # <<<<<<<<<<<<<<
- *         try:
- *             return await asyncio.wait_for(fut, timeout=10.0)
-*/
-  __pyx_t_2 = ((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __Pyx_INCREF(__pyx_t_2);
-  __pyx_t_3 = 0;
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_req_id, __pyx_cur_scope->__pyx_v_msg};
-    __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_send_request, __pyx_callargs+__pyx_t_3, (3-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 351, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __pyx_t_4 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (likely(__pyx_t_4 == PYGEN_NEXT)) {
-    __Pyx_GOTREF(__pyx_r);
-    __Pyx_XGIVEREF(__pyx_r);
-    __Pyx_RefNannyFinishContext();
-    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-    /* return from generator, awaiting value */
-    __pyx_generator->resume_label = 1;
-    return __pyx_r;
-    __pyx_L4_resume_from_await:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 351, __pyx_L1_error)
-  } else if (likely(__pyx_t_4 == PYGEN_RETURN)) {
-    __Pyx_GOTREF(__pyx_r);
-    __Pyx_DECREF(__pyx_r); __pyx_r = 0;
-  } else {
-    __Pyx_XGOTREF(__pyx_r);
-    __PYX_ERR(0, 351, __pyx_L1_error)
-  }
-
-  /* "core/client/async_client.pyx":352
- * 
- *         await self.send_request(req_id, msg)
- *         try:             # <<<<<<<<<<<<<<
- *             return await asyncio.wait_for(fut, timeout=10.0)
- *         except asyncio.TimeoutError:
-*/
-  {
-    __Pyx_ExceptionSave(&__pyx_t_5, &__pyx_t_6, &__pyx_t_7);
-    __Pyx_XGOTREF(__pyx_t_5);
-    __Pyx_XGOTREF(__pyx_t_6);
-    __Pyx_XGOTREF(__pyx_t_7);
-    /*try:*/ {
-
-      /* "core/client/async_client.pyx":353
- *         await self.send_request(req_id, msg)
- *         try:
- *             return await asyncio.wait_for(fut, timeout=10.0)             # <<<<<<<<<<<<<<
- *         except asyncio.TimeoutError:
- *             self._futures.pop(req_id, None)
-*/
-      __Pyx_XDECREF(__pyx_r);
-      __pyx_t_2 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 353, __pyx_L5_error)
-      __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_mstate_global->__pyx_n_u_wait_for); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 353, __pyx_L5_error)
-      __Pyx_GOTREF(__pyx_t_9);
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_3 = 1;
-      #if CYTHON_UNPACK_METHODS
-      if (unlikely(PyMethod_Check(__pyx_t_9))) {
-        __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_9);
-        assert(__pyx_t_2);
-        PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_9);
-        __Pyx_INCREF(__pyx_t_2);
-        __Pyx_INCREF(__pyx__function);
-        __Pyx_DECREF_SET(__pyx_t_9, __pyx__function);
-        __pyx_t_3 = 0;
-      }
-      #endif
-      {
-        PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_fut};
-        __pyx_t_8 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 353, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_8);
-        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_timeout, __pyx_mstate_global->__pyx_float_10_0, __pyx_t_8, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 353, __pyx_L5_error)
-        __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_9, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (__pyx_t_3*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_8);
-        __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L5_error)
-        __Pyx_GOTREF(__pyx_t_1);
-      }
-      __pyx_t_4 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      if (likely(__pyx_t_4 == PYGEN_NEXT)) {
-        __Pyx_GOTREF(__pyx_r);
-        __Pyx_XGIVEREF(__pyx_t_5);
-        __pyx_cur_scope->__pyx_t_0 = __pyx_t_5;
-        __Pyx_XGIVEREF(__pyx_t_6);
-        __pyx_cur_scope->__pyx_t_1 = __pyx_t_6;
-        __Pyx_XGIVEREF(__pyx_t_7);
-        __pyx_cur_scope->__pyx_t_2 = __pyx_t_7;
-        __Pyx_XGIVEREF(__pyx_r);
-        __Pyx_RefNannyFinishContext();
-        __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-        /* return from generator, awaiting value */
-        __pyx_generator->resume_label = 2;
-        return __pyx_r;
-        __pyx_L11_resume_from_await:;
-        __pyx_t_5 = __pyx_cur_scope->__pyx_t_0;
-        __pyx_cur_scope->__pyx_t_0 = 0;
-        __Pyx_XGOTREF(__pyx_t_5);
-        __pyx_t_6 = __pyx_cur_scope->__pyx_t_1;
-        __pyx_cur_scope->__pyx_t_1 = 0;
-        __Pyx_XGOTREF(__pyx_t_6);
-        __pyx_t_7 = __pyx_cur_scope->__pyx_t_2;
-        __pyx_cur_scope->__pyx_t_2 = 0;
-        __Pyx_XGOTREF(__pyx_t_7);
-        if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 353, __pyx_L5_error)
-        __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
-      } else if (likely(__pyx_t_4 == PYGEN_RETURN)) {
-        __Pyx_GOTREF(__pyx_r);
-        __pyx_t_1 = __pyx_r; __pyx_r = NULL;
-      } else {
-        __Pyx_XGOTREF(__pyx_r);
-        __PYX_ERR(0, 353, __pyx_L5_error)
-      }
-      __pyx_r = __pyx_t_1;
-      __pyx_t_1 = 0;
-      goto __pyx_L9_try_return;
-
-      /* "core/client/async_client.pyx":352
- * 
- *         await self.send_request(req_id, msg)
- *         try:             # <<<<<<<<<<<<<<
- *             return await asyncio.wait_for(fut, timeout=10.0)
- *         except asyncio.TimeoutError:
-*/
-    }
-    __pyx_L5_error:;
-    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-
-    /* "core/client/async_client.pyx":354
- *         try:
- *             return await asyncio.wait_for(fut, timeout=10.0)
- *         except asyncio.TimeoutError:             # <<<<<<<<<<<<<<
- *             self._futures.pop(req_id, None)
- *             raise TimeoutError("TCP request timeout")
-*/
-    __Pyx_ErrFetch(&__pyx_t_1, &__pyx_t_9, &__pyx_t_8);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 354, __pyx_L7_except_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_TimeoutError); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 354, __pyx_L7_except_error)
-    __Pyx_GOTREF(__pyx_t_10);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_11 = __Pyx_PyErr_GivenExceptionMatches(__pyx_t_1, __pyx_t_10);
-    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    __Pyx_ErrRestore(__pyx_t_1, __pyx_t_9, __pyx_t_8);
-    __pyx_t_1 = 0; __pyx_t_9 = 0; __pyx_t_8 = 0;
-    if (__pyx_t_11) {
-      __Pyx_AddTraceback("core.client.async_client.AsyncStreamClient._async_request", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_8, &__pyx_t_9, &__pyx_t_1) < 0) __PYX_ERR(0, 354, __pyx_L7_except_error)
-      __Pyx_XGOTREF(__pyx_t_8);
-      __Pyx_XGOTREF(__pyx_t_9);
-      __Pyx_XGOTREF(__pyx_t_1);
-
-      /* "core/client/async_client.pyx":355
- *             return await asyncio.wait_for(fut, timeout=10.0)
- *         except asyncio.TimeoutError:
- *             self._futures.pop(req_id, None)             # <<<<<<<<<<<<<<
- *             raise TimeoutError("TCP request timeout")
- * 
-*/
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_cur_scope->__pyx_v_self), __pyx_mstate_global->__pyx_n_u_futures); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 355, __pyx_L7_except_error)
-      __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_2 = __pyx_t_12;
-      __Pyx_INCREF(__pyx_t_2);
-      __pyx_t_3 = 0;
-      {
-        PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_req_id, Py_None};
-        __pyx_t_10 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_pop, __pyx_callargs+__pyx_t_3, (3-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-        __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 355, __pyx_L7_except_error)
-        __Pyx_GOTREF(__pyx_t_10);
-      }
-      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-
-      /* "core/client/async_client.pyx":356
- *         except asyncio.TimeoutError:
- *             self._futures.pop(req_id, None)
- *             raise TimeoutError("TCP request timeout")             # <<<<<<<<<<<<<<
- * 
- *     async def send_request(self, bytes req_id, dict message):
-*/
-      __pyx_t_12 = NULL;
-      __pyx_t_3 = 1;
-      {
-        PyObject *__pyx_callargs[2] = {__pyx_t_12, __pyx_mstate_global->__pyx_kp_u_TCP_request_timeout};
-        __pyx_t_10 = __Pyx_PyObject_FastCall((PyObject*)(((PyTypeObject*)PyExc_TimeoutError)), __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (__pyx_t_3*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-        __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 356, __pyx_L7_except_error)
-        __Pyx_GOTREF(__pyx_t_10);
-      }
-      __Pyx_Raise(__pyx_t_10, 0, 0, 0);
-      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-      __PYX_ERR(0, 356, __pyx_L7_except_error)
-    }
-    goto __pyx_L7_except_error;
-
-    /* "core/client/async_client.pyx":352
- * 
- *         await self.send_request(req_id, msg)
- *         try:             # <<<<<<<<<<<<<<
- *             return await asyncio.wait_for(fut, timeout=10.0)
- *         except asyncio.TimeoutError:
-*/
-    __pyx_L7_except_error:;
-    __Pyx_XGIVEREF(__pyx_t_5);
-    __Pyx_XGIVEREF(__pyx_t_6);
-    __Pyx_XGIVEREF(__pyx_t_7);
-    __Pyx_ExceptionReset(__pyx_t_5, __pyx_t_6, __pyx_t_7);
-    goto __pyx_L1_error;
-    __pyx_L9_try_return:;
-    __Pyx_XGIVEREF(__pyx_t_5);
-    __Pyx_XGIVEREF(__pyx_t_6);
-    __Pyx_XGIVEREF(__pyx_t_7);
-    __Pyx_ExceptionReset(__pyx_t_5, __pyx_t_6, __pyx_t_7);
-    goto __pyx_L0;
-  }
-  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
-
-  /* "core/client/async_client.pyx":347
- *         return self._async_request(req_id, msg)
- * 
- *     async def _async_request(self, bytes req_id, dict msg):             # <<<<<<<<<<<<<<
- *         fut = self.loop.create_future()
- *         self._futures[req_id] = fut
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_XDECREF(__pyx_t_9);
-  __Pyx_XDECREF(__pyx_t_10);
-  __Pyx_XDECREF(__pyx_t_12);
-  if (__Pyx_PyErr_Occurred()) {
-    __Pyx_Generator_Replace_StopIteration(0);
-    __Pyx_AddTraceback("_async_request", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  }
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  #if !CYTHON_USE_EXC_INFO_STACK
-  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-  #endif
-  __pyx_generator->resume_label = -1;
-  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10generator8(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
-
-/* "core/client/async_client.pyx":358
- *             raise TimeoutError("TCP request timeout")
+/* "core/client/async_client.pyx":353
+ *         return fut # fut.result() / add_done_callback
  * 
  *     async def send_request(self, bytes req_id, dict message):             # <<<<<<<<<<<<<<
  *         connection_key = f"{self.host}:{self.port}"
@@ -12531,15 +12074,15 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_9send_request(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_6send_request(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_9send_request = {"send_request", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_9send_request, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_9send_request(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_6send_request = {"send_request", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_6send_request, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_6send_request(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -12570,39 +12113,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_req_id,&__pyx_mstate_global->__pyx_n_u_message,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 358, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 353, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 358, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 353, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 358, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 353, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "send_request", 0) < (0)) __PYX_ERR(0, 358, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "send_request", 0) < (0)) __PYX_ERR(0, 353, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("send_request", 1, 2, 2, i); __PYX_ERR(0, 358, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("send_request", 1, 2, 2, i); __PYX_ERR(0, 353, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 358, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 353, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 358, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 353, __pyx_L3_error)
     }
     __pyx_v_req_id = ((PyObject*)values[0]);
     __pyx_v_message = ((PyObject*)values[1]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("send_request", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 358, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("send_request", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 353, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -12613,9 +12156,9 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_req_id), (&PyBytes_Type), 1, "req_id", 1))) __PYX_ERR(0, 358, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_message), (&PyDict_Type), 1, "message", 1))) __PYX_ERR(0, 358, __pyx_L1_error)
-  __pyx_r = __pyx_pf_4core_6client_12async_client_17AsyncStreamClient_8send_request(((struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *)__pyx_v_self), __pyx_v_req_id, __pyx_v_message);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_req_id), (&PyBytes_Type), 1, "req_id", 1))) __PYX_ERR(0, 353, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_message), (&PyDict_Type), 1, "message", 1))) __PYX_ERR(0, 353, __pyx_L1_error)
+  __pyx_r = __pyx_pf_4core_6client_12async_client_17AsyncStreamClient_5send_request(((struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *)__pyx_v_self), __pyx_v_req_id, __pyx_v_message);
 
   /* function exit code */
   goto __pyx_L0;
@@ -12634,19 +12177,19 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_8send_request(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_req_id, PyObject *__pyx_v_message) {
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request *__pyx_cur_scope;
+static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_5send_request(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_req_id, PyObject *__pyx_v_message) {
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request *__pyx_cur_scope;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("send_request", 0);
-  __pyx_cur_scope = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_9_send_request(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request, __pyx_mstate_global->__pyx_empty_tuple, NULL);
+  __pyx_cur_scope = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_8_send_request(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request, __pyx_mstate_global->__pyx_empty_tuple, NULL);
   if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request *)Py_None);
+    __pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 358, __pyx_L1_error)
+    __PYX_ERR(0, 353, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -12660,7 +12203,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_8send
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_message);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_message);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10generator8, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_send_request, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient_send_request, __pyx_mstate_global->__pyx_n_u_core_client_async_client); if (unlikely(!gen)) __PYX_ERR(0, 358, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_4core_6client_12async_client_17AsyncStreamClient_7generator7, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_send_request, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient_send_request, __pyx_mstate_global->__pyx_n_u_core_client_async_client); if (unlikely(!gen)) __PYX_ERR(0, 353, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -12676,9 +12219,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_8send
   return __pyx_r;
 }
 
-static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10generator8(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_7generator7(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
 {
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request *__pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request *)__pyx_generator->closure);
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request *__pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -12708,25 +12251,25 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 358, __pyx_L1_error)
+    __PYX_ERR(0, 353, __pyx_L1_error)
   }
 
-  /* "core/client/async_client.pyx":359
+  /* "core/client/async_client.pyx":354
  * 
  *     async def send_request(self, bytes req_id, dict message):
  *         connection_key = f"{self.host}:{self.port}"             # <<<<<<<<<<<<<<
  *         reader, writer = await self._get_connection(connection_key) # cache
  * 
 */
-  __pyx_t_1 = __Pyx_PyUnicode_Unicode(__pyx_cur_scope->__pyx_v_self->host); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyUnicode_Unicode(__pyx_cur_scope->__pyx_v_self->host); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyUnicode_From_int(__pyx_cur_scope->__pyx_v_self->port, 0, ' ', 'd'); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 359, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyUnicode_From_int(__pyx_cur_scope->__pyx_v_self->port, 0, ' ', 'd'); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3[0] = __pyx_t_1;
   __pyx_t_3[1] = __pyx_mstate_global->__pyx_kp_u__3;
   __pyx_t_3[2] = __pyx_t_2;
   __pyx_t_4 = __Pyx_PyUnicode_Join(__pyx_t_3, 3, __Pyx_PyUnicode_GET_LENGTH(__pyx_t_1) + 1 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_2), 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_1));
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 359, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 354, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -12734,7 +12277,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
   __pyx_cur_scope->__pyx_v_connection_key = ((PyObject*)__pyx_t_4);
   __pyx_t_4 = 0;
 
-  /* "core/client/async_client.pyx":360
+  /* "core/client/async_client.pyx":355
  *     async def send_request(self, bytes req_id, dict message):
  *         connection_key = f"{self.host}:{self.port}"
  *         reader, writer = await self._get_connection(connection_key) # cache             # <<<<<<<<<<<<<<
@@ -12748,7 +12291,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_connection_key};
     __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_get_connection, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 360, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
   __pyx_t_6 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_4, &__pyx_r);
@@ -12762,14 +12305,14 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
     __pyx_generator->resume_label = 1;
     return __pyx_r;
     __pyx_L4_resume_from_await:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 360, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 355, __pyx_L1_error)
     __pyx_t_4 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_4);
   } else if (likely(__pyx_t_6 == PYGEN_RETURN)) {
     __Pyx_GOTREF(__pyx_r);
     __pyx_t_4 = __pyx_r; __pyx_r = NULL;
   } else {
     __Pyx_XGOTREF(__pyx_r);
-    __PYX_ERR(0, 360, __pyx_L1_error)
+    __PYX_ERR(0, 355, __pyx_L1_error)
   }
   if ((likely(PyTuple_CheckExact(__pyx_t_4))) || (PyList_CheckExact(__pyx_t_4))) {
     PyObject* sequence = __pyx_t_4;
@@ -12777,7 +12320,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 360, __pyx_L1_error)
+      __PYX_ERR(0, 355, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -12787,22 +12330,22 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
       __Pyx_INCREF(__pyx_t_1);
     } else {
       __pyx_t_2 = __Pyx_PyList_GetItemRefFast(sequence, 0, __Pyx_ReferenceSharing_SharedReference);
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
       __Pyx_XGOTREF(__pyx_t_2);
       __pyx_t_1 = __Pyx_PyList_GetItemRefFast(sequence, 1, __Pyx_ReferenceSharing_SharedReference);
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
       __Pyx_XGOTREF(__pyx_t_1);
     }
     #else
-    __pyx_t_2 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     #endif
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_7 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 360, __pyx_L1_error)
+    __pyx_t_7 = PyObject_GetIter(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_8 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_7);
@@ -12810,7 +12353,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
     __Pyx_GOTREF(__pyx_t_2);
     index = 1; __pyx_t_1 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_1)) goto __pyx_L5_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_1);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < (0)) __PYX_ERR(0, 360, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 2) < (0)) __PYX_ERR(0, 355, __pyx_L1_error)
     __pyx_t_8 = NULL;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     goto __pyx_L6_unpacking_done;
@@ -12818,7 +12361,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_8 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 360, __pyx_L1_error)
+    __PYX_ERR(0, 355, __pyx_L1_error)
     __pyx_L6_unpacking_done:;
   }
   __Pyx_GIVEREF(__pyx_t_2);
@@ -12828,7 +12371,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
   __pyx_cur_scope->__pyx_v_writer = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "core/client/async_client.pyx":362
+  /* "core/client/async_client.pyx":357
  *         reader, writer = await self._get_connection(connection_key) # cache
  * 
  *         serialize_msg = req_id + pack(message) # req_id 16 bytes             # <<<<<<<<<<<<<<
@@ -12836,7 +12379,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
  *         writer.write(msg_len.to_bytes(LENGTH_BYTES, byteorder='big') + serialize_msg)
 */
   __pyx_t_1 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_pack); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 362, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_pack); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 357, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -12855,27 +12398,27 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
     __pyx_t_4 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_2, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 362, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 357, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
   }
-  __pyx_t_2 = PyNumber_Add(__pyx_cur_scope->__pyx_v_req_id, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 362, __pyx_L1_error)
+  __pyx_t_2 = PyNumber_Add(__pyx_cur_scope->__pyx_v_req_id, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 357, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_cur_scope->__pyx_v_serialize_msg = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "core/client/async_client.pyx":363
+  /* "core/client/async_client.pyx":358
  * 
  *         serialize_msg = req_id + pack(message) # req_id 16 bytes
  *         msg_len = len(serialize_msg)             # <<<<<<<<<<<<<<
  *         writer.write(msg_len.to_bytes(LENGTH_BYTES, byteorder='big') + serialize_msg)
  *         await writer.drain()
 */
-  __pyx_t_9 = PyObject_Length(__pyx_cur_scope->__pyx_v_serialize_msg); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 363, __pyx_L1_error)
+  __pyx_t_9 = PyObject_Length(__pyx_cur_scope->__pyx_v_serialize_msg); if (unlikely(__pyx_t_9 == ((Py_ssize_t)-1))) __PYX_ERR(0, 358, __pyx_L1_error)
   __pyx_cur_scope->__pyx_v_msg_len = __pyx_t_9;
 
-  /* "core/client/async_client.pyx":364
+  /* "core/client/async_client.pyx":359
  *         serialize_msg = req_id + pack(message) # req_id 16 bytes
  *         msg_len = len(serialize_msg)
  *         writer.write(msg_len.to_bytes(LENGTH_BYTES, byteorder='big') + serialize_msg)             # <<<<<<<<<<<<<<
@@ -12884,27 +12427,27 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
 */
   __pyx_t_4 = __pyx_cur_scope->__pyx_v_writer;
   __Pyx_INCREF(__pyx_t_4);
-  __pyx_t_10 = PyLong_FromSsize_t(__pyx_cur_scope->__pyx_v_msg_len); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 364, __pyx_L1_error)
+  __pyx_t_10 = PyLong_FromSsize_t(__pyx_cur_scope->__pyx_v_msg_len); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __pyx_t_7 = __pyx_t_10;
   __Pyx_INCREF(__pyx_t_7);
-  __pyx_t_11 = __Pyx_PyLong_From_int(__pyx_v_4core_6client_12async_client_LENGTH_BYTES); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 364, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyLong_From_int(__pyx_v_4core_6client_12async_client_LENGTH_BYTES); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __pyx_t_5 = 0;
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_7, __pyx_t_11};
-    __pyx_t_12 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 359, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_byteorder, __pyx_mstate_global->__pyx_n_u_big, __pyx_t_12, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 364, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_byteorder, __pyx_mstate_global->__pyx_n_u_big, __pyx_t_12, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 359, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_VectorcallMethod_CallFromBuilder((PyObject*)__pyx_mstate_global->__pyx_n_u_to_bytes, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_12);
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 364, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 359, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  __pyx_t_10 = PyNumber_Add(__pyx_t_1, __pyx_cur_scope->__pyx_v_serialize_msg); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 364, __pyx_L1_error)
+  __pyx_t_10 = PyNumber_Add(__pyx_t_1, __pyx_cur_scope->__pyx_v_serialize_msg); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 359, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_5 = 0;
@@ -12913,12 +12456,12 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_write, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 364, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 359, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/client/async_client.pyx":365
+  /* "core/client/async_client.pyx":360
  *         msg_len = len(serialize_msg)
  *         writer.write(msg_len.to_bytes(LENGTH_BYTES, byteorder='big') + serialize_msg)
  *         await writer.drain()             # <<<<<<<<<<<<<<
@@ -12932,7 +12475,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
     PyObject *__pyx_callargs[2] = {__pyx_t_10, NULL};
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_drain, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 365, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_t_6 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_2, &__pyx_r);
@@ -12946,18 +12489,18 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
     __pyx_generator->resume_label = 2;
     return __pyx_r;
     __pyx_L7_resume_from_await:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 365, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 360, __pyx_L1_error)
   } else if (likely(__pyx_t_6 == PYGEN_RETURN)) {
     __Pyx_GOTREF(__pyx_r);
     __Pyx_DECREF(__pyx_r); __pyx_r = 0;
   } else {
     __Pyx_XGOTREF(__pyx_r);
-    __PYX_ERR(0, 365, __pyx_L1_error)
+    __PYX_ERR(0, 360, __pyx_L1_error)
   }
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "core/client/async_client.pyx":358
- *             raise TimeoutError("TCP request timeout")
+  /* "core/client/async_client.pyx":353
+ *         return fut # fut.result() / add_done_callback
  * 
  *     async def send_request(self, bytes req_id, dict message):             # <<<<<<<<<<<<<<
  *         connection_key = f"{self.host}:{self.port}"
@@ -12989,9 +12532,9 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10gen
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13generator9(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10generator8(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "core/client/async_client.pyx":367
+/* "core/client/async_client.pyx":362
  *         await writer.drain()
  * 
  *     async def _get_connection(self, str connection_key):             # <<<<<<<<<<<<<<
@@ -13000,16 +12543,16 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_12_get_connection(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_9_get_connection(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_4core_6client_12async_client_17AsyncStreamClient_11_get_connection, "\n            \350\216\267\345\217\226\346\210\226\345\210\233\345\273\272\350\277\236\346\216\245\347\241\256\344\277\235\346\257\217\344\270\252\350\277\236\346\216\245\346\234\211\344\270\224\345\217\252\346\234\211\344\270\200\344\270\252\345\220\216\345\217\260\350\257\273\345\217\226\344\273\273\345\212\241\n        ");
-static PyMethodDef __pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_12_get_connection = {"_get_connection", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_12_get_connection, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_4core_6client_12async_client_17AsyncStreamClient_11_get_connection};
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_12_get_connection(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_4core_6client_12async_client_17AsyncStreamClient_8_get_connection, "\n            \350\216\267\345\217\226\346\210\226\345\210\233\345\273\272\350\277\236\346\216\245\347\241\256\344\277\235\346\257\217\344\270\252\350\277\236\346\216\245\346\234\211\344\270\224\345\217\252\346\234\211\344\270\200\344\270\252\345\220\216\345\217\260\350\257\273\345\217\226\344\273\273\345\212\241\n        ");
+static PyMethodDef __pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_9_get_connection = {"_get_connection", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_9_get_connection, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_4core_6client_12async_client_17AsyncStreamClient_8_get_connection};
+static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_9_get_connection(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -13039,32 +12582,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_connection_key,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 367, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 362, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 367, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 362, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_get_connection", 0) < (0)) __PYX_ERR(0, 367, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_get_connection", 0) < (0)) __PYX_ERR(0, 362, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_get_connection", 1, 1, 1, i); __PYX_ERR(0, 367, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_get_connection", 1, 1, 1, i); __PYX_ERR(0, 362, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 367, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 362, __pyx_L3_error)
     }
     __pyx_v_connection_key = ((PyObject*)values[0]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_get_connection", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 367, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_get_connection", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 362, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -13075,8 +12618,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_connection_key), (&PyUnicode_Type), 1, "connection_key", 1))) __PYX_ERR(0, 367, __pyx_L1_error)
-  __pyx_r = __pyx_pf_4core_6client_12async_client_17AsyncStreamClient_11_get_connection(((struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *)__pyx_v_self), __pyx_v_connection_key);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_connection_key), (&PyUnicode_Type), 1, "connection_key", 1))) __PYX_ERR(0, 362, __pyx_L1_error)
+  __pyx_r = __pyx_pf_4core_6client_12async_client_17AsyncStreamClient_8_get_connection(((struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *)__pyx_v_self), __pyx_v_connection_key);
 
   /* function exit code */
   goto __pyx_L0;
@@ -13095,19 +12638,19 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_11_get_connection(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_connection_key) {
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection *__pyx_cur_scope;
+static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_8_get_connection(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v_connection_key) {
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection *__pyx_cur_scope;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_get_connection", 0);
-  __pyx_cur_scope = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_10__get_connection(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection, __pyx_mstate_global->__pyx_empty_tuple, NULL);
+  __pyx_cur_scope = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_9__get_connection(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection, __pyx_mstate_global->__pyx_empty_tuple, NULL);
   if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection *)Py_None);
+    __pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 367, __pyx_L1_error)
+    __PYX_ERR(0, 362, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -13118,7 +12661,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_11_ge
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_connection_key);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_connection_key);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13generator9, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_connection, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient__get_connectio, __pyx_mstate_global->__pyx_n_u_core_client_async_client); if (unlikely(!gen)) __PYX_ERR(0, 367, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10generator8, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_connection, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient__get_connectio, __pyx_mstate_global->__pyx_n_u_core_client_async_client); if (unlikely(!gen)) __PYX_ERR(0, 362, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -13134,9 +12677,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_11_ge
   return __pyx_r;
 }
 
-static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13generator9(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_10generator8(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
 {
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection *__pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection *)__pyx_generator->closure);
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection *__pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
   int __pyx_t_1;
   PyObject *__pyx_t_2 = NULL;
@@ -13164,27 +12707,27 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 367, __pyx_L1_error)
+    __PYX_ERR(0, 362, __pyx_L1_error)
   }
 
-  /* "core/client/async_client.pyx":371
+  /* "core/client/async_client.pyx":366
  * 
  *         """
  *         if connection_key in self._connection_cache:             # <<<<<<<<<<<<<<
  *             reader, writer = self._connection_cache[connection_key]
  *             if not writer.is_closing():
 */
-  __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_cur_scope->__pyx_v_connection_key, __pyx_cur_scope->__pyx_v_self->_connection_cache, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 371, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_cur_scope->__pyx_v_connection_key, __pyx_cur_scope->__pyx_v_self->_connection_cache, Py_EQ)); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 366, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "core/client/async_client.pyx":372
+    /* "core/client/async_client.pyx":367
  *         """
  *         if connection_key in self._connection_cache:
  *             reader, writer = self._connection_cache[connection_key]             # <<<<<<<<<<<<<<
  *             if not writer.is_closing():
  *                 return reader, writer
 */
-    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_cur_scope->__pyx_v_self->_connection_cache, __pyx_cur_scope->__pyx_v_connection_key); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 372, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Dict_GetItem(__pyx_cur_scope->__pyx_v_self->_connection_cache, __pyx_cur_scope->__pyx_v_connection_key); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 367, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
       PyObject* sequence = __pyx_t_2;
@@ -13192,7 +12735,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 372, __pyx_L1_error)
+        __PYX_ERR(0, 367, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -13202,22 +12745,22 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
         __Pyx_INCREF(__pyx_t_4);
       } else {
         __pyx_t_3 = __Pyx_PyList_GetItemRefFast(sequence, 0, __Pyx_ReferenceSharing_SharedReference);
-        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 372, __pyx_L1_error)
+        if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 367, __pyx_L1_error)
         __Pyx_XGOTREF(__pyx_t_3);
         __pyx_t_4 = __Pyx_PyList_GetItemRefFast(sequence, 1, __Pyx_ReferenceSharing_SharedReference);
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 372, __pyx_L1_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 367, __pyx_L1_error)
         __Pyx_XGOTREF(__pyx_t_4);
       }
       #else
-      __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 372, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 372, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       #endif
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_5 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 372, __pyx_L1_error)
+      __pyx_t_5 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 367, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_6 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_5);
@@ -13225,7 +12768,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
       __Pyx_GOTREF(__pyx_t_3);
       index = 1; __pyx_t_4 = __pyx_t_6(__pyx_t_5); if (unlikely(!__pyx_t_4)) goto __pyx_L5_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_4);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 2) < (0)) __PYX_ERR(0, 372, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 2) < (0)) __PYX_ERR(0, 367, __pyx_L1_error)
       __pyx_t_6 = NULL;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       goto __pyx_L6_unpacking_done;
@@ -13233,7 +12776,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_6 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 372, __pyx_L1_error)
+      __PYX_ERR(0, 367, __pyx_L1_error)
       __pyx_L6_unpacking_done:;
     }
     __Pyx_GIVEREF(__pyx_t_3);
@@ -13243,7 +12786,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
     __pyx_cur_scope->__pyx_v_writer = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "core/client/async_client.pyx":373
+    /* "core/client/async_client.pyx":368
  *         if connection_key in self._connection_cache:
  *             reader, writer = self._connection_cache[connection_key]
  *             if not writer.is_closing():             # <<<<<<<<<<<<<<
@@ -13257,15 +12800,15 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
       PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_is_closing, __pyx_callargs+__pyx_t_7, (1-__pyx_t_7) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 373, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 368, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
-    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 373, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_1 < 0))) __PYX_ERR(0, 368, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_8 = (!__pyx_t_1);
     if (__pyx_t_8) {
 
-      /* "core/client/async_client.pyx":374
+      /* "core/client/async_client.pyx":369
  *             reader, writer = self._connection_cache[connection_key]
  *             if not writer.is_closing():
  *                 return reader, writer             # <<<<<<<<<<<<<<
@@ -13273,19 +12816,19 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
  *                 del self._connection_cache[connection_key]
 */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 374, __pyx_L1_error)
+      __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 369, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_INCREF(__pyx_cur_scope->__pyx_v_reader);
       __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_reader);
-      if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_cur_scope->__pyx_v_reader) != (0)) __PYX_ERR(0, 374, __pyx_L1_error);
+      if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_cur_scope->__pyx_v_reader) != (0)) __PYX_ERR(0, 369, __pyx_L1_error);
       __Pyx_INCREF(__pyx_cur_scope->__pyx_v_writer);
       __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_writer);
-      if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_cur_scope->__pyx_v_writer) != (0)) __PYX_ERR(0, 374, __pyx_L1_error);
+      if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_cur_scope->__pyx_v_writer) != (0)) __PYX_ERR(0, 369, __pyx_L1_error);
       __pyx_r = __pyx_t_2;
       __pyx_t_2 = 0;
       goto __pyx_L0;
 
-      /* "core/client/async_client.pyx":373
+      /* "core/client/async_client.pyx":368
  *         if connection_key in self._connection_cache:
  *             reader, writer = self._connection_cache[connection_key]
  *             if not writer.is_closing():             # <<<<<<<<<<<<<<
@@ -13294,7 +12837,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
 */
     }
 
-    /* "core/client/async_client.pyx":376
+    /* "core/client/async_client.pyx":371
  *                 return reader, writer
  *             else:
  *                 del self._connection_cache[connection_key]             # <<<<<<<<<<<<<<
@@ -13302,10 +12845,10 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
  *         reader, writer = await asyncio.open_connection(host=self.host, port=self.port) # same underlying File Descriptor/Socket
 */
     /*else*/ {
-      if (unlikely((PyObject_DelItem(__pyx_cur_scope->__pyx_v_self->_connection_cache, __pyx_cur_scope->__pyx_v_connection_key) < 0))) __PYX_ERR(0, 376, __pyx_L1_error)
+      if (unlikely((PyObject_DelItem(__pyx_cur_scope->__pyx_v_self->_connection_cache, __pyx_cur_scope->__pyx_v_connection_key) < 0))) __PYX_ERR(0, 371, __pyx_L1_error)
     }
 
-    /* "core/client/async_client.pyx":371
+    /* "core/client/async_client.pyx":366
  * 
  *         """
  *         if connection_key in self._connection_cache:             # <<<<<<<<<<<<<<
@@ -13314,7 +12857,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
 */
   }
 
-  /* "core/client/async_client.pyx":378
+  /* "core/client/async_client.pyx":373
  *                 del self._connection_cache[connection_key]
  * 
  *         reader, writer = await asyncio.open_connection(host=self.host, port=self.port) # same underlying File Descriptor/Socket             # <<<<<<<<<<<<<<
@@ -13322,12 +12865,12 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
  *         sock = writer.get_extra_info('socket')
 */
   __pyx_t_4 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 378, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_open_connection); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 378, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_open_connection); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->port); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 378, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->port); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_7 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -13343,16 +12886,16 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
   #endif
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_4, NULL};
-    __pyx_t_9 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 378, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 373, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_host, __pyx_cur_scope->__pyx_v_self->host, __pyx_t_9, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 378, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_port, __pyx_t_3, __pyx_t_9, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 378, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_host, __pyx_cur_scope->__pyx_v_self->host, __pyx_t_9, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 373, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_port, __pyx_t_3, __pyx_t_9, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 373, __pyx_L1_error)
     __pyx_t_2 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_5, __pyx_callargs+__pyx_t_7, (1-__pyx_t_7) | (__pyx_t_7*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_9);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 378, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 373, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __pyx_t_10 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_2, &__pyx_r);
@@ -13366,14 +12909,14 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
     __pyx_generator->resume_label = 1;
     return __pyx_r;
     __pyx_L8_resume_from_await:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 378, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 373, __pyx_L1_error)
     __pyx_t_2 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_2);
   } else if (likely(__pyx_t_10 == PYGEN_RETURN)) {
     __Pyx_GOTREF(__pyx_r);
     __pyx_t_2 = __pyx_r; __pyx_r = NULL;
   } else {
     __Pyx_XGOTREF(__pyx_r);
-    __PYX_ERR(0, 378, __pyx_L1_error)
+    __PYX_ERR(0, 373, __pyx_L1_error)
   }
   if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
     PyObject* sequence = __pyx_t_2;
@@ -13381,7 +12924,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 378, __pyx_L1_error)
+      __PYX_ERR(0, 373, __pyx_L1_error)
     }
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -13391,22 +12934,22 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
       __Pyx_INCREF(__pyx_t_9);
     } else {
       __pyx_t_5 = __Pyx_PyList_GetItemRefFast(sequence, 0, __Pyx_ReferenceSharing_SharedReference);
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 378, __pyx_L1_error)
+      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 373, __pyx_L1_error)
       __Pyx_XGOTREF(__pyx_t_5);
       __pyx_t_9 = __Pyx_PyList_GetItemRefFast(sequence, 1, __Pyx_ReferenceSharing_SharedReference);
-      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 378, __pyx_L1_error)
+      if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 373, __pyx_L1_error)
       __Pyx_XGOTREF(__pyx_t_9);
     }
     #else
-    __pyx_t_5 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 378, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 373, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_9 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 378, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 373, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     #endif
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_3 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 378, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 373, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_6 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_3);
@@ -13414,7 +12957,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
     __Pyx_GOTREF(__pyx_t_5);
     index = 1; __pyx_t_9 = __pyx_t_6(__pyx_t_3); if (unlikely(!__pyx_t_9)) goto __pyx_L9_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_9);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_3), 2) < (0)) __PYX_ERR(0, 378, __pyx_L1_error)
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_3), 2) < (0)) __PYX_ERR(0, 373, __pyx_L1_error)
     __pyx_t_6 = NULL;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     goto __pyx_L10_unpacking_done;
@@ -13422,7 +12965,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_6 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 378, __pyx_L1_error)
+    __PYX_ERR(0, 373, __pyx_L1_error)
     __pyx_L10_unpacking_done:;
   }
   __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_reader);
@@ -13434,7 +12977,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
   __Pyx_GIVEREF(__pyx_t_9);
   __pyx_t_9 = 0;
 
-  /* "core/client/async_client.pyx":380
+  /* "core/client/async_client.pyx":375
  *         reader, writer = await asyncio.open_connection(host=self.host, port=self.port) # same underlying File Descriptor/Socket
  *         # socketopt No Nagle when small packet
  *         sock = writer.get_extra_info('socket')             # <<<<<<<<<<<<<<
@@ -13448,38 +12991,38 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
     PyObject *__pyx_callargs[2] = {__pyx_t_9, __pyx_mstate_global->__pyx_n_u_socket};
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_get_extra_info, __pyx_callargs+__pyx_t_7, (2-__pyx_t_7) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_cur_scope->__pyx_v_sock = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "core/client/async_client.pyx":381
+  /* "core/client/async_client.pyx":376
  *         # socketopt No Nagle when small packet
  *         sock = writer.get_extra_info('socket')
  *         if sock:             # <<<<<<<<<<<<<<
  *             import socket
  *             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 */
-  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_cur_scope->__pyx_v_sock); if (unlikely((__pyx_t_8 < 0))) __PYX_ERR(0, 381, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_cur_scope->__pyx_v_sock); if (unlikely((__pyx_t_8 < 0))) __PYX_ERR(0, 376, __pyx_L1_error)
   if (__pyx_t_8) {
 
-    /* "core/client/async_client.pyx":382
+    /* "core/client/async_client.pyx":377
  *         sock = writer.get_extra_info('socket')
  *         if sock:
  *             import socket             # <<<<<<<<<<<<<<
  *             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
  * 
 */
-    __pyx_t_11 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_socket, 0, 0, NULL, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 382, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_socket, 0, 0, NULL, 0); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 377, __pyx_L1_error)
     __pyx_t_2 = __pyx_t_11;
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_2);
     __pyx_cur_scope->__pyx_v_socket = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "core/client/async_client.pyx":383
+    /* "core/client/async_client.pyx":378
  *         if sock:
  *             import socket
  *             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)             # <<<<<<<<<<<<<<
@@ -13488,9 +13031,9 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
 */
     __pyx_t_9 = __pyx_cur_scope->__pyx_v_sock;
     __Pyx_INCREF(__pyx_t_9);
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_socket, __pyx_mstate_global->__pyx_n_u_IPPROTO_TCP); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 383, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_socket, __pyx_mstate_global->__pyx_n_u_IPPROTO_TCP); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 378, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_socket, __pyx_mstate_global->__pyx_n_u_TCP_NODELAY); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 383, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_socket, __pyx_mstate_global->__pyx_n_u_TCP_NODELAY); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 378, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_7 = 0;
     {
@@ -13499,12 +13042,12 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 383, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 378, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "core/client/async_client.pyx":381
+    /* "core/client/async_client.pyx":376
  *         # socketopt No Nagle when small packet
  *         sock = writer.get_extra_info('socket')
  *         if sock:             # <<<<<<<<<<<<<<
@@ -13513,25 +13056,25 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
 */
   }
 
-  /* "core/client/async_client.pyx":385
+  /* "core/client/async_client.pyx":380
  *             sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
  * 
  *         self._connection_cache[connection_key] = (reader, writer)             # <<<<<<<<<<<<<<
  *         return reader, writer
  * 
 */
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 385, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_reader);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_reader);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_cur_scope->__pyx_v_reader) != (0)) __PYX_ERR(0, 385, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_cur_scope->__pyx_v_reader) != (0)) __PYX_ERR(0, 380, __pyx_L1_error);
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_writer);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_writer);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_cur_scope->__pyx_v_writer) != (0)) __PYX_ERR(0, 385, __pyx_L1_error);
-  if (unlikely((PyObject_SetItem(__pyx_cur_scope->__pyx_v_self->_connection_cache, __pyx_cur_scope->__pyx_v_connection_key, __pyx_t_2) < 0))) __PYX_ERR(0, 385, __pyx_L1_error)
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_cur_scope->__pyx_v_writer) != (0)) __PYX_ERR(0, 380, __pyx_L1_error);
+  if (unlikely((PyObject_SetItem(__pyx_cur_scope->__pyx_v_self->_connection_cache, __pyx_cur_scope->__pyx_v_connection_key, __pyx_t_2) < 0))) __PYX_ERR(0, 380, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/client/async_client.pyx":386
+  /* "core/client/async_client.pyx":381
  * 
  *         self._connection_cache[connection_key] = (reader, writer)
  *         return reader, writer             # <<<<<<<<<<<<<<
@@ -13539,20 +13082,20 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
  *     async def _async_shutdown(self):
 */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 386, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 381, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_reader);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_reader);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_cur_scope->__pyx_v_reader) != (0)) __PYX_ERR(0, 386, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_cur_scope->__pyx_v_reader) != (0)) __PYX_ERR(0, 381, __pyx_L1_error);
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_writer);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_writer);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_cur_scope->__pyx_v_writer) != (0)) __PYX_ERR(0, 386, __pyx_L1_error);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_2, 1, __pyx_cur_scope->__pyx_v_writer) != (0)) __PYX_ERR(0, 381, __pyx_L1_error);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "core/client/async_client.pyx":367
+  /* "core/client/async_client.pyx":362
  *         await writer.drain()
  * 
  *     async def _get_connection(self, str connection_key):             # <<<<<<<<<<<<<<
@@ -13581,9 +13124,9 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13gen
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16generator10(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13generator9(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "core/client/async_client.pyx":388
+/* "core/client/async_client.pyx":383
  *         return reader, writer
  * 
  *     async def _async_shutdown(self):             # <<<<<<<<<<<<<<
@@ -13592,15 +13135,15 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_15_async_shutdown(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_12_async_shutdown(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_15_async_shutdown = {"_async_shutdown", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_15_async_shutdown, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_15_async_shutdown(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_12_async_shutdown = {"_async_shutdown", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_12_async_shutdown, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_12_async_shutdown(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -13626,26 +13169,26 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("_async_shutdown", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_4core_6client_12async_client_17AsyncStreamClient_14_async_shutdown(((struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *)__pyx_v_self));
+  __pyx_r = __pyx_pf_4core_6client_12async_client_17AsyncStreamClient_11_async_shutdown(((struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_14_async_shutdown(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self) {
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown *__pyx_cur_scope;
+static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_11_async_shutdown(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self) {
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown *__pyx_cur_scope;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_async_shutdown", 0);
-  __pyx_cur_scope = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown, __pyx_mstate_global->__pyx_empty_tuple, NULL);
+  __pyx_cur_scope = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown, __pyx_mstate_global->__pyx_empty_tuple, NULL);
   if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown *)Py_None);
+    __pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 388, __pyx_L1_error)
+    __PYX_ERR(0, 383, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -13653,7 +13196,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_14_as
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16generator10, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[12]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_async_shutdown, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient__async_shutdow, __pyx_mstate_global->__pyx_n_u_core_client_async_client); if (unlikely(!gen)) __PYX_ERR(0, 388, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13generator9, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_async_shutdown, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient__async_shutdow, __pyx_mstate_global->__pyx_n_u_core_client_async_client); if (unlikely(!gen)) __PYX_ERR(0, 383, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -13669,9 +13212,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_14_as
   return __pyx_r;
 }
 
-static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16generator10(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_13generator9(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
 {
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown *__pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown *)__pyx_generator->closure);
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown *__pyx_cur_scope = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown *)__pyx_generator->closure);
   PyObject *__pyx_r = NULL;
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -13703,10 +13246,10 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 388, __pyx_L1_error)
+    __PYX_ERR(0, 383, __pyx_L1_error)
   }
 
-  /* "core/client/async_client.pyx":389
+  /* "core/client/async_client.pyx":384
  * 
  *     async def _async_shutdown(self):
  *         await AsyncClient._async_shutdown()             # <<<<<<<<<<<<<<
@@ -13720,7 +13263,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_async_shutdown, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 384, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_t_4 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
@@ -13734,16 +13277,16 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
     __pyx_generator->resume_label = 1;
     return __pyx_r;
     __pyx_L4_resume_from_await:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 389, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 384, __pyx_L1_error)
   } else if (likely(__pyx_t_4 == PYGEN_RETURN)) {
     __Pyx_GOTREF(__pyx_r);
     __Pyx_DECREF(__pyx_r); __pyx_r = 0;
   } else {
     __Pyx_XGOTREF(__pyx_r);
-    __PYX_ERR(0, 389, __pyx_L1_error)
+    __PYX_ERR(0, 384, __pyx_L1_error)
   }
 
-  /* "core/client/async_client.pyx":391
+  /* "core/client/async_client.pyx":386
  *         await AsyncClient._async_shutdown()
  * 
  *         for key in list(self._connection_cache.keys()):             # <<<<<<<<<<<<<<
@@ -13757,10 +13300,10 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_keys, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 391, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  __pyx_t_2 = __Pyx_PySequence_ListKeepNew(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 391, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PySequence_ListKeepNew(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 386, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = __pyx_t_2; __Pyx_INCREF(__pyx_t_1);
@@ -13770,20 +13313,20 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
     {
       Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_t_1);
       #if !CYTHON_ASSUME_SAFE_SIZE
-      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 391, __pyx_L1_error)
+      if (unlikely((__pyx_temp < 0))) __PYX_ERR(0, 386, __pyx_L1_error)
       #endif
       if (__pyx_t_5 >= __pyx_temp) break;
     }
     __pyx_t_2 = __Pyx_PyList_GetItemRefFast(__pyx_t_1, __pyx_t_5, __Pyx_ReferenceSharing_OwnStrongReference);
     ++__pyx_t_5;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 391, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 386, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_key);
     __Pyx_XDECREF_SET(__pyx_cur_scope->__pyx_v_key, __pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "core/client/async_client.pyx":392
+    /* "core/client/async_client.pyx":387
  * 
  *         for key in list(self._connection_cache.keys()):
  *             reader, writer = self._connection_cache.pop(key)             # <<<<<<<<<<<<<<
@@ -13797,7 +13340,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
       PyObject *__pyx_callargs[2] = {__pyx_t_6, __pyx_cur_scope->__pyx_v_key};
       __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_pop, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 392, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 387, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     if ((likely(PyTuple_CheckExact(__pyx_t_2))) || (PyList_CheckExact(__pyx_t_2))) {
@@ -13806,7 +13349,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        __PYX_ERR(0, 392, __pyx_L1_error)
+        __PYX_ERR(0, 387, __pyx_L1_error)
       }
       #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -13816,22 +13359,22 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
         __Pyx_INCREF(__pyx_t_7);
       } else {
         __pyx_t_6 = __Pyx_PyList_GetItemRefFast(sequence, 0, __Pyx_ReferenceSharing_SharedReference);
-        if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 392, __pyx_L1_error)
+        if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 387, __pyx_L1_error)
         __Pyx_XGOTREF(__pyx_t_6);
         __pyx_t_7 = __Pyx_PyList_GetItemRefFast(sequence, 1, __Pyx_ReferenceSharing_SharedReference);
-        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 392, __pyx_L1_error)
+        if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 387, __pyx_L1_error)
         __Pyx_XGOTREF(__pyx_t_7);
       }
       #else
-      __pyx_t_6 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 392, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 387, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_7 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 392, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 387, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       #endif
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_8 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 392, __pyx_L1_error)
+      __pyx_t_8 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 387, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_9 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_8);
@@ -13839,7 +13382,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
       __Pyx_GOTREF(__pyx_t_6);
       index = 1; __pyx_t_7 = __pyx_t_9(__pyx_t_8); if (unlikely(!__pyx_t_7)) goto __pyx_L7_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_7);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < (0)) __PYX_ERR(0, 392, __pyx_L1_error)
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_9(__pyx_t_8), 2) < (0)) __PYX_ERR(0, 387, __pyx_L1_error)
       __pyx_t_9 = NULL;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       goto __pyx_L8_unpacking_done;
@@ -13847,7 +13390,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_t_9 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      __PYX_ERR(0, 392, __pyx_L1_error)
+      __PYX_ERR(0, 387, __pyx_L1_error)
       __pyx_L8_unpacking_done:;
     }
     __Pyx_XGOTREF(__pyx_cur_scope->__pyx_v_reader);
@@ -13859,17 +13402,17 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
     __Pyx_GIVEREF(__pyx_t_7);
     __pyx_t_7 = 0;
 
-    /* "core/client/async_client.pyx":393
+    /* "core/client/async_client.pyx":388
  *         for key in list(self._connection_cache.keys()):
  *             reader, writer = self._connection_cache.pop(key)
  *             if writer:             # <<<<<<<<<<<<<<
  *                 writer.close()
  *                 try:
 */
-    __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_cur_scope->__pyx_v_writer); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 393, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyObject_IsTrue(__pyx_cur_scope->__pyx_v_writer); if (unlikely((__pyx_t_10 < 0))) __PYX_ERR(0, 388, __pyx_L1_error)
     if (__pyx_t_10) {
 
-      /* "core/client/async_client.pyx":394
+      /* "core/client/async_client.pyx":389
  *             reader, writer = self._connection_cache.pop(key)
  *             if writer:
  *                 writer.close()             # <<<<<<<<<<<<<<
@@ -13883,12 +13426,12 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
         PyObject *__pyx_callargs[2] = {__pyx_t_7, NULL};
         __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_close, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 394, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
       }
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "core/client/async_client.pyx":395
+      /* "core/client/async_client.pyx":390
  *             if writer:
  *                 writer.close()
  *                 try:             # <<<<<<<<<<<<<<
@@ -13902,7 +13445,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
         __Pyx_XGOTREF(__pyx_t_13);
         /*try:*/ {
 
-          /* "core/client/async_client.pyx":397
+          /* "core/client/async_client.pyx":392
  *                 try:
  *                     # await writer.wait_closed()
  *                     await asyncio.wait_for(writer.wait_closed(), timeout=1.0) # writer.close()             # <<<<<<<<<<<<<<
@@ -13910,9 +13453,9 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
  *         self._connection_cache.clear()
 */
           __pyx_t_7 = NULL;
-          __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 397, __pyx_L10_error)
+          __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 392, __pyx_L10_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_wait_for); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 397, __pyx_L10_error)
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_wait_for); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 392, __pyx_L10_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __pyx_t_14 = __pyx_cur_scope->__pyx_v_writer;
@@ -13922,7 +13465,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
             PyObject *__pyx_callargs[2] = {__pyx_t_14, NULL};
             __pyx_t_6 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_wait_closed, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-            if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 397, __pyx_L10_error)
+            if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 392, __pyx_L10_error)
             __Pyx_GOTREF(__pyx_t_6);
           }
           __pyx_t_3 = 1;
@@ -13939,15 +13482,15 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
           #endif
           {
             PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_7, __pyx_t_6};
-            __pyx_t_14 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 397, __pyx_L10_error)
+            __pyx_t_14 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 392, __pyx_L10_error)
             __Pyx_GOTREF(__pyx_t_14);
-            if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_timeout, __pyx_mstate_global->__pyx_float_1_0, __pyx_t_14, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 397, __pyx_L10_error)
+            if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_timeout, __pyx_mstate_global->__pyx_float_1_0, __pyx_t_14, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 392, __pyx_L10_error)
             __pyx_t_2 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_8, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (__pyx_t_3*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_14);
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
             __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
             __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-            if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 397, __pyx_L10_error)
+            if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 392, __pyx_L10_error)
             __Pyx_GOTREF(__pyx_t_2);
           }
           __pyx_t_4 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_2, &__pyx_r);
@@ -13983,16 +13526,16 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
             __pyx_t_13 = __pyx_cur_scope->__pyx_t_4;
             __pyx_cur_scope->__pyx_t_4 = 0;
             __Pyx_XGOTREF(__pyx_t_13);
-            if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 397, __pyx_L10_error)
+            if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 392, __pyx_L10_error)
           } else if (likely(__pyx_t_4 == PYGEN_RETURN)) {
             __Pyx_GOTREF(__pyx_r);
             __Pyx_DECREF(__pyx_r); __pyx_r = 0;
           } else {
             __Pyx_XGOTREF(__pyx_r);
-            __PYX_ERR(0, 397, __pyx_L10_error)
+            __PYX_ERR(0, 392, __pyx_L10_error)
           }
 
-          /* "core/client/async_client.pyx":395
+          /* "core/client/async_client.pyx":390
  *             if writer:
  *                 writer.close()
  *                 try:             # <<<<<<<<<<<<<<
@@ -14011,7 +13554,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-        /* "core/client/async_client.pyx":398
+        /* "core/client/async_client.pyx":393
  *                     # await writer.wait_closed()
  *                     await asyncio.wait_for(writer.wait_closed(), timeout=1.0) # writer.close()
  *                 except: pass             # <<<<<<<<<<<<<<
@@ -14030,7 +13573,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
         __pyx_L17_try_end:;
       }
 
-      /* "core/client/async_client.pyx":393
+      /* "core/client/async_client.pyx":388
  *         for key in list(self._connection_cache.keys()):
  *             reader, writer = self._connection_cache.pop(key)
  *             if writer:             # <<<<<<<<<<<<<<
@@ -14039,7 +13582,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
 */
     }
 
-    /* "core/client/async_client.pyx":391
+    /* "core/client/async_client.pyx":386
  *         await AsyncClient._async_shutdown()
  * 
  *         for key in list(self._connection_cache.keys()):             # <<<<<<<<<<<<<<
@@ -14049,7 +13592,7 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "core/client/async_client.pyx":399
+  /* "core/client/async_client.pyx":394
  *                     await asyncio.wait_for(writer.wait_closed(), timeout=1.0) # writer.close()
  *                 except: pass
  *         self._connection_cache.clear()             # <<<<<<<<<<<<<<
@@ -14063,12 +13606,12 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_clear, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 399, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 394, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "core/client/async_client.pyx":400
+  /* "core/client/async_client.pyx":395
  *                 except: pass
  *         self._connection_cache.clear()
  *         print("[TCP] All connections closed.")             # <<<<<<<<<<<<<<
@@ -14081,13 +13624,13 @@ static PyObject *__pyx_gb_4core_6client_12async_client_17AsyncStreamClient_16gen
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_mstate_global->__pyx_kp_u_TCP_All_connections_closed};
     __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_builtin_print, __pyx_callargs+__pyx_t_3, (2-__pyx_t_3) | (__pyx_t_3*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 400, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 395, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "core/client/async_client.pyx":388
+  /* "core/client/async_client.pyx":383
  *         return reader, writer
  * 
  *     async def _async_shutdown(self):             # <<<<<<<<<<<<<<
@@ -14166,15 +13709,15 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_11lis
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_18__reduce_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_15__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_18__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_18__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_18__reduce_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_15__reduce_cython__ = {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_15__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_15__reduce_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -14200,14 +13743,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("__reduce_cython__", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__reduce_cython__(((struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *)__pyx_v_self));
+  __pyx_r = __pyx_pf_4core_6client_12async_client_17AsyncStreamClient_14__reduce_cython__(((struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__reduce_cython__(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self) {
+static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_14__reduce_cython__(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self) {
   PyObject *__pyx_v_state = 0;
   PyObject *__pyx_v__dict = 0;
   int __pyx_v_use_setstate;
@@ -14227,7 +13770,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__r
   /* "(tree fragment)":5
  *     cdef object _dict
  *     cdef bint use_setstate
- *     state = (self._connection_cache, self._loop_thread, self._req_fut, self._req_subject, self._running, self.host, self.listen_task, self.loop, self.port, self.timeout)             # <<<<<<<<<<<<<<
+ *     state = (self._connection_cache, self._loop_thread, self._req_futures, self._req_subject, self._running, self.host, self.listen_task, self.loop, self.port, self.timeout)             # <<<<<<<<<<<<<<
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None and _dict:
 */
@@ -14245,9 +13788,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__r
   __Pyx_INCREF(__pyx_v_self->__pyx_base._loop_thread);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._loop_thread);
   if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_self->__pyx_base._loop_thread) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
-  __Pyx_INCREF(__pyx_v_self->__pyx_base._req_fut);
-  __Pyx_GIVEREF(__pyx_v_self->__pyx_base._req_fut);
-  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_v_self->__pyx_base._req_fut) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
+  __Pyx_INCREF(__pyx_v_self->__pyx_base._req_futures);
+  __Pyx_GIVEREF(__pyx_v_self->__pyx_base._req_futures);
+  if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_v_self->__pyx_base._req_futures) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
   __Pyx_INCREF(__pyx_v_self->__pyx_base._req_subject);
   __Pyx_GIVEREF(__pyx_v_self->__pyx_base._req_subject);
   if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 3, __pyx_v_self->__pyx_base._req_subject) != (0)) __PYX_ERR(1, 5, __pyx_L1_error);
@@ -14274,7 +13817,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__r
 
   /* "(tree fragment)":6
  *     cdef bint use_setstate
- *     state = (self._connection_cache, self._loop_thread, self._req_fut, self._req_subject, self._running, self.host, self.listen_task, self.loop, self.port, self.timeout)
+ *     state = (self._connection_cache, self._loop_thread, self._req_futures, self._req_subject, self._running, self.host, self.listen_task, self.loop, self.port, self.timeout)
  *     _dict = getattr(self, '__dict__', None)             # <<<<<<<<<<<<<<
  *     if _dict is not None and _dict:
  *         state += (_dict,)
@@ -14285,7 +13828,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__r
   __pyx_t_4 = 0;
 
   /* "(tree fragment)":7
- *     state = (self._connection_cache, self._loop_thread, self._req_fut, self._req_subject, self._running, self.host, self.listen_task, self.loop, self.port, self.timeout)
+ *     state = (self._connection_cache, self._loop_thread, self._req_futures, self._req_subject, self._running, self.host, self.listen_task, self.loop, self.port, self.timeout)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None and _dict:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -14325,12 +13868,12 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__r
  *         state += (_dict,)
  *         use_setstate = True             # <<<<<<<<<<<<<<
  *     else:
- *         use_setstate = ('self._connection_cache is not None or self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not None',)
+ *         use_setstate = ('self._connection_cache is not None or self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not None',)
 */
     __pyx_v_use_setstate = 1;
 
     /* "(tree fragment)":7
- *     state = (self._connection_cache, self._loop_thread, self._req_fut, self._req_subject, self._running, self.host, self.listen_task, self.loop, self.port, self.timeout)
+ *     state = (self._connection_cache, self._loop_thread, self._req_futures, self._req_subject, self._running, self.host, self.listen_task, self.loop, self.port, self.timeout)
  *     _dict = getattr(self, '__dict__', None)
  *     if _dict is not None and _dict:             # <<<<<<<<<<<<<<
  *         state += (_dict,)
@@ -14342,9 +13885,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__r
   /* "(tree fragment)":11
  *         use_setstate = True
  *     else:
- *         use_setstate = ('self._connection_cache is not None or self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not None',)             # <<<<<<<<<<<<<<
+ *         use_setstate = ('self._connection_cache is not None or self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not None',)             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0x4007570, None), state
+ *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0xfc8dc45, None), state
 */
   /*else*/ {
     __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_mstate_global->__pyx_tuple[6]); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(1, 11, __pyx_L1_error)
@@ -14354,19 +13897,19 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__r
 
   /* "(tree fragment)":12
  *     else:
- *         use_setstate = ('self._connection_cache is not None or self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not None',)
+ *         use_setstate = ('self._connection_cache is not None or self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not None',)
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0x4007570, None), state
+ *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0xfc8dc45, None), state
  *     else:
 */
   if (__pyx_v_use_setstate) {
 
     /* "(tree fragment)":13
- *         use_setstate = ('self._connection_cache is not None or self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not None',)
+ *         use_setstate = ('self._connection_cache is not None or self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not None',)
  *     if use_setstate:
- *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0x4007570, None), state             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0xfc8dc45, None), state             # <<<<<<<<<<<<<<
  *     else:
- *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0x4007570, state)
+ *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0xfc8dc45, state)
 */
     __Pyx_XDECREF(__pyx_r);
     __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_AsyncStreamClient); if (unlikely(!__pyx_t_3)) __PYX_ERR(1, 13, __pyx_L1_error)
@@ -14376,9 +13919,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__r
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_67138928);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_67138928);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_mstate_global->__pyx_int_67138928) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_264821829);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_264821829);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_mstate_global->__pyx_int_264821829) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
     __Pyx_INCREF(Py_None);
     __Pyx_GIVEREF(Py_None);
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 2, Py_None) != (0)) __PYX_ERR(1, 13, __pyx_L1_error);
@@ -14399,17 +13942,17 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__r
 
     /* "(tree fragment)":12
  *     else:
- *         use_setstate = ('self._connection_cache is not None or self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not None',)
+ *         use_setstate = ('self._connection_cache is not None or self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not None',)
  *     if use_setstate:             # <<<<<<<<<<<<<<
- *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0x4007570, None), state
+ *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0xfc8dc45, None), state
  *     else:
 */
   }
 
   /* "(tree fragment)":15
- *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0x4007570, None), state
+ *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0xfc8dc45, None), state
  *     else:
- *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0x4007570, state)             # <<<<<<<<<<<<<<
+ *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0xfc8dc45, state)             # <<<<<<<<<<<<<<
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_AsyncStreamClient__set_state(self, __pyx_state)
 */
@@ -14422,9 +13965,9 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__r
     __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     __Pyx_GIVEREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 0, ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self)))) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
-    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_67138928);
-    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_67138928);
-    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_mstate_global->__pyx_int_67138928) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
+    __Pyx_INCREF(__pyx_mstate_global->__pyx_int_264821829);
+    __Pyx_GIVEREF(__pyx_mstate_global->__pyx_int_264821829);
+    if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_mstate_global->__pyx_int_264821829) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
     __Pyx_INCREF(__pyx_v_state);
     __Pyx_GIVEREF(__pyx_v_state);
     if (__Pyx_PyTuple_SET_ITEM(__pyx_t_4, 2, __pyx_v_state) != (0)) __PYX_ERR(1, 15, __pyx_L1_error);
@@ -14465,21 +14008,21 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_17__r
 
 /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0x4007570, state)
+ *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0xfc8dc45, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_AsyncStreamClient__set_state(self, __pyx_state)
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_20__setstate_cython__(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_17__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_20__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_20__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_20__setstate_cython__(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_17__setstate_cython__ = {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_17__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_17__setstate_cython__(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -14545,7 +14088,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_4core_6client_12async_client_17AsyncStreamClient_19__setstate_cython__(((struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *)__pyx_v_self), __pyx_v___pyx_state);
+  __pyx_r = __pyx_pf_4core_6client_12async_client_17AsyncStreamClient_16__setstate_cython__(((struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *)__pyx_v_self), __pyx_v___pyx_state);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -14555,7 +14098,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_19__setstate_cython__(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_16__setstate_cython__(struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -14566,7 +14109,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_19__s
   __Pyx_RefNannySetupContext("__setstate_cython__", 0);
 
   /* "(tree fragment)":17
- *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0x4007570, state)
+ *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0xfc8dc45, state)
  * def __setstate_cython__(self, __pyx_state):
  *     __pyx_unpickle_AsyncStreamClient__set_state(self, __pyx_state)             # <<<<<<<<<<<<<<
 */
@@ -14584,7 +14127,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_19__s
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0x4007570, state)
+ *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0xfc8dc45, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_AsyncStreamClient__set_state(self, __pyx_state)
 */
@@ -14608,7 +14151,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_17AsyncStreamClient_19__s
  *     int __Pyx_UpdateUnpickledDict(object, object, Py_ssize_t) except -1
  * def __pyx_unpickle_AsyncClient(__pyx_type, long __pyx_checksum, tuple __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x0b48c14, 0xec81ee2, 0x50eccb3, b'_loop_thread, _req_fut, _req_subject, _running, loop')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xa7efb14, 0x5f5baf2, 0x8b51bab, b'_loop_thread, _req_futures, _req_subject, _running, loop')
 */
 
 /* Python wrapper */
@@ -14739,15 +14282,15 @@ static PyObject *__pyx_pf_4core_6client_12async_client_2__pyx_unpickle_AsyncClie
   /* "(tree fragment)":6
  * def __pyx_unpickle_AsyncClient(__pyx_type, long __pyx_checksum, tuple __pyx_state):
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x0b48c14, 0xec81ee2, 0x50eccb3, b'_loop_thread, _req_fut, _req_subject, _running, loop')             # <<<<<<<<<<<<<<
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xa7efb14, 0x5f5baf2, 0x8b51bab, b'_loop_thread, _req_futures, _req_subject, _running, loop')             # <<<<<<<<<<<<<<
  *     __pyx_result = AsyncClient.__new__(__pyx_type)
  *     if __pyx_state is not None:
 */
-  __pyx_t_1 = __Pyx_CheckUnpickleChecksum(__pyx_v___pyx_checksum, 0x0b48c14, 0xec81ee2, 0x50eccb3, __pyx_k_loop_thread__req_fut__req_subje); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(1, 6, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CheckUnpickleChecksum(__pyx_v___pyx_checksum, 0xa7efb14, 0x5f5baf2, 0x8b51bab, __pyx_k_loop_thread__req_futures__req_s); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(1, 6, __pyx_L1_error)
 
   /* "(tree fragment)":7
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x0b48c14, 0xec81ee2, 0x50eccb3, b'_loop_thread, _req_fut, _req_subject, _running, loop')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xa7efb14, 0x5f5baf2, 0x8b51bab, b'_loop_thread, _req_futures, _req_subject, _running, loop')
  *     __pyx_result = AsyncClient.__new__(__pyx_type)             # <<<<<<<<<<<<<<
  *     if __pyx_state is not None:
  *         __pyx_unpickle_AsyncClient__set_state(<AsyncClient> __pyx_result, __pyx_state)
@@ -14766,7 +14309,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_2__pyx_unpickle_AsyncClie
   __pyx_t_2 = 0;
 
   /* "(tree fragment)":8
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x0b48c14, 0xec81ee2, 0x50eccb3, b'_loop_thread, _req_fut, _req_subject, _running, loop')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xa7efb14, 0x5f5baf2, 0x8b51bab, b'_loop_thread, _req_futures, _req_subject, _running, loop')
  *     __pyx_result = AsyncClient.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_AsyncClient__set_state(<AsyncClient> __pyx_result, __pyx_state)
@@ -14791,7 +14334,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_2__pyx_unpickle_AsyncClie
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
     /* "(tree fragment)":8
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x0b48c14, 0xec81ee2, 0x50eccb3, b'_loop_thread, _req_fut, _req_subject, _running, loop')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xa7efb14, 0x5f5baf2, 0x8b51bab, b'_loop_thread, _req_futures, _req_subject, _running, loop')
  *     __pyx_result = AsyncClient.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_AsyncClient__set_state(<AsyncClient> __pyx_result, __pyx_state)
@@ -14804,7 +14347,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_2__pyx_unpickle_AsyncClie
  *         __pyx_unpickle_AsyncClient__set_state(<AsyncClient> __pyx_result, __pyx_state)
  *     return __pyx_result             # <<<<<<<<<<<<<<
  * cdef __pyx_unpickle_AsyncClient__set_state(AsyncClient __pyx_result, __pyx_state: tuple):
- *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_fut = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.loop = __pyx_state[4]
+ *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_futures = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.loop = __pyx_state[4]
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v___pyx_result);
@@ -14816,7 +14359,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_2__pyx_unpickle_AsyncClie
  *     int __Pyx_UpdateUnpickledDict(object, object, Py_ssize_t) except -1
  * def __pyx_unpickle_AsyncClient(__pyx_type, long __pyx_checksum, tuple __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x0b48c14, 0xec81ee2, 0x50eccb3, b'_loop_thread, _req_fut, _req_subject, _running, loop')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xa7efb14, 0x5f5baf2, 0x8b51bab, b'_loop_thread, _req_futures, _req_subject, _running, loop')
 */
 
   /* function exit code */
@@ -14836,7 +14379,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_2__pyx_unpickle_AsyncClie
  *         __pyx_unpickle_AsyncClient__set_state(<AsyncClient> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_AsyncClient__set_state(AsyncClient __pyx_result, __pyx_state: tuple):             # <<<<<<<<<<<<<<
- *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_fut = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.loop = __pyx_state[4]
+ *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_futures = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.loop = __pyx_state[4]
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 5)
 */
 
@@ -14854,7 +14397,7 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncClient
   /* "(tree fragment)":12
  *     return __pyx_result
  * cdef __pyx_unpickle_AsyncClient__set_state(AsyncClient __pyx_result, __pyx_state: tuple):
- *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_fut = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.loop = __pyx_state[4]             # <<<<<<<<<<<<<<
+ *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_futures = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.loop = __pyx_state[4]             # <<<<<<<<<<<<<<
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 5)
 */
   __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 0);
@@ -14867,9 +14410,9 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncClient
   __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 1);
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
-  __Pyx_GOTREF(__pyx_v___pyx_result->_req_fut);
-  __Pyx_DECREF(__pyx_v___pyx_result->_req_fut);
-  __pyx_v___pyx_result->_req_fut = __pyx_t_1;
+  __Pyx_GOTREF(__pyx_v___pyx_result->_req_futures);
+  __Pyx_DECREF(__pyx_v___pyx_result->_req_futures);
+  __pyx_v___pyx_result->_req_futures = __pyx_t_1;
   __pyx_t_1 = 0;
   __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 2);
   __Pyx_INCREF(__pyx_t_1);
@@ -14890,7 +14433,7 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncClient
 
   /* "(tree fragment)":13
  * cdef __pyx_unpickle_AsyncClient__set_state(AsyncClient __pyx_result, __pyx_state: tuple):
- *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_fut = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.loop = __pyx_state[4]
+ *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_futures = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.loop = __pyx_state[4]
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 5)             # <<<<<<<<<<<<<<
 */
   __pyx_t_3 = __Pyx_UpdateUnpickledDict(((PyObject *)__pyx_v___pyx_result), __pyx_v___pyx_state, 5); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(1, 13, __pyx_L1_error)
@@ -14899,7 +14442,7 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncClient
  *         __pyx_unpickle_AsyncClient__set_state(<AsyncClient> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_AsyncClient__set_state(AsyncClient __pyx_result, __pyx_state: tuple):             # <<<<<<<<<<<<<<
- *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_fut = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.loop = __pyx_state[4]
+ *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_futures = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.loop = __pyx_state[4]
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 5)
 */
 
@@ -14921,7 +14464,7 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncClient
  *     int __Pyx_UpdateUnpickledDict(object, object, Py_ssize_t) except -1
  * def __pyx_unpickle_AsyncZmqClient(__pyx_type, long __pyx_checksum, tuple __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xff1ec68, 0x0c55124, 0xa569e74, b'_loop_thread, _req_fut, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x436daf5, 0xc3a19af, 0x45764c2, b'_loop_thread, _req_futures, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')
 */
 
 /* Python wrapper */
@@ -15052,15 +14595,15 @@ static PyObject *__pyx_pf_4core_6client_12async_client_4__pyx_unpickle_AsyncZmqC
   /* "(tree fragment)":6
  * def __pyx_unpickle_AsyncZmqClient(__pyx_type, long __pyx_checksum, tuple __pyx_state):
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xff1ec68, 0x0c55124, 0xa569e74, b'_loop_thread, _req_fut, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')             # <<<<<<<<<<<<<<
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x436daf5, 0xc3a19af, 0x45764c2, b'_loop_thread, _req_futures, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')             # <<<<<<<<<<<<<<
  *     __pyx_result = AsyncZmqClient.__new__(__pyx_type)
  *     if __pyx_state is not None:
 */
-  __pyx_t_1 = __Pyx_CheckUnpickleChecksum(__pyx_v___pyx_checksum, 0xff1ec68, 0x0c55124, 0xa569e74, __pyx_k_loop_thread__req_fut__req_subje_2); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(1, 6, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CheckUnpickleChecksum(__pyx_v___pyx_checksum, 0x436daf5, 0xc3a19af, 0x45764c2, __pyx_k_loop_thread__req_futures__req_s_2); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(1, 6, __pyx_L1_error)
 
   /* "(tree fragment)":7
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xff1ec68, 0x0c55124, 0xa569e74, b'_loop_thread, _req_fut, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x436daf5, 0xc3a19af, 0x45764c2, b'_loop_thread, _req_futures, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')
  *     __pyx_result = AsyncZmqClient.__new__(__pyx_type)             # <<<<<<<<<<<<<<
  *     if __pyx_state is not None:
  *         __pyx_unpickle_AsyncZmqClient__set_state(<AsyncZmqClient> __pyx_result, __pyx_state)
@@ -15079,7 +14622,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_4__pyx_unpickle_AsyncZmqC
   __pyx_t_2 = 0;
 
   /* "(tree fragment)":8
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xff1ec68, 0x0c55124, 0xa569e74, b'_loop_thread, _req_fut, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x436daf5, 0xc3a19af, 0x45764c2, b'_loop_thread, _req_futures, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')
  *     __pyx_result = AsyncZmqClient.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_AsyncZmqClient__set_state(<AsyncZmqClient> __pyx_result, __pyx_state)
@@ -15104,7 +14647,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_4__pyx_unpickle_AsyncZmqC
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
     /* "(tree fragment)":8
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xff1ec68, 0x0c55124, 0xa569e74, b'_loop_thread, _req_fut, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x436daf5, 0xc3a19af, 0x45764c2, b'_loop_thread, _req_futures, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')
  *     __pyx_result = AsyncZmqClient.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_AsyncZmqClient__set_state(<AsyncZmqClient> __pyx_result, __pyx_state)
@@ -15117,7 +14660,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_4__pyx_unpickle_AsyncZmqC
  *         __pyx_unpickle_AsyncZmqClient__set_state(<AsyncZmqClient> __pyx_result, __pyx_state)
  *     return __pyx_result             # <<<<<<<<<<<<<<
  * cdef __pyx_unpickle_AsyncZmqClient__set_state(AsyncZmqClient __pyx_result, __pyx_state: tuple):
- *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_fut = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.addr = __pyx_state[4]; __pyx_result.context = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.socket = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
+ *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_futures = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.addr = __pyx_state[4]; __pyx_result.context = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.socket = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v___pyx_result);
@@ -15129,7 +14672,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_4__pyx_unpickle_AsyncZmqC
  *     int __Pyx_UpdateUnpickledDict(object, object, Py_ssize_t) except -1
  * def __pyx_unpickle_AsyncZmqClient(__pyx_type, long __pyx_checksum, tuple __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xff1ec68, 0x0c55124, 0xa569e74, b'_loop_thread, _req_fut, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x436daf5, 0xc3a19af, 0x45764c2, b'_loop_thread, _req_futures, _req_subject, _running, addr, context, listen_task, loop, socket, timeout')
 */
 
   /* function exit code */
@@ -15149,7 +14692,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_4__pyx_unpickle_AsyncZmqC
  *         __pyx_unpickle_AsyncZmqClient__set_state(<AsyncZmqClient> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_AsyncZmqClient__set_state(AsyncZmqClient __pyx_result, __pyx_state: tuple):             # <<<<<<<<<<<<<<
- *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_fut = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.addr = __pyx_state[4]; __pyx_result.context = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.socket = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
+ *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_futures = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.addr = __pyx_state[4]; __pyx_result.context = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.socket = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 10)
 */
 
@@ -15167,7 +14710,7 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncZmqCli
   /* "(tree fragment)":12
  *     return __pyx_result
  * cdef __pyx_unpickle_AsyncZmqClient__set_state(AsyncZmqClient __pyx_result, __pyx_state: tuple):
- *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_fut = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.addr = __pyx_state[4]; __pyx_result.context = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.socket = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]             # <<<<<<<<<<<<<<
+ *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_futures = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.addr = __pyx_state[4]; __pyx_result.context = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.socket = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]             # <<<<<<<<<<<<<<
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 10)
 */
   __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 0);
@@ -15180,9 +14723,9 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncZmqCli
   __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 1);
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
-  __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._req_fut);
-  __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base._req_fut);
-  __pyx_v___pyx_result->__pyx_base._req_fut = __pyx_t_1;
+  __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._req_futures);
+  __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base._req_futures);
+  __pyx_v___pyx_result->__pyx_base._req_futures = __pyx_t_1;
   __pyx_t_1 = 0;
   __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 2);
   __Pyx_INCREF(__pyx_t_1);
@@ -15234,7 +14777,7 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncZmqCli
 
   /* "(tree fragment)":13
  * cdef __pyx_unpickle_AsyncZmqClient__set_state(AsyncZmqClient __pyx_result, __pyx_state: tuple):
- *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_fut = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.addr = __pyx_state[4]; __pyx_result.context = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.socket = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
+ *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_futures = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.addr = __pyx_state[4]; __pyx_result.context = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.socket = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 10)             # <<<<<<<<<<<<<<
 */
   __pyx_t_3 = __Pyx_UpdateUnpickledDict(((PyObject *)__pyx_v___pyx_result), __pyx_v___pyx_state, 10); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(1, 13, __pyx_L1_error)
@@ -15243,7 +14786,7 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncZmqCli
  *         __pyx_unpickle_AsyncZmqClient__set_state(<AsyncZmqClient> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_AsyncZmqClient__set_state(AsyncZmqClient __pyx_result, __pyx_state: tuple):             # <<<<<<<<<<<<<<
- *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_fut = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.addr = __pyx_state[4]; __pyx_result.context = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.socket = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
+ *     __pyx_result._loop_thread = __pyx_state[0]; __pyx_result._req_futures = __pyx_state[1]; __pyx_result._req_subject = __pyx_state[2]; __pyx_result._running = __pyx_state[3]; __pyx_result.addr = __pyx_state[4]; __pyx_result.context = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.socket = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 10)
 */
 
@@ -15265,7 +14808,7 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncZmqCli
  *     int __Pyx_UpdateUnpickledDict(object, object, Py_ssize_t) except -1
  * def __pyx_unpickle_AsyncStreamClient(__pyx_type, long __pyx_checksum, tuple __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x4007570, 0x403ca52, 0xb66a8ec, b'_connection_cache, _loop_thread, _req_fut, _req_subject, _running, host, listen_task, loop, port, timeout')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xfc8dc45, 0x1d0ee83, 0xc96a5a4, b'_connection_cache, _loop_thread, _req_futures, _req_subject, _running, host, listen_task, loop, port, timeout')
 */
 
 /* Python wrapper */
@@ -15396,15 +14939,15 @@ static PyObject *__pyx_pf_4core_6client_12async_client_6__pyx_unpickle_AsyncStre
   /* "(tree fragment)":6
  * def __pyx_unpickle_AsyncStreamClient(__pyx_type, long __pyx_checksum, tuple __pyx_state):
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x4007570, 0x403ca52, 0xb66a8ec, b'_connection_cache, _loop_thread, _req_fut, _req_subject, _running, host, listen_task, loop, port, timeout')             # <<<<<<<<<<<<<<
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xfc8dc45, 0x1d0ee83, 0xc96a5a4, b'_connection_cache, _loop_thread, _req_futures, _req_subject, _running, host, listen_task, loop, port, timeout')             # <<<<<<<<<<<<<<
  *     __pyx_result = AsyncStreamClient.__new__(__pyx_type)
  *     if __pyx_state is not None:
 */
-  __pyx_t_1 = __Pyx_CheckUnpickleChecksum(__pyx_v___pyx_checksum, 0x4007570, 0x403ca52, 0xb66a8ec, __pyx_k_connection_cache__loop_thread); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(1, 6, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CheckUnpickleChecksum(__pyx_v___pyx_checksum, 0xfc8dc45, 0x1d0ee83, 0xc96a5a4, __pyx_k_connection_cache__loop_thread); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(1, 6, __pyx_L1_error)
 
   /* "(tree fragment)":7
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x4007570, 0x403ca52, 0xb66a8ec, b'_connection_cache, _loop_thread, _req_fut, _req_subject, _running, host, listen_task, loop, port, timeout')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xfc8dc45, 0x1d0ee83, 0xc96a5a4, b'_connection_cache, _loop_thread, _req_futures, _req_subject, _running, host, listen_task, loop, port, timeout')
  *     __pyx_result = AsyncStreamClient.__new__(__pyx_type)             # <<<<<<<<<<<<<<
  *     if __pyx_state is not None:
  *         __pyx_unpickle_AsyncStreamClient__set_state(<AsyncStreamClient> __pyx_result, __pyx_state)
@@ -15423,7 +14966,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_6__pyx_unpickle_AsyncStre
   __pyx_t_2 = 0;
 
   /* "(tree fragment)":8
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x4007570, 0x403ca52, 0xb66a8ec, b'_connection_cache, _loop_thread, _req_fut, _req_subject, _running, host, listen_task, loop, port, timeout')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xfc8dc45, 0x1d0ee83, 0xc96a5a4, b'_connection_cache, _loop_thread, _req_futures, _req_subject, _running, host, listen_task, loop, port, timeout')
  *     __pyx_result = AsyncStreamClient.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_AsyncStreamClient__set_state(<AsyncStreamClient> __pyx_result, __pyx_state)
@@ -15448,7 +14991,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_6__pyx_unpickle_AsyncStre
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
     /* "(tree fragment)":8
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x4007570, 0x403ca52, 0xb66a8ec, b'_connection_cache, _loop_thread, _req_fut, _req_subject, _running, host, listen_task, loop, port, timeout')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xfc8dc45, 0x1d0ee83, 0xc96a5a4, b'_connection_cache, _loop_thread, _req_futures, _req_subject, _running, host, listen_task, loop, port, timeout')
  *     __pyx_result = AsyncStreamClient.__new__(__pyx_type)
  *     if __pyx_state is not None:             # <<<<<<<<<<<<<<
  *         __pyx_unpickle_AsyncStreamClient__set_state(<AsyncStreamClient> __pyx_result, __pyx_state)
@@ -15461,7 +15004,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_6__pyx_unpickle_AsyncStre
  *         __pyx_unpickle_AsyncStreamClient__set_state(<AsyncStreamClient> __pyx_result, __pyx_state)
  *     return __pyx_result             # <<<<<<<<<<<<<<
  * cdef __pyx_unpickle_AsyncStreamClient__set_state(AsyncStreamClient __pyx_result, __pyx_state: tuple):
- *     __pyx_result._connection_cache = __pyx_state[0]; __pyx_result._loop_thread = __pyx_state[1]; __pyx_result._req_fut = __pyx_state[2]; __pyx_result._req_subject = __pyx_state[3]; __pyx_result._running = __pyx_state[4]; __pyx_result.host = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.port = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
+ *     __pyx_result._connection_cache = __pyx_state[0]; __pyx_result._loop_thread = __pyx_state[1]; __pyx_result._req_futures = __pyx_state[2]; __pyx_result._req_subject = __pyx_state[3]; __pyx_result._running = __pyx_state[4]; __pyx_result.host = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.port = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v___pyx_result);
@@ -15473,7 +15016,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_6__pyx_unpickle_AsyncStre
  *     int __Pyx_UpdateUnpickledDict(object, object, Py_ssize_t) except -1
  * def __pyx_unpickle_AsyncStreamClient(__pyx_type, long __pyx_checksum, tuple __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x4007570, 0x403ca52, 0xb66a8ec, b'_connection_cache, _loop_thread, _req_fut, _req_subject, _running, host, listen_task, loop, port, timeout')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xfc8dc45, 0x1d0ee83, 0xc96a5a4, b'_connection_cache, _loop_thread, _req_futures, _req_subject, _running, host, listen_task, loop, port, timeout')
 */
 
   /* function exit code */
@@ -15493,7 +15036,7 @@ static PyObject *__pyx_pf_4core_6client_12async_client_6__pyx_unpickle_AsyncStre
  *         __pyx_unpickle_AsyncStreamClient__set_state(<AsyncStreamClient> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_AsyncStreamClient__set_state(AsyncStreamClient __pyx_result, __pyx_state: tuple):             # <<<<<<<<<<<<<<
- *     __pyx_result._connection_cache = __pyx_state[0]; __pyx_result._loop_thread = __pyx_state[1]; __pyx_result._req_fut = __pyx_state[2]; __pyx_result._req_subject = __pyx_state[3]; __pyx_result._running = __pyx_state[4]; __pyx_result.host = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.port = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
+ *     __pyx_result._connection_cache = __pyx_state[0]; __pyx_result._loop_thread = __pyx_state[1]; __pyx_result._req_futures = __pyx_state[2]; __pyx_result._req_subject = __pyx_state[3]; __pyx_result._running = __pyx_state[4]; __pyx_result.host = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.port = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 10)
 */
 
@@ -15511,7 +15054,7 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncStream
   /* "(tree fragment)":12
  *     return __pyx_result
  * cdef __pyx_unpickle_AsyncStreamClient__set_state(AsyncStreamClient __pyx_result, __pyx_state: tuple):
- *     __pyx_result._connection_cache = __pyx_state[0]; __pyx_result._loop_thread = __pyx_state[1]; __pyx_result._req_fut = __pyx_state[2]; __pyx_result._req_subject = __pyx_state[3]; __pyx_result._running = __pyx_state[4]; __pyx_result.host = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.port = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]             # <<<<<<<<<<<<<<
+ *     __pyx_result._connection_cache = __pyx_state[0]; __pyx_result._loop_thread = __pyx_state[1]; __pyx_result._req_futures = __pyx_state[2]; __pyx_result._req_subject = __pyx_state[3]; __pyx_result._running = __pyx_state[4]; __pyx_result.host = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.port = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]             # <<<<<<<<<<<<<<
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 10)
 */
   __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 0);
@@ -15531,9 +15074,9 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncStream
   __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 2);
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
-  __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._req_fut);
-  __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base._req_fut);
-  __pyx_v___pyx_result->__pyx_base._req_fut = __pyx_t_1;
+  __Pyx_GOTREF(__pyx_v___pyx_result->__pyx_base._req_futures);
+  __Pyx_DECREF(__pyx_v___pyx_result->__pyx_base._req_futures);
+  __pyx_v___pyx_result->__pyx_base._req_futures = __pyx_t_1;
   __pyx_t_1 = 0;
   __pyx_t_1 = __Pyx_PyTuple_GET_ITEM(__pyx_v___pyx_state, 3);
   __Pyx_INCREF(__pyx_t_1);
@@ -15573,7 +15116,7 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncStream
 
   /* "(tree fragment)":13
  * cdef __pyx_unpickle_AsyncStreamClient__set_state(AsyncStreamClient __pyx_result, __pyx_state: tuple):
- *     __pyx_result._connection_cache = __pyx_state[0]; __pyx_result._loop_thread = __pyx_state[1]; __pyx_result._req_fut = __pyx_state[2]; __pyx_result._req_subject = __pyx_state[3]; __pyx_result._running = __pyx_state[4]; __pyx_result.host = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.port = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
+ *     __pyx_result._connection_cache = __pyx_state[0]; __pyx_result._loop_thread = __pyx_state[1]; __pyx_result._req_futures = __pyx_state[2]; __pyx_result._req_subject = __pyx_state[3]; __pyx_result._running = __pyx_state[4]; __pyx_result.host = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.port = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 10)             # <<<<<<<<<<<<<<
 */
   __pyx_t_3 = __Pyx_UpdateUnpickledDict(((PyObject *)__pyx_v___pyx_result), __pyx_v___pyx_state, 10); if (unlikely(__pyx_t_3 == ((int)-1))) __PYX_ERR(1, 13, __pyx_L1_error)
@@ -15582,7 +15125,7 @@ static PyObject *__pyx_f_4core_6client_12async_client___pyx_unpickle_AsyncStream
  *         __pyx_unpickle_AsyncStreamClient__set_state(<AsyncStreamClient> __pyx_result, __pyx_state)
  *     return __pyx_result
  * cdef __pyx_unpickle_AsyncStreamClient__set_state(AsyncStreamClient __pyx_result, __pyx_state: tuple):             # <<<<<<<<<<<<<<
- *     __pyx_result._connection_cache = __pyx_state[0]; __pyx_result._loop_thread = __pyx_state[1]; __pyx_result._req_fut = __pyx_state[2]; __pyx_result._req_subject = __pyx_state[3]; __pyx_result._running = __pyx_state[4]; __pyx_result.host = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.port = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
+ *     __pyx_result._connection_cache = __pyx_state[0]; __pyx_result._loop_thread = __pyx_state[1]; __pyx_result._req_futures = __pyx_state[2]; __pyx_result._req_subject = __pyx_state[3]; __pyx_result._running = __pyx_state[4]; __pyx_result.host = __pyx_state[5]; __pyx_result.listen_task = __pyx_state[6]; __pyx_result.loop = __pyx_state[7]; __pyx_result.port = __pyx_state[8]; __pyx_result.timeout = __pyx_state[9]
  *     __Pyx_UpdateUnpickledDict(__pyx_result, __pyx_state, 10)
 */
 
@@ -15609,7 +15152,7 @@ static PyObject *__pyx_tp_new_4core_6client_12async_client_AsyncClient(PyTypeObj
   p = ((struct __pyx_obj_4core_6client_12async_client_AsyncClient *)o);
   p->__pyx_vtab = __pyx_vtabptr_4core_6client_12async_client_AsyncClient;
   p->_req_subject = Py_None; Py_INCREF(Py_None);
-  p->_req_fut = Py_None; Py_INCREF(Py_None);
+  p->_req_futures = Py_None; Py_INCREF(Py_None);
   p->loop = Py_None; Py_INCREF(Py_None);
   p->_loop_thread = Py_None; Py_INCREF(Py_None);
   return o;
@@ -15626,7 +15169,7 @@ static void __pyx_tp_dealloc_4core_6client_12async_client_AsyncClient(PyObject *
   #endif
   PyObject_GC_UnTrack(o);
   Py_CLEAR(p->_req_subject);
-  Py_CLEAR(p->_req_fut);
+  Py_CLEAR(p->_req_futures);
   Py_CLEAR(p->loop);
   Py_CLEAR(p->_loop_thread);
   PyTypeObject *tp = Py_TYPE(o);
@@ -15653,8 +15196,8 @@ static int __pyx_tp_traverse_4core_6client_12async_client_AsyncClient(PyObject *
   if (p->_req_subject) {
     e = (*v)(p->_req_subject, a); if (e) return e;
   }
-  if (p->_req_fut) {
-    e = (*v)(p->_req_fut, a); if (e) return e;
+  if (p->_req_futures) {
+    e = (*v)(p->_req_futures, a); if (e) return e;
   }
   if (p->loop) {
     e = (*v)(p->loop, a); if (e) return e;
@@ -15671,8 +15214,8 @@ static int __pyx_tp_clear_4core_6client_12async_client_AsyncClient(PyObject *o) 
   tmp = ((PyObject*)p->_req_subject);
   p->_req_subject = Py_None; Py_INCREF(Py_None);
   Py_XDECREF(tmp);
-  tmp = ((PyObject*)p->_req_fut);
-  p->_req_fut = Py_None; Py_INCREF(Py_None);
+  tmp = ((PyObject*)p->_req_futures);
+  p->_req_futures = Py_None; Py_INCREF(Py_None);
   Py_XDECREF(tmp);
   tmp = ((PyObject*)p->loop);
   p->loop = Py_None; Py_INCREF(Py_None);
@@ -16020,12 +15563,11 @@ static PyObject *__pyx_getprop_4core_6client_12async_client_17AsyncStreamClient_
 
 static PyMethodDef __pyx_methods_4core_6client_12async_client_AsyncStreamClient[] = {
   {"_listen_loop", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_3_listen_loop, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"_async_request", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_6_async_request, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"send_request", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_9send_request, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"_get_connection", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_12_get_connection, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_4core_6client_12async_client_17AsyncStreamClient_11_get_connection},
-  {"_async_shutdown", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_15_async_shutdown, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_18__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_20__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"send_request", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_6send_request, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"_get_connection", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_9_get_connection, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_4core_6client_12async_client_17AsyncStreamClient_8_get_connection},
+  {"_async_shutdown", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_12_async_shutdown, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_15__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_4core_6client_12async_client_17AsyncStreamClient_17__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {0, 0, 0, 0}
 };
 
@@ -17520,16 +17062,16 @@ static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_7
 };
 #endif
 
-static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_8__async_request(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_8_send_request(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
   PyObject *o;
   #if CYTHON_USE_FREELISTS
-  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_8__async_request > 0) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(t, __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request))))
+  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_8_send_request > 0) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(t, __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request))))
   {
-    o = (PyObject*)__pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_8__async_request[--__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_8__async_request];
+    o = (PyObject*)__pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_8_send_request[--__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_8_send_request];
     #if CYTHON_USE_TYPE_SPECS
     Py_DECREF(Py_TYPE(o));
     #endif
-    memset(o, 0, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request));
+    memset(o, 0, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request));
     #if CYTHON_COMPILING_IN_LIMITED_API
     (void) PyObject_Init(o, t);
     #else
@@ -17545,191 +17087,11 @@ static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_8_
   return o;
 }
 
-static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_8__async_request(PyObject *o) {
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request *)o;
+static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_8_send_request(PyObject *o) {
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request *)o;
   #if CYTHON_USE_TP_FINALIZE
   if (unlikely(__Pyx_PyObject_GetSlot(o, tp_finalize, destructor)) && !__Pyx_PyObject_GC_IsFinalized(o)) {
-    if (__Pyx_PyObject_GetSlot(o, tp_dealloc, destructor) == __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_8__async_request) {
-      if (PyObject_CallFinalizerFromDealloc(o)) return;
-    }
-  }
-  #endif
-  PyObject_GC_UnTrack(o);
-  Py_CLEAR(p->__pyx_v_fut);
-  Py_CLEAR(p->__pyx_v_msg);
-  Py_CLEAR(p->__pyx_v_req_id);
-  Py_CLEAR(p->__pyx_v_self);
-  Py_CLEAR(p->__pyx_t_0);
-  Py_CLEAR(p->__pyx_t_1);
-  Py_CLEAR(p->__pyx_t_2);
-  #if CYTHON_USE_FREELISTS
-  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_8__async_request < 8) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(Py_TYPE(o), __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request))))
-  {
-    __pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_8__async_request[__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_8__async_request++] = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request *)o);
-  } else
-  #endif
-  {
-    PyTypeObject *tp = Py_TYPE(o);
-    #if CYTHON_USE_TYPE_SLOTS
-    (*tp->tp_free)(o);
-    #else
-    {
-      freefunc tp_free = (freefunc)PyType_GetSlot(tp, Py_tp_free);
-      if (tp_free) tp_free(o);
-    }
-    #endif
-    #if CYTHON_USE_TYPE_SPECS
-    Py_DECREF(tp);
-    #endif
-  }
-}
-
-static int __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_8__async_request(PyObject *o, visitproc v, void *a) {
-  int e;
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request *)o;
-  {
-    e = __Pyx_call_type_traverse(o, 1, v, a);
-    if (e) return e;
-  }
-  if (p->__pyx_v_fut) {
-    e = (*v)(p->__pyx_v_fut, a); if (e) return e;
-  }
-  if (p->__pyx_v_msg) {
-    e = (*v)(p->__pyx_v_msg, a); if (e) return e;
-  }
-  if (p->__pyx_v_self) {
-    e = (*v)(((PyObject *)p->__pyx_v_self), a); if (e) return e;
-  }
-  if (p->__pyx_t_0) {
-    e = (*v)(p->__pyx_t_0, a); if (e) return e;
-  }
-  if (p->__pyx_t_1) {
-    e = (*v)(p->__pyx_t_1, a); if (e) return e;
-  }
-  if (p->__pyx_t_2) {
-    e = (*v)(p->__pyx_t_2, a); if (e) return e;
-  }
-  return 0;
-}
-#if CYTHON_USE_TYPE_SPECS
-static PyType_Slot __pyx_type_4core_6client_12async_client___pyx_scope_struct_8__async_request_slots[] = {
-  {Py_tp_dealloc, (void *)__pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_8__async_request},
-  {Py_tp_traverse, (void *)__pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_8__async_request},
-  {Py_tp_new, (void *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_8__async_request},
-  {0, 0},
-};
-static PyType_Spec __pyx_type_4core_6client_12async_client___pyx_scope_struct_8__async_request_spec = {
-  "core.client.async_client.__pyx_scope_struct_8__async_request",
-  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request),
-  0,
-  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC,
-  __pyx_type_4core_6client_12async_client___pyx_scope_struct_8__async_request_slots,
-};
-#else
-
-static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_8__async_request = {
-  PyVarObject_HEAD_INIT(0, 0)
-  "core.client.async_client.""__pyx_scope_struct_8__async_request", /*tp_name*/
-  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8__async_request), /*tp_basicsize*/
-  0, /*tp_itemsize*/
-  __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_8__async_request, /*tp_dealloc*/
-  0, /*tp_vectorcall_offset*/
-  0, /*tp_getattr*/
-  0, /*tp_setattr*/
-  0, /*tp_as_async*/
-  0, /*tp_repr*/
-  0, /*tp_as_number*/
-  0, /*tp_as_sequence*/
-  0, /*tp_as_mapping*/
-  0, /*tp_hash*/
-  0, /*tp_call*/
-  0, /*tp_str*/
-  0, /*tp_getattro*/
-  0, /*tp_setattro*/
-  0, /*tp_as_buffer*/
-  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
-  0, /*tp_doc*/
-  __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_8__async_request, /*tp_traverse*/
-  0, /*tp_clear*/
-  0, /*tp_richcompare*/
-  0, /*tp_weaklistoffset*/
-  0, /*tp_iter*/
-  0, /*tp_iternext*/
-  0, /*tp_methods*/
-  0, /*tp_members*/
-  0, /*tp_getset*/
-  0, /*tp_base*/
-  0, /*tp_dict*/
-  0, /*tp_descr_get*/
-  0, /*tp_descr_set*/
-  #if !CYTHON_USE_TYPE_SPECS
-  0, /*tp_dictoffset*/
-  #endif
-  0, /*tp_init*/
-  0, /*tp_alloc*/
-  __pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_8__async_request, /*tp_new*/
-  0, /*tp_free*/
-  0, /*tp_is_gc*/
-  0, /*tp_bases*/
-  0, /*tp_mro*/
-  0, /*tp_cache*/
-  0, /*tp_subclasses*/
-  0, /*tp_weaklist*/
-  0, /*tp_del*/
-  0, /*tp_version_tag*/
-  #if CYTHON_USE_TP_FINALIZE
-  0, /*tp_finalize*/
-  #else
-  NULL, /*tp_finalize*/
-  #endif
-  #if !CYTHON_COMPILING_IN_PYPY || PYPY_VERSION_NUM >= 0x07030800
-  0, /*tp_vectorcall*/
-  #endif
-  #if __PYX_NEED_TP_PRINT_SLOT == 1
-  0, /*tp_print*/
-  #endif
-  #if PY_VERSION_HEX >= 0x030C0000
-  0, /*tp_watched*/
-  #endif
-  #if PY_VERSION_HEX >= 0x030d00A4
-  0, /*tp_versions_used*/
-  #endif
-  #if CYTHON_COMPILING_IN_PYPY && PY_VERSION_HEX >= 0x03090000 && PY_VERSION_HEX < 0x030a0000
-  0, /*tp_pypy_flags*/
-  #endif
-};
-#endif
-
-static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_9_send_request(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
-  PyObject *o;
-  #if CYTHON_USE_FREELISTS
-  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_9_send_request > 0) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(t, __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request))))
-  {
-    o = (PyObject*)__pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_9_send_request[--__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_9_send_request];
-    #if CYTHON_USE_TYPE_SPECS
-    Py_DECREF(Py_TYPE(o));
-    #endif
-    memset(o, 0, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request));
-    #if CYTHON_COMPILING_IN_LIMITED_API
-    (void) PyObject_Init(o, t);
-    #else
-    (void) PyObject_INIT(o, t);
-    #endif
-    PyObject_GC_Track(o);
-  } else
-  #endif
-  {
-    o = __Pyx_AllocateExtensionType(t, 1);
-    if (unlikely(!o)) return 0;
-  }
-  return o;
-}
-
-static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_9_send_request(PyObject *o) {
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request *)o;
-  #if CYTHON_USE_TP_FINALIZE
-  if (unlikely(__Pyx_PyObject_GetSlot(o, tp_finalize, destructor)) && !__Pyx_PyObject_GC_IsFinalized(o)) {
-    if (__Pyx_PyObject_GetSlot(o, tp_dealloc, destructor) == __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_9_send_request) {
+    if (__Pyx_PyObject_GetSlot(o, tp_dealloc, destructor) == __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_8_send_request) {
       if (PyObject_CallFinalizerFromDealloc(o)) return;
     }
   }
@@ -17743,9 +17105,9 @@ static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_9_s
   Py_CLEAR(p->__pyx_v_serialize_msg);
   Py_CLEAR(p->__pyx_v_writer);
   #if CYTHON_USE_FREELISTS
-  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_9_send_request < 8) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(Py_TYPE(o), __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request))))
+  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_8_send_request < 8) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(Py_TYPE(o), __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request))))
   {
-    __pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_9_send_request[__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_9_send_request++] = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request *)o);
+    __pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_8_send_request[__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_8_send_request++] = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request *)o);
   } else
   #endif
   {
@@ -17764,9 +17126,9 @@ static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_9_s
   }
 }
 
-static int __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_9_send_request(PyObject *o, visitproc v, void *a) {
+static int __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_8_send_request(PyObject *o, visitproc v, void *a) {
   int e;
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request *)o;
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request *)o;
   {
     e = __Pyx_call_type_traverse(o, 1, v, a);
     if (e) return e;
@@ -17789,27 +17151,27 @@ static int __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_9_s
   return 0;
 }
 #if CYTHON_USE_TYPE_SPECS
-static PyType_Slot __pyx_type_4core_6client_12async_client___pyx_scope_struct_9_send_request_slots[] = {
-  {Py_tp_dealloc, (void *)__pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_9_send_request},
-  {Py_tp_traverse, (void *)__pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_9_send_request},
-  {Py_tp_new, (void *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_9_send_request},
+static PyType_Slot __pyx_type_4core_6client_12async_client___pyx_scope_struct_8_send_request_slots[] = {
+  {Py_tp_dealloc, (void *)__pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_8_send_request},
+  {Py_tp_traverse, (void *)__pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_8_send_request},
+  {Py_tp_new, (void *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_8_send_request},
   {0, 0},
 };
-static PyType_Spec __pyx_type_4core_6client_12async_client___pyx_scope_struct_9_send_request_spec = {
-  "core.client.async_client.__pyx_scope_struct_9_send_request",
-  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request),
+static PyType_Spec __pyx_type_4core_6client_12async_client___pyx_scope_struct_8_send_request_spec = {
+  "core.client.async_client.__pyx_scope_struct_8_send_request",
+  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request),
   0,
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC,
-  __pyx_type_4core_6client_12async_client___pyx_scope_struct_9_send_request_slots,
+  __pyx_type_4core_6client_12async_client___pyx_scope_struct_8_send_request_slots,
 };
 #else
 
-static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_9_send_request = {
+static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_8_send_request = {
   PyVarObject_HEAD_INIT(0, 0)
-  "core.client.async_client.""__pyx_scope_struct_9_send_request", /*tp_name*/
-  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9_send_request), /*tp_basicsize*/
+  "core.client.async_client.""__pyx_scope_struct_8_send_request", /*tp_name*/
+  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_8_send_request), /*tp_basicsize*/
   0, /*tp_itemsize*/
-  __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_9_send_request, /*tp_dealloc*/
+  __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_8_send_request, /*tp_dealloc*/
   0, /*tp_vectorcall_offset*/
   0, /*tp_getattr*/
   0, /*tp_setattr*/
@@ -17826,7 +17188,7 @@ static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_9
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
   0, /*tp_doc*/
-  __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_9_send_request, /*tp_traverse*/
+  __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_8_send_request, /*tp_traverse*/
   0, /*tp_clear*/
   0, /*tp_richcompare*/
   0, /*tp_weaklistoffset*/
@@ -17844,7 +17206,7 @@ static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_9
   #endif
   0, /*tp_init*/
   0, /*tp_alloc*/
-  __pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_9_send_request, /*tp_new*/
+  __pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_8_send_request, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -17877,16 +17239,16 @@ static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_9
 };
 #endif
 
-static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_10__get_connection(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_9__get_connection(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
   PyObject *o;
   #if CYTHON_USE_FREELISTS
-  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_10__get_connection > 0) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(t, __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection))))
+  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_9__get_connection > 0) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(t, __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection))))
   {
-    o = (PyObject*)__pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_10__get_connection[--__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_10__get_connection];
+    o = (PyObject*)__pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_9__get_connection[--__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_9__get_connection];
     #if CYTHON_USE_TYPE_SPECS
     Py_DECREF(Py_TYPE(o));
     #endif
-    memset(o, 0, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection));
+    memset(o, 0, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection));
     #if CYTHON_COMPILING_IN_LIMITED_API
     (void) PyObject_Init(o, t);
     #else
@@ -17902,11 +17264,11 @@ static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_10
   return o;
 }
 
-static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_10__get_connection(PyObject *o) {
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection *)o;
+static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_9__get_connection(PyObject *o) {
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection *)o;
   #if CYTHON_USE_TP_FINALIZE
   if (unlikely(__Pyx_PyObject_GetSlot(o, tp_finalize, destructor)) && !__Pyx_PyObject_GC_IsFinalized(o)) {
-    if (__Pyx_PyObject_GetSlot(o, tp_dealloc, destructor) == __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_10__get_connection) {
+    if (__Pyx_PyObject_GetSlot(o, tp_dealloc, destructor) == __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_9__get_connection) {
       if (PyObject_CallFinalizerFromDealloc(o)) return;
     }
   }
@@ -17919,9 +17281,9 @@ static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_10_
   Py_CLEAR(p->__pyx_v_socket);
   Py_CLEAR(p->__pyx_v_writer);
   #if CYTHON_USE_FREELISTS
-  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_10__get_connection < 8) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(Py_TYPE(o), __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection))))
+  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_9__get_connection < 8) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(Py_TYPE(o), __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection))))
   {
-    __pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_10__get_connection[__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_10__get_connection++] = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection *)o);
+    __pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_9__get_connection[__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_9__get_connection++] = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection *)o);
   } else
   #endif
   {
@@ -17940,9 +17302,9 @@ static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_10_
   }
 }
 
-static int __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_10__get_connection(PyObject *o, visitproc v, void *a) {
+static int __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_9__get_connection(PyObject *o, visitproc v, void *a) {
   int e;
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection *)o;
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection *)o;
   {
     e = __Pyx_call_type_traverse(o, 1, v, a);
     if (e) return e;
@@ -17965,27 +17327,27 @@ static int __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_10_
   return 0;
 }
 #if CYTHON_USE_TYPE_SPECS
-static PyType_Slot __pyx_type_4core_6client_12async_client___pyx_scope_struct_10__get_connection_slots[] = {
-  {Py_tp_dealloc, (void *)__pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_10__get_connection},
-  {Py_tp_traverse, (void *)__pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_10__get_connection},
-  {Py_tp_new, (void *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_10__get_connection},
+static PyType_Slot __pyx_type_4core_6client_12async_client___pyx_scope_struct_9__get_connection_slots[] = {
+  {Py_tp_dealloc, (void *)__pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_9__get_connection},
+  {Py_tp_traverse, (void *)__pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_9__get_connection},
+  {Py_tp_new, (void *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_9__get_connection},
   {0, 0},
 };
-static PyType_Spec __pyx_type_4core_6client_12async_client___pyx_scope_struct_10__get_connection_spec = {
-  "core.client.async_client.__pyx_scope_struct_10__get_connection",
-  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection),
+static PyType_Spec __pyx_type_4core_6client_12async_client___pyx_scope_struct_9__get_connection_spec = {
+  "core.client.async_client.__pyx_scope_struct_9__get_connection",
+  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection),
   0,
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC,
-  __pyx_type_4core_6client_12async_client___pyx_scope_struct_10__get_connection_slots,
+  __pyx_type_4core_6client_12async_client___pyx_scope_struct_9__get_connection_slots,
 };
 #else
 
-static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_10__get_connection = {
+static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_9__get_connection = {
   PyVarObject_HEAD_INIT(0, 0)
-  "core.client.async_client.""__pyx_scope_struct_10__get_connection", /*tp_name*/
-  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__get_connection), /*tp_basicsize*/
+  "core.client.async_client.""__pyx_scope_struct_9__get_connection", /*tp_name*/
+  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_9__get_connection), /*tp_basicsize*/
   0, /*tp_itemsize*/
-  __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_10__get_connection, /*tp_dealloc*/
+  __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_9__get_connection, /*tp_dealloc*/
   0, /*tp_vectorcall_offset*/
   0, /*tp_getattr*/
   0, /*tp_setattr*/
@@ -18002,7 +17364,7 @@ static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_1
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
   0, /*tp_doc*/
-  __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_10__get_connection, /*tp_traverse*/
+  __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_9__get_connection, /*tp_traverse*/
   0, /*tp_clear*/
   0, /*tp_richcompare*/
   0, /*tp_weaklistoffset*/
@@ -18020,7 +17382,7 @@ static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_1
   #endif
   0, /*tp_init*/
   0, /*tp_alloc*/
-  __pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_10__get_connection, /*tp_new*/
+  __pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_9__get_connection, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -18053,16 +17415,16 @@ static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_1
 };
 #endif
 
-static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
   PyObject *o;
   #if CYTHON_USE_FREELISTS
-  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown > 0) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(t, __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown))))
+  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown > 0) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(t, __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown))))
   {
-    o = (PyObject*)__pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown[--__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown];
+    o = (PyObject*)__pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown[--__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown];
     #if CYTHON_USE_TYPE_SPECS
     Py_DECREF(Py_TYPE(o));
     #endif
-    memset(o, 0, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown));
+    memset(o, 0, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown));
     #if CYTHON_COMPILING_IN_LIMITED_API
     (void) PyObject_Init(o, t);
     #else
@@ -18078,11 +17440,11 @@ static PyObject *__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_11
   return o;
 }
 
-static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown(PyObject *o) {
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown *)o;
+static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown(PyObject *o) {
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown *)o;
   #if CYTHON_USE_TP_FINALIZE
   if (unlikely(__Pyx_PyObject_GetSlot(o, tp_finalize, destructor)) && !__Pyx_PyObject_GC_IsFinalized(o)) {
-    if (__Pyx_PyObject_GetSlot(o, tp_dealloc, destructor) == __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown) {
+    if (__Pyx_PyObject_GetSlot(o, tp_dealloc, destructor) == __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown) {
       if (PyObject_CallFinalizerFromDealloc(o)) return;
     }
   }
@@ -18097,9 +17459,9 @@ static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_11_
   Py_CLEAR(p->__pyx_t_3);
   Py_CLEAR(p->__pyx_t_4);
   #if CYTHON_USE_FREELISTS
-  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown < 8) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(Py_TYPE(o), __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown))))
+  if (likely((int)(__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown < 8) & __PYX_CHECK_FINAL_TYPE_FOR_FREELISTS(Py_TYPE(o), __pyx_mstate_global->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown, sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown))))
   {
-    __pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown[__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown++] = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown *)o);
+    __pyx_mstate_global->__pyx_freelist_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown[__pyx_mstate_global->__pyx_freecount_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown++] = ((struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown *)o);
   } else
   #endif
   {
@@ -18118,9 +17480,9 @@ static void __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_11_
   }
 }
 
-static int __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown(PyObject *o, visitproc v, void *a) {
+static int __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown(PyObject *o, visitproc v, void *a) {
   int e;
-  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown *)o;
+  struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown *p = (struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown *)o;
   {
     e = __Pyx_call_type_traverse(o, 1, v, a);
     if (e) return e;
@@ -18152,27 +17514,27 @@ static int __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_11_
   return 0;
 }
 #if CYTHON_USE_TYPE_SPECS
-static PyType_Slot __pyx_type_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown_slots[] = {
-  {Py_tp_dealloc, (void *)__pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown},
-  {Py_tp_traverse, (void *)__pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown},
-  {Py_tp_new, (void *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown},
+static PyType_Slot __pyx_type_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown_slots[] = {
+  {Py_tp_dealloc, (void *)__pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown},
+  {Py_tp_traverse, (void *)__pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown},
+  {Py_tp_new, (void *)__pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown},
   {0, 0},
 };
-static PyType_Spec __pyx_type_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown_spec = {
-  "core.client.async_client.__pyx_scope_struct_11__async_shutdown",
-  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown),
+static PyType_Spec __pyx_type_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown_spec = {
+  "core.client.async_client.__pyx_scope_struct_10__async_shutdown",
+  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown),
   0,
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC,
-  __pyx_type_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown_slots,
+  __pyx_type_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown_slots,
 };
 #else
 
-static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown = {
+static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown = {
   PyVarObject_HEAD_INIT(0, 0)
-  "core.client.async_client.""__pyx_scope_struct_11__async_shutdown", /*tp_name*/
-  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown), /*tp_basicsize*/
+  "core.client.async_client.""__pyx_scope_struct_10__async_shutdown", /*tp_name*/
+  sizeof(struct __pyx_obj_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown), /*tp_basicsize*/
   0, /*tp_itemsize*/
-  __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown, /*tp_dealloc*/
+  __pyx_tp_dealloc_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown, /*tp_dealloc*/
   0, /*tp_vectorcall_offset*/
   0, /*tp_getattr*/
   0, /*tp_setattr*/
@@ -18189,7 +17551,7 @@ static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_1
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
   0, /*tp_doc*/
-  __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown, /*tp_traverse*/
+  __pyx_tp_traverse_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown, /*tp_traverse*/
   0, /*tp_clear*/
   0, /*tp_richcompare*/
   0, /*tp_weaklistoffset*/
@@ -18207,7 +17569,7 @@ static PyTypeObject __pyx_type_4core_6client_12async_client___pyx_scope_struct_1
   #endif
   0, /*tp_init*/
   0, /*tp_alloc*/
-  __pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown, /*tp_new*/
+  __pyx_tp_new_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown, /*tp_new*/
   0, /*tp_free*/
   0, /*tp_is_gc*/
   0, /*tp_bases*/
@@ -18680,79 +18042,60 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_4core_6client_12async_client___pyx_scope_struct_8__async_request_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request)) __PYX_ERR(0, 347, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_4core_6client_12async_client___pyx_scope_struct_8__async_request_spec, __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request) < (0)) __PYX_ERR(0, 347, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_4core_6client_12async_client___pyx_scope_struct_8_send_request_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request)) __PYX_ERR(0, 353, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_4core_6client_12async_client___pyx_scope_struct_8_send_request_spec, __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request) < (0)) __PYX_ERR(0, 353, __pyx_L1_error)
   #else
-  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request = &__pyx_type_4core_6client_12async_client___pyx_scope_struct_8__async_request;
+  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request = &__pyx_type_4core_6client_12async_client___pyx_scope_struct_8_send_request;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request) < (0)) __PYX_ERR(0, 347, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request) < (0)) __PYX_ERR(0, 353, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
-  PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request);
+  PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request);
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request->tp_dictoffset && __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request->tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8__async_request->tp_getattro = PyObject_GenericGetAttr;
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request->tp_dictoffset && __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request->tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_8_send_request->tp_getattro = PyObject_GenericGetAttr;
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_4core_6client_12async_client___pyx_scope_struct_9_send_request_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request)) __PYX_ERR(0, 358, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_4core_6client_12async_client___pyx_scope_struct_9_send_request_spec, __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request) < (0)) __PYX_ERR(0, 358, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_4core_6client_12async_client___pyx_scope_struct_9__get_connection_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection)) __PYX_ERR(0, 362, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_4core_6client_12async_client___pyx_scope_struct_9__get_connection_spec, __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection) < (0)) __PYX_ERR(0, 362, __pyx_L1_error)
   #else
-  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request = &__pyx_type_4core_6client_12async_client___pyx_scope_struct_9_send_request;
+  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection = &__pyx_type_4core_6client_12async_client___pyx_scope_struct_9__get_connection;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request) < (0)) __PYX_ERR(0, 358, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection) < (0)) __PYX_ERR(0, 362, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
-  PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request);
+  PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection);
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request->tp_dictoffset && __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request->tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9_send_request->tp_getattro = PyObject_GenericGetAttr;
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection->tp_dictoffset && __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection->tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_9__get_connection->tp_getattro = PyObject_GenericGetAttr;
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__get_connection_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection)) __PYX_ERR(0, 367, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__get_connection_spec, __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection) < (0)) __PYX_ERR(0, 367, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown)) __PYX_ERR(0, 383, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown_spec, __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown) < (0)) __PYX_ERR(0, 383, __pyx_L1_error)
   #else
-  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection = &__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__get_connection;
+  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown = &__pyx_type_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection) < (0)) __PYX_ERR(0, 367, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown) < (0)) __PYX_ERR(0, 383, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
-  PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection);
+  PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown);
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection->tp_dictoffset && __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection->tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__get_connection->tp_getattro = PyObject_GenericGetAttr;
-  }
-  #endif
-  #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown)) __PYX_ERR(0, 388, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown_spec, __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown) < (0)) __PYX_ERR(0, 388, __pyx_L1_error)
-  #else
-  __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown = &__pyx_type_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown;
-  #endif
-  #if !CYTHON_COMPILING_IN_LIMITED_API
-  #endif
-  #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown) < (0)) __PYX_ERR(0, 388, __pyx_L1_error)
-  #endif
-  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
-  PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown);
-  #endif
-  #if !CYTHON_COMPILING_IN_LIMITED_API
-  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown->tp_dictoffset && __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown->tp_getattro == PyObject_GenericGetAttr)) {
-    __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_11__async_shutdown->tp_getattro = PyObject_GenericGetAttr;
+  if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown->tp_dictoffset && __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown->tp_getattro == PyObject_GenericGetAttr)) {
+    __pyx_mstate->__pyx_ptype_4core_6client_12async_client___pyx_scope_struct_10__async_shutdown->tp_getattro = PyObject_GenericGetAttr;
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
@@ -19446,7 +18789,7 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
  *     """
  *         Table / RecordBatch scale
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_1scale, 0, __pyx_mstate_global->__pyx_n_u_scale, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_1scale, 0, __pyx_mstate_global->__pyx_n_u_scale, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[12])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 50, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19461,7 +18804,7 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
  *         if not self._running:
  *             raise RuntimeError("client is not running")
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_11AsyncClient_3run, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncClient_run, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_11AsyncClient_3run, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncClient_run, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19506,7 +18849,7 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
  *         if not self._running:
  *             return
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_11AsyncClient_11close, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncClient_close, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[15])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_11AsyncClient_11close, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncClient_close, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19519,7 +18862,7 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
  *     cdef tuple state
  *     cdef object _dict
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_11AsyncClient_13__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncClient___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[16])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_11AsyncClient_13__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncClient___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[15])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19529,11 +18872,11 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, state)
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_AsyncClient__set_state(self, __pyx_state)
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_11AsyncClient_15__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncClient___setstate_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[17])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_11AsyncClient_15__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncClient___setstate_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[16])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19606,7 +18949,7 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
  *     cdef tuple state
  *     cdef object _dict
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_14AsyncZmqClient_15__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncZmqClient___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[18])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_14AsyncZmqClient_15__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncZmqClient___reduce_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[17])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19616,11 +18959,11 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, state)
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_AsyncZmqClient__set_state(self, __pyx_state)
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_14AsyncZmqClient_17__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncZmqClient___setstate_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[19])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_14AsyncZmqClient_17__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncZmqClient___setstate_cython, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[18])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19643,64 +18986,49 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
   if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient, __pyx_mstate_global->__pyx_n_u_listen_loop, __pyx_t_2) < (0)) __PYX_ERR(0, 304, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/client/async_client.pyx":347
- *         return self._async_request(req_id, msg)
- * 
- *     async def _async_request(self, bytes req_id, dict msg):             # <<<<<<<<<<<<<<
- *         fut = self.loop.create_future()
- *         self._futures[req_id] = fut
-*/
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_6_async_request, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient__async_request, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 347, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
-  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
-  #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient, __pyx_mstate_global->__pyx_n_u_async_request, __pyx_t_2) < (0)) __PYX_ERR(0, 347, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-  /* "core/client/async_client.pyx":358
- *             raise TimeoutError("TCP request timeout")
+  /* "core/client/async_client.pyx":353
+ *         return fut # fut.result() / add_done_callback
  * 
  *     async def send_request(self, bytes req_id, dict message):             # <<<<<<<<<<<<<<
  *         connection_key = f"{self.host}:{self.port}"
  *         reader, writer = await self._get_connection(connection_key) # cache
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_9send_request, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient_send_request, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 358, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_6send_request, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient_send_request, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 353, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient, __pyx_mstate_global->__pyx_n_u_send_request, __pyx_t_2) < (0)) __PYX_ERR(0, 358, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient, __pyx_mstate_global->__pyx_n_u_send_request, __pyx_t_2) < (0)) __PYX_ERR(0, 353, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/client/async_client.pyx":367
+  /* "core/client/async_client.pyx":362
  *         await writer.drain()
  * 
  *     async def _get_connection(self, str connection_key):             # <<<<<<<<<<<<<<
  *         """
  * 
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_12_get_connection, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient__get_connectio, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 367, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_9_get_connection, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient__get_connectio, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient, __pyx_mstate_global->__pyx_n_u_get_connection, __pyx_t_2) < (0)) __PYX_ERR(0, 367, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient, __pyx_mstate_global->__pyx_n_u_get_connection, __pyx_t_2) < (0)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "core/client/async_client.pyx":388
+  /* "core/client/async_client.pyx":383
  *         return reader, writer
  * 
  *     async def _async_shutdown(self):             # <<<<<<<<<<<<<<
  *         await AsyncClient._async_shutdown()
  * 
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_15_async_shutdown, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient__async_shutdow, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[12])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 388, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_12_async_shutdown, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient__async_shutdow, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[11])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 383, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient, __pyx_mstate_global->__pyx_n_u_async_shutdown, __pyx_t_2) < (0)) __PYX_ERR(0, 388, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_4core_6client_12async_client_AsyncStreamClient, __pyx_mstate_global->__pyx_n_u_async_shutdown, __pyx_t_2) < (0)) __PYX_ERR(0, 383, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "(tree fragment)":1
@@ -19708,7 +19036,7 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
  *     cdef tuple state
  *     cdef object _dict
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_18__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient___reduce_cytho, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[20])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_15__reduce_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient___reduce_cytho, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[19])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19718,11 +19046,11 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
 
   /* "(tree fragment)":16
  *     else:
- *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0x4007570, state)
+ *         return __pyx_unpickle_AsyncStreamClient, (type(self), 0xfc8dc45, state)
  * def __setstate_cython__(self, __pyx_state):             # <<<<<<<<<<<<<<
  *     __pyx_unpickle_AsyncStreamClient__set_state(self, __pyx_state)
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_20__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient___setstate_cyt, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[21])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 16, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_17AsyncStreamClient_17__setstate_cython__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_AsyncStreamClient___setstate_cyt, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[20])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19735,9 +19063,9 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
  *     int __Pyx_UpdateUnpickledDict(object, object, Py_ssize_t) except -1
  * def __pyx_unpickle_AsyncClient(__pyx_type, long __pyx_checksum, tuple __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x0b48c14, 0xec81ee2, 0x50eccb3, b'_loop_thread, _req_fut, _req_subject, _running, loop')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xa7efb14, 0x5f5baf2, 0x8b51bab, b'_loop_thread, _req_futures, _req_subject, _running, loop')
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_3__pyx_unpickle_AsyncClient, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_AsyncClient, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[22])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 4, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_3__pyx_unpickle_AsyncClient, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_AsyncClient, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[21])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19750,7 +19078,7 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
  *     int __Pyx_CheckUnpickleChecksum(long, long, long, long, const char*) except -1
  *     int __Pyx_UpdateUnpickledDict(object, object, Py_ssize_t) except -1
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_5__pyx_unpickle_AsyncZmqClient, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_AsyncZmqClient, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[23])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 4, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_5__pyx_unpickle_AsyncZmqClient, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_AsyncZmqClient, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[22])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19763,9 +19091,9 @@ __Pyx_RefNannySetupContext("PyInit_async_client", 0);
  *     int __Pyx_UpdateUnpickledDict(object, object, Py_ssize_t) except -1
  * def __pyx_unpickle_AsyncStreamClient(__pyx_type, long __pyx_checksum, tuple __pyx_state):             # <<<<<<<<<<<<<<
  *     cdef object __pyx_result
- *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0x4007570, 0x403ca52, 0xb66a8ec, b'_connection_cache, _loop_thread, _req_fut, _req_subject, _running, host, listen_task, loop, port, timeout')
+ *     __Pyx_CheckUnpickleChecksum(__pyx_checksum, 0xfc8dc45, 0x1d0ee83, 0xc96a5a4, b'_connection_cache, _loop_thread, _req_futures, _req_subject, _running, host, listen_task, loop, port, timeout')
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_7__pyx_unpickle_AsyncStreamClient, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_AsyncStreamClient, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[24])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 4, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_12async_client_7__pyx_unpickle_AsyncStreamClient, 0, __pyx_mstate_global->__pyx_n_u_pyx_unpickle_AsyncStreamClient, NULL, __pyx_mstate_global->__pyx_n_u_core_client_async_client, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[23])); if (unlikely(!__pyx_t_2)) __PYX_ERR(1, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_2);
@@ -19882,9 +19210,9 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   /* "(tree fragment)":11
  *         use_setstate = True
  *     else:
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.loop is not None',)             # <<<<<<<<<<<<<<
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.loop is not None',)             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_AsyncClient, (type(self), 0x0b48c14, None), state
+ *         return __pyx_unpickle_AsyncClient, (type(self), 0xa7efb14, None), state
 */
   __pyx_mstate_global->__pyx_tuple[3] = PyTuple_Pack(1, __pyx_mstate_global->__pyx_kp_u_self__loop_thread_is_not_None_or); if (unlikely(!__pyx_mstate_global->__pyx_tuple[3])) __PYX_ERR(1, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[3]);
@@ -19904,9 +19232,9 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   /* "(tree fragment)":11
  *         use_setstate = True
  *     else:
- *         use_setstate = ('self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)             # <<<<<<<<<<<<<<
+ *         use_setstate = ('self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not None',)             # <<<<<<<<<<<<<<
  *     if use_setstate:
- *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0xff1ec68, None), state
+ *         return __pyx_unpickle_AsyncZmqClient, (type(self), 0x436daf5, None), state
 */
   __pyx_mstate_global->__pyx_tuple[5] = PyTuple_Pack(1, __pyx_mstate_global->__pyx_kp_u_self__loop_thread_is_not_None_or_2); if (unlikely(!__pyx_mstate_global->__pyx_tuple[5])) __PYX_ERR(1, 11, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[5]);
@@ -19937,34 +19265,34 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
 static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   {
-    const struct { const unsigned int length: 8; } index[] = {{20},{21},{12},{18},{4},{179},{16},{18},{20},{16},{29},{19},{24},{25},{17},{19},{11},{10},{30},{28},{1},{1},{1},{1},{8},{7},{17},{21},{28},{7},{6},{2},{9},{26},{211},{116},{228},{17},{9},{14},{6},{11},{29},{31},{27},{17},{15},{24},{16},{17},{35},{37},{32},{33},{33},{30},{30},{14},{32},{34},{30},{24},{27},{27},{46},{14},{7},{6},{5},{15},{8},{11},{6},{97},{20},{7},{11},{5},{6},{18},{12},{8},{17},{4},{6},{14},{15},{7},{18},{6},{9},{3},{5},{11},{9},{20},{6},{4},{11},{9},{17},{5},{9},{18},{5},{6},{12},{16},{7},{18},{7},{14},{24},{13},{11},{6},{4},{8},{5},{4},{5},{1},{5},{1},{6},{11},{10},{8},{3},{8},{15},{14},{12},{4},{4},{2},{5},{8},{9},{3},{8},{10},{13},{10},{5},{4},{4},{3},{4},{8},{9},{6},{12},{11},{3},{8},{3},{7},{10},{3},{7},{8},{4},{8},{5},{7},{7},{14},{4},{2},{12},{7},{4},{15},{11},{9},{3},{2},{2},{4},{7},{2},{4},{3},{4},{5},{5},{9},{7},{15},{14},{12},{11},{10},{26},{32},{29},{14},{12},{4},{5},{11},{9},{19},{29},{17},{8},{6},{11},{14},{10},{17},{13},{6},{11},{6},{5},{3},{24},{11},{5},{6},{4},{4},{14},{12},{13},{10},{9},{14},{21},{7},{12},{10},{10},{10},{12},{19},{5},{3},{4},{6},{5},{5},{4},{6},{5},{5},{6},{4},{8},{9},{5},{4},{7},{8},{8},{6},{6},{12},{15},{4},{5},{6},{5},{6},{6},{11},{8},{4},{5},{6},{2},{3},{11},{10},{9},{185},{11},{173},{38},{109},{163},{169},{2},{11},{57},{58},{55},{11},{3}};
-    #if (CYTHON_COMPRESS_STRINGS) == 2 /* compression: bz2 (2570 bytes) */
-const char* const cstring = "BZh91AY&SY9\331\250.\000\t\220\177\377\377\377\377\367\347\367\377\377\277\377\377\277\377\377\377\366\300t@@f\300dH@@@@G@@\000`\tK\215V\373swh[\273\2209\264\244M\263d\211\207\003a\242MDy\010hi\341&\230\215C\311?H!\264\2314\365\r\032z\215\241\251\246L\010\321\220\321\210\321\265<\2154j\0144\3224h\332\203$M\032\233\025\036)\264\321M\224\332\010h\320\000\000\r\000\000\320\000\000\000\000\000\000\000\001\006\231\030M\032a\006!\211\246\000\214\2151\014L\000\2310\000L\203F\000\000\214\230L\230\002a\0301\010\020\230\2024\247\223M5F\320\004\36504\023&F\010\300\004b0\000\004`#LLh\214\232\030!\006\231\030M\032a\006!\211\246\000\214\2151\014L\000\2310\000L\203F\000\000\214\230L\230\002a\030$\220D\312z0Jz22\232y&SaOjM\036\243'\250h\362@\0324\000\000\000\000\000\364\200\000\000*\220*\300\250\n\021\r\002\0067'\323\374\0254\027\000\024\211(S\203\225.\010\334\240\tX\371\031>\\\3567'\221\315\350C\231\321\204!\010B\017\204!?\344\201\372@B\"\0244\316+\331\0063l%WH\024\200-`\222\010 \222H\204\212(\361\313\235\277\311\3211\"\340r\305\347\021!p@]CC\320\207?o\334\014B&`3\306\214\306\"\365SJ7O| \332Nbo9\305%)\274\314\334O#\204\215\240S\026\017t5Q\300?\362\221_\027\345\376{\337\270\306\255)\264S0\302@\001\311\225\025\002\311\t<\305\223:\225m\024L\337I\271YG\252\222\200$\313\342Je\206J%\375\356 \212\220\004\360\244\3655@\002W\313+\365\336)}\235\\\365\326\225\235\303\014\264\300\200\321$\220\201\207\004s\214:\307\223%Cw)\323\302N }d:K\273\270\325\267]\233g\017\303\213\201\022@ B\371a\276x\343\342\207\007\234\301#\213\277\311\214\271\030\371O\206\346\340\331\300u\343\227\231\304/\302\270pTT.\242H\331\034\035\321\345\2761nB\361\225Q{85,\t\263x\230\377l\000\301\305\324\271S^\206\3625\3632x\343|\310\362\030\314\033\375\317\275\301x\315\210\346P\334\227\346\210\341\240l\335\210B:i@\215\375\243\366\035WK\373\020:NP\347`\314\311\223$\223\024\311\231\220\204!\351W\233\315\335\274\n\361<\244/]\215\213E\333o\031L-\333\254\010\205\000-\270\241D\211F\364\241\204\371\253d^\277b\016;U\220\026Yau9)o*\022""\242\000\261\276\205\226\003\021.]\032\240\020\273\260i\312\266v\244\255j#\314*g\243.\356\275\333\313X\225\014Zb\261\2642\243\226\354X\254\036\326a\327Wvan\252\r\\\313\211\264h\200S\257\345\265\205f\316j\002\311\303*\363UU\"\300Z\326\314\226B\215l\211$\273\224\255n+\031m\022\344\02088%\270\335\242\236\234o\303\217c\004\251\252\274\276I\032Fm\321\357\260H$\027kt\216\201\221\221fqlU\004s\247\"\323\032\315GY\316\271\366MW\004\365I\303v\001+\335=\016\030\245\302k\021\020i\017M/(EXc\024\275Z\351\214\roSW&\017@\003\314^\314\260P\246\243\257*\036\265\020\037\222\224\347\234\250\273{'\024sW,\302B\210/\243\007\2111O\206\301\230\221\006\305#,\220K;g0pf\230\035t\360\322\002\024S\300\246z4\3226Hsx>^><\204\366t\rv\224\321\207\352\034ZF`g\270\300\313\305\203\243\000\210\3057\351\rI\260\252tr\016\035\321q\364c(A\214\233E\014\317w\333/7\024oXl\314\246\264K\177{\210\033\034AH\324\001Q\200\375\237\207%(6\247\\&\205V\257\tXz\205\014 \272\206\352\300\221%\274+\361lRPJt\350\261_\004\\\277\017a\275p\n8'\321\322\252\346\202\35488P\000\213\342\273[\204W8\320\016\210\260\306\227J\327v\n\207\1779\212\245b\231\\\323nm\216\341\336\223,37\317k\263Go\014\013\326N\370Z\351`=\347\031\210\307b\377\014HI\201\246F\001\230d\030\020\312\206\036J\006\371\202H2\221H\017g\215\304\353\"\314\022\rM}f\005\327\347\021\255QL4<\272\215\023\2512\302\002\243\252\260M\000\354A\227I\312_L\300\002\334\315\346\310t\357-\3569 %1\017pq\255\205'\t$\222L\256\263=\201\034\324I\267\231\265\305\265\2671gu\3714} h 3\035\255\256TX\353f\254\301\270M\341g\241\353\030\325P\202&\326\026\335f\266\307\001#L\021-\021\2700@\201z\0040@\242\205\355\266\372\356\201]\026$\322\270\322\361\253e\204\361\023\330\371\357\033\351!J \355\206\030b\356Y\241\216<\262\035 \240\255\373%\230E#mL\306\264Kb)\010F\213Mi\271+\304\262^\232$E,c\306\031\002\353c\036`\010\245iU)}C\034\226\036,\266A-\206\023Kk\021\033^\272`\024\320\210\026\305\244b\0139\354\372W`\305\3246\224\356A{M\313\2320l\227\002L\366TZ\330\327u\214|\tmm*\034hD\201 G\026Vyd\300s\026\365""\323\264B\021sb\303l\326\"\2649\276\340\261\0011\277;\245\255\010\216)\232\017\356(\023Qy16\225\321\234M+\202\227\033\307\335\200R[$\372g\336\362\221\231W\035\307\2502;ni\252\212p\215\365\232R\203\351\253]68\305\353\275\252C\236\216A\260$`,;$\201)$BE\004RCM\217>)c\335!f/\252\312\356\\Np\032m\265@]km\330\241Z9\204\342\300\246\272 \201\361\347\352\312^#\"S\003)\240\373\200\350\304\221\033GA\003\031d$\325\265\346M\t\357\032\027 \370(H\000\352\020P\031\200\374\314\300(L7\255\251\032\326\010%\004@\260F\325\254\004C[~\221\000\201\002\362\003`\342\023\233\306\224\340\007@L \032H\201AmQ\026\000\212V\204E\365\241$\010@\300B\3142\342\3527!\021\334r\265=\212k\010]\250\242\250;\025\030n\360_\214\025\003#j\221\200j\233\2253\243Nt\004FP\2569\031\231\017\031\331J\351\222\370\033# \240J\371%\336D\013P5\230+\276\242\240\000Q\014C=T\030\320\260J\273\300]H\275 \212\350\353\211<o.R\256\350,1\314\034\220\034\204\221W\332CH\325\302\367p\345q\204\035\354U\371\031IC\246\246\327\227\337\007\204\243H\3629+x\030%H\270\003u\356I\3317\272\214\353\237\007't\224!\265\035\300\254\234\322g\0000\300\314\016\274\372\310C\2163\354Q{\021\261V\253\304\006\216\345M\272C\260\034\262\260E\370\227\001\366\356P\005\260\311VK\326\240d\rT\251\233\215#)\025\250=\337\223`b\004\247R\343M,\257]\332(\207\r0\314\213!\305\312\214\262l\325\026\364\366\020C\343\265\206\335\324\035\342E\235\262W\007\021\032qs\\$\216\237T\311\221\t3\275o\224\302\224T\227\2011\247\260\252+\206\204\002\322F\366a\230\201\\\264\0072`\030!\210\371\263\016\252y\340\267\027\004\010\264&\002R\324\005\227\300\010\343\014\2177,N \342\234\343\203s\010&\362\r\304\200\265\357\036!\312\334j\310N\217%\004\202\311$'G\014\324N\030f8\034\353\323WR\260\027\242\326i\000\202q\0355eC\230\010\201\242!\360\374\367C\336\r\036\340\350\026N\365\021\027\213\0009\352\356\303\214&\310-\302\220\" 0\033\352\323\3020\374(\2420!\350Qe\216\210\204I\014\035bj\354H=\342w2\264n\322\020\024\2447\212\241\261D/@\013@\3403\221\326\202c\034P1t;\214\032\373\325\"\3062\211\351Xr""\312\306\202\215\300cE\244\013\353\223\320j\036\254L\354\322\273Qa\3231L\242\233hY\210AH\321UC\225\206G\313\250\266\223\302\226x`\256\246\335\014t\222\230\006\246\270%\310(\215\350\\\306Ak\0140\014\3259,\371\364\266\333SwF\352.\026(\361\220#Z\342|e\223T9\217\002rt\030\225\374\270\211\361.=x\3769{\363\244\316j\340\204\247X\263L\021\353\372\006\301j\030#\003\340/\276%\214\202\313\032Q\301\231\364tsWp\226\265\375\270\226&\225\220=2\214&\353\n\204z\206\223\250PJ~\306\3106NT\375\232Cp\243\035\00037_\311.\303E\355\003\024\257&\332oe\256Y\\4\246\337/\235\365&4\031\030\024\324C\200k\350\316B;y'C\345A\253\207\341\201\367\315\212\3215h*\363v\277\337\272v\254\267\310\274o\032P*a\007,r\t\326e\177A\260\307\212\346\206\301\212bX\251\2669e\262\202]\2210bb\017\311\215w\303k\301\277v8\371\233.x\361pLmy\006\211H\322\376d\007^\261V\257\030\376\254=\322\310>\021\242\336X\212Y)\205\220\336\230,\034\374\376\273\233\242n*\323\341\347\275 \236Q\354\247kS\213\213\273\207\302\364e\337A\313\032\373\n\223\220\255.\374|J\332\006\300!iYSA\254\255\255\262.\311\027]\2755\251\332\021'\220pFo\247?\371\355\177\277\365\211\033\276\30540\177\342\356H\247\n\022\007;5\005\300";
-    PyObject *data = __Pyx_DecompressString(cstring, 2570, 2);
+    const struct { const unsigned int length: 8; } index[] = {{20},{21},{12},{18},{4},{179},{16},{18},{20},{16},{29},{19},{24},{25},{17},{11},{10},{30},{28},{1},{1},{1},{1},{8},{7},{17},{21},{28},{7},{6},{2},{9},{26},{215},{120},{232},{17},{9},{14},{6},{11},{29},{31},{27},{17},{15},{24},{16},{17},{35},{37},{33},{33},{30},{30},{14},{32},{34},{30},{24},{27},{27},{46},{14},{7},{6},{5},{15},{8},{11},{6},{97},{20},{7},{11},{5},{6},{18},{12},{8},{17},{4},{6},{15},{7},{18},{6},{9},{3},{5},{11},{9},{20},{6},{4},{11},{9},{17},{5},{9},{18},{5},{6},{12},{16},{7},{18},{7},{14},{24},{13},{11},{6},{4},{8},{5},{4},{5},{1},{5},{1},{6},{11},{10},{8},{3},{15},{14},{12},{4},{4},{2},{5},{8},{9},{3},{8},{10},{13},{10},{5},{4},{4},{3},{4},{8},{9},{6},{12},{11},{3},{8},{3},{7},{10},{3},{7},{8},{4},{8},{5},{7},{7},{14},{4},{2},{12},{7},{4},{15},{11},{9},{3},{2},{2},{4},{7},{2},{4},{3},{4},{5},{5},{9},{7},{15},{14},{12},{11},{10},{26},{32},{29},{14},{12},{4},{5},{11},{9},{19},{29},{17},{8},{6},{11},{14},{10},{17},{13},{6},{11},{6},{5},{3},{24},{11},{5},{6},{4},{4},{14},{12},{13},{10},{9},{14},{21},{7},{12},{10},{10},{10},{12},{19},{5},{3},{4},{6},{5},{5},{4},{6},{5},{5},{6},{4},{8},{9},{5},{4},{7},{8},{8},{6},{6},{12},{15},{4},{5},{6},{5},{6},{6},{11},{8},{4},{5},{6},{2},{3},{11},{10},{9},{185},{11},{173},{38},{109},{167},{169},{2},{11},{57},{58},{55},{11},{3}};
+    #if (CYTHON_COMPRESS_STRINGS) == 2 /* compression: bz2 (2557 bytes) */
+const char* const cstring = "BZh91AY&SY\226\360e\331\000\ts\177\377\377\377\377\367\347\377\377\377\277\377\377\273\377\377\377\366\300t@@f\300dH@@@@G@@\000`\tK\256>oz7w\226=\331\303\326\326\266\312V\330\231\265\241\340=\r\022!0\215\244\3232h\2314\311\251\351\204\321\032yM\246\220\036\246\230\230\236\246\324h\332\232\r\014\236\246M\017S\320\322m54dz\021\246\230\324\031)\246$\330U?D\315)\223z\240\364@h\365\001\240\000\000\000\000\006\201\240\000\000\000\000\014\2004L\231\nj\2365OP\0324\000\003@\003@\000\000\001\220\000\000\000\000\365\000\000\000\006!!\244\311\265\004\236\222~\212x\246\232\0322l\241\243OQ\352\006\200\000\000\000\000\000\0004\033S@\000\0104\310\302h\323\0101\014M0\004di\210b`\004\311\200\002d\0320\000\004d\302d\300\023\010\301(\"\001\032251\030)\244zi4\323L\203F\232=& b4\000\000\000\000\000h\000\000\001h\0212\014\300H\210R3#3\370\326\263\370+(-\360,\022hK\177\2156\004lP\006F^u\036/\033\231\211\320\347\342\365\243\213\327\214c\030\3061\204c\033\030\304\014t\004\"!CM\201j\364\026\032\202\325\332 W\000Na$\020A$\221\t\024Q\347\245\277\247b\372\204\213\201\320\007\030\205\211\302\001;KNh(\343c\203,\250K\000\221R\302\201\020\344\230\265\262]t\246!Y[\014\214\312\361\213#\023 kETJj\036\314\002Qa#*\202\\\211\035\337gw\025\3041{\350\357\335]\361\205\000\0062\272\202\212\024\360h\271\233\351y\241\273\363\251\265\022\271\223\222\304\312\351\233\224\005\243V\364\271\002\022 \003T\354n\000\013E\263K\224\017I\245\304\232\330\321V\263.l\206|\311\004f7\264\235\244\225s\371\232\251\346RSRG\2651Xo\356\275\276\3645\335\223<s\016P\201\025\005\020_\246\r\365\303V\2108\237c\n\251}\337\347\277\037\352\377\222\365c\306b\277:\361\211\235\301/\300\250\334\220\3102\310\215\231\256\016\305\304{\005\373K\303\305\300\243\006p\355\250\n0!\330\376@\001\335\214\004\022\227-e\220\211\010\311 \2018?H';&\177q\260\204\260\3524;\344\2410\010\0202\347xB8\262\201\032\272\203\266;6\313\352\000t{\003~\346ffd\222b\23132\020\2048&\347o\217\265\210\334-\231T\246<Sf\275{\211-\336\247y\271*l2\200\032VH\253\341\024\020\302^""\n\356\237\346\252\311\363\350\333\010\177\037:\005\260|.p\340P\001XW\355M\230\00400\233\267{l\326\351p\311\223'\301\263T3\351\207&\221\013\331Q\024pP\303\"0\354=tmoHLB\200\315E\342\023X\311\270\202\000\353\305R\321\206\004\356\252{x\024\323\236\200\244\324d\364\336\n\252\222[\344-\340\261\231\\\031\217\250_\261\226\243H\331@\2676h\343m\345\242\212u\350aV6\307\006t0\025\267\0073\n\242\250\274\252$h\031\321\024\333\007\241\244\021\273h\222\230\341+\271\033\266s'NU\264\253\263\276\000\255\332\333\230\"\226\223%URuG\255\"K1e^\301\316\214*)X6:\034\0028\001\030X\204\016\243ScP\227\345%\224D1\246qkqs\331\314\320:\024\220\241\001\020\346\017\335R,X\247\2738\240\221\006e# )f\022\007\0235\000\344\325v@\020\255UqL\365\264\212\251:\251\307\315\257Vz\3111t\315F\025hU\3124\3410\006\014l$\275+\272\020\010\212W\212\260\332\237*W\261\240a\272\014}\031\312\200\316O\260\202\253\267\333/_\270tb\23104\323\024l\327\277&\222\003,\312\r U\333|Y\250\014\270^\366\013\333\031o\2429\205\235FM\305\247\001#\032<\331a\371NA%\270\255\303\361\031p\245\342\214\001I\004\306\352K\006n\315\005#E\355\331\220 -\343<L/D\353[@\255,\305\267\244gK\363r\274\255\204\214\346G\003\244'\235\316\010l\264m\222]\265\371\255m\270\360\263@\277e\017\013ZX\016\3465#\035\314\\\330\220\222\345\235\013\205QP.AR\245\034\224\016At\220T\221$\007W\027\244\326ET$,jf\220(\246\221\031\225j\240\320\362\334\331\307\\\311\252\370\n\307S`\232\001\324A\227D7\365\271\034^\032\346\332\000\027\356k\266q\307yk\360\344\200\225B\036\320\343U\205uBI$\223+f\3170G%\002g\314\326q=\r\270\251n,\0329\240^@f:\315\242U\254y\231\254\250\033EO\n\227\275\221\216\305Y\004T\323\023\347\031\247\235\300H\327r%\2428\"\344@\030\220\021 @P\240t\231'MI\232\025\200-\232-p\261f\260dC,\252\212\213\232\260\332\356,!\356\273\035NY\241\216>!r\240\255\211\245@\212FyY\214\341\344\231 \263\031f\2317\324TQ-id\252\316r\344#y)\332\324r\360\202\027:\344\271q[\032\226\334\005\354\315\023\333X4\315X\206L\365S\001$\301\020)jF\010(\351.%\245\204\020!r\320\310\027\366\2319""\002\207RL\022ql\300Z\272\023\237\240x\022\332\271*b\230E\004\004l\3417\226\014\006\211\312\310\204\"m{\016\005J\361eg\007\316&@HoZ\325\320\210G,\353\007\347T\"\325}\024\237b\360\254O+\005lq\314BF\023e\030\250U1\226\352\214\250F\323P*/\244'\264Zh\n\204pJ_-j;\332\026)\226\364\326\004\207\211\215\344\210)$BE\004RC$\316\320\256g\265Bhg9\006K,,\300d]\332\202\362\333n\376\244\264e\021\213\002\2745@\007\216\366yK\344dD\235\025'\203\314\r\030\222!\272s\220\024\343j\224\226\3264f\242\262\231o=\345\202\250\016\260P\2403\001\306f\001Ba\301\26726Y\000\022\202&a\031\331d\004COL\260\200\201\002\244\006\274\344\025\322\222\305p\035BAA\242\250\022\223\333\010N\010K4\250a\215S\314\"\004TH\nP\306\235\273\235HpY-GR\274!\027Pb\2446\235\2757\362\265%\006\340\210\342`\020\001Qd\233K\0169\000H#\031%\260\252\2508\255\262a\256L@p\005@\250D\304I{\\\013T\232:\336\3336\000\030\205\241\257n\301b\025\211\325\020]hd\010\"\312:\244\256\307\205\024I\251\006A\032\001\301\001\245$V)\310d\031u\336\335l-0\203\274\312\305\201\225W4\360\314\343;\303\201(\2629\035\030\\\013\245D&\001x\314\032_O]\300\341\246\364\031\"\375\024\214z\2118AaI\225X\001E\005Pj\336\302\020\324+\332\221u#kf\307\000\353td\233Z\024\352\245\321\3206\2125U\237E\201\234\215\016\211R\204\2413P\270\034\302W\024[\007\237\0138b\004\252\260\270\311\\\326%\334\242\210p\325\006dY\r\235\250\246\rEZ\325\253*\317\005\000B\303C\r\034\004\035\342E\325\026 \342Q\227\0076_$ww\245\221\"M\207\251\363\230R\2226!0\253\333\222\305\2410@,\243\036\273\206PU=\200\345\320\002\3042\357\243\t\326\353\327\202\234\\\020\"\220\010\t\314\310\n\357\000\014`[.\317*\204\246(\243~\246\352\201\022\224B\204@[t\232\2614\260##\216 \221QI38\322\273\214(4\271\315\222\307\224\300\304\213M\240\004\023\210\343Y*\315\000D\013\342\036\355\273a\351\022W\240u\021\225\336b\020\244\234\014\263]\007*\221\224zLa\004\010\211yZ\274\030\373\222\312`C\320\242\212\335)\010\2150u4YZA\357\025\334\272\314v\030\002FT\276\326M\010\025\200\352R$f\251x)\270qy\330z\313\310V\246\221\034+:\262\370""\260H\353\0051\254\201bm\363V\247L(\255\256V\314\206\306S$\t\367D\326B\t\"\305\014\020\334\311#\313\262\233\250\341Z\270]\207\002\360\303j\262R\341k\303\004M%Q\277\t\263\220M\360\242\200\253\201\2218\234N&\234\331\370y/\2419jF\341\0206\346G\214\262k\0163\200\032\006\204\003\322un\270h\271_I~\260\211\262\317\302(\032\r\312hM:e\236`\217\337\2425KH\301\030\032\303\017\340Yh*#\317(\031\237GG%\307\001S\233\014d\212\204\344\037\250\243\212\224\307\021\036\221\246|E\000\2665u\301\274<}\215}\321\264W\347X\014\375\267\275\242\226\271j\001\230X5\035\356QT\263\2707juU\362X%\264\036\014K)!\2005iUB1\250\235mJ\313\302z\026\033\332\021W%\335\213\\\230\274\377\337\323\347\222,\253\177\222\232\007\014\340\305k#\351tS+H\013dF\255D\306P\341\2528\362\226A;Xf\211\363\307\357xk:\0379\365\345\016\016I\004\350\177\244\305\232b\255\001\346*\2639sCm1j\32731O)\2300\"\312n7hV\034\260|\013\217X,ZT\260\330\312)1c\355\301\244\344\223\346\032vI\177\315P\255\216\222\227n\n\370\222\355\272=\024{x#\336I 6 \312D\205\t\002\2346\327\2041\316\275\211u\020\250k\021F\020\0023\365_s\353\364Z\271\000\275\332\315\333\030\037\361w$S\205\t\to\006]\220";
+    PyObject *data = __Pyx_DecompressString(cstring, 2557, 2);
     if (unlikely(!data)) __PYX_ERR(0, 1, __pyx_L1_error)
     const char* const bytes = __Pyx_PyBytes_AsString(data);
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (likely(bytes)); else { Py_DECREF(data); __PYX_ERR(0, 1, __pyx_L1_error) }
     #endif
-    #elif (CYTHON_COMPRESS_STRINGS) != 0 /* compression: zlib (2357 bytes) */
-const char* const cstring = "x\332\305\027Mo\033\307\325di\233\251\225\330\212-\313\r\232x\005\270MS\330T\350*q*\2736X\231\266U\3132%\3212dG\231\014w\207\324J\313\235\345\316\254(\032)\252#[\364\260G\036\031 E\367\310\002=\010\310EG\035\367\310\243\016M\221\243\177B\337\233]QK\233\316!(Z\200\234y3\357\315\314\373~o\377\365\355\267\337\375\345\353\177\377\371\357\337\177\375\327\357\276\371\307\367\377\374\333\254V\020-[\237\263Lf\313k\305m\030\0278w\326\2659\213\013\323\256\345r9\265\251Y\260\2531\327\345\356\254\266\310m\266\310%\323\344\006\225\332\\Knp[3\205f0\313\2540\227Jf\2654!]S\227\314E\"[+\025K\327f>\233\321\250mh.\333d\272\024\232\360*\272E\205`B\343U\255\342\231\2264mM\266\034&r\332|UkqO\263\03134\3115\007\350\222\007\344\006\2635\301$\002\332\207\324\266\271\244\322\3446\201\343\300\366\207\232a\272\360\210\271\315\360\364=j\t\226+Q}\013Op\256Y\324\255\261\222\313u&PJ\255\030\t\266\256\255lx\322\340M[\323y\335\261\230d\271\301N,\374\363\362\\i]+X\026\220\3306\276\301m\241\351\240.f\344\000\247\315\r\266\325\255\021\375\003F]Ya\240.`\213\001[F\264\277`\n\311l\222\324n\204Xf\324\000\345U\271\253\341\245.kxL\000\363f\235qO\342V\014>{\264\244\336\321f\237\003\270>x\036\244\002\311\005s\267\341\032x7\302F\357\301\216zQH\340\n\330~>\233\273C\r\203\200\026\231\036\271B4i\246\001\243)[\332\354\321\206\320\200Js=\333\206't\356\262\351\0103M\321\221H\264\3109\255\035\303\024\264b1f\343X\323M\021A\206KLC\371\2010_0\264\274C[\026\247\2066+\230U\315\221c\265\022\235\352`\336\370I\364:\r\344\214\250\220\177\"7\\P\323h\002\320\030\251z\362\315H\360&\364\303\221\004\033\\\214FX\221\275$\025[\243\361\250\326\004\342\177\301\354\377\343M\360\026w$\002\254'\331\316\177Gy\003\204\340*r\207d\004\007\252{\2201\252.\2553mv\340\313\2670\361\3305\301=Wg\267\245\356\314NO'r\\\002\314\021\020\323\360tFt\225\302\010\031FBz\201K\345\033\320\221\273\2138;$Q*\027$7 X\222K\344\235\304\001\255\366\347\037\257\200\237\033\236\305\\\265^\221`\265z\202\337\344\306\033\270~\205d4\357\303D\221\004IFF\341\207$\034&\2501""\231\210\326\021\004\326qv{\035\373\232\032\236\325\033\t\231\007\2537\010\234\304\217\2266A1B\224\004\326\264MI^\324\033\257\356\277\312\3761\352\315\274\347\232.u\210\343r\311un\345nY\\\207\342s\033\000Z\257\030\364\366\034\265ufA\032TI{.\212\226\273\305\302Bq\271X..?\032\224\340\022\267L\2755\177\267\270X\236/\257\315\227J\313\217\313\217\t$\376\205\371\305\373\305eBJ\255\0352w\317\003\271\256\3537*\2775\010\231\301tL>\215R0\311_Ofd\222\317'|\220ls\223\020&u\"9qZdF\205\331\200Y%\203z\240\324\272\013U\234,\002\223\313\254\272\022e\004`\202,>\276[\\(\254\2251\245\227U\226\211\306\022\347Vq\207\351\236\344n9\252PJ\322\2432\205e\306\200\000\206\334nY\025\250\310\230Ih\235{\300\324\220C\276b3\2652y<A\232q\341f\023\022\001\225\204\361*!\264I\301\212\244b\326*\334\366\204\032\3404uY\245%\031w\241\232\342\223Dp\354\022\024\257\202V\231\256\354\241S!\365*\3502\027\351\203\250>\203\220#\000<\335\224\254\216K(\344\261FM\003\000\220\304\204\373\\\2523\224F\305>\030\336\253\333\321HlHO\342\250\233 \000\013Zc\270\366\240\326r[\367\\\027\335\0062\261\347\"\241\n\247D\r\334b-4k..\254I\233\352 \004\334\031\035\215\027\230\\\r\312\352\3346\250\244\204\030h\276hB\265\203\256\201e\3504l^U\231ST]^'\324ui+\002Q[ 9*\003G\031_/^\211v\\\201S\270\024\304\257r\202\330(\004\311\206Y\333\300\372i\032\246m\260\035\022\205\027\031D\231\351@/@\250\005M\020\314z\324g\022\004\217l\np\334_\240\322\305&7\355M\301m\320\004\374\304Q$Y\020\232\212Y0B\215\271\311hM\024\032\2137\t\251\203\3208:\261\372\001\346\230na\0265\370\021\270K\025\023\307j\241\275\0109\036\205m\230\300\007\250\304f\315h`\030\243\352!\033T\300\253\330\251\304\006\006\035\023\265\3510\033\377\t\215\251\245P\031\020@\350\222\271+\270#\270p\250\003\236\023wA\216\356\230\016s\270\343pW:\320B3\030l\t>Y\361\252U\346:-\260\025o\306S.v$\002N\273C\240\210\350[\302\253G+\260\031\210\024\301\261i\020\304\376:\202<\3331\365-\320B21\214\300$\263\366(\374 \367E\310m\2119\001c\247\341Q+R$\366|.6\350.m\222XR\270T5\350;\003 7\320\313\361\2268\252""\2149\245uTz\002\031\345#\214ep(\313U=\263\032w\200\304jATl\223\310\260\320\034\014\352\010y\255\242\0146\320_\261\367\001v\217;\240H\223\340\234\266\001~\t\277cWMd\022\334\207v\035\330t\005d\032\206\234\327)&V\254\026\252b\014XI\326\017h\321M\210\206\027\014\235Q\250 \303\304\201\220\301*\236\332:\366\270\341\025qT\225\300\315\215f]\025\302\330u\021\212\370\006\310`U\032A\330IqG&J&\031Q>U\332\024\246\201\324Q\357\245\272+E$\300\267\343\026\313\003s)cK\374\234\222\360\261\007, \005\211\325\002D\000\360&~\252\304\237+\220_U\320B\346\260\205R\032:\277\347@\266b\236`\003^@\273\226\310\rt\343y\246\201\377\031o\033\345\336\246\226\307\324 \266Q[L%\377\350#L\201`\010,bM\0272\210\032\334\027\014r\017\374rq\t\351\276\027\314\004\177\332\243{\215\335\302a\366\255\366x{j7\3652{\342\344\317:\231N\241\263\324\317\\\352\244\372\231\017:\264\377\3233\355O\374\223~\2713\331Mu/\005\227z\223{\251\341\315\367\202\331\036\331_\010Kk\341Z%\254\350\207\231\237w\212\335\311 \365\362\324\211\223\331\335\355\366\212\177\312\257u\226\0163\331v\326O\365\263\347\375O:\247;\215.\200x\317O\374|\177l\302_\357Nu\001\230\364\335\316E@\246\273\037\005\371\340\017=sog\277q\230=\333n\372\324o\340\225c\355\353\355U\377\026\320\274\025\\\014\032\273\300\350\325\240\020\254\366\362\273\005\274q\246-\361\306\267\017\263c\355\005\020#\373v{\251\255\373\343\376\025\177\263\233:T\024\333\376S\340\361B\267\034L\004[{\343@\335?w\321\257\205\357\177\332\243=\031\336|x0s \303\225r\377\334y\377Fg\252\363\031\262v\336\377\035\360|n\302_\n/\376*H\005\343\207c\347\374\223\341\304\257\203)P\247\327+\034\216\235\205\267o\253{\337\007\316\033\375s\027\374G\335\211.\355\356\004 \304\020#C\314\276\353_\355\320\016\220L\200R?\3506\202l\017\030?\333nDfy\247]\366/w3\335\207\201\354\335\331\277\262\277\025.=\t\237\254\3663c\355\373~\336\277\327\271\332\245\375\314i\320\365S\277\330\271\000\006\314\276\353O\365\263\223>\\\251Lyz\267\001\367\205g\257\006w{)\260\341\231\375\033\007S\207\303;\371\037z\354\363\360\363/\303/7""\303M;\264\277zy\342\304\037S\2054L\205\364\003\234\036\244\027pZH?\301\351Iz\r\247\265\364\263\364\217`q\032\336\315\367\356\357\335\334\257\035,\035\016\357\320\001\213\341\370/@\313\227\3672{\017\367\345\301\235\360\331\027\341\027fh\326\303\272\014\345\016\274\336J\335G&\356\247\037\342\3640\275\214\323rz\025\247\325\364:N\353i\212\023MW~\014\237\327{W\300Y\232{[\007\223a)b\364xKET?\363Q0\036\374\262\227\332M\035f.w\032\241\366q\357\014H\001\032]\356g\316\203\247\\\002\374\024^\371\025\272Y?\373q/\025\346\177\277\237\203\013\373\2313\355\374\350\203\341\371+\335\007\340\362K\211\223\277\351\345\303\231\007\007\357\204\253O\177\340\244\177\263\263\001\336\330H\034\274\026,\005\366\336\342\301T|\254\237\231\016\032\275S=\n\235\345\177\000\363\335\207@";
-    PyObject *data = __Pyx_DecompressString(cstring, 2357, 1);
+    #elif (CYTHON_COMPRESS_STRINGS) != 0 /* compression: zlib (2335 bytes) */
+const char* const cstring = "x\332\305\027Mo\033\307\325di\233\251\225\330\212-\313\r\232x\005\270M\323\332T\350*q*\273.T\231\266U\313\022%\2616dC\231\014w\207\324Z\313\235\345\314\254H\032)\254#[\364\260G\036\031 E\367\310\002=\010\310EG\035\367\310\243\016M\221\243\177B\337\233\245\250\225M\347\020\024-@\316\274\231\367f\346}\277\267\377\372\346\233o\377\362\325\277\377\374\367\357\276\372\353\267_\377\343\273\177\376m\326\230\223-\327\234wl\346\252k\205m\030\0279\3676\214y\207K\333\255\346r9\275i8\260k0!\270\2305\226\270\313\226\270b\206\332\244\312\230o\251M\356\032\2664,\346\330e&\250bN\313\220J\330\246b\002\211\\\243X(^\233\371l\306\240\256e\010\366\214\231J\032\322/\233\016\225\222I\203W\214\262o;\312v\r\325\362\230\314\031\013\025\243\305}\303e\3142\0247<\240K\036P\233\3145$S\010\030\037R\327\345\212*\233\273\004\216\003\333\037\032\226-\340\021{\233\341\351\273\324\221,W\244\346\026\236\340\334p\250\250\262\242\340&\223(\245Q\210\005\3330\3266}e\361\206k\230\274\3469L\261\334pg \374\323\322|q\303\230s\034 q]|\203\273\3220A]\314\312\001\316\230\037n\353[c\372\373\214\nUf\240.`\213\001[V\274\277hK\305\\\222\324n\214Xe\324\002\345U\2700\360Re\327\030\367\325\223\207+\372Rc\366)\200\033\303\267@\004\020S2\261\rg\340\221\030\033_\016;\372z\251\200\005\340\361\351l\356w\324\262\010\250\214\231\261\335\343\311\260-\030m\3252f\0177\244\001T\206\360]\027\2360\271`\3231f\232\242\327\220x\221\363ZM\313\226\264\3540\346\342X5m\031C\226 \266\245\215.\355\347\014\315\354\321\226\303\251e\314J\346Tr\344H\207\304\244&\330r\360$\272\230\001r\306T\310?Q\233\002t2\232@\260:\251\370\312\027\340\032o$\000\367A\307\033I\260\311\345h\204\023\033HQ\2715\032\217\252M \376W\014\377\277\336\005\317\021#\021`I\305\232\377\035%\016\021\222\353\220=&'8S\315\207TQ\021\264\306\214\331\241_\337\302\214\343V%\367\205\311n+\323\233\235\236N$\267\004\230# \246\345\233\214\230:w\021r\034\ty\005.Uo@\307\256/\007i!\211\322I \271\001\201\223\\\"\357\250`\237\311\230\235\205\3455\360y\313w\230\320\3535\005\226\253%\370Mn\274""\201\353WHF\363~\234h\204\004\307\t\252L%\"s\004\201s\224\266^\307\276&\346\223Z=!\323p\365\006\201\222\370\321\322$(F\210\222\300\332\256\255\310\363Z\375\325\375W\331?B\275\231\367\\CP\217x\202+nr'w\313\341&T\225\333\000\320Z\331\242\267\347\251k2\007R\236N\320\363q4\334)\314-\026V\013\245\302\352\303am-r\3076[\013w\nK\245\205\322\372B\261\270\272\\Z&\220\344\027\027\226\356\025V\t)\266\232d\376\256\017r]7o\224\177c\0212\203\251\227|\032\247[\222\277\236\314\276$\237O\370\030\331\3466!L\231Dq\342\265\310\214\016\243!\263Z\006\375@\261u\007\3123Y\002&WYe-\216x`\202,-\337),\316\255\2270}\227t&\211\307\"\347N\241\311L_qQ\212\253\221\226\364\260$aI\261 @!\217;N\031J-f\nZ\343>0u\334Jze\363\301\004\211C\300]6\2046U\204\361\n!\264A\301n\244lW\313\334\365\245\036\3404\025\254\334R\214\013(\214\370\010\221\034\013\276\346N\322\n3\265\005L*\225Y\001\355\345b\r\020\3352\020r\010\200o\333\212\325p\t5y\240C\333\002\000x\267\341>AM\206\374\353h\006S\37357\036\211\013\tG\0366\006\004`I\253\014\327>TR\356\232\276\020\350(\203\374:\010\240D\205\333b-4dnP6\223V4A\010\2703>:X`\272\264(\253q\327\242\212\022b\241\301\342\t\025\r\332\005\226\241ipyE\347BY\021\274F\250\020\264\025\203\250-\220\034\225\201\243z%\256q\005\346\027\024\304\256p\202\3308\330\310\246]\335\304\212h[\266k\261&\211\003\211\014\343\311\366\240\302\023\352@\037\003\263\031\267\212\004\301C[\002<\350\032P\331\362\031\267\335g\222\273\240\001\370\311\303\230q \0105\223\240\374*\023\311\270L\224\014\2077\010\251\201\2608z\003\265\003\3141q\302,\253\360#p\227.\013\236\323B;\021r4J\327\262\201\017P\205\313\032\361\3000\032\365C.\250\200W\260\377\030\030\026tK\364\246\307\\\374'4\246\227R\347:\000\241\321\345BrOr\351Q\017<f\320\333x\246g{\314\343\236\307\205\362\240\013f0\270\n|\261\354W*Lx-\260\021o\014\246\334\300\201\0108k\223@90\267\244_\213W\340E R\014\017L\203 \266\3101\344\273\236mn\201\026\222)`\004&\231\237G\341\207Y.Fn+\214~\214\231\272O\235X\221\330\311\t\354\261\005m\220\201\244p\251\356\261\233C 7\324\313""\321\226<\254q9\255uTz\002\031g\036\214ap(G\350\266W\217M qZ\020\r\333$6,\224\371a\305 \257\325\216\341\006\372+v1\300\356Q/\023k\022\234\323\265\300/\341w\344\252\211\014\202\373\320q\003\233BB\206a\310y\215b\n\305\272\240k\303\220\225d\245\200\306\333\206hx\316\320\031\245\0162L\030\010Y\254\354\353\255#\217;\276\"\236\256\007\270\271\331\250\351\2227p]\204b\276\001\262X\205\306\020\366D\334S\211\342HF\024J\235.\245m!u\334E\351>I\023I\360\355A\263\344\203\271\264\261\025~\021)\370^\003\026\220\202\014\324\002D\000\360\006~\200\014>B \257\352\240\205\314\341J\2554t~\337\203,\305|\311\206\274\200v\035\231\033\352\306\367m\013\3773\3766\312\275M\035\237\351An\243\266\230N\372\361w\224\006\301\020X\256\032\0022\210\036\304s\006\271\007~\271A\351\350\276\027\316\204/v\351n}g\356 \373V{\274=\265\223z\231=q\362'\235Lg\256\263\322\317\\\352\244\372\231\017:\264\377\3433\355O\202\223A\2513\331Mu/\205\227z\223\273\251\343\233\357\205\263=\262\267\030\025\327\243\365rT6\0172?\355\024\272\223a\352\345\251\023'\263;\333\355\265\340TP\355\254\034d\262\355l\220\352g\317\007\237tNw\352]\000\361\236\037\005\371\376\330D\260\321\235\352\0020\031\210\316E@\246\273\037\205\371\360\017={\267\271W?\310\236m7\002\032\324\361\312\261\366\365\366\243\340\026\320\274\025^\014\353;\300\350\325p.|\324\313\357\314\341\2153m\2057\276}\220\035k/\202\030\331\267\333+m3\030\017\256\004\317\272\251\003M\261\035<\006\036/tK\341D\270\265;\016\324\375s\027\203j\364\376\247=\332S\321\315\007\3733\373*Z+\365\317\235\017nt\246:\237!k\347\203\337\002\317\347&\202\225\350\342/\302T8~0v.8\031M\3742\234\002u\372\275\271\203\261\263\360\366m}\357\373\300y\275\177\356B\360\260;\321\245\335f\010B\034c\344\030\263\357\006W;\264\003$\023\240\324\017\272\3650\333\003\306\317\266\353\261Y\336i\227\202\313\335Lw\2717\323{\261g\355\377*\372#(\373I?3\326\276\027\344\203\273\235\253]\332\317\234\006]?\016\n\235\013`\300\354\273\301T?;\031\300\225\332\224\247w\352p_t\366jx\247\227\002\033\236\331\273\261?up|'\377}\217}""\021}aE\226\033\271\342\345\211\02325\227\206i.]\300\251\220^\304i1]\304\251\230^\307i=\275\201\323F\372\363\364\017`s:T\275|\357\336\356\315\275\352\376\312\301\361\035:d3\032\377\031h\372\362nfw\031\354\365\"\372\034\334\257\026\325\352Q\275\0315\277\204\327\377\224z\200L<H/\343\264\234~\204\323\243\364\023\234\236\244)N4\315pb\351\312\017\341\363z\357\n8Lcwk\1772*\306\214\036m\351\250\352g>\n\307\303\237\367R;\251\203\314\345N=2>\356\235\001)\266\242\225\325~\346<x\313%\300O\341\225_\242\253\365\263\037\367RQ\376\367{9\270\260\2379\323\316\217>\030\235\277\322\275\017n\277\2228\371\353^>\232\271\277\377N\364\350\361\367\234\014nv6\301#\353\211\203\327\302\225\320\335]\332\237\032\034\353g\246\303z\357T\217BW\371\037\014\214o\302";
+    PyObject *data = __Pyx_DecompressString(cstring, 2335, 1);
     if (unlikely(!data)) __PYX_ERR(0, 1, __pyx_L1_error)
     const char* const bytes = __Pyx_PyBytes_AsString(data);
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (likely(bytes)); else { Py_DECREF(data); __PYX_ERR(0, 1, __pyx_L1_error) }
     #endif
-    #else /* compression: none (4916 bytes) */
-const char* const bytes = "\344\273\273\345\212\241\346\211\247\350\241\214\345\244\261\350\264\245: AsyncClient-EventLoop] Closing...Event loop error: NoneNote that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.Packet too largeProcessing Error: ] Shutdown complete.Shutdown error: [TCP] All connections closed.TCP ConnectionError[TCP] Heartbeat received[TCP] Listen_loop error: [TCP] Reader for TCP request timeoutTCP timeoutZMQError :[ZMQ] Connecting to server at [ZMQ] Listener loop started.[:.?add_noteclient-client identity :client is not runningcore/client/async_client.pyxdisableenablegcisenabledr_id and size of payload :self._connection_cache is not None or self._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not Noneself._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.loop is not Noneself._loop_thread is not None or self._req_fut is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not Nonesend multiframe : started.<stringsource>tcp://AsyncClientAsyncClient.__reduce_cython__AsyncClient.__setstate_cython__AsyncClient._async_shutdownAsyncClient.closeAsyncClient.runAsyncClient.send_requestAsyncIOSchedulerAsyncStreamClientAsyncStreamClient.__reduce_cython__AsyncStreamClient.__setstate_cython__AsyncStreamClient._async_requestAsyncStreamClient._async_shutdownAsyncStreamClient._get_connectionAsyncStreamClient._listen_loopAsyncStreamClient.send_requestAsyncZmqClientAsyncZmqClient.__reduce_cython__AsyncZmqClient.__setstate_cython__AsyncZmqClient._async_shutdownAsyncZmqClient._init_zmqAsyncZmqClient._listen_loopAsyncZmqClient.send_requestAsyncZmqClient.wrap_protocol.<locals>.<lambda>CancelledErrorContextDE""ALERETERMEventLoopPolicyIDENTITYIPPROTO_TCPLINGER__Pyx_CFunc_2c7b9d__4core_6client_12async_client_11AsyncClient_voi__etc_to_py_4self.<locals>.wrap__Pyx_PyDict_NextRefSubjectTCP_NODELAYTableThreadThreadPoolExecutorTimeoutErrorZMQErroradd_done_callbackaddramount_async_request_async_shutdownasyncioasyncio.coroutinesat_eof__await__bigbonusbonus_sharebyteordercall_soon_threadsafecancelcastcfunc.to_py__class____class_getitem__clearclient_idcline_in_tracebackclosecolumncolumn_namescomplete_messagecomputeconcurrent.futuresconnectconnection_keycore.client.async_clientcreate_futurecreate_taskdaemondata__dict___dictdonedraineerrnofframesfrom_arraysfrom_bytes__func__fut_futures_get_connectionget_extra_info__getstate__highhostidindex__init___init_zmqipcis_aliveis_closing_is_coroutineis_runningitemsjoinjsonkeykeys<lambda>len_byteslinger_listen_looplisten_tasklow__main__mapmessage__module__msgmsg_lenmultiplyname__name__namesndigits__new__new_event_loopnextofon_completedon_nextopenopen_connectionopen_streamoperatorsopsospapackpayloadpcpipepopportpriceprintpy_bufferpyarrowpyarrow.compute__pyx_checksum__pyx_result__pyx_state__pyx_type__pyx_unpickle_AsyncClient__pyx_unpickle_AsyncStreamClient__pyx_unpickle_AsyncZmqClient__pyx_vtable____qualname__r_idratioraw_payloadreactivexreactivex.operatorsreactivex.scheduler.eventloopreactivex.subjectread_allreaderreadexactlyrecv_multipart__reduce____reduce_cython____reduce_ex__req_idreq_subjectresultroundrunrun_coroutine_threadsaferun_foreverscaleschemaselfsendsend_multipartsend_requestserialize_msgset_columnset_debugset_event_loopset_event_loop_policyset_hwm__set_name__set_resultsetdefaultsetsockopt__setstate____setstate_cython__sharesidsocksocketstartstatestopstringsupertabletargetterm__test__threadingthrowtimetimeoutto_bytestransferunpackupdateuse_setstateutils.serializeuuiduuid4uvloopvaluevaluesvolumewait_closedwait_forwrapwritewriterzezmqzmq.asyncio\240\032\2504\250\177\270a\270q\200A\340\010\t\210\021\210!\200\001\360\010\000\005\031\230""\004\230A\230Q\330\004\030\230\001\330\004\036\230a\330\n\013\2105\220\005\220T\230\027\240\001\240\030\250\030\260\027\270\001\330\n\013\2105\220\005\220T\230\027\240\001\240\032\250:\260_\300L\320PY\320Yb\320bc\340\004\034\230E\240\027\250\001\360\006\000\005\010\200v\210S\220\006\220g\230Q\340\004\010\210\010\220\001\330\010\023\2205\230\007\230q\240\001\330\010\013\2105\220\003\2201\330\014\025\220]\240!\2401\330\014\027\220r\230\026\230q\240\002\240)\2501\250J\260i\270x\300q\340\010\017\210w\220a\220q\360\006\000\005\014\2102\210V\220<\230q\240\t\250\026\250q\200\001\330\004,\250A\250V\2601\200A\330\010\013\2104\210t\2201\330\014\r\340\010\014\210L\230\001\330\010\r\210Q\210c\220\021\220$\220j\240\001\340\010\013\2104\210v\220W\230E\240\024\240T\250\025\250k\270\021\330\014\r\330\020\026\220g\320\0356\260a\260t\320;K\3104\310t\320ST\330\020\023\2207\230!\2308\2401\330\014\023\220=\240\001\330\020\025\220Q\320\026(\250\001\250\021\340\014\020\220\005\320\025*\250!\2504\250u\260A\340\014\017\210t\220>\240\024\240T\250\035\260i\270q\330\020\024\220M\240\025\240a\240x\250q\340\010\r\210Q\210c\220\021\220$\220j\240\001\200A\330\010\013\2104\210t\2201\330\014\022\220,\230a\230q\340\010\025\220T\230\036\240q\250\010\260\001\330\010\017\210q\200\001\360\010\000\005\016\210T\220\037\240\004\240K\250t\260?\300$\300k\320QU\320UV\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220E\230\024\230Q\330\010\022\220!\330\010\027\220q\340\010\030\230\001\330\004\007\200q\330\010\017\320\017,\250D\260\001\260\027\270\013\3007\310!\340\010\017\320\017,\250D\260\001\260\027\270\013\3001\200\001\360\010\000\005\016\210T\220\037\240\004\240K\250t\260?\300$\300k\320QU\320U\\\320\\`\320`j\320jn\320n|\360\000\000}\001A\002\360\000\000A\002H\002\360\000\000H\002L\002\360\000\000L\002U\002\360\000\000U\002Y\002\360\000\000Y\002Z\002\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220E\230\024\230Q\330\010\022\220!\330\010\027\220q\340\010\030\230\001\330\004\007\200q""\330\010\017\320\017/\250t\2601\260G\270;\300g\310Q\340\010\017\320\017/\250t\2601\260G\270;\300a\200\001\360\010\000\005\016\210T\320\021%\240T\250\037\270\004\270K\300t\310?\320Z^\320^i\320im\320mt\320tx\360\000\000y\001G\002\360\000\000G\002K\002\360\000\000K\002R\002\360\000\000R\002V\002\360\000\000V\002]\002\360\000\000]\002a\002\360\000\000a\002b\002\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220E\230\024\230Q\330\010\022\220!\330\010\027\220q\340\010\030\230\001\330\004\007\200q\330\010\017\320\0172\260$\260a\260w\270k\310\027\320PQ\340\010\017\320\0172\260$\260a\260w\270k\310\021\210!\200\001\330\004)\250\021\250&\260\001\200\001\340\004\037\230q\320 0\260\013\270;\300k\320QR\330\004\023\220>\240\030\250\021\250!\330\004\007\200|\2207\230!\330\0100\260\001\3201B\300.\320PQ\330\004\013\2101\200\001\340\004\037\230q\320 0\260\013\270;\300k\320QR\330\004\023\320\023$\240H\250A\250Q\330\004\007\200|\2207\230!\330\0103\2601\3204H\310\016\320VW\330\004\013\2101\200\001\340\004\037\230q\320 0\260\013\270;\300k\320QR\330\004\023\220;\230h\240a\240q\330\004\007\200|\2207\230!\330\010-\250Q\250n\270N\310!\330\004\013\2101\200\001\330\004/\250q\260\006\260aeof";
+    #else /* compression: none (4859 bytes) */
+const char* const bytes = "\344\273\273\345\212\241\346\211\247\350\241\214\345\244\261\350\264\245: AsyncClient-EventLoop] Closing...Event loop error: NoneNote that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.Packet too largeProcessing Error: ] Shutdown complete.Shutdown error: [TCP] All connections closed.TCP ConnectionError[TCP] Heartbeat received[TCP] Listen_loop error: [TCP] Reader for TCP timeoutZMQError :[ZMQ] Connecting to server at [ZMQ] Listener loop started.[:.?add_noteclient-client identity :client is not runningcore/client/async_client.pyxdisableenablegcisenabledr_id and size of payload :self._connection_cache is not None or self._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.host is not None or self.listen_task is not None or self.loop is not Noneself._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.loop is not Noneself._loop_thread is not None or self._req_futures is not None or self._req_subject is not None or self.addr is not None or self.context is not None or self.listen_task is not None or self.loop is not None or self.socket is not Nonesend multiframe : started.<stringsource>tcp://AsyncClientAsyncClient.__reduce_cython__AsyncClient.__setstate_cython__AsyncClient._async_shutdownAsyncClient.closeAsyncClient.runAsyncClient.send_requestAsyncIOSchedulerAsyncStreamClientAsyncStreamClient.__reduce_cython__AsyncStreamClient.__setstate_cython__AsyncStreamClient._async_shutdownAsyncStreamClient._get_connectionAsyncStreamClient._listen_loopAsyncStreamClient.send_requestAsyncZmqClientAsyncZmqClient.__reduce_cython__AsyncZmqClient.__setstate_cython__AsyncZmqClient._async_shutdownAsyncZmqClient._init_zmqAsyncZmqClient._listen_loopAsyncZmqClient.send_requestAsyncZmqClient.wrap_protocol.<locals>.<lambda>CancelledErrorContextDEALERETERMEventLoopPolicyIDENTITYIPPROTO""_TCPLINGER__Pyx_CFunc_2c7b9d__4core_6client_12async_client_11AsyncClient_voi__etc_to_py_4self.<locals>.wrap__Pyx_PyDict_NextRefSubjectTCP_NODELAYTableThreadThreadPoolExecutorTimeoutErrorZMQErroradd_done_callbackaddramount_async_shutdownasyncioasyncio.coroutinesat_eof__await__bigbonusbonus_sharebyteordercall_soon_threadsafecancelcastcfunc.to_py__class____class_getitem__clearclient_idcline_in_tracebackclosecolumncolumn_namescomplete_messagecomputeconcurrent.futuresconnectconnection_keycore.client.async_clientcreate_futurecreate_taskdaemondata__dict___dictdonedraineerrnofframesfrom_arraysfrom_bytes__func__fut_get_connectionget_extra_info__getstate__highhostidindex__init___init_zmqipcis_aliveis_closing_is_coroutineis_runningitemsjoinjsonkeykeys<lambda>len_byteslinger_listen_looplisten_tasklow__main__mapmessage__module__msgmsg_lenmultiplyname__name__namesndigits__new__new_event_loopnextofon_completedon_nextopenopen_connectionopen_streamoperatorsopsospapackpayloadpcpipepopportpriceprintpy_bufferpyarrowpyarrow.compute__pyx_checksum__pyx_result__pyx_state__pyx_type__pyx_unpickle_AsyncClient__pyx_unpickle_AsyncStreamClient__pyx_unpickle_AsyncZmqClient__pyx_vtable____qualname__r_idratioraw_payloadreactivexreactivex.operatorsreactivex.scheduler.eventloopreactivex.subjectread_allreaderreadexactlyrecv_multipart__reduce____reduce_cython____reduce_ex__req_idreq_subjectresultroundrunrun_coroutine_threadsaferun_foreverscaleschemaselfsendsend_multipartsend_requestserialize_msgset_columnset_debugset_event_loopset_event_loop_policyset_hwm__set_name__set_resultsetdefaultsetsockopt__setstate____setstate_cython__sharesidsocksocketstartstatestopstringsupertabletargetterm__test__threadingthrowtimetimeoutto_bytestransferunpackupdateuse_setstateutils.serializeuuiduuid4uvloopvaluevaluesvolumewait_closedwait_forwrapwritewriterzezmqzmq.asyncio\240\032\2504\250\177\270a\270q\200A\340\010\t\210\021\210!\200\001\360\010\000\005\031\230\004\230A\230Q\330\004\030\230\001\330\004\036\230a\330\n\013""\2105\220\005\220T\230\027\240\001\240\030\250\030\260\027\270\001\330\n\013\2105\220\005\220T\230\027\240\001\240\032\250:\260_\300L\320PY\320Yb\320bc\340\004\034\230E\240\027\250\001\360\006\000\005\010\200v\210S\220\006\220g\230Q\340\004\010\210\010\220\001\330\010\023\2205\230\007\230q\240\001\330\010\013\2105\220\003\2201\330\014\025\220]\240!\2401\330\014\027\220r\230\026\230q\240\002\240)\2501\250J\260i\270x\300q\340\010\017\210w\220a\220q\360\006\000\005\014\2102\210V\220<\230q\240\t\250\026\250q\200\001\330\004,\250A\250V\2601\200A\330\010\013\2104\210t\2201\330\014\r\340\010\014\210L\230\001\330\010\r\210Q\210c\220\021\220$\220j\240\001\340\010\013\2104\210v\220W\230E\240\024\240T\250\025\250k\270\021\330\014\r\330\020\026\220g\320\0356\260a\260t\320;K\3104\310t\320ST\330\020\023\2207\230!\2308\2401\330\014\023\220=\240\001\330\020\025\220Q\320\026(\250\001\250\021\340\014\020\220\005\320\025*\250!\2504\250u\260A\340\014\017\210t\220>\240\024\240T\250\035\260i\270q\330\020\024\220M\240\025\240a\240x\250q\340\010\r\210Q\210c\220\021\220$\220j\240\001\200A\330\010\013\2104\210t\2201\330\014\022\220,\230a\230q\340\010\025\220T\230\036\240q\250\010\260\001\330\010\017\210q\200\001\360\010\000\005\016\210T\220\037\240\004\240O\2604\260\177\300d\310+\320UY\320YZ\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220E\230\024\230Q\330\010\022\220!\330\010\027\220q\340\010\030\230\001\330\004\007\200q\330\010\017\320\017,\250D\260\001\260\027\270\013\3007\310!\340\010\017\320\017,\250D\260\001\260\027\270\013\3001\200\001\360\010\000\005\016\210T\220\037\240\004\240O\2604\260\177\300d\310+\320UY\320Y`\320`d\320dn\320nr\360\000\000s\001A\002\360\000\000A\002E\002\360\000\000E\002L\002\360\000\000L\002P\002\360\000\000P\002Y\002\360\000\000Y\002]\002\360\000\000]\002^\002\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220E\230\024\230Q\330\010\022\220!\330\010\027\220q\340\010\030\230\001\330\004\007\200q\330\010\017\320\017/\250t\2601\260G\270;""\300g\310Q\340\010\017\320\017/\250t\2601\260G\270;\300a\200\001\360\010\000\005\016\210T\320\021%\240T\250\037\270\004\270O\3104\310\177\320^b\320bm\320mq\320qx\320x|\360\000\000}\001K\002\360\000\000K\002O\002\360\000\000O\002V\002\360\000\000V\002Z\002\360\000\000Z\002a\002\360\000\000a\002e\002\360\000\000e\002f\002\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220E\230\024\230Q\330\010\022\220!\330\010\027\220q\340\010\030\230\001\330\004\007\200q\330\010\017\320\0172\260$\260a\260w\270k\310\027\320PQ\340\010\017\320\0172\260$\260a\260w\270k\310\021\210!\200\001\330\004)\250\021\250&\260\001\200\001\340\004\037\230q\320 0\260\013\270;\300k\320QR\330\004\023\220>\240\030\250\021\250!\330\004\007\200|\2207\230!\330\0100\260\001\3201B\300.\320PQ\330\004\013\2101\200\001\340\004\037\230q\320 0\260\013\270;\300k\320QR\330\004\023\320\023$\240H\250A\250Q\330\004\007\200|\2207\230!\330\0103\2601\3204H\310\016\320VW\330\004\013\2101\200\001\340\004\037\230q\320 0\260\013\270;\300k\320QR\330\004\023\220;\230h\240a\240q\330\004\007\200|\2207\230!\330\010-\250Q\250n\270N\310!\330\004\013\2101\200\001\330\004/\250q\260\006\260aeof";
     PyObject *data = NULL;
     CYTHON_UNUSED_VAR(__Pyx_DecompressString);
     #endif
     PyObject **stringtab = __pyx_mstate->__pyx_string_tab;
     Py_ssize_t pos = 0;
-    for (int i = 0; i < 275; i++) {
+    for (int i = 0; i < 271; i++) {
       Py_ssize_t bytes_length = index[i].length;
       PyObject *string = PyUnicode_DecodeUTF8(bytes + pos, bytes_length, NULL);
-      if (likely(string) && i >= 41) PyUnicode_InternInPlace(&string);
+      if (likely(string) && i >= 40) PyUnicode_InternInPlace(&string);
       if (unlikely(!string)) {
         Py_XDECREF(data);
         __PYX_ERR(0, 1, __pyx_L1_error)
@@ -19972,7 +19300,7 @@ const char* const bytes = "\344\273\273\345\212\241\346\211\247\350\241\214\345\
       stringtab[i] = string;
       pos += bytes_length;
     }
-    for (int i = 275; i < 291; i++) {
+    for (int i = 271; i < 287; i++) {
       Py_ssize_t bytes_length = index[i].length;
       PyObject *string = PyBytes_FromStringAndSize(bytes + pos, bytes_length);
       stringtab[i] = string;
@@ -19983,14 +19311,14 @@ const char* const bytes = "\344\273\273\345\212\241\346\211\247\350\241\214\345\
       }
     }
     Py_XDECREF(data);
-    for (Py_ssize_t i = 0; i < 291; i++) {
+    for (Py_ssize_t i = 0; i < 287; i++) {
       if (unlikely(PyObject_Hash(stringtab[i]) == -1)) {
         __PYX_ERR(0, 1, __pyx_L1_error)
       }
     }
     #if CYTHON_IMMORTAL_CONSTANTS
     {
-      PyObject **table = stringtab + 275;
+      PyObject **table = stringtab + 271;
       for (Py_ssize_t i=0; i<16; ++i) {
         #if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
         Py_SET_REFCNT(table[i], _Py_IMMORTAL_REFCNT_LOCAL);
@@ -20003,17 +19331,17 @@ const char* const bytes = "\344\273\273\345\212\241\346\211\247\350\241\214\345\
   }
   {
     PyObject **numbertab = __pyx_mstate->__pyx_number_tab;
-    double const c_constants[] = {1.0,2.0,10.0,1e-3,1e-5,30.0};
-    for (int i = 0; i < 6; i++) {
+    double const c_constants[] = {1.0,2.0,1e-3,1e-5,30.0};
+    for (int i = 0; i < 5; i++) {
       numbertab[i] = PyFloat_FromDouble(c_constants[i]);
       if (unlikely(!numbertab[i])) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   {
-    PyObject **numbertab = __pyx_mstate->__pyx_number_tab + 6;
+    PyObject **numbertab = __pyx_mstate->__pyx_number_tab + 5;
     int8_t const cint_constants_1[] = {0,1,2,42};
     int16_t const cint_constants_2[] = {1000};
-    int32_t const cint_constants_4[] = {10485760L,11832340L,67138928L,267512936L};
+    int32_t const cint_constants_4[] = {10485760L,70703861L,176093972L,264821829L};
     for (int i = 0; i < 9; i++) {
       numbertab[i] = PyLong_FromLong((i < 4 ? cint_constants_1[i - 0] : (i < 5 ? cint_constants_2[i - 4] : cint_constants_4[i - 5])));
       if (unlikely(!numbertab[i])) __PYX_ERR(0, 1, __pyx_L1_error)
@@ -20022,7 +19350,7 @@ const char* const bytes = "\344\273\273\345\212\241\346\211\247\350\241\214\345\
   #if CYTHON_IMMORTAL_CONSTANTS
   {
     PyObject **table = __pyx_mstate->__pyx_number_tab;
-    for (Py_ssize_t i=0; i<15; ++i) {
+    for (Py_ssize_t i=0; i<14; ++i) {
       #if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
       Py_SET_REFCNT(table[i], _Py_IMMORTAL_REFCNT_LOCAL);
       #else
@@ -20104,84 +19432,79 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_listen_loop, __pyx_mstate->__pyx_kp_b_iso88591__6, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 347};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_req_id, __pyx_mstate->__pyx_n_u_msg, __pyx_mstate->__pyx_n_u_fut};
-    __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_async_request, __pyx_mstate->__pyx_kp_b_iso88591__6, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
-  }
-  {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 8, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 358};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 8, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 353};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_req_id, __pyx_mstate->__pyx_n_u_message, __pyx_mstate->__pyx_n_u_connection_key, __pyx_mstate->__pyx_n_u_reader, __pyx_mstate->__pyx_n_u_writer, __pyx_mstate->__pyx_n_u_serialize_msg, __pyx_mstate->__pyx_n_u_msg_len};
-    __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_send_request, __pyx_mstate->__pyx_kp_b_iso88591__6, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_send_request, __pyx_mstate->__pyx_kp_b_iso88591__6, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 367};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 362};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_connection_key, __pyx_mstate->__pyx_n_u_reader, __pyx_mstate->__pyx_n_u_writer, __pyx_mstate->__pyx_n_u_sock, __pyx_mstate->__pyx_n_u_socket};
-    __pyx_mstate_global->__pyx_codeobj_tab[11] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_get_connection, __pyx_mstate->__pyx_kp_b_iso88591__6, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[11])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_get_connection, __pyx_mstate->__pyx_kp_b_iso88591__6, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 388};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 383};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_key, __pyx_mstate->__pyx_n_u_reader, __pyx_mstate->__pyx_n_u_writer};
-    __pyx_mstate_global->__pyx_codeobj_tab[12] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_async_shutdown, __pyx_mstate->__pyx_kp_b_iso88591__6, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[12])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[11] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_async_shutdown, __pyx_mstate->__pyx_kp_b_iso88591__6, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[11])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 50};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_data};
-    __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_scale, __pyx_mstate->__pyx_kp_b_iso88591_AQ_a_5_T_5_T__LPYYbbc_E_vS_gQ_5, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[12] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_scale, __pyx_mstate->__pyx_kp_b_iso88591_AQ_a_5_T_5_T__LPYYbbc_E_vS_gQ_5, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[12])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 114};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_req_id, __pyx_mstate->__pyx_n_u_msg};
-    __pyx_mstate_global->__pyx_codeobj_tab[14] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_run, __pyx_mstate->__pyx_kp_b_iso88591_A_4t1_aq_T_q_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[14])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_run, __pyx_mstate->__pyx_kp_b_iso88591_A_4t1_aq_T_q_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 137};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
-    __pyx_mstate_global->__pyx_codeobj_tab[15] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_close, __pyx_mstate->__pyx_kp_b_iso88591_A_4t1_L_Qc_j_4vWE_T_k_g_6at_K4tS, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[15])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[14] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_async_client_pyx, __pyx_mstate->__pyx_n_u_close, __pyx_mstate->__pyx_kp_b_iso88591_A_4t1_L_Qc_j_4vWE_T_k_g_6at_K4tS, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[14])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
-    __pyx_mstate_global->__pyx_codeobj_tab[16] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_mstate->__pyx_kp_b_iso88591_T_Kt_kQUUV_G1F_a_vWE_Q_q_q_D_7, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[16])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[15] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_mstate->__pyx_kp_b_iso88591_T_O4_d_UYYZ_G1F_a_vWE_Q_q_q_D_7, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[15])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 16};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[17] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_mstate->__pyx_kp_b_iso88591__7, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[17])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[16] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_mstate->__pyx_kp_b_iso88591__7, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[16])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
-    __pyx_mstate_global->__pyx_codeobj_tab[18] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_mstate->__pyx_kp_b_iso88591_T_Kt_kQUU_jjnn_A_A_H_H_L_L_U_U, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[18])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[17] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_mstate->__pyx_kp_b_iso88591_T_O4_d_UYY_ddnnr_s_A_A_E_E_L_L, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[17])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 16};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[19] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_mstate->__pyx_kp_b_iso88591_AV1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[19])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[18] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_mstate->__pyx_kp_b_iso88591_AV1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[18])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 1};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_state, __pyx_mstate->__pyx_n_u_dict_2, __pyx_mstate->__pyx_n_u_use_setstate};
-    __pyx_mstate_global->__pyx_codeobj_tab[20] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_mstate->__pyx_kp_b_iso88591_T_T_Kt_Z_iimmttx_y_G_G_K_K_R_R, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[20])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[19] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_reduce_cython, __pyx_mstate->__pyx_kp_b_iso88591_T_T_O4_bbmmqqxx_K_K_O_O_V_V_Z_Z, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[19])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 16};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_pyx_state};
-    __pyx_mstate_global->__pyx_codeobj_tab[21] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_mstate->__pyx_kp_b_iso88591_q_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[21])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[20] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_setstate_cython, __pyx_mstate->__pyx_kp_b_iso88591_q_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[20])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 4};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[22] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_AsyncClient, __pyx_mstate->__pyx_kp_b_iso88591_q_0_kQR_haq_7_QnN_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[22])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[21] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_AsyncClient, __pyx_mstate->__pyx_kp_b_iso88591_q_0_kQR_haq_7_QnN_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[21])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 4};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[23] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_AsyncZmqClient, __pyx_mstate->__pyx_kp_b_iso88591_q_0_kQR_7_0_1B_PQ_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[23])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[22] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_AsyncZmqClient, __pyx_mstate->__pyx_kp_b_iso88591_q_0_kQR_7_0_1B_PQ_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[22])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 4};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_pyx_type, __pyx_mstate->__pyx_n_u_pyx_checksum, __pyx_mstate->__pyx_n_u_pyx_state, __pyx_mstate->__pyx_n_u_pyx_result};
-    __pyx_mstate_global->__pyx_codeobj_tab[24] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_AsyncStreamClient, __pyx_mstate->__pyx_kp_b_iso88591_q_0_kQR_HAQ_7_314H_VW_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[24])) goto bad;
+    __pyx_mstate_global->__pyx_codeobj_tab[23] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_pyx_unpickle_AsyncStreamClient, __pyx_mstate->__pyx_kp_b_iso88591_q_0_kQR_HAQ_7_314H_VW_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[23])) goto bad;
   }
   Py_DECREF(tuple_dedup_map);
   return 0;

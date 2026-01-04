@@ -1555,13 +1555,13 @@ struct __pyx_obj_4core_6client_5mdapi_MdApi;
  * 
  * cdef class AsyncClient:             # <<<<<<<<<<<<<<
  *     cdef object _req_subject
- *     cdef object _req_fut
+ *     cdef object _req_futures
 */
 struct __pyx_obj_4core_6client_12async_client_AsyncClient {
   PyObject_HEAD
   struct __pyx_vtabstruct_4core_6client_12async_client_AsyncClient *__pyx_vtab;
   PyObject *_req_subject;
-  PyObject *_req_fut;
+  PyObject *_req_futures;
   int _running;
   PyObject *loop;
   PyObject *_loop_thread;
@@ -1621,7 +1621,7 @@ struct __pyx_obj_4core_6client_5mdapi_MdApi {
  * 
  * cdef class AsyncClient:             # <<<<<<<<<<<<<<
  *     cdef object _req_subject
- *     cdef object _req_fut
+ *     cdef object _req_futures
 */
 
 struct __pyx_vtabstruct_4core_6client_12async_client_AsyncClient {

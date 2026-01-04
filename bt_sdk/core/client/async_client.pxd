@@ -3,7 +3,7 @@
 
 cdef class AsyncClient:
     cdef object _req_subject 
-    cdef object _req_fut 
+    cdef object _req_futures 
     cdef bint _running
     cdef object loop
     cdef object _loop_thread

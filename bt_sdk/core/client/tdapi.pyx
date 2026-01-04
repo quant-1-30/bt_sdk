@@ -37,44 +37,45 @@ cdef class TdApi:
     
     cpdef object register(self, dict body):
         cdef bytes req_id = fast_uuid4_bytes()
+        cdef dict rq = {"topic": "register", "body": body}
 
-        body["topic"] = "register"
-        obs = self.async_client.run(req_id, body)
+        obs = self.async_client.run(req_id, rq)
         return obs
 
     cpdef object set_cash(self, dict body): # experiment_id
         cdef bytes req_id = fast_uuid4_bytes()
+        cdef dict rq = {"topic": "set_cash", "body": body}
 
-        body["topic"] = "set_cash"
-        obs = self.async_client.run(req_id, body)
+        obs = self.async_client.run(req_id, rq)
         return obs
 
     cpdef object getvalue(self, dict body):
         cdef bytes req_id = fast_uuid4_bytes()
+        cdef dict rq = {"topic": "get_data", "body": body}
 
-        body["topic"] = "get_data"
-        obs = self.async_client.run(req_id, body)
+        obs = self.async_client.run(req_id, rq)
         return obs
     
     # @contextmanager   
     cpdef object subscribe(self, dict body):
         cdef bytes req_id = fast_uuid4_bytes()
+        cdef dict rq = {"topic": "subscribe", "body": body}
 
-        obs = self.async_client.run(req_id, body)
+        obs = self.async_client.run(req_id, rq)
         return obs
     
     cpdef object submit(self, dict body):
         cdef bytes req_id = fast_uuid4_bytes()
+        cdef dict rq = {"topic": "submit", "body": body}
 
-        body["topic"] = "order"
-        obs = self.async_client.run(req_id, body)
+        obs = self.async_client.run(req_id, rq)
         return obs
     
     cpdef object on_dt_over(self, dict body):
         cdef bytes req_id = fast_uuid4_bytes()
+        cdef dict rq = {"topic": "on_dt_over", "body": body}
         
-        body["topic"] = "on_dt_over"
-        obs = self.async_client.run(req_id, body)
+        obs = self.async_client.run(req_id, rq)
         return obs
     
     cpdef void close(self):

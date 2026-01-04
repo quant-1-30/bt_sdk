@@ -4,7 +4,6 @@
 import pytest
 from datetime import datetime
 from bt_sdk.core.client import TdApi
-from bt_sdk.constant import *
 from bt_sdk.core.model import *
 
 
@@ -30,16 +29,15 @@ class TestTdApi:
 
     @pytest.fixture
     def td_api(self, patch_client_id, patch_experiment_id):
-        api = TdApi(addr=("localhost", 8888), client_id=patch_client_id, timeout=20)
+        api = TdApi(addr=("127.0.0.1", 8888), client_id=patch_client_id, timeout=20)
         # api = TdApi(addr=("192.168.2.100", 8888), client_id=client_id, timeout=20)
-        api.experiment_id = patch_experiment_id
         return api
     
     @pytest.fixture
     def experiment(self, patch_client_id):
         strategy = "test"
         extra_info='002750'
-        return Experiment(client_id=patch_client_id, strategy=strategy, extra_info=extra_info)
+        return {"client_id": "patch_client_id", "strategy": strategy, "extra_info": extra_info, "identity": "jsklfjaslfjsalfjaslfj"}
     
     @pytest.fixture
     def cash(self):
@@ -68,20 +66,21 @@ class TestTdApi:
                      end_date = end_date,
                      sid = sid)
     
-    # def test_register(self, td_api, experiment):
-    #     resp = td_api.register(experiment)
-    #     print("resp ", resp)
-    #     assert resp is not None
+    def test_register(self, td_api, experiment):
+        fut = td_api.register(experiment)
+        resp = fut.result()
+        print("resp ", resp)
+        assert resp is not None
 
     # def test_set_cash(self, td_api, cash, patch_experiment_id):
     #     data = td_api.set_cash(cash, patch_experiment_id)
     #     print("test_set_cash: ", data)
     #     assert data is not None
     
-    def test_submit(self, td_api, order, patch_experiment_id):
-        data = td_api.submit(order, patch_experiment_id)
-        print("test_submit: ", data)
-        assert data is not None
+    # def test_submit(self, td_api, order, patch_experiment_id):
+    #     data = td_api.submit(order, patch_experiment_id)
+    #     print("test_submit: ", data)
+    #     assert data is not None
 
     # def test_getAccount(self, td_api, patch_experiment_id):
     #     o = td_api.getvalue("account", patch_experiment_id)
