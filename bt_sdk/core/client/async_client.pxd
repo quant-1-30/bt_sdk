@@ -35,6 +35,7 @@ cdef class AsyncZmqClient(AsyncClient):
 cdef class AsyncStreamClient(AsyncClient):
     cdef str host
     cdef int port
+    cdef object _conn_lock
     cdef object _connection_cache
     cdef int timeout
     cdef readonly object listen_task

@@ -47,6 +47,6 @@ def pack(msg: Mapping) -> bytes:
     # return msgpack.packb({"topic": topic, "body": body, "experiment_id": experiment_id, "request_id":request_id}, use_bin_type=True)
     return msgpack.packb(msg, use_bin_type=True)
 
-def unpack(data: bytes) -> dict:
+def unpack(data: bytes) -> list:
     data = msgpack.unpackb(data, raw=False)
     return data

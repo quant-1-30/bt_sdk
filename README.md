@@ -94,6 +94,13 @@ def bytes_to_table(data: bytes):
             subject.pipe --- obseverable
             subscribe --- on_next / on_complete / on_error 
 
-from reactivex.operators import as_iterable # blocking
+a. async for x in observable.to_async_iterable()
 
-for table in obs.pipe(as_iterable()):
+from reactivex.operators import as_iterable # blocking
+b.for table in obs.pipe(as_iterable()):
+c.  obs.subscribe(
+        on_next=q.put,
+        on_completed=lambda: q.put(None) # 发送结束信号
+    )
+
+# 涉及 cache 必须lock in case cache inconsistent

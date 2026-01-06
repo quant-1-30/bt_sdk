@@ -220,7 +220,6 @@ cdef class AsyncZmqClient(AsyncClient):
                     
                     r_id = frames[0]
                     payload = frames[1]
-                    print("r_id and size of payload :", r_id, len(payload))
                     req_subject = self._req_subject[r_id]
                     
                     if payload == b"eof":
@@ -238,12 +237,10 @@ cdef class AsyncZmqClient(AsyncClient):
                             # "meta": table.schema.metadata 
                         })
                 except zmq.ZMQError as ze:
-                    print("ZMQError :", ze)
                     if ze.errno == zmq.ETERM: break
                 except asyncio.CancelledError:
                     break
                 except Exception as e:
-                    print(f"Processing Error: {e}")
                     break 
 
     cdef object wrap_protocol(self, bytes req_id, dict msg):
@@ -296,14 +293,15 @@ cdef class AsyncStreamClient(AsyncClient):
         super().__init__()
             
         self.host, self.port = addr
-        self._connection_cache = {} 
+        self._conn_lock = asyncio.Lock()  # in different coro maybe cause cache bug
+        self._connection_cache = {}
         self.timeout = timeout
         
         self.listen_task = self.loop.create_task(self._listen_loop())
 
     async def _listen_loop(self):
         cdef bytes raw_payload
-        cdef dict payload
+        cdef list payload
         cdef bytes r_id
         cdef str connection_key = f"{self.host}:{self.port}"
 
@@ -311,13 +309,13 @@ cdef class AsyncStreamClient(AsyncClient):
 
         print(f"[TCP] Reader for {connection_key} started.")
 
-        while self._running and not reader.at_eof():
+        # while self._running and not reader.at_eof():
+        while self._running:
             try:
                 len_bytes = await asyncio.wait_for(reader.readexactly(LENGTH_BYTES), timeout=30.0)
                 msg_len = int.from_bytes(len_bytes, 'big')
 
                 if msg_len == 0:
-                    print("[TCP] Heartbeat received")
                     continue # reset wait_for timeout
                 
                 if msg_len > 10 * 1024 * 1024: 
@@ -342,13 +340,13 @@ cdef class AsyncStreamClient(AsyncClient):
             
     cdef object wrap_protocol(self, bytes req_id, dict msg): # return future to user to determin await or result block
         """TCP 返回 Coroutine 用户需 await"""
-        # from concurrent.futures import Future
-        # cdef object fut = Future()
-        fut = self.loop.create_future()
+        from concurrent.futures import Future
+        cdef object fut = Future() # block 
+        # fut = self.loop.create_future() # nonblock 
         self._req_futures[req_id] = fut 
         
         asyncio.run_coroutine_threadsafe(self.send_request(req_id, msg), self.loop)
-        return fut # fut.result() / add_done_callback
+        return fut # await asyncio.wrap_future(fut) to transform block to nonblock
 
     async def send_request(self, bytes req_id, dict message):
         connection_key = f"{self.host}:{self.port}"
@@ -363,22 +361,23 @@ cdef class AsyncStreamClient(AsyncClient):
         """
             获取或创建连接确保每个连接有且只有一个后台读取任务
         """
-        if connection_key in self._connection_cache:
-            reader, writer = self._connection_cache[connection_key]
-            if not writer.is_closing():
-                return reader, writer
-            else:
-                del self._connection_cache[connection_key]
+        async with self._conn_lock:
+            if connection_key in self._connection_cache:
+                reader, writer = self._connection_cache[connection_key]
+                if not writer.is_closing():
+                    return reader, writer
+                else:
+                    del self._connection_cache[connection_key]
         
-        reader, writer = await asyncio.open_connection(host=self.host, port=self.port) # same underlying File Descriptor/Socket
-        # socketopt No Nagle when small packet 
-        sock = writer.get_extra_info('socket')
-        if sock:
-            import socket
-            sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-            
-        self._connection_cache[connection_key] = (reader, writer)
-        return reader, writer
+            reader, writer = await asyncio.open_connection(host=self.host, port=self.port) # same underlying File Descriptor/Socket
+            # socketopt No Nagle when small packet 
+            sock = writer.get_extra_info('socket')
+            if sock:
+                import socket
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+
+            self._connection_cache[connection_key] = (reader, writer)
+            return reader, writer
 
     async def _async_shutdown(self):
         await AsyncClient._async_shutdown()

@@ -1,4 +1,4 @@
-from .mdapi import MdApi
-from .tdapi import TdApi
+from core.client.mdapi import MdApi
+from core.client.tdapi import TdApi
 
 __all__ = ["MdApi", "TdApi"]

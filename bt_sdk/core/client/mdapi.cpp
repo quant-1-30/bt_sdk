@@ -1596,6 +1596,7 @@ struct __pyx_obj_4core_6client_12async_client_AsyncStreamClient {
   struct __pyx_obj_4core_6client_12async_client_AsyncClient __pyx_base;
   PyObject *host;
   int port;
+  PyObject *_conn_lock;
   PyObject *_connection_cache;
   int timeout;
   PyObject *listen_task;
