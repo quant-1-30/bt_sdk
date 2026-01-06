@@ -1,10 +1,23 @@
 # /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from contextlib import contextmanager
+import reactivex.operators as ops
+import pyarrow as pa
+# from contextlib import contextmanager
 
 from core.client.async_client cimport AsyncZmqClient 
 from core.client.util cimport fast_uuid4_bytes
+
+
+cdef inline object obs2table(object observable):
+    cdef list result
+    result = observable.pipe(
+        ops.to_list() # ops.to_list() pack into list end of 
+    ).run()
+    if result:
+        # return pa.Table.from_batches(result)  # pa.RecordBatch
+        return pa.concat_tables(result) # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks() 
+    return {}
 
 
 cdef class MdApi:
@@ -76,13 +89,19 @@ cdef class MdApi:
         obs = self.async_client.run(req_id, rq)
         return obs
 
-    #cpdef dict factor(self, body: Query): # sid
-    #    close = self.get_close(body)
-    #    adjust = self.get_event("adjustment", body)
-    #    right = self.get_event("rightment", body)
-    #    from bt_sdk.core.helper.factor import calc_factor
-    #    factors = calc_factor(close, adjust, right)
-    #    return factors
+    cpdef object get_factor(self, dict body):
+        cdef object obs_close, obs_adjust, obs_right
+        cdef object close, adjust, right
+
+        obs_close = self.get_close(body)
+        obs_adjust = self.get_event("adjustment", body)
+        obs_right = self.get_event("rightment", body)
+        close = obs2table(obs_close)
+        adjust = obs2table(obs_adjust)
+        right = obs2table(obs_right)
+        from bt_sdk.core.helper.factor import calc_factor
+        factors = calc_factor(close, adjust, right)
+        return factors
     
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:

@@ -6,7 +6,7 @@
 namespace rpc_feed {
 namespace adjust {
 
-const int Multiply = 10 
+const int Multiply = 10; 
 
 struct AdjustmentEvent {
     int ex_date;       // ex_date

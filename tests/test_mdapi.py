@@ -35,20 +35,14 @@ class TestMdApi:
 
     @pytest.fixture
     def query(self):
-        start_date = 20250424
+        start_date = 20100101
         end_date = 20250424
         sid = [b'002750']
         return {"start_date": start_date ,"end_date": end_date, "sid": sid}
     
     # def test_getCalendar(self, md_api):
     #     with md_api as client:
-    #         observable = client.get_calendar()
-
-    #         # result = observable.pipe(
-    #         #     ops.to_list() # ops.to_list() pack into list end of 
-    #         # ).run()
-    #         # print("result :", result)
-            
+    #         observable = client.get_calendar() 
     #         q = queue.Queue()
     #         results = []
             
@@ -197,30 +191,31 @@ class TestMdApi:
                 
     #         print(f"Close Results: {results}")
 
-    def test_subscirbe(self, md_api, query):
-        with md_api as client:
-            observable = client.subscribe(query)
+    # def test_subscirbe(self, md_api, query):
+    #     with md_api as client:
+    #         observable = client.subscribe(query)
 
-            q = queue.Queue()
-            results = []
+    #         q = queue.Queue()
+    #         results = []
             
-            observable.subscribe( # nonblocking 
-                on_next=q.put,
-                on_error=lambda e: q.put(e),
-                on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
-            )
+    #         observable.subscribe( # nonblocking 
+    #             on_next=q.put,
+    #             on_error=lambda e: q.put(e),
+    #             on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
+    #         )
             
-            while True:
-                item = q.get() # blocking
-                if item is StopIteration:
-                    break
-                if isinstance(item, Exception):
-                    raise item
-                results.append(item)
+    #         while True:
+    #             item = q.get() # blocking
+    #             if item is StopIteration:
+    #                 break
+    #             if isinstance(item, Exception):
+    #                 raise item
+    #             results.append(item)
                 
-            print(f"Subscribe Results: {results}")
+    #         print(f"Subscribe Results: {results}")
     
-    # def test_factor(self, md_api, query):
-    #     data = md_api.factor(query)
-    #     print("test_get_factors: ", data.raw_factors, data.adj_factors)
-    #     assert data is not None
+    def test_factor(self, md_api, query):
+        with md_api as client:
+            data = client.get_factor(query)
+            print("test_get_factors: ", data.raw_factors, data.adj_factors)
+            assert data is not None

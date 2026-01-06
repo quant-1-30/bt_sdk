@@ -13,3 +13,5 @@ cdef class MdApi:
     cpdef object subscribe(self, dict body)
 
     cpdef object get_close(self, dict body)
+    
+    cpdef object get_factor(self, dict body)

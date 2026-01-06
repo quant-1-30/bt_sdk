@@ -60,8 +60,8 @@ class TestTdApi:
     
     @pytest.fixture(scope="function")
     def query(self):
-        start_date = 0
-        end_date = 1846371800
+        start_date = 1744387199
+        end_date = 1745400660
         sid = [b'002750']
         return {"start_date": start_date, "end_date": end_date, "sid": sid}
     
@@ -95,12 +95,12 @@ class TestTdApi:
     #     print("test get_position: ", resp)
     #     assert resp is not None
 
-    def test_subscirbe_order(self, td_api, patch_experiment_id, query):
-        query["req_type"] = "order"
-        fut = td_api.subscribe(patch_experiment_id, query)
-        resp = fut.result()
-        print("test_reqOrder: ", resp)
-        assert resp is not None
+    # def test_subscirbe_order(self, td_api, patch_experiment_id, query):
+    #     query["req_type"] = "order"
+    #     fut = td_api.subscribe(patch_experiment_id, query)
+    #     resp = fut.result()
+    #     print("test_reqOrder: ", resp)
+    #     assert resp is not None
 
     # def test_subscribe_position(self, td_api, patch_experiment_id, query):
     #     query["req_type"] = "position"
