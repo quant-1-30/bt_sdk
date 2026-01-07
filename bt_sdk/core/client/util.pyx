@@ -1,4 +1,7 @@
 # cython: language_level=3
+
+from ping3 import ping
+
 from libc.stdint cimport uint8_t
 
 # C typedef / cython ctypedef
@@ -30,3 +33,17 @@ cpdef str fast_uuid4_str():
         uuid_generate(uu)
         uuid_unparse_lower(uu, out)
     return out[:36].decode('ascii')
+
+
+cpdef double on_ping(str addr, int timeout , str unit): # unit = s means second
+    """
+        ping the server
+    """
+    cdef double resp
+    resp = ping(dest_addr=addr, timeout=timeout, unit=unit)
+    if resp is False:
+        raise ValueError("domain not found")
+    elif resp is None:
+        raise ValueError("ping timeout")
+    else:
+        return resp

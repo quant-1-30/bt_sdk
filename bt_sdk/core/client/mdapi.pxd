@@ -6,12 +6,14 @@ cdef class MdApi:
 
     cpdef object get_instrument(self)
 
-    cpdef object get_benchmark(self, bytes index)
+    cpdef object get_benchmark(self, object body)
 
-    cpdef object get_event(self, str topic, dict body)
+    cpdef object get_event(self, str topic, object body)
 
-    cpdef object subscribe(self, dict body)
+    cpdef object subscribe(self, object body)
 
-    cpdef object get_close(self, dict body)
+    cpdef object get_close(self, object body)
     
-    cpdef object get_factor(self, dict body)
+    cpdef object get_factor(self, object body)
+    
+    cpdef void disconnect(self)

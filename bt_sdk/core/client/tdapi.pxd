@@ -2,16 +2,16 @@ cdef class TdApi:
     cdef bytes client_id
     cdef object async_client
 
-    cpdef object register(self, dict body)
+    cpdef object register(self, object body)
 
-    cpdef object set_cash(self, bytes experiment_id, dict body)
+    cpdef object set_cash(self, bytes experiment_id, object body)
 
-    cpdef object getvalue(self, bytes experiment_id, str req_type)
+    cpdef object getvalue(self, bytes experiment_id, bytes req_type)
 
-    cpdef object subscribe(self, bytes experiment_id, dict body)
+    cpdef object subscribe(self, bytes experiment_id, object body)
 
-    cpdef object submit(self, bytes experiment_id, dict body)
+    cpdef object submit(self, bytes experiment_id, object body)
 
-    cpdef object on_dt_over(self, bytes experiment_id, dict body)
+    cpdef object on_dt_over(self, bytes experiment_id, object body)
 
-    cpdef void close(self)
+    cpdef void disconnect(self)

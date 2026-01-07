@@ -38,7 +38,7 @@ extensions = [
         name="core.client.util", 
         sources=["core/client/util.pyx"],
         include_dirs=[np.get_include(), current_dir],
-        libraries=["uuid"],
+        # libraries=["uuid"], # macos support uuid/uuid.h | linux libuuid
         language="c++",
     )
 ]
@@ -55,6 +55,6 @@ setup(
             'initializedcheck': False,   # 关闭内存视图初始化检查
             'cdivision': True,           # 开启 C 级别除法（不检查除零，极快）
         },
-        annotate=False # 生成 .html 文件，方便查看代码是否实现C 级加速
+        annotate=False # .html 文件，方便查看代码是否实现C 级加速
     )
 )

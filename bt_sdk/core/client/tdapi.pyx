@@ -1,10 +1,9 @@
-# /usr/bin/env python3
-# -*- coding: utf-8 -*-
+# cython: language_level=3
 
+import msgspec
 from contextlib import contextmanager
 
-# from core.client.data cimport Position, Trade, Account # data as package
-cimport core.client.data as cdata
+from core.protocol import Event
 from core.client.util cimport fast_uuid4_bytes
 from core.client.async_client cimport AsyncStreamClient
 
@@ -35,48 +34,47 @@ cdef class TdApi:
         self.client_id = client_id
         self.async_client = AsyncStreamClient(addr, timeout)
     
-    cpdef object register(self, dict body):
+    cpdef object register(self, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        body["client_id"] = self.client_id
-        cdef dict rq = {"topic": b"register", "body": body}
+        cdef object event = Event(topic="register", body=body)
 
-        obs = self.async_client.run(req_id, rq)
-        return obs
+        fut = self.async_client.run(req_id, event)
+        return fut
 
-    cpdef object set_cash(self, bytes experiment_id, dict body): # experiment_id
+    cpdef object set_cash(self, bytes experiment_id, object body): 
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef dict rq = {"topic": b"set_cash", "experiment_id": experiment_id, "body": body}
+        cdef object event = Event(topic = "set_cash", experiment_id=experiment_id, body=body)
 
-        obs = self.async_client.run(req_id, rq)
-        return obs
+        fut = self.async_client.run(req_id, event)
+        return fut
 
-    cpdef object getvalue(self, bytes experiment_id, str req_type):
+    cpdef object getvalue(self, bytes experiment_id, bytes req_type):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef dict rq = {"topic": b"get_data", "experiment_id": experiment_id, "body": {"type": req_type}}
+        cdef object event = Event(topic = "get_data", sub_topic = req_type, experiment_id=experiment_id)
 
-        obs = self.async_client.run(req_id, rq)
-        return obs
+        fut = self.async_client.run(req_id, event)
+        return fut
     
-    cpdef object subscribe(self, bytes experiment_id, dict body):
+    cpdef object subscribe(self, bytes experiment_id, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef dict rq = {"topic": b"subscribe", "experiment_id": experiment_id, "body": body}
+        cdef object event = Event(topic = "subscribe", experiment_id=experiment_id, body=body)
 
-        obs = self.async_client.run(req_id, rq)
-        return obs
+        fut = self.async_client.run(req_id, event)
+        return fut
     
-    cpdef object submit(self, bytes experiment_id, dict body):
+    cpdef object submit(self, bytes experiment_id, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef dict rq = {"topic": b"submit", "experiment_id": experiment_id, "body": body}
+        cdef object event = Event(topic = "submit", experiment_id=experiment_id, body=body)
 
-        obs = self.async_client.run(req_id, rq)
-        return obs
+        fut = self.async_client.run(req_id, event)
+        return fut
     
-    cpdef object on_dt_over(self, bytes experiment_id, dict body):
+    cpdef object on_dt_over(self, bytes experiment_id, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef dict rq = {"topic": b"on_dt_over", "experiment_id": experiment_id, "body": body}
+        cdef object event = Event(topic = "on_dt_over", experiment_id=experiment_id, body=body)
         
-        obs = self.async_client.run(req_id, rq)
-        return obs
+        fut = self.async_client.run(req_id, event)
+        return fut
     
-    cpdef void close(self):
+    cpdef void disconnect(self):
         self.async_client.close()

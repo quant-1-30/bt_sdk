@@ -4,8 +4,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.8.7"
-description = "revise core/lib C++ logic"
+version = "0.9.0"
+description = "rewrite async_client"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [
@@ -36,6 +36,7 @@ reactivex = "^4.1.0"
 uvloop = "^0.22.1"
 cython = "^3.2.3"
 pyarrow = "^22.0.0"
+msgspec = "^0.20.0"
 
 [tool.poetry.group.build.dependencies]
 setuptools = "^68.0.0"

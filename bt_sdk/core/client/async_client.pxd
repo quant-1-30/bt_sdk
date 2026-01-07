@@ -14,9 +14,9 @@ cdef class AsyncClient:
 
     cdef void _finalize_task(self, object future)
     
-    cdef object wrap_protocol(self, bytes req_id, dict msg)
+    cdef object wrap_protocol(self, bytes req_id, object msg)
     
-    cpdef object run(self, bytes req_id, dict msg)
+    cpdef object run(self, bytes req_id, object msg)
 
     cpdef void close(self)
 
@@ -28,8 +28,7 @@ cdef class AsyncZmqClient(AsyncClient):
     cdef object socket
     cdef readonly object listen_task
     
-    # virtual due to cython not supported nested function
-    cdef object wrap_protocol(self, bytes req_id, dict msg)
+    cdef object wrap_protocol(self, bytes req_id, object msg) # virtual / cython not supported nested function
     
     
 cdef class AsyncStreamClient(AsyncClient):
@@ -40,5 +39,5 @@ cdef class AsyncStreamClient(AsyncClient):
     cdef int timeout
     cdef readonly object listen_task
     
-    cdef object wrap_protocol(self, bytes req_id, dict msg)
+    cdef object wrap_protocol(self, bytes req_id, object msg)
     

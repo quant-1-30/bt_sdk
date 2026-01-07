@@ -9,6 +9,7 @@ from reactivex import operators as ops
 import pyarrow as pa
 import pyarrow.compute as pc
 
+from bt_sdk.core.protocol import QueryBody
 from bt_sdk.core.client import MdApi
 
 
@@ -21,8 +22,16 @@ class TestMdApi:
     
     @pytest.fixture
     def benchmark(self):
-        # 000001 000680 399006 399001
+        
         return b'000001'
+
+    @pytest.fixture
+    def benchmark(self):
+        start_date = 20000101
+        end_date = 20250424
+        sid = [b'000001'] # 000001 000680 399006 399001
+        # return {"start_date": start_date ,"end_date": end_date, "sid": sid}
+        return QueryBody(start_date, end_date, sid)
 
     @pytest.fixture
     def session(self):
@@ -35,10 +44,11 @@ class TestMdApi:
 
     @pytest.fixture
     def query(self):
-        start_date = 20100101
+        start_date = 20000101
         end_date = 20250424
         sid = [b'002750']
-        return {"start_date": start_date ,"end_date": end_date, "sid": sid}
+        # return {"start_date": start_date ,"end_date": end_date, "sid": sid}
+        return QueryBody(start_date, end_date, sid)
     
     # def test_getCalendar(self, md_api):
     #     with md_api as client:
@@ -70,10 +80,8 @@ class TestMdApi:
     #         async def collect():
     #             async for item in obs: # v4
     #                 results.append(item)
-            
     #         future = asyncio.run_coroutine_threadsafe(collect(), client.loop)
     #         future.result(timeout=10) 
-             
     #         assert len(results) > 0
 
     # def test_getInstrument(self, md_api):

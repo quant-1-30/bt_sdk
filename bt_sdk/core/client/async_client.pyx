@@ -20,7 +20,8 @@ from reactivex.subject import Subject
 from reactivex.scheduler.eventloop import AsyncIOScheduler
 from concurrent.futures import ThreadPoolExecutor
 
-from utils.serialize import pack, unpack
+from core.protocol import _ENCODER, _DECODER
+
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
@@ -54,7 +55,7 @@ cpdef object scale(dict data):
     cdef object table = data["data"]
     cdef list columns = []
     cdef dict scale_configs = {
-        **{col: 1e-5 for col in ["open", "high", "low", "close"]},  # ** unpack
+        **{col: 1e-5 for col in ["open", "high", "low", "close"]}, 
         **{col: 1e-3 for col in ["volume", "amount", "bonus_share", "transfer", "bonus", "price", "ratio"]}
     }
     cdef list field_names = table.schema.names
@@ -111,14 +112,14 @@ cdef class AsyncClient:
         except Exception as e:
             print(f"任务执行失败: {e}")
 
-    cpdef object run(self, bytes req_id, dict msg):
+    cpdef object run(self, bytes req_id, object msg):
         if not self._running:
             raise RuntimeError("client is not running")
         
         obs_or_fut = self.wrap_protocol(req_id, msg)
         return obs_or_fut
 
-    cdef object wrap_protocol(self, bytes req_id, dict msg):
+    cdef object wrap_protocol(self, bytes req_id, object msg):
         """implement on protocol"""
         pass    
 
@@ -243,36 +244,32 @@ cdef class AsyncZmqClient(AsyncClient):
                 except Exception as e:
                     break 
 
-    cdef object wrap_protocol(self, bytes req_id, dict msg):
+    cdef object wrap_protocol(self, bytes req_id, object msg):
         cdef object req_subject = Subject()
 
         if not self._running:
             raise RuntimeError("client is not running")
 
-        self._req_subject[req_id] = req_subject # avoid to ops.filter(lambda) 
+        self._req_subject[req_id] = req_subject # avoid to ops.filter(lambda) --- global bus
 
-        # share obs
         observable = req_subject.pipe(
-            # ops.sample(0.1),  # 100ms aband rest pack
-            # # up to 500 / 1 second pack to list
-            # ops.buffer_with_time_or_count(timespan=1.0, count=500),
-            # # on receive / 50ms not receive
-            # ops.throttle_first(0.05),
+            # ops.sample(0.1),  # 100ms abandon reset 
+            # ops.buffer_with_time_or_count(timespan=1.0, count=500), # up to 500 / 1 second to list
+            # ops.throttle_first(0.05), # on receive / 50ms not receive
             # ops.publish_replay(1), # cache 1 record 
             # ops.ref_count()
             ops.map(scale), # avoid lambda function due to python overhead and function must cpdef or def
             ops.share() 
         ) 
-        # only send rq and receive api move to subclass and accumlate to global bus
         coro = self.send_request(req_id, msg) 
         future = asyncio.run_coroutine_threadsafe(coro, self.loop)
         future.add_done_callback(lambda f: self._finalize_task(f))
         return observable 
 
-    async def send_request(self, bytes req_id, dict message):
-        serialize_msg = pack(message)
-        # multi_frame [req_id, serialized_msg]
-        await self.socket.send_multipart([req_id, serialize_msg])
+    async def send_request(self, bytes req_id, object msg):
+        # serialize_msg = pack(msg)
+        serialize_msg = _ENCODER.encode(msg)
+        await self.socket.send_multipart([req_id, serialize_msg]) # multi_frame
         print("send multiframe :", req_id, serialize_msg)
 
     async def _async_shutdown(self):
@@ -323,7 +320,8 @@ cdef class AsyncStreamClient(AsyncClient):
 
                 complete_message = await reader.readexactly(msg_len)
                 req_id = complete_message[:REQ_ID_SIZE] 
-                payload = unpack(complete_message[REQ_ID_SIZE:]) 
+                # payload = unpack(complete_message[REQ_ID_SIZE:]) 
+                payload = _DECODER.decode(complete_message[REQ_ID_SIZE:]) 
                 
                 fut = self._req_futures.pop(req_id, None)
                 if fut and not fut.done():
@@ -338,7 +336,7 @@ cdef class AsyncStreamClient(AsyncClient):
                 print(f"[TCP] Listen_loop error: {e}")
                 break
             
-    cdef object wrap_protocol(self, bytes req_id, dict msg): # return future to user to determin await or result block
+    cdef object wrap_protocol(self, bytes req_id, object msg): # return future to user to determin await or result block
         """TCP 返回 Coroutine 用户需 await"""
         from concurrent.futures import Future
         cdef object fut = Future() # block 
@@ -348,11 +346,12 @@ cdef class AsyncStreamClient(AsyncClient):
         asyncio.run_coroutine_threadsafe(self.send_request(req_id, msg), self.loop)
         return fut # await asyncio.wrap_future(fut) to transform block to nonblock
 
-    async def send_request(self, bytes req_id, dict message):
+    async def send_request(self, bytes req_id, object msg):
         connection_key = f"{self.host}:{self.port}"
         reader, writer = await self._get_connection(connection_key) # cache            
         
-        serialize_msg = req_id + pack(message) # req_id 16 bytes
+        # serialize_msg = req_id + pack(msg) # req_id 16 bytes
+        serialize_msg = req_id + _ENCODER.encode(msg) # req_id 16 bytes
         msg_len = len(serialize_msg)
         writer.write(msg_len.to_bytes(LENGTH_BYTES, byteorder='big') + serialize_msg)
         await writer.drain()

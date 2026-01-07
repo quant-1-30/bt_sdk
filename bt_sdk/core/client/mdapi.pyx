@@ -1,10 +1,11 @@
-# /usr/bin/env python3
-# -*- coding: utf-8 -*-
+# cython: language_level=3
 
+import msgspec
 import reactivex.operators as ops
 import pyarrow as pa
 # from contextlib import contextmanager
 
+from core.protocol import Event
 from core.client.async_client cimport AsyncZmqClient 
 from core.client.util cimport fast_uuid4_bytes
 
@@ -35,9 +36,9 @@ cdef class MdApi:
             request calendar
         """
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef dict rq = {"topic": "calendar"}
+        cdef object event = Event(topic="calendar")
 
-        obs = self.async_client.run(req_id, rq)
+        obs = self.async_client.run(req_id, event)
         return obs
     
     cpdef object get_instrument(self):
@@ -45,51 +46,46 @@ cdef class MdApi:
             request instruments
         """
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef dict rq = {"topic": "instrument"}
+        cdef object event = Event(topic="instrument")
 
-        obs = self.async_client.run(req_id, rq)
+        obs = self.async_client.run(req_id, event)
         return obs
     
-    cpdef object get_benchmark(self, bytes index):
-        """
-            request index 000001 000680 399006 399001
-        """
+    cpdef object get_benchmark(self, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef dict rq = {"topic": "index", "body": {"sid": [index]}}
+        cdef object event = Event(topic="index", body=body)
 
-        obs = self.async_client.run(req_id, rq)
+        obs = self.async_client.run(req_id, event)
         return obs 
     
-    cpdef object get_event(self, str topic, dict body):
+    cpdef object get_event(self, str topic, object body):
         """
             request instruments
         """
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef dict rq = {"topic": topic, "body": body}
+        cdef object event = Event(topic=topic, body=body)
         
-        obs = self.async_client.run(req_id, rq)
+        obs = self.async_client.run(req_id, event)
         return obs
 
-    # @contextmanager
-    cpdef object subscribe(self, dict body):
-        """使用迭代器模式替代上下文管理器"""
+    cpdef object subscribe(self, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef dict rq = {"topic": "tick", "body": body}
+        cdef object event = Event(topic="tick", body=body)
 
-        obs = self.async_client.run(req_id, rq)
+        obs = self.async_client.run(req_id, event)
         return obs
         
-    cpdef object get_close(self, dict body):
+    cpdef object get_close(self, object body):
         """
             request instruments
         """
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef dict rq = {"topic": "close", "body": body}
+        cdef object event = Event(topic="close", body=body)
         
-        obs = self.async_client.run(req_id, rq)
+        obs = self.async_client.run(req_id, event)
         return obs
 
-    cpdef object get_factor(self, dict body):
+    cpdef object get_factor(self, object body):
         cdef object obs_close, obs_adjust, obs_right
         cdef object close, adjust, right
 
@@ -102,6 +98,9 @@ cdef class MdApi:
         from bt_sdk.core.helper.factor import calc_factor
         factors = calc_factor(close, adjust, right)
         return factors
+
+    cpdef void disconnect(self):
+        self.async_client.close()
     
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:

@@ -5,69 +5,33 @@ Created on Tue Mar 12 15:37:47 2019
 
 @author: python
 """
-import threading
+from contextlib import ExitStack
+from contextlib import contextmanager
 from warnings import (
     catch_warnings,
     filterwarnings,
 )
-from contextlib import contextmanager
+        
+class Context(contextlib.ContextDecorator):
 
-context = threading.local()
+    def __init__(self, how_used):
+        self.how_used = how_used
 
-def get_algo_instance():
-    return getattr(context, 'algorithm', None)
-
-def set_algo_instance(algo):
-    context.algorithm = algo
-
-
-@object.__new__
-class nop_context(object):
-    """A nop context manager.
-    """
     def __enter__(self):
-        pass
+        print(f'__enter__({self.how_used})')
+        return self
 
-    def __exit__(self, *excinfo):
-        pass
-
-
-def _nop(*args, **kwargs):
-    pass
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print(f'__exit__({self.how_used})')
 
 
-class CallbackManager(object):
-    """Create a context manager from a pre-execution callback and a
-    post-execution callback.
-
-    Parameters
-    ----------
-    pre : (...) -> any, optional
-        A pre-execution callback. This will be passed ``*args`` and
-        ``**kwargs``.
-    post : (...) -> any, optional
-        A post-execution callback. This will be passed ``*args`` and
-        ``**kwargs``.
-
-    Notes
-    -----
-    The enter value of this context manager will be the result of calling
-    ``pre(*args, **kwargs)``
-    """
-    def __init__(self, pre=None, post=None):
-        self.pre = pre if pre is not None else _nop
-        self.post = post if post is not None else _nop
-
-    def __call__(self, *args, **kwargs):
-        return _ManagedCallbackContext(self.pre, self.post, args, kwargs)
-
-    # special case, if no extra args are passed make this a context manager
-    # which forwards no args to pre and post
-    def __enter__(self):
-        return self.pre()
-
-    def __exit__(self, *excinfo):
-        self.post()
+@contextlib.contextmanager
+def make_context():
+    print("enter make_context")
+    try:
+        yield {}
+    except RuntimeError as err:
+        print(f"{err=}")
 
 
 class _ManagedCallbackContext(object):
@@ -117,7 +81,6 @@ def ignore_nanwarnings():
         )
     )
 
-
 @contextmanager
 def ignore_pandas_nan_categorical_warning():
     with catch_warnings():
@@ -131,14 +94,17 @@ def ignore_pandas_nan_categorical_warning():
         yield
 
 
+context = threading.local()
+
+def get_algo_instance():
+    return getattr(context, 'algorithm', None)
+
+def set_algo_instance(algo):
+    context.algorithm = algo
+
 class AlgoAPI(object):
     """
-    Context manager for making an algorithm instance available to AlgoAPI
-    functions within a scoped block.
-    多线程编程中的对同一变量的访问冲突的一种技术, TLS会为每一个线程维护一个和该线程绑定的变量的副本。而不是无止尽的传递局部参数的方式编程
-    每一个线程都拥有自己的变量副本, 并不意味着就一定不会对TLS变量中某些操作枷锁了。
-    Java平台的java.lang.ThreadLocal和Python 中的threading.local()都是TLS技术的一种实现
-    TLS使用的缺陷是, 如果你的线程都不退出, 那么副本数据可能一直不被GC回收, 会消耗很多资源, 比如线程池中, 线程都不退出, 使用TLS需要非常小心
+        TLS: ThreadLocalStorage to avoid var confliction / withdraw: tls cannot be gc until thread exit
     """
     def __init__(self, algo_instance):
         self.algo_instance = algo_instance

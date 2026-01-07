@@ -5,6 +5,23 @@ import struct
 from typing import Any, Mapping
 
 
+def default_encoder(obj):
+    if isinstance(obj, uuid.UUID):
+        return obj.bytes # str(obj) 
+    # elif isinstance(obj, datetime.datetime):
+    #     return obj.isoformat()
+    raise TypeError(f"Object of type {type(obj)} is not serializable")
+
+def pack(msg: Mapping) -> bytes:
+    # bytes ---> base64 encode(bytes-like ---> bytes-like object)
+    # decode = {k: base64.b64decode(v) for k, v in body.items()}
+    # decode = {k: json.loads(v.decode("utf-8")) for k, v in decode.items()}
+    return msgpack.packb(msg, use_bin_type=True, default=default_encoder)
+
+def unpack(data: bytes) -> list:
+    decode_data = msgpack.unpackb(data, use_list=False, raw=False, strict_map_key=False)
+    return decode_data
+
 # struct_fmt = {
 #     "md": {
 #             "calendar": ">i",
@@ -20,33 +37,15 @@ from typing import Any, Mapping
 #     },
 # }
 
-# def msg_unpack(_type: str, msg_type, msg: bytes) -> Any:
-#     # # 网络传输base64编码替换 +与/ 特殊字符 返回bytes
-#     # # bytes ---> base64 encode(bytes-like ---> bytes-like object)
-#     # # base64 decode (str / bytes-like ---> bytes-like)
-#     # body = metadata.pop("body")
-#     # decode = {k: base64.b64decode(v) for k, v in body.items()}
-#     # decode = {k: json.loads(v.decode("utf-8")) for k, v in decode.items()}
-#     # msgpack / struct 
-#     # zlib --- stream data / gzip --- file
-#     #  uuid_obj = uuid.UUID(bytes=unpacked[0])
-#     if msg:
-#         try:
-#             unpacked = struct.unpack(struct_fmt[_type][msg_type], msg)
-#             # uuid.UUID(bytes=unpacked[-1]) / byte.decode("utf-8")
-#             return unpacked
-#         except Exception as e:
-#             print("msg_unpack error: ", e)
-#             return ''
-#     return ''
-
-
-def pack(msg: Mapping) -> bytes:
-    # msg_c = msg.copy()
-    # msg_c["request_id"] = request_id
-    # return msgpack.packb({"topic": topic, "body": body, "experiment_id": experiment_id, "request_id":request_id}, use_bin_type=True)
-    return msgpack.packb(msg, use_bin_type=True)
-
-def unpack(data: bytes) -> list:
-    data = msgpack.unpackb(data, raw=False)
-    return data
+# struct_format = {"tick": ">liiiiiq",  # l -- long / q -- long long / L /Q unsigned
+#                  "calendar": ">i", 
+#                  "instrument": ">6sii", 
+#                  "adjustment": ">6siiiii", 
+#                  "rightment": ">6siiii"}
+      
+# def struct_pack(msg: str, obj) -> Any:  # ! / > stands for big-endian / i16s (uuid) / I{length}s () 
+#     if obj:
+#         # import pdb; pdb.set_trace()
+#         data = obj if isinstance(obj, tuple) else (obj,)
+#         packed = struct.pack(struct_format[msg], *data)
+#         return packed
