@@ -48,16 +48,16 @@ cdef class TdApi:
         fut = self.async_client.run(req_id, event)
         return fut
 
-    cpdef object getvalue(self, bytes experiment_id, bytes req_type):
+    cpdef object getvalue(self, bytes experiment_id, str topic):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic = "get_data", sub_topic = req_type, experiment_id=experiment_id)
+        cdef object event = Event(topic="get_data", sub_topic=topic, experiment_id=experiment_id)
 
         fut = self.async_client.run(req_id, event)
         return fut
     
-    cpdef object subscribe(self, bytes experiment_id, object body):
+    cpdef object subscribe(self, bytes experiment_id, str topic, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic = "subscribe", experiment_id=experiment_id, body=body)
+        cdef object event = Event(topic = "subscribe", sub_topic=topic, experiment_id=experiment_id, body=body)
 
         fut = self.async_client.run(req_id, event)
         return fut

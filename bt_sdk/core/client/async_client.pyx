@@ -20,8 +20,7 @@ from reactivex.subject import Subject
 from reactivex.scheduler.eventloop import AsyncIOScheduler
 from concurrent.futures import ThreadPoolExecutor
 
-from core.protocol import _ENCODER, _DECODER
-
+from core.protocol import _ENCODER, _DECODER, _RespDECODER
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
@@ -110,7 +109,7 @@ cdef class AsyncClient:
         try:
             ret = future.result()  # result or exception
         except Exception as e:
-            print(f"任务执行失败: {e}")
+            print(f"_finalize_task: {e}")
 
     cpdef object run(self, bytes req_id, object msg):
         if not self._running:
@@ -140,12 +139,11 @@ cdef class AsyncClient:
             return
             
         self._running = False
-        print(f"[{self.__class__.__name__}] Closing...")
 
         if self.loop is not None and self.loop.is_running():
             try:
                 fut = asyncio.run_coroutine_threadsafe(self._async_shutdown(), self.loop)
-                fut.result(timeout=2.0) # 等待子类清理资源
+                fut.result(timeout=2.0) 
             except Exception as e:
                 print(f"Shutdown error: {e}")
             
@@ -181,7 +179,6 @@ cdef class AsyncZmqClient(AsyncClient):
         
         # Set a unique identity for this client for easier debugging on the server when reconnect
         client_id = f"client-{uuid.uuid4()}".encode('utf-8') # if not set client will generate uuid as client_id
-        print("client identity :", client_id)
         self.socket.setsockopt(zmq.IDENTITY, client_id)
 
         # # zmq.SNDBUF` / `zmq.RCVBUF` kernal TCP Window 
@@ -199,7 +196,6 @@ cdef class AsyncZmqClient(AsyncClient):
         # self.socket.setsockopt(zmq.HEARTBEAT_TIMEOUT, 15000) 
         # self.socket.setsockopt(zmq.HEARTBEAT_TTL, 15000) 
         
-        print(f"[ZMQ] Connecting to server at {self.addr}")
         self.socket.connect(self.addr)
         self.listen_task = self.loop.create_task(self._listen_loop())
 
@@ -270,7 +266,6 @@ cdef class AsyncZmqClient(AsyncClient):
         # serialize_msg = pack(msg)
         serialize_msg = _ENCODER.encode(msg)
         await self.socket.send_multipart([req_id, serialize_msg]) # multi_frame
-        print("send multiframe :", req_id, serialize_msg)
 
     async def _async_shutdown(self):
         await AsyncClient._async_shutdown(self)
@@ -306,8 +301,7 @@ cdef class AsyncStreamClient(AsyncClient):
 
         print(f"[TCP] Reader for {connection_key} started.")
 
-        # while self._running and not reader.at_eof():
-        while self._running:
+        while self._running: # reader.at_eof() means close connect
             try:
                 len_bytes = await asyncio.wait_for(reader.readexactly(LENGTH_BYTES), timeout=30.0)
                 msg_len = int.from_bytes(len_bytes, 'big')
@@ -315,13 +309,12 @@ cdef class AsyncStreamClient(AsyncClient):
                 if msg_len == 0:
                     continue # reset wait_for timeout
                 
-                if msg_len > 10 * 1024 * 1024: 
-                    raise ValueError("Packet too large")
+                if msg_len > 10 * 1024 * 1024 or msg_len == 4: 
+                    raise ValueError("Packet too large or Error occcur ")
 
                 complete_message = await reader.readexactly(msg_len)
                 req_id = complete_message[:REQ_ID_SIZE] 
-                # payload = unpack(complete_message[REQ_ID_SIZE:]) 
-                payload = _DECODER.decode(complete_message[REQ_ID_SIZE:]) 
+                payload = _RespDECODER.decode(complete_message[REQ_ID_SIZE:]) # decode(payload)
                 
                 fut = self._req_futures.pop(req_id, None)
                 if fut and not fut.done():

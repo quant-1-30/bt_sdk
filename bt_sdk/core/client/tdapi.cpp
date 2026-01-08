@@ -1676,7 +1676,7 @@ struct __pyx_vtabstruct_4core_6client_5tdapi_TdApi {
   PyObject *(*__pyx_register)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, int __pyx_skip_dispatch);
   PyObject *(*set_cash)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, int __pyx_skip_dispatch);
   PyObject *(*getvalue)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, int __pyx_skip_dispatch);
-  PyObject *(*subscribe)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, int __pyx_skip_dispatch);
+  PyObject *(*subscribe)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, PyObject *, int __pyx_skip_dispatch);
   PyObject *(*submit)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, int __pyx_skip_dispatch);
   PyObject *(*on_dt_over)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, int __pyx_skip_dispatch);
   void (*disconnect)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, int __pyx_skip_dispatch);
@@ -2492,8 +2492,8 @@ static int __Pyx_State_RemoveModule(void*);
 
 static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_register(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_body, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_set_cash(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_body, int __pyx_skip_dispatch); /* proto*/
-static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_getvalue(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_req_type, int __pyx_skip_dispatch); /* proto*/
-static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_subscribe(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_body, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_getvalue(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_topic, int __pyx_skip_dispatch); /* proto*/
+static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_subscribe(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_topic, PyObject *__pyx_v_body, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_submit(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_body, int __pyx_skip_dispatch); /* proto*/
 static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_on_dt_over(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_body, int __pyx_skip_dispatch); /* proto*/
 static void __pyx_f_4core_6client_5tdapi_5TdApi_disconnect(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, int __pyx_skip_dispatch); /* proto*/
@@ -2519,8 +2519,8 @@ static const char __pyx_k_async_client_client_id[] = "async_client, client_id";
 static int __pyx_pf_4core_6client_5tdapi_5TdApi___init__(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_client_id, PyObject *__pyx_v_addr, int __pyx_v_timeout); /* proto */
 static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_2register(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
 static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_4set_cash(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_body); /* proto */
-static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_6getvalue(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_req_type); /* proto */
-static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_8subscribe(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_body); /* proto */
+static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_6getvalue(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_topic); /* proto */
+static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_8subscribe(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_topic, PyObject *__pyx_v_body); /* proto */
 static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_10submit(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_body); /* proto */
 static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_12on_dt_over(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_body); /* proto */
 static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_14disconnect(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self); /* proto */
@@ -2558,7 +2558,7 @@ typedef struct {
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_values;
   PyObject *__pyx_tuple[2];
   PyObject *__pyx_codeobj_tab[10];
-  PyObject *__pyx_string_tab[91];
+  PyObject *__pyx_string_tab[90];
   PyObject *__pyx_number_tab[2];
 /* #### Code section: module_state_contents ### */
 /* CommonTypesMetaclass.module_state_decls */
@@ -2662,35 +2662,34 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_reduce_cython __pyx_string_tab[59]
 #define __pyx_n_u_reduce_ex __pyx_string_tab[60]
 #define __pyx_n_u_register __pyx_string_tab[61]
-#define __pyx_n_u_req_type __pyx_string_tab[62]
-#define __pyx_n_u_run __pyx_string_tab[63]
-#define __pyx_n_u_self __pyx_string_tab[64]
-#define __pyx_n_u_set_cash __pyx_string_tab[65]
-#define __pyx_n_u_set_name __pyx_string_tab[66]
-#define __pyx_n_u_setdefault __pyx_string_tab[67]
-#define __pyx_n_u_setstate __pyx_string_tab[68]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[69]
-#define __pyx_n_u_state __pyx_string_tab[70]
-#define __pyx_n_u_sub_topic __pyx_string_tab[71]
-#define __pyx_n_u_submit __pyx_string_tab[72]
-#define __pyx_n_u_subscribe __pyx_string_tab[73]
-#define __pyx_n_u_test __pyx_string_tab[74]
-#define __pyx_n_u_timeout __pyx_string_tab[75]
-#define __pyx_n_u_topic __pyx_string_tab[76]
-#define __pyx_n_u_update __pyx_string_tab[77]
-#define __pyx_n_u_use_setstate __pyx_string_tab[78]
-#define __pyx_n_u_values __pyx_string_tab[79]
-#define __pyx_kp_b_PyObject_int___pyx_skip_dispatch __pyx_string_tab[80]
-#define __pyx_kp_b_iso88591_1F __pyx_string_tab[81]
-#define __pyx_kp_b_iso88591_A_A_E_E_d_t1HA_q __pyx_string_tab[82]
+#define __pyx_n_u_run __pyx_string_tab[62]
+#define __pyx_n_u_self __pyx_string_tab[63]
+#define __pyx_n_u_set_cash __pyx_string_tab[64]
+#define __pyx_n_u_set_name __pyx_string_tab[65]
+#define __pyx_n_u_setdefault __pyx_string_tab[66]
+#define __pyx_n_u_setstate __pyx_string_tab[67]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[68]
+#define __pyx_n_u_state __pyx_string_tab[69]
+#define __pyx_n_u_sub_topic __pyx_string_tab[70]
+#define __pyx_n_u_submit __pyx_string_tab[71]
+#define __pyx_n_u_subscribe __pyx_string_tab[72]
+#define __pyx_n_u_test __pyx_string_tab[73]
+#define __pyx_n_u_timeout __pyx_string_tab[74]
+#define __pyx_n_u_topic __pyx_string_tab[75]
+#define __pyx_n_u_update __pyx_string_tab[76]
+#define __pyx_n_u_use_setstate __pyx_string_tab[77]
+#define __pyx_n_u_values __pyx_string_tab[78]
+#define __pyx_kp_b_PyObject_int___pyx_skip_dispatch __pyx_string_tab[79]
+#define __pyx_kp_b_iso88591_1F __pyx_string_tab[80]
+#define __pyx_kp_b_iso88591_A_A_E_E_d_t1HA_q __pyx_string_tab[81]
+#define __pyx_kp_b_iso88591_A_A_E_Jg_ST_d_t1HA_q __pyx_string_tab[82]
 #define __pyx_kp_b_iso88591_A_A_E_N_QVVW_d_t1HA_q __pyx_string_tab[83]
-#define __pyx_kp_b_iso88591_A_A_E__TYYZ_d_t1HA_q __pyx_string_tab[84]
-#define __pyx_kp_b_iso88591_A_A_E_l_NZ_d_t1HA_q __pyx_string_tab[85]
-#define __pyx_kp_b_iso88591_A_A_E_nOSXXY_d_t1HA_q __pyx_string_tab[86]
-#define __pyx_kp_b_iso88591_A_A_E_oUZZ_d_t1HA_q __pyx_string_tab[87]
-#define __pyx_kp_b_iso88591_A_M_q __pyx_string_tab[88]
-#define __pyx_kp_b_iso88591_T_A_G1F_a_vWE_Q_q_q_d_7_WA_d_7 __pyx_string_tab[89]
-#define __pyx_kp_b_iso88591_q_0_kQR_5_7_q_a_1 __pyx_string_tab[90]
+#define __pyx_kp_b_iso88591_A_A_E_nOSXXY_d_t1HA_q __pyx_string_tab[84]
+#define __pyx_kp_b_iso88591_A_A_E_oUZZ_d_t1HA_q __pyx_string_tab[85]
+#define __pyx_kp_b_iso88591_A_A_E_z_Veejjk_d_t1HA_q __pyx_string_tab[86]
+#define __pyx_kp_b_iso88591_A_M_q __pyx_string_tab[87]
+#define __pyx_kp_b_iso88591_T_A_G1F_a_vWE_Q_q_q_d_7_WA_d_7 __pyx_string_tab[88]
+#define __pyx_kp_b_iso88591_q_0_kQR_5_7_q_a_1 __pyx_string_tab[89]
 #define __pyx_int_9999 __pyx_number_tab[0]
 #define __pyx_int_209177870 __pyx_number_tab[1]
 /* #### Code section: module_state_clear ### */
@@ -2714,7 +2713,7 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_type_4core_6client_5tdapi_TdApi);
   for (int i=0; i<2; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
   for (int i=0; i<10; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<91; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<90; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   for (int i=0; i<2; ++i) { Py_CLEAR(clear_module_state->__pyx_number_tab[i]); }
 /* #### Code section: module_state_clear_contents ### */
 /* CommonTypesMetaclass.module_state_clear */
@@ -2745,7 +2744,7 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_type_4core_6client_5tdapi_TdApi);
   for (int i=0; i<2; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
   for (int i=0; i<10; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<91; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<90; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   for (int i=0; i<2; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_number_tab[i]); }
 /* #### Code section: module_state_traverse_contents ### */
 /* CommonTypesMetaclass.module_state_traverse */
@@ -3440,7 +3439,7 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_set_cash(struct __pyx_obj_4
  *         fut = self.async_client.run(req_id, event)
  *         return fut             # <<<<<<<<<<<<<<
  * 
- *     cpdef object getvalue(self, bytes experiment_id, bytes req_type):
+ *     cpdef object getvalue(self, bytes experiment_id, str topic):
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_fut);
@@ -3604,9 +3603,9 @@ static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_4set_cash(struct __pyx_obj
 /* "core/client/tdapi.pyx":51
  *         return fut
  * 
- *     cpdef object getvalue(self, bytes experiment_id, bytes req_type):             # <<<<<<<<<<<<<<
+ *     cpdef object getvalue(self, bytes experiment_id, str topic):             # <<<<<<<<<<<<<<
  *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic = "get_data", sub_topic = req_type, experiment_id=experiment_id)
+ *         cdef object event = Event(topic="get_data", sub_topic=topic, experiment_id=experiment_id)
 */
 
 static PyObject *__pyx_pw_4core_6client_5tdapi_5TdApi_7getvalue(PyObject *__pyx_v_self, 
@@ -3616,7 +3615,7 @@ PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_getvalue(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_req_type, int __pyx_skip_dispatch) {
+static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_getvalue(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_topic, int __pyx_skip_dispatch) {
   PyObject *__pyx_v_req_id = 0;
   PyObject *__pyx_v_event = 0;
   PyObject *__pyx_v_fut = NULL;
@@ -3667,7 +3666,7 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_getvalue(struct __pyx_obj_4
         }
         #endif
         {
-          PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_v_experiment_id, __pyx_v_req_type};
+          PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_v_experiment_id, __pyx_v_topic};
           __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -3694,9 +3693,9 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_getvalue(struct __pyx_obj_4
 
   /* "core/client/tdapi.pyx":52
  * 
- *     cpdef object getvalue(self, bytes experiment_id, bytes req_type):
+ *     cpdef object getvalue(self, bytes experiment_id, str topic):
  *         cdef bytes req_id = fast_uuid4_bytes()             # <<<<<<<<<<<<<<
- *         cdef object event = Event(topic = "get_data", sub_topic = req_type, experiment_id=experiment_id)
+ *         cdef object event = Event(topic="get_data", sub_topic=topic, experiment_id=experiment_id)
  * 
 */
   __pyx_t_1 = __pyx_f_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
@@ -3705,9 +3704,9 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_getvalue(struct __pyx_obj_4
   __pyx_t_1 = 0;
 
   /* "core/client/tdapi.pyx":53
- *     cpdef object getvalue(self, bytes experiment_id, bytes req_type):
+ *     cpdef object getvalue(self, bytes experiment_id, str topic):
  *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic = "get_data", sub_topic = req_type, experiment_id=experiment_id)             # <<<<<<<<<<<<<<
+ *         cdef object event = Event(topic="get_data", sub_topic=topic, experiment_id=experiment_id)             # <<<<<<<<<<<<<<
  * 
  *         fut = self.async_client.run(req_id, event)
 */
@@ -3731,7 +3730,7 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_getvalue(struct __pyx_obj_4
     __pyx_t_3 = __Pyx_MakeVectorcallBuilderKwds(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 53, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_mstate_global->__pyx_n_u_get_data, __pyx_t_3, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 53, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_sub_topic, __pyx_v_req_type, __pyx_t_3, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 53, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_sub_topic, __pyx_v_topic, __pyx_t_3, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 53, __pyx_L1_error)
     if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_experiment_id, __pyx_v_experiment_id, __pyx_t_3, __pyx_callargs+1, 2) < (0)) __PYX_ERR(0, 53, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_3);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -3744,7 +3743,7 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_getvalue(struct __pyx_obj_4
   __pyx_t_1 = 0;
 
   /* "core/client/tdapi.pyx":55
- *         cdef object event = Event(topic = "get_data", sub_topic = req_type, experiment_id=experiment_id)
+ *         cdef object event = Event(topic="get_data", sub_topic=topic, experiment_id=experiment_id)
  * 
  *         fut = self.async_client.run(req_id, event)             # <<<<<<<<<<<<<<
  *         return fut
@@ -3768,7 +3767,7 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_getvalue(struct __pyx_obj_4
  *         fut = self.async_client.run(req_id, event)
  *         return fut             # <<<<<<<<<<<<<<
  * 
- *     cpdef object subscribe(self, bytes experiment_id, object body):
+ *     cpdef object subscribe(self, bytes experiment_id, str topic, object body):
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_fut);
@@ -3778,9 +3777,9 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_getvalue(struct __pyx_obj_4
   /* "core/client/tdapi.pyx":51
  *         return fut
  * 
- *     cpdef object getvalue(self, bytes experiment_id, bytes req_type):             # <<<<<<<<<<<<<<
+ *     cpdef object getvalue(self, bytes experiment_id, str topic):             # <<<<<<<<<<<<<<
  *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic = "get_data", sub_topic = req_type, experiment_id=experiment_id)
+ *         cdef object event = Event(topic="get_data", sub_topic=topic, experiment_id=experiment_id)
 */
 
   /* function exit code */
@@ -3817,7 +3816,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ) {
   PyObject *__pyx_v_experiment_id = 0;
-  PyObject *__pyx_v_req_type = 0;
+  PyObject *__pyx_v_topic = 0;
   #if !CYTHON_METH_FASTCALL
   CYTHON_UNUSED Py_ssize_t __pyx_nargs;
   #endif
@@ -3838,7 +3837,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   #endif
   __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
   {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_experiment_id,&__pyx_mstate_global->__pyx_n_u_req_type,0};
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_experiment_id,&__pyx_mstate_global->__pyx_n_u_topic,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
     if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 51, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
@@ -3868,7 +3867,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 51, __pyx_L3_error)
     }
     __pyx_v_experiment_id = ((PyObject*)values[0]);
-    __pyx_v_req_type = ((PyObject*)values[1]);
+    __pyx_v_topic = ((PyObject*)values[1]);
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
@@ -3884,8 +3883,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_experiment_id), (&PyBytes_Type), 1, "experiment_id", 1))) __PYX_ERR(0, 51, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_req_type), (&PyBytes_Type), 1, "req_type", 1))) __PYX_ERR(0, 51, __pyx_L1_error)
-  __pyx_r = __pyx_pf_4core_6client_5tdapi_5TdApi_6getvalue(((struct __pyx_obj_4core_6client_5tdapi_TdApi *)__pyx_v_self), __pyx_v_experiment_id, __pyx_v_req_type);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_topic), (&PyUnicode_Type), 1, "topic", 1))) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_r = __pyx_pf_4core_6client_5tdapi_5TdApi_6getvalue(((struct __pyx_obj_4core_6client_5tdapi_TdApi *)__pyx_v_self), __pyx_v_experiment_id, __pyx_v_topic);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3904,7 +3903,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_6getvalue(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_req_type) {
+static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_6getvalue(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_topic) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -3913,7 +3912,7 @@ static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_6getvalue(struct __pyx_obj
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("getvalue", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_4core_6client_5tdapi_5TdApi_getvalue(__pyx_v_self, __pyx_v_experiment_id, __pyx_v_req_type, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_4core_6client_5tdapi_5TdApi_getvalue(__pyx_v_self, __pyx_v_experiment_id, __pyx_v_topic, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -3933,9 +3932,9 @@ static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_6getvalue(struct __pyx_obj
 /* "core/client/tdapi.pyx":58
  *         return fut
  * 
- *     cpdef object subscribe(self, bytes experiment_id, object body):             # <<<<<<<<<<<<<<
+ *     cpdef object subscribe(self, bytes experiment_id, str topic, object body):             # <<<<<<<<<<<<<<
  *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic = "subscribe", experiment_id=experiment_id, body=body)
+ *         cdef object event = Event(topic = "subscribe", sub_topic=topic, experiment_id=experiment_id, body=body)
 */
 
 static PyObject *__pyx_pw_4core_6client_5tdapi_5TdApi_9subscribe(PyObject *__pyx_v_self, 
@@ -3945,7 +3944,7 @@ PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_subscribe(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_body, int __pyx_skip_dispatch) {
+static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_subscribe(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_topic, PyObject *__pyx_v_body, int __pyx_skip_dispatch) {
   PyObject *__pyx_v_req_id = 0;
   PyObject *__pyx_v_event = 0;
   PyObject *__pyx_v_fut = NULL;
@@ -3996,8 +3995,8 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_subscribe(struct __pyx_obj_
         }
         #endif
         {
-          PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_v_experiment_id, __pyx_v_body};
-          __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+          PyObject *__pyx_callargs[4] = {__pyx_t_3, __pyx_v_experiment_id, __pyx_v_topic, __pyx_v_body};
+          __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (4-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
@@ -4023,9 +4022,9 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_subscribe(struct __pyx_obj_
 
   /* "core/client/tdapi.pyx":59
  * 
- *     cpdef object subscribe(self, bytes experiment_id, object body):
+ *     cpdef object subscribe(self, bytes experiment_id, str topic, object body):
  *         cdef bytes req_id = fast_uuid4_bytes()             # <<<<<<<<<<<<<<
- *         cdef object event = Event(topic = "subscribe", experiment_id=experiment_id, body=body)
+ *         cdef object event = Event(topic = "subscribe", sub_topic=topic, experiment_id=experiment_id, body=body)
  * 
 */
   __pyx_t_1 = __pyx_f_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 59, __pyx_L1_error)
@@ -4034,9 +4033,9 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_subscribe(struct __pyx_obj_
   __pyx_t_1 = 0;
 
   /* "core/client/tdapi.pyx":60
- *     cpdef object subscribe(self, bytes experiment_id, object body):
+ *     cpdef object subscribe(self, bytes experiment_id, str topic, object body):
  *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic = "subscribe", experiment_id=experiment_id, body=body)             # <<<<<<<<<<<<<<
+ *         cdef object event = Event(topic = "subscribe", sub_topic=topic, experiment_id=experiment_id, body=body)             # <<<<<<<<<<<<<<
  * 
  *         fut = self.async_client.run(req_id, event)
 */
@@ -4056,12 +4055,13 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_subscribe(struct __pyx_obj_
   }
   #endif
   {
-    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 3 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_3 = __Pyx_MakeVectorcallBuilderKwds(3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 60, __pyx_L1_error)
+    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 4 : 0)] = {__pyx_t_2, NULL};
+    __pyx_t_3 = __Pyx_MakeVectorcallBuilderKwds(4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 60, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_mstate_global->__pyx_n_u_subscribe, __pyx_t_3, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 60, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_experiment_id, __pyx_v_experiment_id, __pyx_t_3, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 60, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_body, __pyx_v_body, __pyx_t_3, __pyx_callargs+1, 2) < (0)) __PYX_ERR(0, 60, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_sub_topic, __pyx_v_topic, __pyx_t_3, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 60, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_experiment_id, __pyx_v_experiment_id, __pyx_t_3, __pyx_callargs+1, 2) < (0)) __PYX_ERR(0, 60, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_body, __pyx_v_body, __pyx_t_3, __pyx_callargs+1, 3) < (0)) __PYX_ERR(0, 60, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_3);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -4073,7 +4073,7 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_subscribe(struct __pyx_obj_
   __pyx_t_1 = 0;
 
   /* "core/client/tdapi.pyx":62
- *         cdef object event = Event(topic = "subscribe", experiment_id=experiment_id, body=body)
+ *         cdef object event = Event(topic = "subscribe", sub_topic=topic, experiment_id=experiment_id, body=body)
  * 
  *         fut = self.async_client.run(req_id, event)             # <<<<<<<<<<<<<<
  *         return fut
@@ -4107,9 +4107,9 @@ static PyObject *__pyx_f_4core_6client_5tdapi_5TdApi_subscribe(struct __pyx_obj_
   /* "core/client/tdapi.pyx":58
  *         return fut
  * 
- *     cpdef object subscribe(self, bytes experiment_id, object body):             # <<<<<<<<<<<<<<
+ *     cpdef object subscribe(self, bytes experiment_id, str topic, object body):             # <<<<<<<<<<<<<<
  *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic = "subscribe", experiment_id=experiment_id, body=body)
+ *         cdef object event = Event(topic = "subscribe", sub_topic=topic, experiment_id=experiment_id, body=body)
 */
 
   /* function exit code */
@@ -4146,12 +4146,13 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ) {
   PyObject *__pyx_v_experiment_id = 0;
+  PyObject *__pyx_v_topic = 0;
   PyObject *__pyx_v_body = 0;
   #if !CYTHON_METH_FASTCALL
   CYTHON_UNUSED Py_ssize_t __pyx_nargs;
   #endif
   CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[2] = {0,0};
+  PyObject* values[3] = {0,0,0};
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -4167,11 +4168,15 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   #endif
   __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
   {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_experiment_id,&__pyx_mstate_global->__pyx_n_u_body,0};
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_experiment_id,&__pyx_mstate_global->__pyx_n_u_topic,&__pyx_mstate_global->__pyx_n_u_body,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
     if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 58, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
+        case  3:
+        values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 58, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
         if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 58, __pyx_L3_error)
@@ -4185,23 +4190,26 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
       if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "subscribe", 0) < (0)) __PYX_ERR(0, 58, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("subscribe", 1, 2, 2, i); __PYX_ERR(0, 58, __pyx_L3_error) }
+      for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("subscribe", 1, 3, 3, i); __PYX_ERR(0, 58, __pyx_L3_error) }
       }
-    } else if (unlikely(__pyx_nargs != 2)) {
+    } else if (unlikely(__pyx_nargs != 3)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
       if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 58, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
       if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 58, __pyx_L3_error)
+      values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 58, __pyx_L3_error)
     }
     __pyx_v_experiment_id = ((PyObject*)values[0]);
-    __pyx_v_body = values[1];
+    __pyx_v_topic = ((PyObject*)values[1]);
+    __pyx_v_body = values[2];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("subscribe", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 58, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("subscribe", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 58, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -4213,7 +4221,8 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_experiment_id), (&PyBytes_Type), 1, "experiment_id", 1))) __PYX_ERR(0, 58, __pyx_L1_error)
-  __pyx_r = __pyx_pf_4core_6client_5tdapi_5TdApi_8subscribe(((struct __pyx_obj_4core_6client_5tdapi_TdApi *)__pyx_v_self), __pyx_v_experiment_id, __pyx_v_body);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_topic), (&PyUnicode_Type), 1, "topic", 1))) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_r = __pyx_pf_4core_6client_5tdapi_5TdApi_8subscribe(((struct __pyx_obj_4core_6client_5tdapi_TdApi *)__pyx_v_self), __pyx_v_experiment_id, __pyx_v_topic, __pyx_v_body);
 
   /* function exit code */
   goto __pyx_L0;
@@ -4232,7 +4241,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_8subscribe(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_body) {
+static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_8subscribe(struct __pyx_obj_4core_6client_5tdapi_TdApi *__pyx_v_self, PyObject *__pyx_v_experiment_id, PyObject *__pyx_v_topic, PyObject *__pyx_v_body) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -4241,7 +4250,7 @@ static PyObject *__pyx_pf_4core_6client_5tdapi_5TdApi_8subscribe(struct __pyx_ob
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("subscribe", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_4core_6client_5tdapi_5TdApi_subscribe(__pyx_v_self, __pyx_v_experiment_id, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_4core_6client_5tdapi_5TdApi_subscribe(__pyx_v_self, __pyx_v_experiment_id, __pyx_v_topic, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6029,7 +6038,7 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtable_4core_6client_5tdapi_TdApi.__pyx_register = (PyObject *(*)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, int __pyx_skip_dispatch))__pyx_f_4core_6client_5tdapi_5TdApi_register;
   __pyx_vtable_4core_6client_5tdapi_TdApi.set_cash = (PyObject *(*)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, int __pyx_skip_dispatch))__pyx_f_4core_6client_5tdapi_5TdApi_set_cash;
   __pyx_vtable_4core_6client_5tdapi_TdApi.getvalue = (PyObject *(*)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, int __pyx_skip_dispatch))__pyx_f_4core_6client_5tdapi_5TdApi_getvalue;
-  __pyx_vtable_4core_6client_5tdapi_TdApi.subscribe = (PyObject *(*)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, int __pyx_skip_dispatch))__pyx_f_4core_6client_5tdapi_5TdApi_subscribe;
+  __pyx_vtable_4core_6client_5tdapi_TdApi.subscribe = (PyObject *(*)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, PyObject *, int __pyx_skip_dispatch))__pyx_f_4core_6client_5tdapi_5TdApi_subscribe;
   __pyx_vtable_4core_6client_5tdapi_TdApi.submit = (PyObject *(*)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, int __pyx_skip_dispatch))__pyx_f_4core_6client_5tdapi_5TdApi_submit;
   __pyx_vtable_4core_6client_5tdapi_TdApi.on_dt_over = (PyObject *(*)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, PyObject *, PyObject *, int __pyx_skip_dispatch))__pyx_f_4core_6client_5tdapi_5TdApi_on_dt_over;
   __pyx_vtable_4core_6client_5tdapi_TdApi.disconnect = (void (*)(struct __pyx_obj_4core_6client_5tdapi_TdApi *, int __pyx_skip_dispatch))__pyx_f_4core_6client_5tdapi_5TdApi_disconnect;
@@ -6521,9 +6530,9 @@ __Pyx_RefNannySetupContext("PyInit_tdapi", 0);
   /* "core/client/tdapi.pyx":51
  *         return fut
  * 
- *     cpdef object getvalue(self, bytes experiment_id, bytes req_type):             # <<<<<<<<<<<<<<
+ *     cpdef object getvalue(self, bytes experiment_id, str topic):             # <<<<<<<<<<<<<<
  *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic = "get_data", sub_topic = req_type, experiment_id=experiment_id)
+ *         cdef object event = Event(topic="get_data", sub_topic=topic, experiment_id=experiment_id)
 */
   __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_5tdapi_5TdApi_7getvalue, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TdApi_getvalue, NULL, __pyx_mstate_global->__pyx_n_u_core_client_tdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -6536,9 +6545,9 @@ __Pyx_RefNannySetupContext("PyInit_tdapi", 0);
   /* "core/client/tdapi.pyx":58
  *         return fut
  * 
- *     cpdef object subscribe(self, bytes experiment_id, object body):             # <<<<<<<<<<<<<<
+ *     cpdef object subscribe(self, bytes experiment_id, str topic, object body):             # <<<<<<<<<<<<<<
  *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic = "subscribe", experiment_id=experiment_id, body=body)
+ *         cdef object event = Event(topic = "subscribe", sub_topic=topic, experiment_id=experiment_id, body=body)
 */
   __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_4core_6client_5tdapi_5TdApi_9subscribe, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_TdApi_subscribe, NULL, __pyx_mstate_global->__pyx_n_u_core_client_tdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 58, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -6742,31 +6751,31 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
 static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   {
-    const struct { const unsigned int length: 8; } index[] = {{1},{9},{179},{1},{8},{21},{7},{6},{2},{9},{59},{14},{5},{20},{5},{23},{25},{16},{14},{16},{14},{14},{12},{15},{4},{18},{4},{9},{18},{5},{10},{14},{17},{13},{8},{5},{10},{13},{8},{8},{12},{8},{13},{5},{8},{10},{7},{8},{7},{10},{3},{14},{12},{11},{10},{20},{14},{12},{10},{17},{13},{8},{8},{3},{4},{8},{12},{10},{12},{19},{5},{9},{6},{9},{8},{7},{5},{6},{12},{6},{52},{11},{45},{51},{51},{50},{51},{51},{11},{95},{55}};
-    #if (CYTHON_COMPRESS_STRINGS) == 2 /* compression: bz2 (1021 bytes) */
-const char* const cstring = "BZh91AY&SY\374\361bu\000\000d\177\377\346\315\275\304\351\377\366\315\257\343\377\370\277\377\377\345@@@@@@@@@@@@@\000@\000P\003^T\366<\333#G\003H)\352\r\023M\244\362\232b\003\321\030\215\000\320\0322\006\206\203CL&\023\032&\217D8\000\032\r\r\006\200\r2\r\014\201\246\200\000\014\200\014\200\310\00054hj\n=\004\323jh\323@\000\000\000\320\000\000\000\000\000\001\251\3514\223I\352z\233\322M\000\365\000\000\000\000\000\000\000\000\000\036\240\tD\023F\200\215$\360\215LL \323@\000\323M\032\000\000\0324=C&\232a\037\207e\023ww\366\234\"q+\245\212q\271\342(\212\250\252\202C}\377\345\241\2650Gpq\215\002\204F\262\022\214\036\"\2027\207\341\270\365\311\252\303\"\365v\2679\357\177\323u\351<]\273\r\371\004)\342\016\245>d\240\257\t\240\305\275\266x\022B\342_d\214\026\335\004\221S0\021\341\320\237\320f~\303\007\\\266\243U\01435\225\346\2278\230Uy\022\235\235\214o\360-&\206\225d\360D'\324\200\"\211\006\013Q;\240F\005\035H}\234`H<\323\206\025\225g\376Jw\244i\201\214\310\265R#\250&$\260\3225\035Cx\036\235k)\256k\026\216>\255\334\013\021@p\345\010\304H\336\007\"2\0001\221\2112\033\300\255\002\337\311\246\261\212\001-\365\tU\312\366\266\374\210)\343p\n\361\034!Z\002\261\0021\036\210\n\004\252\016`\304\376\310\336\0062E\320`\330\256|6\342\353u\262p\243\222\363\371\035\353\245\342\366#O\005\310\302KPr\265I5t\256]S,7\271 \323\002\227s2\245V\025<!K\237\256\351\345\304In\332\352\333\303\334\270M5\223\266x\3109\302\202\242\270\026\246\263\232\210,\366\022_u\200\347\264\025\254fi\n\301\001 \300\n\224R\221*M\234\243\247aN\241\023\0200\250\035\026\231\021=\3604\337\021\277\361\004K\231\033\0005\375OY\203$Q\240\201\211*\246\024\302$y\224\224\350*\244\360d\215D%\314\234XK\010@\265I1\025\177TC\367\212N\205\262\264W\226\205\243\002\223\243\024K\001&\254V&\365\361\315\215\325$A\216\201K\336\322G\344\213\263\243\232\220-M*\002Y\244\222\261\323H^\321X\215\323\211OR\023B\247\0214RZ\2170\344{T\340\202Tsbc\226\010\200\"Xa\320(-\301\270>Q\\\261\t\003\r0\324@\350T\220)\244r\335\2525\343C\025\022\346\017\014Q""%j\026\330\222.+\327\330]\240\277mTB\364\314\3450\376!}D\245\223\016\246\332Q\026\254\035\235\0214Y\336\356\317\004\301\234\313U\311\225=*R\314\252\331\204\236e\305\021\251\024W_bcp\3051\231\225\313eX!\021\266jX\027V\254#3\346-c\314\201\304\022\341M\357\002\010\251@\213m<#\222@\360\244Y:\"\323HQ\201\212\305\264l\332lD\213y\324\302/z\n\263\266\005\307f\250\352\013\200\344\037U\362\020\260\201<.\254\344\224\241LX<\225q\2117JdKB\244\233\023]Z\342\216es\324\250\353\006\331\254\361\371\257\274\252\002\205\233\005u\027\250\013\233\325\2043\200\243\2316\275\363\362\250|S\345\3636\265\214\n\240)\326X\005\371k#\224\357_\306\323\225\273k\202\300\336\033\000\255\235\350&\360\202\305,\025\345\310\277q\217f\217\n0\246BHp\023\300X\027\317\022[t\031\242\314\257\341*w\244\216\274\271\025\002h\220\n-*U\250Q\277z\355\325\346xl\232\255\224\234\212\014\371(\000\214\234\257\037\036+\367o]\377\213\271\"\234(H~x\261:\200";
-    PyObject *data = __Pyx_DecompressString(cstring, 1021, 2);
+    const struct { const unsigned int length: 8; } index[] = {{1},{9},{179},{1},{8},{21},{7},{6},{2},{9},{59},{14},{5},{20},{5},{23},{25},{16},{14},{16},{14},{14},{12},{15},{4},{18},{4},{9},{18},{5},{10},{14},{17},{13},{8},{5},{10},{13},{8},{8},{12},{8},{13},{5},{8},{10},{7},{8},{7},{10},{3},{14},{12},{11},{10},{20},{14},{12},{10},{17},{13},{8},{3},{4},{8},{12},{10},{12},{19},{5},{9},{6},{9},{8},{7},{5},{6},{12},{6},{52},{11},{45},{50},{51},{51},{51},{56},{11},{95},{55}};
+    #if (CYTHON_COMPRESS_STRINGS) == 2 /* compression: bz2 (1018 bytes) */
+const char* const cstring = "BZh91AY&SY\315\2173\373\000\000d\377\377\346\315\275\304\351\377\366\315\257\363\377\371\277\377\377\364@@@@@@@@@@@@@\000@\000P\003^\220\000\000\201\244M\023MF\206\324m@\320\032z\217P=@h\003M\r\017P\000i\247\244\036$yG\244~\250p\320\r\000\006\200\320\032\000\000\001\246\2154\001\220\000\000\321\246A\216\032\001\240\000\320\032\003@\000\0004\321\246\2002\000\000\0324\3101\303@4\000\032\003@h\000\000\006\2324\320\006@\000\003F\231\006\032i4#I\2014\247\264\320\232OJz\236\024z@hd\000\000\000\323\3242hm5=G\211\250\375\037\"'\077\0772u\204\363\026\232I\330\317\010B\022\204\240H\377\317\3519\034*P\215\325\346\354\010\000N\"A\327\232\016\223,\010\300\022\023\347\032\246\213H\342#S\263\033\252\253\353\"\245p\302$\231m`\242\313\250u\226c\000\256\357g\266\032\020i\265M\000B\206(\2065\001)\3378\021\331\253\277P\324\"\027\251\305\310\342\203\t\334\273\273\005\275\212*\275\022\237\217\340\326\377\210\3227\267\353\024E\020Q\350\304\004!+\257{\017\232\235!5A\322\274\204s;\270\341\231\245G\326\370k<B\372tx\030i\200l\374#k\266>\356Y\322N\311\373\263\374K\341\361\337$L\235j\226\024Gw\002\242\027\000K\272\033\267\317\345\206\005\335}=:\250\200\323\301^\226{X\347p\221\014\224\274\006\260S0g\000\310\241QlU\005\000\230\200\312\025?\3308\227\222\026c\270\376Y\232\337g\303\326\214\227>\376\375\202\341v\003{\265l\243\014\250\030\270\210qm\266\3424\001\315\250\007\014\010\273\034\323\025\025<\010\322\317\3575\023b!\227\224\361\345\352\366-\023\317e\016\242P\014\300\200P\260\006\247/\370\210\r\026\010gk\003ex;\271\031\246\222\202\005c\214&\003\032\346\331m\310\332\364k\330K\246\0169\233;\330\223\030\316\366\215\r\036\251\205\013fG\000\313\321\225X1\342\235\0378\223\247\320\226\233I\203\215\233\2263L\035uL*/H\224%\010P\335\245\350#\223\016{\305\277AY\247v\343\206\242\340\324\371\332TR\212B\\\002J\320U9\264\006u\027\221\004\n\321\025=\356\020\177\212M\275-\251:\243\316q\215\306l]\254\306\34297qp\252k\312L\222/\ty/\033\212\214\353 \310\361\021\214`\371:\n\t\000\225\016n\321\237|4\004q\031\224H""\206\017`\371\246\020\222$Gv\220\306\372\245_m\006\274\223n\207\201\252Bg \313b@\352\277\005\027d\030e\253$o\235w\327\310\2039\tJ\316\032\234\264\242\034;\274\0018\027\333\357J\364\303j\345,\231\250\244\212W1\320%1\306p\341l\221_\235S[\005#X\325\\\366U\204d\035g%\240\\j\320\027zr\344\260\332\036A/\022\362AE\031\240\255\266p\257[E\201\210\334}\005\306\361t\021\220\345\016\237\215Q$\356Jc'\275\0014:\"\326\330Cd\026\200\310\037Vq\030\330\"(\215\306\201\nPS%\017\230\353\t?\\\350\231@\251'\305\315Y\306Zk\242\242\215`u\235\367\207\354}\344\200\010\026{\242\272\205\371\022\337-`Gt\001\303L\376\346q\343(?$\374\374\003\364\332Bu\202\332\261@\027\323\351\225\357\210#\245/\217/\220(b\265\\\023\347\232\n+@\276sA{\262E$c\302\221\304\3741\324\003c\360\022\340\240f\3746!U\252\2559\366\034\225=\255\326z\334\307\035\031`\250\274\362l\361\276\3040V\261\243\322\351\253\373 \344W\225\034P\0022\031_{\t)]\205\377\305\334\221N\024$3c\314\376\300";
+    PyObject *data = __Pyx_DecompressString(cstring, 1018, 2);
     if (unlikely(!data)) __PYX_ERR(0, 1, __pyx_L1_error)
     const char* const bytes = __Pyx_PyBytes_AsString(data);
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (likely(bytes)); else { Py_DECREF(data); __PYX_ERR(0, 1, __pyx_L1_error) }
     #endif
-    #elif (CYTHON_COMPRESS_STRINGS) != 0 /* compression: zlib (878 bytes) */
-const char* const cstring = "x\332\215S\317o\033E\024\256%#,5J\025@\300\241R'BjJH\234\032\005\005\t\004\212\300\001\016\270I\tM\023\016\243\361\314\263=x=\263\236\2315^\t!\037}\364q\217{\364\321G\037}\344\270G\037\363'\360'\360f\327v\013E(\266\274\376\336\274_\363}\357m\265\366\351I\365)~k\r\355\200\270\016s\344\233\330u\264\"\322\022\001\201l\202a\016\202\230Xg$w`|\220\"\347\365\363\303\343\317\217\tS\202\030\370\025\270\263\304FM\0360k\301\022\335\"\315H\006N*\342\342\020l\225\374\320\"\261\216\210\002\020\304i\022b\334\353\t\256\003\212Xp\036\220=\246\224v\314I\255(\246K\325\336#B\032l\"\007\340\263\317X`\241\3725\023\202b pm\340\210\007\022\224;r\202\205\262\032\306C!-k\006\000\312?\333\\\332\002\t\013A\253\312l\2548-R<S\254B\032Z\001\321\206\344\001\205\213J\361\272\367K\257\201j[\035\031\016_\325\007>\202\236\307C\374}\213\332\320\006\014\335sh]\212\323P\346\217*\245\006D\304\201\362\\TJ\327\307H\325\"\303\177;\360\322\\+\205L\013\273\rn\300\202\010\n\013\343\204\243z\000\246\260\r\264\245uk\013KR\316lgeE\315\236t\033l\271\301Q\242`&\247.u\025E\323\021\016\010lS\213x\303\027\201\002*Qx\30384\031\357\362@[\224X9d\207\373\260B=\246X\033\214\227~%V5\227>?\010\215v\232\353\200R\341u)\376^q\203a\010F\366\212\206\224\266\"\234\005E\252T0\307rThC\327\364\251\264ts_\351\240g)\3551\274$~zZD\001\306\366l\333\206\200\205\024\353\201w(\370\215\322W\222\205:\244\024\367\202\362\016\360\256\215z\205e\300F\201+\360\252\253\207~k\013\024)$\325\305\016\271\226\305\331\300\371U\362M\372\021\013\326\rW\243\246o\014}s\000C\017\213\241\031\350\347]L\244\374\306\255\247\227\257\306\212\003\"\001-\226\337o\2630\364?\226'\267p\312\324i\274l1\372\315\320)E\037Vp\2508*\230\207D!J\r\221\205M\255\\g{\036?k\372\227\231\354?\221\370f\254d\351\312\020'hC\346x\347\343{-\206\325\242H\212c\332\214\261\364\250\264,\177\224\326\322\263\351\356\350tYy\230=<\230\372\377\244\236\356\244\217\247[\263\372|\347\266\262=\026\223\303\304a\334\367\336\373`\334\1773\370\311t\177\326X\034e\027/\262\027WwM9\234\375\261\240\331\345uv}s""\327\224\203Y\260\330\377\263\221\335\374r\367\014\265x\226\375\3642{y}\327\224\352|{\241\263\237o\376\247\313\326\370\307\344\375\244?*\375U\271\367\326\366\370r\362(-\247\247\313\362\326\370\273Imr\226\034\244lY~{4\030_M\352\311{\311\305\262\362\316dwY\371`\322\277\255|\230\224\274\257\217\305\262\007\217S1\335\235\236\314>\231_-No\377yr1*\335\226\037%\375\214<\235\335\237\177\261\350f\027\317\227\345w'\237%\225\264\224\356\370\"\277ON\022\254\273\227\366\247\225\331\366\034\233\336\037\327\376\006\367Ii\016";
-    PyObject *data = __Pyx_DecompressString(cstring, 878, 1);
+    #elif (CYTHON_COMPRESS_STRINGS) != 0 /* compression: zlib (883 bytes) */
+const char* const cstring = "x\332\215S\275o\333F\024\217\000\025\025\020C\201\333\242\311\020 g\004\210\323\324\246\243\302\201\013$ha\244r?\200:v\342\332i\n\364p\272{\222\316\242\356(\336Q\025\213\016\0325j\344\310Q\243F\215\032;r\324\350?\241\177B\337\221\222\222\266)`\022$\337\273\367\371\373\275G\257\366\305\201\367\030\357\332\261\266@l\233Y\362<\266m\255\2104D\200/\033\0202\013~L\214\r%\267\020:'EN\352'\273\373_\356\023\246\004\t\341\022\2705\304D\r\3563c\300\020\335$\215H\372V*b\343\000\214G\276o\222XGD\001\010b5\t\320\357\335\000\333\006E\014X'\220m\246\224\266\314J\255(\206K\325\332&B\206XD\366\301E\0371\337\200\3675\023\202\242#p\035\302\036\367%(\273g\005\013\244\027\304\003!\rk\370\000\312\275[\\\232B\022\006\374\246\307L\2548-B\034R\314B\216\265\002\242C\222;\024&*\305\273\326g\216\003\3252:\n9|U\357;\017z\022\017\360\371\006\271\241\3070\260/\241y&\016\003\231\277<JC\020\021\007\312sR)]\035#T\203\010\377m\300\246\271V\n\221\026z\013l\237\371\021\024\032\372\tKu\037\302B\017\241%\215]i\230\222rf\332K-jt\245]\313\206\2078J$,\314\241K\355!i:\302\001\201ih\021\257\361\242\240\200J$>d\034\032\214w\270\257\rR\254,\242\303}XJ]\246X\013BG\375\222,/\247>?\010Bm5\327>\245\302\361R|\336b\203A\000\241\354\026\005)mF8\013\212P\251`\226\345R\301\r]\301\247\322\320u\277\322B\327P\332e\330$^]-\"\037}\273\246e\002\300D\212u\301\031\024\374F\351[\312\002\035P\212{Ay\033x\307D\335B\013\301D\276-\344eU'\272\255-\244H!\250\016V\310\271,\316\372\326\255\222+\322\213\230\277*\270\0345\375\317\320\327\0070pb1\2640Rn\323VS\313Wb\331;J\002\232,\357k\275(\364=K\223k8]j56Y\214|=lJ\321\206\031,2\215\314\345.Q\200\024Cd`\235+\347\327\234\304/\032\356'&\217\036J\374#\226ttd\200\2233\001\263\274\375\331\215&\303lQ$\305>m\304\230zXZ\224\357\247\265\364h\2625<\\T\356fww&\356\233\324\323\315\364\301dcZ\237m^U\252#1\336M,\372}\347\254\267F\275\367;\3770k\315\177\315^\235]/\342\341\344\321\364x\276\227\235\236g\347\027\327\r\331\231\252\371\213\354\325\353\354\365\317\327\r\361f\325\271\316~z\223\275\371\345\272!""\273\323\337\347\267\377\254f\347\220\301ev\331\371\277\270\215\321\217\311\247IoX\372\253r\343\203\352\350l|/-\247\207\213\362\306\350\333qm|\224\354\244lQ\376p\330\037]\214\353\311'\311\351\242\362\321xkQ\271=\356]U\356$%g\353a\262\354\326\203TL\266&\007\323\317g\027\363\303\253\177\236\234\016KW\345{I/#\217\2477gO\347\235\354\364\345\242\374\361\370IRIK\351\246K\362\307\370 \301\274\333ioR\231VgX\364\346\250\3667IQg\351";
+    PyObject *data = __Pyx_DecompressString(cstring, 883, 1);
     if (unlikely(!data)) __PYX_ERR(0, 1, __pyx_L1_error)
     const char* const bytes = __Pyx_PyBytes_AsString(data);
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (likely(bytes)); else { Py_DECREF(data); __PYX_ERR(0, 1, __pyx_L1_error) }
     #endif
-    #else /* compression: none (1563 bytes) */
-const char* const bytes = ".127.0.0.1Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.?add_notecore/client/tdapi.pyxdisableenablegcisenabledself.async_client is not None or self.client_id is not None<stringsource>Event__Pyx_PyDict_NextRefTdApiTdApi.__reduce_cython__TdApi.__setstate_cython__TdApi.disconnectTdApi.getvalueTdApi.on_dt_overTdApi.registerTdApi.set_cashTdApi.submitTdApi.subscribeaddrasyncio.coroutinesbodyclient_idcline_in_tracebackclosecontextlibcontextmanagercore.client.tdapicore.protocol__dict___dictdisconnectexperiment_id__func__get_data__getstate__getvalue_is_coroutineitems__main____module__msgspec__name____new__on_dt_overpop__pyx_checksum__pyx_result__pyx_state__pyx_type__pyx_unpickle_TdApi__pyx_vtable____qualname____reduce____reduce_cython____reduce_ex__registerreq_typerunselfset_cash__set_name__setdefault__setstate____setstate_cython__statesub_topicsubmitsubscribe__test__timeouttopicupdateuse_setstatevaluesPyObject *(int __pyx_skip_dispatch)\000fast_uuid4_bytes\200\001\330\004#\2401\240F\250!\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240&\250\014\260E\270\021\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240(\250*\260N\300/\320QV\320VW\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240(\250-\260~\300_\320TY\320YZ\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240(\250,\260l\300*\310N\320Z[\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240(\250,\260n\300O\320SX\320XY\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240(\250.\270\016\300o\320UZ\320Z[\340\010\016\210d\220-\230t\2401\240H\250A\330\010""\017\210q\200A\330\010\014\210M\230\026\230q\200\001\360\010\000\005\016\210T\220\037\240\004\240A\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220E\230\024\230Q\330\010\022\220!\330\010\027\220q\340\010\030\230\001\330\004\007\200q\330\010\017\320\017&\240d\250!\2507\260+\270W\300A\340\010\017\320\017&\240d\250!\2507\260+\270Q\200\001\340\004\037\230q\320 0\260\013\270;\300k\320QR\330\004\023\2205\230\010\240\001\240\021\330\004\007\200|\2207\230!\330\010'\240q\250\010\260\016\270a\330\004\013\2101";
+    #else /* compression: none (1560 bytes) */
+const char* const bytes = ".127.0.0.1Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.?add_notecore/client/tdapi.pyxdisableenablegcisenabledself.async_client is not None or self.client_id is not None<stringsource>Event__Pyx_PyDict_NextRefTdApiTdApi.__reduce_cython__TdApi.__setstate_cython__TdApi.disconnectTdApi.getvalueTdApi.on_dt_overTdApi.registerTdApi.set_cashTdApi.submitTdApi.subscribeaddrasyncio.coroutinesbodyclient_idcline_in_tracebackclosecontextlibcontextmanagercore.client.tdapicore.protocol__dict___dictdisconnectexperiment_id__func__get_data__getstate__getvalue_is_coroutineitems__main____module__msgspec__name____new__on_dt_overpop__pyx_checksum__pyx_result__pyx_state__pyx_type__pyx_unpickle_TdApi__pyx_vtable____qualname____reduce____reduce_cython____reduce_ex__registerrunselfset_cash__set_name__setdefault__setstate____setstate_cython__statesub_topicsubmitsubscribe__test__timeouttopicupdateuse_setstatevaluesPyObject *(int __pyx_skip_dispatch)\000fast_uuid4_bytes\200\001\330\004#\2401\240F\250!\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240&\250\014\260E\270\021\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240&\250\014\260J\270g\300^\320ST\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240(\250*\260N\300/\320QV\320VW\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240(\250,\260n\300O\320SX\320XY\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240(\250.\270\016\300o\320UZ\320Z[\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240(\250-\260z\300\027\310\016\320Ve\320ej\320jk\340\010\016\210d\220-\230t\2401\240H\250A""\330\010\017\210q\200A\330\010\014\210M\230\026\230q\200\001\360\010\000\005\016\210T\220\037\240\004\240A\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220E\230\024\230Q\330\010\022\220!\330\010\027\220q\340\010\030\230\001\330\004\007\200q\330\010\017\320\017&\240d\250!\2507\260+\270W\300A\340\010\017\320\017&\240d\250!\2507\260+\270Q\200\001\340\004\037\230q\320 0\260\013\270;\300k\320QR\330\004\023\2205\230\010\240\001\240\021\330\004\007\200|\2207\230!\330\010'\240q\250\010\260\016\270a\330\004\013\2101";
     PyObject *data = NULL;
     CYTHON_UNUSED_VAR(__Pyx_DecompressString);
     #endif
     PyObject **stringtab = __pyx_mstate->__pyx_string_tab;
     Py_ssize_t pos = 0;
-    for (int i = 0; i < 80; i++) {
+    for (int i = 0; i < 79; i++) {
       Py_ssize_t bytes_length = index[i].length;
       PyObject *string = PyUnicode_DecodeUTF8(bytes + pos, bytes_length, NULL);
       if (likely(string) && i >= 12) PyUnicode_InternInPlace(&string);
@@ -6777,7 +6786,7 @@ const char* const bytes = ".127.0.0.1Note that Cython is deliberately stricter t
       stringtab[i] = string;
       pos += bytes_length;
     }
-    for (int i = 80; i < 91; i++) {
+    for (int i = 79; i < 90; i++) {
       Py_ssize_t bytes_length = index[i].length;
       PyObject *string = PyBytes_FromStringAndSize(bytes + pos, bytes_length);
       stringtab[i] = string;
@@ -6788,14 +6797,14 @@ const char* const bytes = ".127.0.0.1Note that Cython is deliberately stricter t
       }
     }
     Py_XDECREF(data);
-    for (Py_ssize_t i = 0; i < 91; i++) {
+    for (Py_ssize_t i = 0; i < 90; i++) {
       if (unlikely(PyObject_Hash(stringtab[i]) == -1)) {
         __PYX_ERR(0, 1, __pyx_L1_error)
       }
     }
     #if CYTHON_IMMORTAL_CONSTANTS
     {
-      PyObject **table = stringtab + 80;
+      PyObject **table = stringtab + 79;
       for (Py_ssize_t i=0; i<11; ++i) {
         #if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
         Py_SET_REFCNT(table[i], _Py_IMMORTAL_REFCNT_LOCAL);
@@ -6833,7 +6842,7 @@ const char* const bytes = ".127.0.0.1Note that Cython is deliberately stricter t
 }
 /* #### Code section: init_codeobjects ### */
 typedef struct {
-    unsigned int argcount : 2;
+    unsigned int argcount : 3;
     unsigned int num_posonly_args : 1;
     unsigned int num_kwonly_args : 1;
     unsigned int nlocals : 3;
@@ -6866,13 +6875,13 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 51};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_experiment_id, __pyx_mstate->__pyx_n_u_req_type};
-    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_tdapi_pyx, __pyx_mstate->__pyx_n_u_getvalue, __pyx_mstate->__pyx_kp_b_iso88591_A_A_E_l_NZ_d_t1HA_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_experiment_id, __pyx_mstate->__pyx_n_u_topic};
+    __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_tdapi_pyx, __pyx_mstate->__pyx_n_u_getvalue, __pyx_mstate->__pyx_kp_b_iso88591_A_A_E_Jg_ST_d_t1HA_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 58};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_experiment_id, __pyx_mstate->__pyx_n_u_body};
-    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_tdapi_pyx, __pyx_mstate->__pyx_n_u_subscribe, __pyx_mstate->__pyx_kp_b_iso88591_A_A_E__TYYZ_d_t1HA_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 58};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_experiment_id, __pyx_mstate->__pyx_n_u_topic, __pyx_mstate->__pyx_n_u_body};
+    __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_core_client_tdapi_pyx, __pyx_mstate->__pyx_n_u_subscribe, __pyx_mstate->__pyx_kp_b_iso88591_A_A_E_z_Veejjk_d_t1HA_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
     const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 65};

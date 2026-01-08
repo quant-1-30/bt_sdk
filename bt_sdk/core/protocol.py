@@ -41,11 +41,11 @@ class Event(msgspec.Struct, frozen=True):
     # body: EmptyBody = msgspec.field(default_factory=EmptyBody)
 
 
-class ExperimentBody(msgspec.Struct, fronze=True, tag="experiment"):
+class ExperimentBody(msgspec.Struct, frozen=True, tag="experiment"):
     experiment_id: bytes
 
 
-class TradeBody(msgspec.Struct, forzen=True, tag="trade"):
+class TradeBody(msgspec.Struct, frozen=True, tag="trade"):
     vtorder_id: bytes
     executed_dt: int
     executed_size: int
@@ -58,8 +58,8 @@ class PositionBody(msgspec.Struct, frozen=True, tag="position"):
     datetime: int 
     size: int
     available: int
-    cost_basis: int
-    pnl: int
+    cost_basis: float
+    pnl: float
     experiment_id: bytes
 
 
@@ -77,11 +77,11 @@ class Empty(msgspec.Struct, frozen=True, tag="empty"):
     pass
 
 
-class ErrMSg(msgspec.Struct):
+class ErrMSg(msgspec.Struct, frozen=True, tag="error"):
     error: str
 
 
-class Sentinel(msgspec.Struct):
+class Sentinel(msgspec.Struct, frozen=True, tag="sentinel"):
     pass
 
 
@@ -89,7 +89,9 @@ class Resp(msgspec.Struct, frozen=True):
     body: Union[ExperimentBody, TradeBody, PositionBody, AccountBody, Empty, ErrMSg, Sentinel, None]=None
 
 
+ResponseTypes = List[Resp]
+
 # global
 _ENCODER = msgspec.msgpack.Encoder()
 _DECODER = msgspec.msgpack.Decoder(type=Event)
-_RespDECODER = msgspec.msgpack.Decoder(type=Resp)
+_RespDECODER = msgspec.msgpack.Decoder(type=ResponseTypes) # msgspec.msgpack.Decoder(type=Resp)
