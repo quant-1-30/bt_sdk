@@ -41,6 +41,8 @@ def right2struct(table_data):
 
 
 def calc_factor(close, adjust, right, forward=True):
+    if not close:
+        return {}
     vector_trading = close.column("date").to_pylist()
     vector_close = close.column("close").to_pylist()
     vector_adjust_event = adjust2struct(adjust)

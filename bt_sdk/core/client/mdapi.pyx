@@ -5,9 +5,9 @@ import reactivex.operators as ops
 import pyarrow as pa
 # from contextlib import contextmanager
 
-from core.protocol import Event
-from core.client.async_client cimport AsyncZmqClient 
-from core.client.util cimport fast_uuid4_bytes
+from bt_sdk.core.protocol import Event
+from bt_sdk.core.client.async_client cimport AsyncZmqClient 
+from bt_sdk.core.client.util cimport fast_uuid4_bytes
 
 
 cdef inline object obs2table(object observable):
@@ -36,7 +36,7 @@ cdef class MdApi:
             request calendar
         """
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic="calendar")
+        cdef object event = Event(topic=RpcTopic.Calendar)
 
         obs = self.async_client.run(req_id, event)
         return obs
@@ -46,31 +46,21 @@ cdef class MdApi:
             request instruments
         """
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic="instrument")
+        cdef object event = Event(topic=RpcTopic.Instrument)
 
         obs = self.async_client.run(req_id, event)
         return obs
     
     cpdef object get_benchmark(self, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic="index", body=body)
+        cdef object event = Event(topic=RpcTopic.Index, body=body)
 
         obs = self.async_client.run(req_id, event)
         return obs 
     
-    cpdef object get_event(self, str topic, object body):
-        """
-            request instruments
-        """
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=topic, body=body)
-        
-        obs = self.async_client.run(req_id, event)
-        return obs
-
     cpdef object subscribe(self, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic="tick", body=body)
+        cdef object event = Event(topic=RpcTopic.Tick, body=body)
 
         obs = self.async_client.run(req_id, event)
         return obs
@@ -80,7 +70,17 @@ cdef class MdApi:
             request instruments
         """
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic="close", body=body)
+        cdef object event = Event(topic=RpcTopic.Close, body=body)
+        
+        obs = self.async_client.run(req_id, event)
+        return obs
+
+    cpdef object get_event(self, int topic, object body):
+        """
+            request instruments
+        """
+        cdef bytes req_id = fast_uuid4_bytes()
+        cdef object event = Event(topic=topic, body=body)
         
         obs = self.async_client.run(req_id, event)
         return obs
@@ -90,8 +90,8 @@ cdef class MdApi:
         cdef object close, adjust, right
 
         obs_close = self.get_close(body)
-        obs_adjust = self.get_event("adjustment", body)
-        obs_right = self.get_event("rightment", body)
+        obs_adjust = self.get_event(RpcTopic.Adjustment, body)
+        obs_right = self.get_event(RpcTopic.Rightment, body)
         close = obs2table(obs_close)
         adjust = obs2table(obs_adjust)
         right = obs2table(obs_right)

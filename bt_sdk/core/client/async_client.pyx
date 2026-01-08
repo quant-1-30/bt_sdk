@@ -3,8 +3,7 @@
 # cython: language_level=3, boundscheck=False, wraparound=False
 
 import os
-import json
-import time
+import socket
 import asyncio
 import uvloop
 import reactivex
@@ -18,9 +17,9 @@ import reactivex.operators as ops
 from reactivex import of
 from reactivex.subject import Subject
 from reactivex.scheduler.eventloop import AsyncIOScheduler
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
 
-from core.protocol import _ENCODER, _DECODER, _RespDECODER
+from bt_sdk.core.protocol import _ENCODER, _RespDECODER
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
@@ -36,7 +35,7 @@ cdef inline object _deserialize_to_table(bytes arrow_bytes): # inline function e
     # read_all() ---> Table (underlying data point ZMQ bytes 
     table = pa.ipc.open_stream(pa.py_buffer(arrow_bytes)).read_all()
     # pc zero_copy and vectorize
-    for col_name in ["sid", "name"]:
+    for col_name in ["name"]:
         if col_name in table.column_names:
             col = table.column(col_name)
             table = table.set_column(
@@ -236,6 +235,7 @@ cdef class AsyncZmqClient(AsyncClient):
                 except zmq.ZMQError as ze:
                     if ze.errno == zmq.ETERM: break
                 except asyncio.CancelledError:
+                    print("Zmq asyncio.CancelledError")
                     break
                 except Exception as e:
                     break 
@@ -281,78 +281,19 @@ cdef class AsyncZmqClient(AsyncClient):
 
 cdef class AsyncStreamClient(AsyncClient):
     
-    def __init__(self, tuple addr, int timeout=5):
+    def __init__(self, tuple addr, int timeout=30):
         super().__init__()
             
         self.host, self.port = addr
-        self._conn_lock = asyncio.Lock()  # in different coro maybe cause cache bug
+        self._conn_lock = asyncio.Lock() 
         self._connection_cache = {}
         self.timeout = timeout
         
         self.listen_task = self.loop.create_task(self._listen_loop())
-
-    async def _listen_loop(self):
-        cdef bytes raw_payload
-        cdef list payload
-        cdef bytes r_id
-        cdef str connection_key = f"{self.host}:{self.port}"
-
-        reader, writer = await self._get_connection(connection_key) # cache            
-
-        print(f"[TCP] Reader for {connection_key} started.")
-
-        while self._running: # reader.at_eof() means close connect
-            try:
-                len_bytes = await asyncio.wait_for(reader.readexactly(LENGTH_BYTES), timeout=30.0)
-                msg_len = int.from_bytes(len_bytes, 'big')
-
-                if msg_len == 0:
-                    continue # reset wait_for timeout
-                
-                if msg_len > 10 * 1024 * 1024 or msg_len == 4: 
-                    raise ValueError("Packet too large or Error occcur ")
-
-                complete_message = await reader.readexactly(msg_len)
-                req_id = complete_message[:REQ_ID_SIZE] 
-                payload = _RespDECODER.decode(complete_message[REQ_ID_SIZE:]) # decode(payload)
-                
-                fut = self._req_futures.pop(req_id, None)
-                if fut and not fut.done():
-                    fut.set_result(payload)
-            except asyncio.TimeoutError:
-                print("TCP timeout")
-                break
-            except ConnectionError: # asyncio.IncompleteReadError 
-                print(f"TCP ConnectionError")
-                break
-            except Exception as e:
-                print(f"[TCP] Listen_loop error: {e}")
-                break
-            
-    cdef object wrap_protocol(self, bytes req_id, object msg): # return future to user to determin await or result block
-        """TCP 返回 Coroutine 用户需 await"""
-        from concurrent.futures import Future
-        cdef object fut = Future() # block 
-        # fut = self.loop.create_future() # nonblock 
-        self._req_futures[req_id] = fut 
-        
-        asyncio.run_coroutine_threadsafe(self.send_request(req_id, msg), self.loop)
-        return fut # await asyncio.wrap_future(fut) to transform block to nonblock
-
-    async def send_request(self, bytes req_id, object msg):
-        connection_key = f"{self.host}:{self.port}"
-        reader, writer = await self._get_connection(connection_key) # cache            
-        
-        # serialize_msg = req_id + pack(msg) # req_id 16 bytes
-        serialize_msg = req_id + _ENCODER.encode(msg) # req_id 16 bytes
-        msg_len = len(serialize_msg)
-        writer.write(msg_len.to_bytes(LENGTH_BYTES, byteorder='big') + serialize_msg)
-        await writer.drain()
-
+    
     async def _get_connection(self, str connection_key):
-        """
-            获取或创建连接确保每个连接有且只有一个后台读取任务
-        """
+        cdef object reader, writer
+
         async with self._conn_lock:
             if connection_key in self._connection_cache:
                 reader, writer = self._connection_cache[connection_key]
@@ -361,26 +302,97 @@ cdef class AsyncStreamClient(AsyncClient):
                 else:
                     del self._connection_cache[connection_key]
         
-            reader, writer = await asyncio.open_connection(host=self.host, port=self.port) # same underlying File Descriptor/Socket
-            # socketopt No Nagle when small packet 
-            sock = writer.get_extra_info('socket')
-            if sock:
-                import socket
-                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+            print(f"[TCP] Connecting to {self.host}:{self.port}...")
+            try: 
+                reader, writer = await asyncio.wait_for(
+                    asyncio.open_connection(self.host, self.port), 
+                    timeout=self.timeout
+                )
+                sock = writer.get_extra_info('socket') # disable Nagle to decrease dalay due to small packed
+                if sock:
+                    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
-            self._connection_cache[connection_key] = (reader, writer)
-            return reader, writer
+                self._connection_cache[connection_key] = (reader, writer)
+                print(f"[TCP] Connected successfully.")
+                return reader, writer
+            except Exception as e:
+                 raise ConnectionError(f"Failed to connect to {self.host}:{self.port}: {e}")
+
+    async def _listen_loop(self):
+        cdef bytes raw_payload
+        cdef list payload
+        cdef bytes r_id
+        cdef str connection_key = f"{self.host}:{self.port}"
+        cdef object reader = None, writer = None
+        
+        print(f"[TCP] Reader for {connection_key} started.")
+        while self._running:
+            try:
+                if reader is None or writer is None or writer.is_closing():  # reader.at_eof() means close connect
+                    reader, writer = await self._get_connection(connection_key)
+
+                len_bytes = await reader.readexactly(LENGTH_BYTES)
+                # len_bytes = await asyncio.wait_for(reader.readexactly(LENGTH_BYTES), timeout=30.0)
+                msg_len = int.from_bytes(len_bytes, 'big')
+
+                if msg_len == 0: continue # Heartbeat
+                
+                if msg_len > 10 * 1024 * 1024:
+                    raise ValueError("Packet too large")
+
+                complete_message = await reader.readexactly(msg_len)
+                req_id = complete_message[:REQ_ID_SIZE]
+                payload = _RespDECODER.decode(complete_message[REQ_ID_SIZE:])
+                
+                fut = self._req_futures.pop(req_id, None)
+                if fut and not fut.done():
+                    self.loop.call_soon_threadsafe(fut.set_result, payload)# ensure cross thread safely / fut.set_result(payload)
+
+            except (asyncio.IncompleteReadError, asyncio.TimeoutError, ConnectionError, OSError) as e:
+                if self._running:
+                    print(f"[TCP] Connection lost: {e}. Cleaning up and retrying...")
+                    async with self._conn_lock: 
+                        self._connection_cache.pop(connection_key, None) # clean cache avoid send_request reuse
+                    
+                    if writer:
+                        writer.close() # nonblock send Fin and stop writer 
+                    reader = None
+                    writer = None  
+                    await asyncio.sleep(1) 
+            except Exception as e:
+                print(f"[TCP] Unexpected error: {e}")
+                await asyncio.sleep(1)
+
+    cdef object wrap_protocol(self, bytes req_id, object msg): # return future to user to determin await or result block
+        cdef object fut = Future() # block 
+        # fut = self.loop.create_future() # nonblock
+        # res = await asyncio.wrap_future(fut) # concurrent.futures.Future wrap to asyncio.Future and concurrent future object can be await in asyncio loop
+        self._req_futures[req_id] = fut 
+        
+        asyncio.run_coroutine_threadsafe(self.send_request(req_id, msg), self.loop)
+        return fut 
+    async def send_request(self, bytes req_id, object msg):
+        cdef bytes body = _ENCODER.encode(msg)
+        cdef int total_length = REQ_ID_SIZE + len(body) 
+        cdef str connection_key = f"{self.host}:{self.port}"
+
+        reader, writer = await self._get_connection(connection_key) 
+        writer.writelines([
+            total_length.to_bytes(LENGTH_BYTES, 'big'),
+            req_id,
+            body
+        ])
+        await writer.drain()
 
     async def _async_shutdown(self):
-        await AsyncClient._async_shutdown()
+        await AsyncClient._async_shutdown(self) # avoid super() in cython
 
         for key in list(self._connection_cache.keys()):
             reader, writer = self._connection_cache.pop(key)
             if writer:
                 writer.close()
                 try:
-                    # await writer.wait_closed()
-                    await asyncio.wait_for(writer.wait_closed(), timeout=1.0) # writer.close()
+                    await asyncio.wait_for(writer.wait_closed(), timeout=1.0) # wait_closed to flush avoid drop last message
                 except: pass
         self._connection_cache.clear()
         print("[TCP] All connections closed.")

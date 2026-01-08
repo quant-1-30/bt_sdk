@@ -56,17 +56,25 @@ pytest 中执行多个测试用例时，每个测试用例都会创建新的 Api
 # rxpy 响应性编程重构
 # cython 重构 api and client 避免asyncio.queue
 
+# no nagle on writer 
+# server Delayed ACK / client `TCP_NODELAY`
+# observer filter operate heavy cpu / resp --- bus to avoid filter
 
-<!-- def factor(self, body: Query) -> List[Any]: # sid
-    close = self.get_close(body)
-    adjust = self.get_event("adjustment", body)
-    right = self.get_event("rightment", body)
-    from bt_sdk.core.helper.factor import calc_factor
-    factors = calc_factor(close, adjust, right)
-    return factors -->
+# cython not support lambda or nested
+# reactivex subject --- on_next / on_complete / on_error 
+            subject.pipe --- obseverable
+            subscribe --- on_next / on_complete / on_error 
 
+a. async for x in observable.to_async_iterable()
 
 ``python
+from reactivex.operators import as_iterable # blocking
+b.for table in obs.pipe(as_iterable()):
+c.  obs.subscribe(
+        on_next=q.put,
+        on_completed=lambda: q.put(None) # 发送结束信号
+    )
+
 import pyarrow as pa
 
 def bytes_to_table(data: bytes):
@@ -85,22 +93,24 @@ def bytes_to_table(data: bytes):
         return None
 ```
 
-# no nagle on writer 
-# server Delayed ACK / client `TCP_NODELAY`
-# observer filter operate heavy cpu / resp --- bus to avoid filter
+# .pxd 函数体**：Cython 要求必须inline
+* .pyx 函数体且没有 pxd` private
 
-# cython not support lambda or nested
-# reactivex subject --- on_next / on_complete / on_error 
-            subject.pipe --- obseverable
-            subscribe --- on_next / on_complete / on_error 
+# zmq / tcp 长链接问题 
+a. cache writer and reader for reuse  not close api, tcp established tcp status
+b. writer --- fd
+c. server fin ---> client readexactly incompleteReadError
+d. long reuse key is to avoid open_connection
+e. usage pattern --- singelton long live in process / reference not gc
+f. close and wait_closed --- writer.close() nonblock  send fin and stop writer / wait_closed to flush blocking
 
-a. async for x in observable.to_async_iterable()
+**避免阻塞**：`wait_closed()` 可能会因为网络状况差、对方没有 ACK 而卡住几百毫秒甚至数秒。如果在 `finally` 块中 `await` 它，你的重连逻辑（`await asyncio.sleep(3)`）就会被顺延推迟，导致系统恢复变慢
 
-from reactivex.operators import as_iterable # blocking
-b.for table in obs.pipe(as_iterable()):
-c.  obs.subscribe(
-        on_next=q.put,
-        on_completed=lambda: q.put(None) # 发送结束信号
-    )
+**系统资源处理**：当你执行 `self._writer = None` 并且旧的 `writer` 对象不再被引用时，Python 会自动清理。旧连接在操作系统层面会进入 `FIN_WAIT` 状态，由操作系统内核自行处理，不会占用你 Python 进程的逻辑资源
 
-# 涉及 cache 必须lock in case cache inconsistent
+**原因**：如果你在 `close()` 之后立即退出 Python 解释器或停止事件循环（Event Loop），而没有 `wait_closed()`，那么缓冲区中还没来得及发出的数据（比如最后一条撤单指令）可能会被**强行丢弃**
+
+MANIFEST.in` 决定文件会被包含在 **源码分发包 (sdist, 即 .tar.gz 文件)**
+
+python -m build --wheel --no-isolation # setuptool 
+poetry build --format wheel # pure python

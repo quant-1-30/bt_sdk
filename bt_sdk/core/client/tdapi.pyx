@@ -3,9 +3,9 @@
 import msgspec
 from contextlib import contextmanager
 
-from core.protocol import Event
-from core.client.util cimport fast_uuid4_bytes
-from core.client.async_client cimport AsyncStreamClient
+from bt_sdk.core.protocol import Event
+from bt_sdk.core.client.util cimport fast_uuid4_bytes
+from bt_sdk.core.client.async_client cimport AsyncStreamClient
 
 
 cdef class TdApi:
@@ -36,42 +36,42 @@ cdef class TdApi:
     
     cpdef object register(self, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic="register", body=body)
-
+        cdef object event = Event(topic=BrokerTopic.Register, body=body)
+        
         fut = self.async_client.run(req_id, event)
         return fut
 
     cpdef object set_cash(self, bytes experiment_id, object body): 
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic = "set_cash", experiment_id=experiment_id, body=body)
+        cdef object event = Event(topic=BrokerTopic.SetCash, experiment_id=experiment_id, body=body)
 
         fut = self.async_client.run(req_id, event)
         return fut
 
-    cpdef object getvalue(self, bytes experiment_id, str topic):
+    cpdef object getvalue(self, bytes experiment_id, int topic):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic="get_data", sub_topic=topic, experiment_id=experiment_id)
+        cdef object event = Event(topic=BrokerTopic.GetValue, sub_topic=topic, experiment_id=experiment_id)
 
         fut = self.async_client.run(req_id, event)
         return fut
     
-    cpdef object subscribe(self, bytes experiment_id, str topic, object body):
+    cpdef object subscribe(self, bytes experiment_id, int topic, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic = "subscribe", sub_topic=topic, experiment_id=experiment_id, body=body)
+        cdef object event = Event(topic=BrokerTopic.Subscribe, sub_topic=topic, experiment_id=experiment_id, body=body)
 
         fut = self.async_client.run(req_id, event)
         return fut
     
     cpdef object submit(self, bytes experiment_id, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic = "submit", experiment_id=experiment_id, body=body)
+        cdef object event = Event(topic=BrokerTopic.Submit, experiment_id=experiment_id, body=body)
 
         fut = self.async_client.run(req_id, event)
         return fut
     
     cpdef object on_dt_over(self, bytes experiment_id, object body):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic = "on_dt_over", experiment_id=experiment_id, body=body)
+        cdef object event = Event(topic=BrokerTopic.DayOver, experiment_id=experiment_id, body=body)
         
         fut = self.async_client.run(req_id, event)
         return fut

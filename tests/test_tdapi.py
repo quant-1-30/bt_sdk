@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*- 
 
 import pytest
+import pytz
 import uuid
 from datetime import datetime
-from bt_sdk.core.client import TdApi
-from bt_sdk.core.protocol import RegisterBody, CashBody, OrderBody, QueryBody, Event
+from bt_sdk.core.client import TdApi, SubTopic
+from bt_sdk.core.protocol import RegisterBody, CashBody, OrderBody, QueryBody
 
 
 def get_data(q):
@@ -26,7 +27,7 @@ class TestTdApi:
     
     @pytest.fixture
     def experiment_id(self): # bytes.fromhex()
-        return b'\xe6\x0e\x1a\xdfC\x9bN\t\x84\x92\xc6S\x8b\xd6\xf9\xe7' # uuid.UUID(bytes=***)
+        return b'\xacc\xfb\xa4\x8a\xacF\xca\xa6\xde\xa6$\xa7W7`'
 
     @pytest.fixture
     def td_api(self, client_id):
@@ -37,8 +38,8 @@ class TestTdApi:
     @pytest.fixture
     def register(self, client_id):
         strategy = "test_cython"
-        extra_info= "002750"
-        return RegisterBody(client_id=client_id, strategy=strategy, extra_info=extra_info, identity=b"jsklfjaslfjsalfjaslfj")
+        extra_info= "300308"
+        return RegisterBody(client_id=client_id, strategy=strategy, extra_info=extra_info)
     
     @pytest.fixture
     def cash(self):
@@ -48,10 +49,11 @@ class TestTdApi:
       
     @pytest.fixture
     def order(self):
-        created_str = "2025-04-23 9:30:00" # asia 8 after utc
+        created_str = "2025-04-23 9:31:00" # 原始数据没有设定pytz timezone default to UTC
         created_dt = datetime.strptime(created_str, '%Y-%m-%d %H:%M:%S')
+        created_dt = pytz.UTC.localize(created_dt)
         return OrderBody(
-                sid=b"002750", 
+                sid=b"300308", 
                 pricelimit=2, # / 100
                 sizer_ratio=80, #  /100
                 created_dt=int(created_dt.timestamp()),
@@ -61,9 +63,9 @@ class TestTdApi:
     
     @pytest.fixture(scope="function")
     def query(self):
-        start_date = 0
-        end_date = 1845400660
-        sid = [b'002750']
+        start_date = 1589817599
+        end_date = 1589880660
+        sid = [b'300308']
         return QueryBody(start_date=start_date, end_date=end_date, sid=sid)
     
     # def test_register(self, td_api, register):
@@ -85,31 +87,31 @@ class TestTdApi:
     #     assert resp is not None
 
     # def test_getAccount(self, td_api, experiment_id):
-    #     fut = td_api.getvalue(experiment_id, "account")
+    #     fut = td_api.getvalue(experiment_id, SubTopic.Account)
     #     resp = fut.result()
     #     print("test get_account: ", resp)
     #     assert resp is not None
 
     # def test_getPosition(self, td_api, experiment_id):
-    #     fut = td_api.getvalue(experiment_id, "position")
+    #     fut = td_api.getvalue(experiment_id, SubTopic.Position)
     #     resp = fut.result()
     #     print("test get_position: ", resp)
     #     assert resp is not None
 
     # def test_subscirbe_order(self, td_api, experiment_id, query):
-    #     fut = td_api.subscribe(experiment_id, "order", query)
+    #     fut = td_api.subscribe(experiment_id, SubTopic.Order, query)
     #     resp = fut.result()
     #     print("test_reqOrder: ", resp)
     #     assert resp is not None
 
     # def test_subscribe_position(self, td_api, experiment_id, query):
-    #     fut = td_api.subscribe(experiment_id, "position", query)
+    #     fut = td_api.subscribe(experiment_id, SubTopic.Position, query)
     #     resp = fut.result()
     #     print("test_reqPosition: ", resp)
     #     assert resp is not None
 
     # def test_subscribe_account(self, td_api, experiment_id, query):
-    #     fut = td_api.subscribe(experiment_id, "account", query)
+    #     fut = td_api.subscribe(experiment_id, SubTopic.Account, query)
     #     resp = fut.result()
     #     print("test_reqAccount: ", resp)
     #     assert resp is not None

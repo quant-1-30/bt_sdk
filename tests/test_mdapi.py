@@ -10,15 +10,14 @@ import pyarrow as pa
 import pyarrow.compute as pc
 
 from bt_sdk.core.protocol import QueryBody
-from bt_sdk.core.client import MdApi
+from bt_sdk.core.client import MdApi, RpcTopic
 
 
 class TestMdApi:
     
     @pytest.fixture
     def md_api(self):
-        return MdApi(addr=("127.0.0.1", 9000))
-        # return MdApi(addr=("192.168.2.100", 9000))
+        return MdApi(addr=("127.0.0.1", 9000)) # MdApi(addr=("192.168.2.100", 9000))
     
     @pytest.fixture
     def benchmark(self):
@@ -30,7 +29,6 @@ class TestMdApi:
         start_date = 20000101
         end_date = 20250424
         sid = [b'000001'] # 000001 000680 399006 399001
-        # return {"start_date": start_date ,"end_date": end_date, "sid": sid}
         return QueryBody(start_date, end_date, sid)
 
     @pytest.fixture
@@ -39,15 +37,13 @@ class TestMdApi:
     
     @pytest.fixture
     def event_type(self):
-        # return "adjustment"
-        return "rightment"
+        return RpcTopic.Adjustment # RpcTopic.Rightment
 
     @pytest.fixture
     def query(self):
         start_date = 20000101
         end_date = 20250424
         sid = [b'002750']
-        # return {"start_date": start_date ,"end_date": end_date, "sid": sid}
         return QueryBody(start_date, end_date, sid)
     
     # def test_getCalendar(self, md_api):
@@ -59,7 +55,7 @@ class TestMdApi:
     #         observable.subscribe( # nonblocking 
     #             on_next=q.put,
     #             on_error=lambda e: q.put(e),
-    #             on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
+    #             on_completed=lambda: q.put(StopIteration) 
     #         )
             
     #         while True:
@@ -107,32 +103,32 @@ class TestMdApi:
                 
     #         print(f"Instrument Results: {results}")
 
-    # def test_getBenchmark(self, md_api, benchmark):
-    #     with md_api as client:
-    #         observable = client.get_benchmark(benchmark)
+    def test_getBenchmark(self, md_api, benchmark):
+        with md_api as client:
+            observable = client.get_benchmark(benchmark)
 
-    #         q = queue.Queue()
-    #         results = []
+            q = queue.Queue()
+            results = []
             
-    #         observable.subscribe( # nonblocking 
-    #             on_next=q.put,
-    #             on_error=lambda e: q.put(e),
-    #             on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
-    #         )
+            observable.subscribe( # nonblocking 
+                on_next=q.put,
+                on_error=lambda e: q.put(e),
+                on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
+            )
             
-    #         while True:
-    #             item = q.get() # blocking
-    #             if item is StopIteration:
-    #                 break
-    #             if isinstance(item, Exception):
-    #                 raise item
-    #             results.append(item)
+            while True:
+                item = q.get() # blocking
+                if item is StopIteration:
+                    break
+                if isinstance(item, Exception):
+                    raise item
+                results.append(item)
                 
-    #         print(f"Benchmark Results: {results}")
+            print(f"Benchmark Results: {results}")
      
     # def test_adjust_event(self, md_api, query):
     #     with md_api as client:
-    #         observable = client.get_event("adjustment", query)
+    #         observable = client.get_event(RpcTopic.Adjustment, query)
 
     #         q = queue.Queue()
     #         results = []
@@ -155,7 +151,7 @@ class TestMdApi:
     
     # def test_right_event(self, md_api, query):
     #     with md_api as client:
-    #         observable = client.get_event("rightment", query)
+    #         observable = client.get_event(RpcTopic.Rightment, query)
 
     #         q = queue.Queue()
     #         results = []
@@ -222,8 +218,8 @@ class TestMdApi:
                 
     #         print(f"Subscribe Results: {results}")
     
-    def test_factor(self, md_api, query):
-        with md_api as client:
-            data = client.get_factor(query)
-            print("test_get_factors: ", data.raw_factors, data.adj_factors)
-            assert data is not None
+    # def test_factor(self, md_api, query):
+    #     with md_api as client:
+    #         data = client.get_factor(query)
+    #         print("test_get_factors: ", data.raw_factors, data.adj_factors)
+    #         assert data is not None

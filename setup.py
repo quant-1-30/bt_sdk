@@ -9,22 +9,22 @@ current_dir = os.path.abspath(os.getcwd())
 
 extensions = [
     Extension(
-        name="core.client.mdapi", 
-        sources=["core/client/mdapi.pyx"],
-        include_dirs=[np.get_include(), current_dir],
+        name="bt_sdk.core.client.mdapi", 
+        sources=["bt_sdk/core/client/mdapi.pyx"],
+        include_dirs=[np.get_include(), current_dir, "."],
         language="c++",
         extra_compile_args=["-O3", "-std=c++11"],
     ),
     Extension(
-        name="core.client.tdapi", 
-        sources=["core/client/tdapi.pyx"],
-        include_dirs=[np.get_include(), current_dir],
+        name="bt_sdk.core.client.tdapi", 
+        sources=["bt_sdk/core/client/tdapi.pyx"],
+        include_dirs=[np.get_include(), current_dir, "."],
         language="c++",
         extra_compile_args=["-O3", "-std=c++11"],
     ),
      Extension(
-        name="core.client.async_client",  # * 表示匹配目录下所有模块
-        sources=["core/client/async_client.pyx"],
+        name="bt_sdk.core.client.async_client",  # * 表示匹配目录下所有模块
+        sources=["bt_sdk/core/client/async_client.pyx"],
         include_dirs=[np.get_include(), "."],  # 包含 NumPy 和当前目录（用于查找 pxd）
         language="c++",                         # 如果使用了 vector/map，必须指定
         extra_compile_args=["-O3", "-std=c++11"]
@@ -33,13 +33,6 @@ extensions = [
             # "-Wno-unused-but-set-variable",
             # "-Wno-unused-parameter",
             # "-Wno-sign-compare", # O3 极致优化，C++11 标准
-    ),
-    Extension(
-        name="core.client.util", 
-        sources=["core/client/util.pyx"],
-        include_dirs=[np.get_include(), current_dir],
-        # libraries=["uuid"], # macos support uuid/uuid.h | linux libuuid
-        language="c++",
     )
 ]
 

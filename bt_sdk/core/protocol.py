@@ -15,11 +15,10 @@ class RegisterBody(msgspec.Struct, frozen=True, tag="register"):
     client_id: bytes
     strategy: str
     extra_info: str
-    identity: bytes
 
 
 class CashBody(msgspec.Struct, frozen=True, tag="cash"):
-    session: int # 19900202
+    session: int 
     cash: float
 
 
@@ -34,8 +33,8 @@ class OrderBody(msgspec.Struct, frozen=True, tag="order"):
 
 
 class Event(msgspec.Struct, frozen=True):
-    topic: str
-    sub_topic: str = ""
+    topic: int
+    sub_topic: int = -1
     experiment_id: bytes = b""
     body: Union[QueryBody, RegisterBody, CashBody, OrderBody, None] = None # tag to find body in Union strict
     # body: EmptyBody = msgspec.field(default_factory=EmptyBody)
@@ -51,6 +50,7 @@ class TradeBody(msgspec.Struct, frozen=True, tag="trade"):
     executed_size: int
     executed_price: float
     comm: float
+    isbuy: bool
 
 
 class PositionBody(msgspec.Struct, frozen=True, tag="position"):
