@@ -4,8 +4,8 @@ build-backend =  "setuptools.build_meta" # "poetry.core.masonry.api" for pure py
 
 [project] # used for setuptools
 name = "bt-sdk"
-version = "0.9.7"
-description = "revise factor bug"
+version = "0.9.8"
+description = "revise async_client loop bug to adapt ray scale"
 authors = [
     {name = "hengxin.liu", email = "john@example.com"}
 ]
@@ -13,8 +13,8 @@ readme = "README.md"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.9.7"
-description = "revise factor bug"
+version = "0.9.8"
+description = "revise async_client loop bug to adapt ray scale"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [

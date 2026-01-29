@@ -85,17 +85,36 @@ cdef class AsyncClient:
         self._init_event_loop()
     
     cdef void _init_event_loop(self):
-        self.loop = asyncio.new_event_loop()
+        # self.loop = asyncio.new_event_loop()
 
-        if hasattr(self.loop, 'set_debug'):
-            self.loop.set_debug(False)
+        # if hasattr(self.loop, 'set_debug'):
+        #     self.loop.set_debug(False)
         
-        self._loop_thread = threading.Thread(
-            target=self._run_event_loop,
-            daemon=True, # to clean up thread when main thread finish 
-            name="AsyncClient-EventLoop"
-        )
-        self._loop_thread.start()
+        # self._loop_thread = threading.Thread(
+        #     target=self._run_event_loop,
+        #     daemon=True, # to clean up thread when main thread finish 
+        #     name="AsyncClient-EventLoop"
+        # )
+        # self._loop_thread.start()
+
+        try:
+            self.loop = asyncio.get_running_loop() # Ray Actor Loop 
+            self._use_internal_thread = False
+            print(f"[{self.__class__.__name__}] Attached to existing Event Loop: {id(self.loop)}")
+        except RuntimeError:
+            self._use_internal_thread = True # Sync thread and new loop on background
+
+            self.loop = asyncio.new_event_loop()
+            if hasattr(self.loop, 'set_debug'):
+                self.loop.set_debug(False)
+        
+            self._loop_thread = threading.Thread(
+                target=self._run_event_loop,
+                daemon=True,
+                name="AsyncClient-EventLoop"
+            )
+            self._loop_thread.start()
+            print(f"[{self.__class__.__name__}] Started internal background thread.")
         
     cdef void _run_event_loop(self):
         asyncio.set_event_loop(self.loop)
@@ -165,10 +184,14 @@ cdef class AsyncZmqClient(AsyncClient):
         super().__init__()
         self.addr = f"tcp://{addr[0]}:{addr[1]}"
         self.timeout = timeout
+        self.init_task = None
         
-        # Initialize ZMQ context and socket within the loop
-        future = asyncio.run_coroutine_threadsafe(self._init_zmq(), self.loop)
-        future.result() # Wait for ZMQ initialization to complete
+        if self._use_internal_thread: # sync mode ---> across thread 
+            # Initialize ZMQ context and socket within the loop
+            fut = asyncio.run_coroutine_threadsafe(self._init_zmq(), self.loop)
+            fut.result() # Wait for ZMQ initialization to complete
+        else:
+            self.init_task = self.loop.create_task(self._init_zmq()) # under ray loop, but has a problem when task is finished
 
     async def _init_zmq(self):
         """Initializes ZMQ context and socket. Must be called from within the event loop."""
@@ -263,6 +286,9 @@ cdef class AsyncZmqClient(AsyncClient):
         return observable 
 
     async def send_request(self, bytes req_id, object msg):
+        if self.init_task:
+            await self.init_task # ray loop to wait init_zmq task finish
+
         # serialize_msg = pack(msg)
         serialize_msg = _ENCODER.encode(msg)
         await self.socket.send_multipart([req_id, serialize_msg]) # multi_frame
@@ -364,8 +390,7 @@ cdef class AsyncStreamClient(AsyncClient):
                 await asyncio.sleep(1)
 
     cdef object wrap_protocol(self, bytes req_id, object msg): # return future to user to determin await or result block
-        cdef object fut = Future() # block 
-        # fut = self.loop.create_future() # nonblock
+        cdef object fut = Future() # block  / self.loop.create_future() # nonblock
         # res = await asyncio.wrap_future(fut) # concurrent.futures.Future wrap to asyncio.Future and concurrent future object can be await in asyncio loop
         self._req_futures[req_id] = fut 
         
