@@ -46,180 +46,28 @@ class TestMdApi:
         sid = [b'002750']
         return QueryBody(start_date, end_date, sid)
     
-    # def test_getCalendar(self, md_api):
-    #     with md_api as client:
-    #         observable = client.get_calendar() 
-    #         q = queue.Queue()
-    #         results = []
-            
-    #         observable.subscribe( # nonblocking 
-    #             on_next=q.put,
-    #             on_error=lambda e: q.put(e),
-    #             on_completed=lambda: q.put(StopIteration) 
-    #         )
-            
-    #         while True:
-    #             item = q.get() # blocking
-    #             if item is StopIteration:
-    #                 break
-    #             if isinstance(item, Exception):
-    #                 raise item
-    #             results.append(item)
-                
-    #         print(f"Calendar Results: {results}")
+    def test_getCalendar(self, md_api):
+        with md_api as client:
+            results = client.get_calendar() 
+        print(f"Calendar Results: {results}")
 
-    # def test_get_calendar_async(self, md_api):
-    #     with md_api as client:
-    #         obs = client.get_calendar()
-    #         results = []
-
-    #         async def collect():
-    #             async for item in obs: # v4
-    #                 results.append(item)
-    #         future = asyncio.run_coroutine_threadsafe(collect(), client.loop)
-    #         future.result(timeout=10) 
-    #         assert len(results) > 0
-
-    # def test_getInstrument(self, md_api):
-    #     with md_api as client:
-    #         observable = client.get_instrument()
-
-    #         q = queue.Queue()
-    #         results = []
-            
-    #         observable.subscribe( # nonblocking 
-    #             on_next=q.put,
-    #             on_error=lambda e: q.put(e),
-    #             on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
-    #         )
-            
-    #         while True:
-    #             item = q.get() # blocking
-    #             if item is StopIteration:
-    #                 break
-    #             if isinstance(item, Exception):
-    #                 raise item
-    #             results.append(item)
-                
-    #         print(f"Instrument Results: {results}")
+    def test_getInstrument(self, md_api):
+        with md_api as client:
+            results = client.get_instrument()
+            print(f"Instrument Results: {results}")
 
     def test_getBenchmark(self, md_api, benchmark):
         with md_api as client:
-            observable = client.get_benchmark(benchmark)
-
-            q = queue.Queue()
-            results = []
-            
-            observable.subscribe( # nonblocking 
-                on_next=q.put,
-                on_error=lambda e: q.put(e),
-                on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
-            )
-            
-            while True:
-                item = q.get() # blocking
-                if item is StopIteration:
-                    break
-                if isinstance(item, Exception):
-                    raise item
-                results.append(item)
-                
+            results = client.get_benchmark(benchmark)
             print(f"Benchmark Results: {results}")
      
-    # def test_adjust_event(self, md_api, query):
-    #     with md_api as client:
-    #         observable = client.get_event(RpcTopic.Adjustment, query)
-
-    #         q = queue.Queue()
-    #         results = []
-            
-    #         observable.subscribe( # nonblocking 
-    #             on_next=q.put,
-    #             on_error=lambda e: q.put(e),
-    #             on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
-    #         )
-            
-    #         while True:
-    #             item = q.get() # blocking
-    #             if item is StopIteration:
-    #                 break
-    #             if isinstance(item, Exception):
-    #                 raise item
-    #             results.append(item)
-                
-    #         print(f"Adjustment Results: {results}")
+    def test_subscirbe(self, md_api, query):
+        with md_api as client:
+            results = client.subscribe(query)
+            print(f"Subscribe Results: {results}")
     
-    # def test_right_event(self, md_api, query):
-    #     with md_api as client:
-    #         observable = client.get_event(RpcTopic.Rightment, query)
-
-    #         q = queue.Queue()
-    #         results = []
-            
-    #         observable.subscribe( # nonblocking 
-    #             on_next=q.put,
-    #             on_error=lambda e: q.put(e),
-    #             on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
-    #         )
-            
-    #         while True:
-    #             item = q.get() # blocking
-    #             if item is StopIteration:
-    #                 break
-    #             if isinstance(item, Exception):
-    #                 raise item
-    #             results.append(item)
-                
-    #         print(f"Right Results: {results}")
-    
-    # def test_get_close(self, md_api, query):
-    #     with md_api as client:
-    #         observable = client.get_close(query)
-
-    #         q = queue.Queue()
-    #         results = []
-            
-    #         observable.subscribe( # nonblocking 
-    #             on_next=q.put,
-    #             on_error=lambda e: q.put(e),
-    #             on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
-    #         )
-            
-    #         while True:
-    #             item = q.get() # blocking
-    #             if item is StopIteration:
-    #                 break
-    #             if isinstance(item, Exception):
-    #                 raise item
-    #             results.append(item)
-                
-    #         print(f"Close Results: {results}")
-
-    # def test_subscirbe(self, md_api, query):
-    #     with md_api as client:
-    #         observable = client.subscribe(query)
-
-    #         q = queue.Queue()
-    #         results = []
-            
-    #         observable.subscribe( # nonblocking 
-    #             on_next=q.put,
-    #             on_error=lambda e: q.put(e),
-    #             on_completed=lambda: q.put(StopIteration) # 使用特殊标记表示结束
-    #         )
-            
-    #         while True:
-    #             item = q.get() # blocking
-    #             if item is StopIteration:
-    #                 break
-    #             if isinstance(item, Exception):
-    #                 raise item
-    #             results.append(item)
-                
-    #         print(f"Subscribe Results: {results}")
-    
-    # def test_factor(self, md_api, query):
-    #     with md_api as client:
-    #         data = client.get_factor(query)
-    #         print("test_get_factors: ", data.raw_factors, data.adj_factors)
-    #         assert data is not None
+    def test_factor(self, md_api, query):
+        with md_api as client:
+            data = client.get_factor(query)
+            print("test_get_factors: ", data.raw_factors, data.adj_factors)
+            assert data is not None

@@ -26,15 +26,14 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 cdef int LENGTH_BYTES = 4
 cdef int REQ_ID_SIZE = 16
 
-
 cdef inline object _deserialize_to_table(bytes arrow_bytes): # inline function embed to reduce overhead when hundrends
     if not arrow_bytes:
         return None   
     # pa.py_buffer to wrap Python bytes
     # open_stream zero_copy parse 
     # read_all() ---> Table (underlying data point ZMQ bytes 
-    table = pa.ipc.open_stream(pa.py_buffer(arrow_bytes)).read_all()
     # pc zero_copy and vectorize
+    table = pa.ipc.open_stream(pa.py_buffer(arrow_bytes)).read_all()
     for col_name in ["name"]:
         if col_name in table.column_names:
             col = table.column(col_name)
@@ -44,7 +43,6 @@ cdef inline object _deserialize_to_table(bytes arrow_bytes): # inline function e
                 pc.cast(col, pa.string())
             )
     return table
-
 
 cpdef object scale(dict data):
     """
@@ -68,61 +66,16 @@ cpdef object scale(dict data):
             col_data = pc.round(pc.multiply(col_data, factor), ndigits=2) # vectorize on C++ better than divide
         
         columns.append(col_data)
-
-    # rebuild once
-    return pa.Table.from_arrays(columns, names=field_names)
-    # return pa.RecordBatch.from_arrays(columns, names=field_names)
+    return pa.Table.from_arrays(columns, names=field_names) # pa.RecordBatch.from_arrays
 
 
 cdef class AsyncClient:
 
     def __init__(self):
         
-        self._req_subject = {} # self._global_bus = Subject() # global bus to filter req is heavy cpu operation when max concurrent 
-        self._req_futures = {}
         self._running = True
+        self.listen_task = None
         
-        self._init_event_loop()
-    
-    cdef void _init_event_loop(self):
-        # self.loop = asyncio.new_event_loop()
-
-        # if hasattr(self.loop, 'set_debug'):
-        #     self.loop.set_debug(False)
-        
-        # self._loop_thread = threading.Thread(
-        #     target=self._run_event_loop,
-        #     daemon=True, # to clean up thread when main thread finish 
-        #     name="AsyncClient-EventLoop"
-        # )
-        # self._loop_thread.start()
-
-        try:
-            self.loop = asyncio.get_running_loop() # Ray Actor Loop 
-            self._use_internal_thread = False
-            print(f"[{self.__class__.__name__}] Attached to existing Event Loop: {id(self.loop)}")
-        except RuntimeError:
-            self._use_internal_thread = True # Sync thread and new loop on background
-
-            self.loop = asyncio.new_event_loop()
-            if hasattr(self.loop, 'set_debug'):
-                self.loop.set_debug(False)
-        
-            self._loop_thread = threading.Thread(
-                target=self._run_event_loop,
-                daemon=True,
-                name="AsyncClient-EventLoop"
-            )
-            self._loop_thread.start()
-            print(f"[{self.__class__.__name__}] Started internal background thread.")
-        
-    cdef void _run_event_loop(self):
-        asyncio.set_event_loop(self.loop)
-        try:
-            self.loop.run_forever()
-        except Exception as e:
-            print(f"Event loop error: {e}")
-
     cdef void _finalize_task(self, object future):
         try:
             ret = future.result()  # result or exception
@@ -141,7 +94,6 @@ cdef class AsyncClient:
         pass    
 
     async def send_request(self, bytes req_id, dict message):
-        """子类需实现具体的发送逻辑"""
         pass
 
     async def _async_shutdown(self):
@@ -153,23 +105,16 @@ cdef class AsyncClient:
                 pass
 
     cpdef void close(self):
-        if not self._running:
-            return
-            
+        if not self._running: return
         self._running = False
+        
+        try:
+            loop = asyncio.get_running_loop()
+            if loop.is_running():
+                loop.create_task(self._async_shutdown())
+        except RuntimeError:
+            pass # No loop running, nothing to clean up
 
-        if self.loop is not None and self.loop.is_running():
-            try:
-                fut = asyncio.run_coroutine_threadsafe(self._async_shutdown(), self.loop)
-                fut.result(timeout=2.0) 
-            except Exception as e:
-                print(f"Shutdown error: {e}")
-            
-            self.loop.call_soon_threadsafe(self.loop.stop)
-            
-            if self._loop_thread and self._loop_thread.is_alive():
-                self._loop_thread.join(timeout=1.0)
-            
         print(f"[{self.__class__.__name__}] Shutdown complete.")
 
 
@@ -184,42 +129,41 @@ cdef class AsyncZmqClient(AsyncClient):
         super().__init__()
         self.addr = f"tcp://{addr[0]}:{addr[1]}"
         self.timeout = timeout
-        self.init_task = None
+        self._req_subject = {} # self._global_bus = Subject() # global bus to filter req is heavy cpu operation when max concurrent 
+        self._connected = False
         
-        if self._use_internal_thread: # sync mode ---> across thread 
-            # Initialize ZMQ context and socket within the loop
-            fut = asyncio.run_coroutine_threadsafe(self._init_zmq(), self.loop)
-            fut.result() # Wait for ZMQ initialization to complete
-        else:
-            self.init_task = self.loop.create_task(self._init_zmq()) # under ray loop, but has a problem when task is finished
+    async def _ensure_connection(self):
+            """
+                lazy initialize to ensure create zmq in loop
+            """
+            if self._connected:
+                return
+            try:
+                loop = asyncio.get_running_loop()
 
-    async def _init_zmq(self):
-        """Initializes ZMQ context and socket. Must be called from within the event loop."""
-        self.context = zmq.asyncio.Context()
-        # self.context.set(zmq.IO_THREADS, 4) # 
-        self.socket = self.context.socket(zmq.DEALER)
-        
-        # Set a unique identity for this client for easier debugging on the server when reconnect
-        client_id = f"client-{uuid.uuid4()}".encode('utf-8') # if not set client will generate uuid as client_id
-        self.socket.setsockopt(zmq.IDENTITY, client_id)
+                print(f"[ZMQ] Initializing on Loop: {id(loop)}")
+                self.context = zmq.asyncio.Context()
+                self.socket = self.context.socket(zmq.DEALER)
 
-        # # zmq.SNDBUF` / `zmq.RCVBUF` kernal TCP Window 
-        # self.socket.setsockopt(zmq.SNDBUF, 2*1024*1024)
-        # self.socket.setsockopt(zmq.RCVBUF, 2*1024*1024)
-
-        self.socket.setsockopt(zmq.LINGER, 0)
-        # No Nagle
-        self.socket.setsockopt(42, 1) # zmq.constants.TCP_NODELAY / socket.TCP_NODELAY 1
-        # Set high-water mark to prevent excessive memory usage
-        self.socket.set_hwm(1000)
-
-        # # heartbeat
-        # self.socket.setsockopt(zmq.HEARTBEAT_IVL, 5000)      
-        # self.socket.setsockopt(zmq.HEARTBEAT_TIMEOUT, 15000) 
-        # self.socket.setsockopt(zmq.HEARTBEAT_TTL, 15000) 
-        
-        self.socket.connect(self.addr)
-        self.listen_task = self.loop.create_task(self._listen_loop())
+                client_id = f"client-{uuid.uuid4()}".encode('utf-8')
+                self.socket.setsockopt(zmq.IDENTITY, client_id)
+                self.socket.setsockopt(zmq.LINGER, 0) # No Nagle
+                # # zmq.SNDBUF` / `zmq.RCVBUF` kernal TCP Window 
+                # self.socket.setsockopt(zmq.SNDBUF, 2*1024*1024)
+                # self.socket.setsockopt(zmq.RCVBUF, 2*1024*1024)
+                self.socket.setsockopt(42, 1) # zmq.constants.TCP_NODELAY / socket.TCP_NODELAY 1
+                # Set high-water mark to prevent excessive memory usage
+                self.socket.set_hwm(1000)
+                # # heartbeat
+                # self.socket.setsockopt(zmq.HEARTBEAT_IVL, 5000)      
+                # self.socket.setsockopt(zmq.HEARTBEAT_TIMEOUT, 15000) 
+                # self.socket.setsockopt(zmq.HEARTBEAT_TTL, 15000) 
+                self.socket.connect(self.addr)
+                self.listen_task = loop.create_task(self._listen_loop())
+                self._connected = True
+            except Exception as e:
+                print(f"[ZMQ Init Error] {e}")
+                raise e
 
     async def _listen_loop(self):
             """
@@ -277,18 +221,21 @@ cdef class AsyncZmqClient(AsyncClient):
             # ops.throttle_first(0.05), # on receive / 50ms not receive
             # ops.publish_replay(1), # cache 1 record 
             # ops.ref_count()
-            ops.map(scale), # avoid lambda function due to python overhead and function must cpdef or def
+            ops.map(scale),
             ops.share() 
         ) 
-        coro = self.send_request(req_id, msg) 
-        future = asyncio.run_coroutine_threadsafe(coro, self.loop)
-        future.add_done_callback(lambda f: self._finalize_task(f))
-        return observable 
+        try:
+            # coro = self.send_request(req_id, msg) 
+            # future = asyncio.run_coroutine_threadsafe(coro, loop)
+            # future.add_done_callback(lambda f: self._finalize_task(f))
+            loop = asyncio.get_running_loop()
+            loop.create_task(self.send_request(req_id, msg)) 
+        except RuntimeError:
+            print("[Fatal] AsyncZmqClient.run called outside Event Loop!") # sync via wrap
+        return observable
 
     async def send_request(self, bytes req_id, object msg):
-        if self.init_task:
-            await self.init_task # ray loop to wait init_zmq task finish
-
+        await self._ensure_connection()
         # serialize_msg = pack(msg)
         serialize_msg = _ENCODER.encode(msg)
         await self.socket.send_multipart([req_id, serialize_msg]) # multi_frame
@@ -311,11 +258,34 @@ cdef class AsyncStreamClient(AsyncClient):
         super().__init__()
             
         self.host, self.port = addr
+        self._initialized = False
+
         self._conn_lock = asyncio.Lock() 
         self._connection_cache = {}
+        self._req_futures = {}
         self.timeout = timeout
+        self.listen_task = None
         
-        self.listen_task = self.loop.create_task(self._listen_loop())
+    async def _ensure_initialized(self):
+        """
+            核心延迟初始化逻辑：确保 Loop、Lock、Listen Task 就绪
+        """
+        if self._initialized:
+            return
+        try:
+            loop = asyncio.get_running_loop()
+            
+            if self._conn_lock is None:
+                self._conn_lock = asyncio.Lock()
+            
+            if self.listen_task is None or self.listen_task.done():
+                print(f"[TCP] Starting listener loop on {self.host}:{self.port} (Loop: {id(loop)})")
+                self.listen_task = loop.create_task(self._listen_loop())
+            
+            self._initialized = True
+        except Exception as e:
+            print(f"[TCP Init Error] {e}")
+            raise e
     
     async def _get_connection(self, str connection_key):
         cdef object reader, writer
@@ -351,14 +321,15 @@ cdef class AsyncStreamClient(AsyncClient):
         cdef str connection_key = f"{self.host}:{self.port}"
         cdef object reader = None, writer = None
         
+        await self._ensure_initialized()
+
         print(f"[TCP] Reader for {connection_key} started.")
         while self._running:
             try:
                 if reader is None or writer is None or writer.is_closing():  # reader.at_eof() means close connect
                     reader, writer = await self._get_connection(connection_key)
 
-                len_bytes = await reader.readexactly(LENGTH_BYTES)
-                # len_bytes = await asyncio.wait_for(reader.readexactly(LENGTH_BYTES), timeout=30.0)
+                len_bytes = await reader.readexactly(LENGTH_BYTES) # await asyncio.wait_for(reader.readexactly(LENGTH_BYTES), timeout=30.0)
                 msg_len = int.from_bytes(len_bytes, 'big')
 
                 if msg_len == 0: continue # Heartbeat
@@ -372,7 +343,7 @@ cdef class AsyncStreamClient(AsyncClient):
                 
                 fut = self._req_futures.pop(req_id, None)
                 if fut and not fut.done():
-                    self.loop.call_soon_threadsafe(fut.set_result, payload)# ensure cross thread safely / fut.set_result(payload)
+                    fut.set_result(payload)# ensure cross thread safely / fut.set_result(payload)
 
             except (asyncio.IncompleteReadError, asyncio.TimeoutError, ConnectionError, OSError) as e:
                 if self._running:
@@ -389,17 +360,33 @@ cdef class AsyncStreamClient(AsyncClient):
                 print(f"[TCP] Unexpected error: {e}")
                 await asyncio.sleep(1)
 
-    cdef object wrap_protocol(self, bytes req_id, object msg): # return future to user to determin await or result block
-        cdef object fut = Future() # block  / self.loop.create_future() # nonblock
-        # res = await asyncio.wrap_future(fut) # concurrent.futures.Future wrap to asyncio.Future and concurrent future object can be await in asyncio loop
-        self._req_futures[req_id] = fut 
+    # cdef object wrap_protocol(self, bytes req_id, object msg): # return future to user to determin await or result block
+    #     cdef object fut = Future() # wrap_protocol block  / loop.create_future() # nonblock
+    #     # res = await asyncio.wrap_future(fut) # concurrent.futures.Future wrap to asyncio.Future and concurrent future object can be await in asyncio loop
+    #     self._req_futures[req_id] = fut 
         
-        asyncio.run_coroutine_threadsafe(self.send_request(req_id, msg), self.loop)
+    #     loop = asyncio.get_running_loop()
+    #     asyncio.run_coroutine_threadsafe(self.send_request(req_id, msg), loop)
+    #     return fut
+
+    cdef object wrap_protocol(self, bytes req_id, object msg): 
+        cdef object loop, fut
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            raise RuntimeError("AsyncStreamClient.run must be called inside an Event Loop")
+
+        fut = loop.create_future() # Loop Future light than concurrent.futures
+        self._req_futures[req_id] = fut
+        loop.create_task(self.send_request(req_id, msg))
         return fut 
+
     async def send_request(self, bytes req_id, object msg):
         cdef bytes body = _ENCODER.encode(msg)
         cdef int total_length = REQ_ID_SIZE + len(body) 
         cdef str connection_key = f"{self.host}:{self.port}"
+
+        await self._ensure_initialized()
 
         reader, writer = await self._get_connection(connection_key) 
         writer.writelines([

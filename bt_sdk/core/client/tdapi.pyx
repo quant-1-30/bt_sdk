@@ -33,6 +33,8 @@ cdef class TdApi:
                     int timeout=5):
         self.client_id = client_id
         self.async_client = AsyncStreamClient(addr, timeout)
+
+        self.async_client.attch_loop()
     
     cpdef object register(self, object body):
         cdef bytes req_id = fast_uuid4_bytes()

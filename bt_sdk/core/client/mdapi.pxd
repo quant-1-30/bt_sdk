@@ -9,17 +9,27 @@ cpdef enum RpcTopic:
  
 
 cdef class MdApi:
+    cdef int timeout
     cdef object async_client
+    cdef object loop
+    cdef object _loop_thread
+    
+    cdef void _init_event_loop(self)
+    
+    cdef void _run_event_loop(self)
+
     cpdef object get_calendar(self)
 
     cpdef object get_instrument(self)
 
-    cpdef object get_benchmark(self)
+    cpdef object get_benchmark(self, object body)
 
     cpdef object subscribe(self, object body)
     
-    cpdef object _event_obs(self, int topic, object body)
+    cpdef object get_event_obs(self, int topic, object body)
 
-    cpdef object _close_obs(self, object body)
+    cpdef object get_close_obs(self, object body)
+    
+    cpdef object get_factor(self, object body)
     
     cpdef void disconnect(self)

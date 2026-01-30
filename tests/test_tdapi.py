@@ -68,11 +68,11 @@ class TestTdApi:
         sid = [b'300308']
         return QueryBody(start_date=start_date, end_date=end_date, sid=sid)
     
-    # def test_register(self, td_api, register):
-    #     fut = td_api.register(register)
-    #     resp = fut.result()
-    #     print("resp ", resp)
-    #     assert resp is not None
+    def test_register(self, td_api, register):
+        fut = td_api.register(register)
+        resp = fut.result()
+        print("resp ", resp)
+        assert resp is not None
 
     # def test_set_cash(self, td_api, cash, experiment_id):
     #     fut = td_api.set_cash(experiment_id, cash)
@@ -116,8 +116,8 @@ class TestTdApi:
     #     print("test_reqAccount: ", resp)
     #     assert resp is not None
     
-    def test_on_dt_over(self, td_api, experiment_id, query):
-        fut = td_api.on_dt_over(experiment_id, query)
-        resp = fut.result()
-        print("test_on_dt_over: ", resp)
-        assert resp is not None
+    # def test_on_dt_over(self, td_api, experiment_id, query):
+    #     fut = td_api.on_dt_over(experiment_id, query)
+    #     resp = fut.result()
+    #     print("test_on_dt_over: ", resp)
+    #     assert resp is not None
