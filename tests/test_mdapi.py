@@ -45,25 +45,25 @@ class TestMdApi:
         sid = [b'002750']
         return QueryBody(start_date, end_date, sid)
     
-    # def test_getCalendar(self, md_api):
-    #     with md_api as client:
-    #         results = client.get_calendar() 
-    #     print(f"Calendar Results: {results}")
+    def test_getCalendar(self, md_api):
+        with md_api as client:
+            results = client.get_calendar() 
+        print(f"Calendar Results: {results}")
 
-    # def test_getInstrument(self, md_api):
-    #     with md_api as client:
-    #         results = client.get_instrument()
-    #         print(f"Instrument Results: {results}")
+    def test_getInstrument(self, md_api):
+        with md_api as client:
+            results = client.get_instrument()
+            print(f"Instrument Results: {results}")
 
-    # def test_getBenchmark(self, md_api, benchmark):
-    #     with md_api as client:
-    #         results = client.get_benchmark(benchmark)
-    #         print(f"Benchmark Results: {results}")
+    def test_getBenchmark(self, md_api, benchmark):
+        with md_api as client:
+            results = client.get_benchmark(benchmark)
+            print(f"Benchmark Results: {results}")
      
-    # def test_subscirbe(self, md_api, query):
-    #     with md_api as client:
-    #         results = client.subscribe(query)
-    #         print(f"Subscribe Results: {results}")
+    def test_subscirbe(self, md_api, query):
+        with md_api as client:
+            results = client.subscribe(query)
+            print(f"Subscribe Results: {results}")
     
     def test_factor(self, md_api, query):
         with md_api as client:

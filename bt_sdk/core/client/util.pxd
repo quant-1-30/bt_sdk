@@ -3,6 +3,7 @@
 
 import datetime
 from ping3 import ping
+import pyarrow as pa
 
 from libc.stdint cimport uint8_t, int64_t
 from libc.time cimport gmtime, time_t, tm
@@ -111,3 +112,13 @@ cdef inline int64_t ts_to_int_date(int64_t ts, bint native=True) nogil: # only c
     cdef tm* info = gmtime(&rawtime)
     return (info.tm_year + 1900) * 10000 + (info.tm_mon + 1) * 100 + info.tm_mday
 
+
+cdef inline object _merge_tables(list result):
+    if result and len(result) > 0:
+        try:
+            # return pa.Table.from_batches(result)  # pa.RecordBatch
+            return pa.concat_tables(result, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks() 
+        except Exception as e:
+            print(f"[MdApi] Merge error: {e}")
+            return None
+    return None
