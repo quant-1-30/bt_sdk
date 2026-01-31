@@ -30,14 +30,19 @@ cpdef enum ExecType:
 cdef class TdApi:
     cdef bytes client_id
     cdef object async_client
+    cdef object _loop_thread
+    
+    cdef void _run_loop_thread(self, object loop)
+    
+    cdef object _send_request(self, int topic, bytes experiment_id=*, object body=*, int sub_topic=*)
 
     cpdef object register(self, object body)
 
     cpdef object set_cash(self, bytes experiment_id, object body)
 
-    cpdef object getvalue(self, bytes experiment_id, int topic)
+    cpdef object getvalue(self, int topic, bytes experiment_id)
 
-    cpdef object subscribe(self, bytes experiment_id, int topic, object body)
+    cpdef object subscribe(self, int topic, bytes experiment_id, object body)
 
     cpdef object submit(self, bytes experiment_id, object body)
 

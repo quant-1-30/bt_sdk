@@ -4,8 +4,8 @@ build-backend =  "setuptools.build_meta" # "poetry.core.masonry.api" for pure py
 
 [project] # used for setuptools
 name = "bt-sdk"
-version = "0.9.9"
-description = "remove loop in async_client __init__"
+version = "0.10.2"
+description = "revise getvalue bug in tdapi"
 authors = [
     {name = "hengxin.liu", email = "john@example.com"}
 ]
@@ -13,8 +13,8 @@ readme = "README.md"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.9.9"
-description = "remove loop in async_client __init__ "
+version = "0.10.2"
+description = "revise getvalue bug in tdapi"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [

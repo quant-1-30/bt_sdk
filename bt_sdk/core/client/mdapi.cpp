@@ -1576,6 +1576,32 @@ struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_asy
 struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async;
 struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async;
 struct __pyx_obj___pyx_scope_struct____Pyx_CFunc_6bt_sdk_4core_6client_5mdapi_5MdApi_void__lParenMdApi__rParen_to_py_4self;
+struct __pyx_opt_args_6bt_sdk_4core_6client_12async_client_14AsyncZmqClient_attach_loop;
+struct __pyx_opt_args_6bt_sdk_4core_6client_12async_client_17AsyncStreamClient_attach_loop;
+
+/* "bt_sdk/core/client/async_client.pxd":31
+ *     cdef object listen_task
+ * 
+ *     cpdef void attach_loop(self, loop, bint is_background=?)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef object wrap_protocol(self, bytes req_id, object msg) # virtual / cython not supported nested function
+*/
+struct __pyx_opt_args_6bt_sdk_4core_6client_12async_client_14AsyncZmqClient_attach_loop {
+  int __pyx_n;
+  int is_background;
+};
+
+/* "bt_sdk/core/client/async_client.pxd":48
+ *     cdef object listen_task
+ * 
+ *     cpdef void attach_loop(self, loop, bint is_background=?)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef object wrap_protocol(self, bytes req_id, object msg)
+*/
+struct __pyx_opt_args_6bt_sdk_4core_6client_12async_client_17AsyncStreamClient_attach_loop {
+  int __pyx_n;
+  int is_background;
+};
 struct __pyx_t_6bt_sdk_4core_6client_4util_UuidFrame;
 struct __pyx_t_6bt_sdk_4core_6client_4util_MarketTime;
 struct __pyx_opt_args_6bt_sdk_4core_6client_4util_num2date;
@@ -1685,15 +1711,17 @@ struct __pyx_obj_6bt_sdk_4core_6client_12async_client_AsyncZmqClient {
   struct __pyx_obj_6bt_sdk_4core_6client_12async_client_AsyncClient __pyx_base;
   PyObject *addr;
   int timeout;
+  int is_background_loop;
   int _connected;
   PyObject *_req_subject;
   PyObject *context;
   PyObject *socket;
+  PyObject *loop;
   PyObject *listen_task;
 };
 
 
-/* "bt_sdk/core/client/async_client.pxd":32
+/* "bt_sdk/core/client/async_client.pxd":36
  * 
  * 
  * cdef class AsyncStreamClient(AsyncClient):             # <<<<<<<<<<<<<<
@@ -1705,10 +1733,12 @@ struct __pyx_obj_6bt_sdk_4core_6client_12async_client_AsyncStreamClient {
   PyObject *host;
   int port;
   int _initialized;
+  int is_background_loop;
   PyObject *_conn_lock;
   PyObject *_connection_cache;
   int timeout;
   PyObject *_req_futures;
+  PyObject *loop;
   PyObject *listen_task;
 };
 
@@ -1730,7 +1760,7 @@ struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi {
 };
 
 
-/* "bt_sdk/core/client/mdapi.pyx":15
+/* "bt_sdk/core/client/mdapi.pyx":16
  * 
  * 
  * async def _collect_async(observable, timeout):             # <<<<<<<<<<<<<<
@@ -1755,8 +1785,8 @@ struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async
 };
 
 
-/* "bt_sdk/core/client/mdapi.pyx":104
- *             print(f"Event loop error: {e}")
+/* "bt_sdk/core/client/mdapi.pyx":118
+ * # --------------------------------------------------------------- Ray Async Actor --------------------------------------------------------
  * 
  *     async def get_calendar_async(self):             # <<<<<<<<<<<<<<
  *         """
@@ -1773,8 +1803,8 @@ struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_
 };
 
 
-/* "bt_sdk/core/client/mdapi.pyx":121
- *         return future.result()
+/* "bt_sdk/core/client/mdapi.pyx":130
+ *         return data
  * 
  *     async def get_instrument_async(self):             # <<<<<<<<<<<<<<
  *         """
@@ -1791,8 +1821,8 @@ struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrumen
 };
 
 
-/* "bt_sdk/core/client/mdapi.pyx":138
- *         return future.result()
+/* "bt_sdk/core/client/mdapi.pyx":142
+ *         return data
  * 
  *     async def get_benchmark_async(self, object body):             # <<<<<<<<<<<<<<
  *         cdef bytes req_id = fast_uuid4_bytes()
@@ -1810,8 +1840,8 @@ struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark
 };
 
 
-/* "bt_sdk/core/client/mdapi.pyx":169
- *         return obs
+/* "bt_sdk/core/client/mdapi.pyx":151
+ *         return data
  * 
  *     async def get_close_async(self, object body):             # <<<<<<<<<<<<<<
  *         obs = self.get_close_obs(body)
@@ -1827,8 +1857,8 @@ struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_asy
 };
 
 
-/* "bt_sdk/core/client/mdapi.pyx":185
- *         return obs
+/* "bt_sdk/core/client/mdapi.pyx":157
+ *         return data
  * 
  *     async def get_event_async(self, int topic, object body):             # <<<<<<<<<<<<<<
  *         obs = self.get_event_obs(topic, body)
@@ -1845,7 +1875,7 @@ struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_asy
 };
 
 
-/* "bt_sdk/core/client/mdapi.pyx":191
+/* "bt_sdk/core/client/mdapi.pyx":163
  *         return data
  * 
  *     async def get_factor_async(self, object body):             # <<<<<<<<<<<<<<
@@ -1856,7 +1886,6 @@ struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_as
   PyObject_HEAD
   PyObject *__pyx_v_adjust;
   PyObject *__pyx_v_body;
-  PyObject *__pyx_v_calc_factor;
   PyObject *__pyx_v_close;
   PyObject *__pyx_v_coro1;
   PyObject *__pyx_v_coro2;
@@ -1914,11 +1943,12 @@ static struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncClient 
 
 struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncZmqClient {
   struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncClient __pyx_base;
+  void (*attach_loop)(struct __pyx_obj_6bt_sdk_4core_6client_12async_client_AsyncZmqClient *, PyObject *, int __pyx_skip_dispatch, struct __pyx_opt_args_6bt_sdk_4core_6client_12async_client_14AsyncZmqClient_attach_loop *__pyx_optional_args);
 };
 static struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncZmqClient *__pyx_vtabptr_6bt_sdk_4core_6client_12async_client_AsyncZmqClient;
 
 
-/* "bt_sdk/core/client/async_client.pxd":32
+/* "bt_sdk/core/client/async_client.pxd":36
  * 
  * 
  * cdef class AsyncStreamClient(AsyncClient):             # <<<<<<<<<<<<<<
@@ -1928,11 +1958,12 @@ static struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncZmqClie
 
 struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncStreamClient {
   struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncClient __pyx_base;
+  void (*attach_loop)(struct __pyx_obj_6bt_sdk_4core_6client_12async_client_AsyncStreamClient *, PyObject *, int __pyx_skip_dispatch, struct __pyx_opt_args_6bt_sdk_4core_6client_12async_client_17AsyncStreamClient_attach_loop *__pyx_optional_args);
 };
 static struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncStreamClient *__pyx_vtabptr_6bt_sdk_4core_6client_12async_client_AsyncStreamClient;
 
 
-/* "bt_sdk/core/client/mdapi.pyx":65
+/* "bt_sdk/core/client/mdapi.pyx":73
  * 
  * 
  * cdef class MdApi:             # <<<<<<<<<<<<<<
@@ -2810,15 +2841,6 @@ static CYTHON_INLINE int __Pyx_IterFinish(void);
 /* UnpackItemEndCheck.proto */
 static int __Pyx_IternextUnpackEndCheck(PyObject *retval, Py_ssize_t expected);
 
-/* ImportImpl.export */
-static PyObject *__Pyx__Import(PyObject *name, PyObject *const *imported_names, Py_ssize_t len_imported_names, PyObject *qualname, PyObject *moddict, int level);
-
-/* Import.proto */
-static CYTHON_INLINE PyObject *__Pyx_Import(PyObject *name, PyObject *const *imported_names, Py_ssize_t len_imported_names, PyObject *qualname, int level);
-
-/* ImportFrom.proto */
-static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name);
-
 /* GetAttr3.proto */
 static CYTHON_INLINE PyObject *__Pyx_GetAttr3(PyObject *, PyObject *, PyObject *);
 
@@ -2884,6 +2906,15 @@ enum __Pyx_ImportType_CheckSize_3_2_3 {
 };
 static PyTypeObject *__Pyx_ImportType_3_2_3(PyObject* module, const char *module_name, const char *class_name, size_t size, size_t alignment, enum __Pyx_ImportType_CheckSize_3_2_3 check_size);
 #endif
+
+/* ImportImpl.export */
+static PyObject *__Pyx__Import(PyObject *name, PyObject *const *imported_names, Py_ssize_t len_imported_names, PyObject *qualname, PyObject *moddict, int level);
+
+/* Import.proto */
+static CYTHON_INLINE PyObject *__Pyx_Import(PyObject *name, PyObject *const *imported_names, Py_ssize_t len_imported_names, PyObject *qualname, int level);
+
+/* ImportFrom.proto */
+static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name);
 
 /* ListPack.proto */
 static PyObject *__Pyx_PyList_Pack(Py_ssize_t n, ...);
@@ -3104,17 +3135,17 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_4on_erro
 static int __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi___init__(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_addr, int __pyx_v_timeout); /* proto */
 static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_2__enter__(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_4get_calendar_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_7get_calendar(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_9get_instrument_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_12get_instrument(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_14get_benchmark_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_benchmark(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_19subscribe(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_21get_close_obs(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_23get_close_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_26get_event_obs(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, int __pyx_v_topic, PyObject *__pyx_v_body); /* proto */
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_28get_event_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, int __pyx_v_topic, PyObject *__pyx_v_body); /* proto */
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_31get_factor_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_7get_instrument_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_10get_benchmark_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_13get_close_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_16get_event_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, int __pyx_v_topic, PyObject *__pyx_v_body); /* proto */
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_19get_factor_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_22get_calendar(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_24get_instrument(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_26get_benchmark(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_28subscribe(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_30get_close_obs(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_32get_event_obs(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, int __pyx_v_topic, PyObject *__pyx_v_body); /* proto */
 static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_34get_factor(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body); /* proto */
 static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_36disconnect(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_38__exit__(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_exc_type, PyObject *__pyx_v_exc_val, PyObject *__pyx_v_exc_tb); /* proto */
@@ -3176,7 +3207,7 @@ typedef struct {
   __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_values;
   PyObject *__pyx_tuple[3];
   PyObject *__pyx_codeobj_tab[26];
-  PyObject *__pyx_string_tab[230];
+  PyObject *__pyx_string_tab[231];
   PyObject *__pyx_number_tab[2];
 /* #### Code section: module_state_contents ### */
 /* CommonTypesMetaclass.module_state_decls */
@@ -3333,9 +3364,9 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_TimeoutError __pyx_string_tab[58]
 #define __pyx_n_u_addr __pyx_string_tab[59]
 #define __pyx_n_u_adjust __pyx_string_tab[60]
-#define __pyx_n_u_all __pyx_string_tab[61]
-#define __pyx_n_u_asyncio __pyx_string_tab[62]
-#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[63]
+#define __pyx_n_u_asyncio __pyx_string_tab[61]
+#define __pyx_n_u_asyncio_coroutines __pyx_string_tab[62]
+#define __pyx_n_u_attach_loop __pyx_string_tab[63]
 #define __pyx_n_u_await __pyx_string_tab[64]
 #define __pyx_n_u_body __pyx_string_tab[65]
 #define __pyx_n_u_bt_sdk_core_client_mdapi __pyx_string_tab[66]
@@ -3401,107 +3432,108 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_n_u_get_running_loop __pyx_string_tab[126]
 #define __pyx_n_u_getstate __pyx_string_tab[127]
 #define __pyx_n_u_id __pyx_string_tab[128]
-#define __pyx_n_u_is_coroutine __pyx_string_tab[129]
-#define __pyx_n_u_item __pyx_string_tab[130]
-#define __pyx_n_u_items __pyx_string_tab[131]
-#define __pyx_n_u_loop __pyx_string_tab[132]
-#define __pyx_n_u_main __pyx_string_tab[133]
-#define __pyx_n_u_member_names __pyx_string_tab[134]
-#define __pyx_n_u_members __pyx_string_tab[135]
-#define __pyx_n_u_module __pyx_string_tab[136]
-#define __pyx_n_u_module_2 __pyx_string_tab[137]
-#define __pyx_n_u_month __pyx_string_tab[138]
-#define __pyx_n_u_msgspec __pyx_string_tab[139]
-#define __pyx_n_u_name __pyx_string_tab[140]
-#define __pyx_n_u_name_2 __pyx_string_tab[141]
-#define __pyx_n_u_new __pyx_string_tab[142]
-#define __pyx_n_u_new_event_loop __pyx_string_tab[143]
-#define __pyx_n_u_next __pyx_string_tab[144]
-#define __pyx_n_u_obs __pyx_string_tab[145]
-#define __pyx_n_u_obs_adjust __pyx_string_tab[146]
-#define __pyx_n_u_obs_close __pyx_string_tab[147]
-#define __pyx_n_u_obs_right __pyx_string_tab[148]
-#define __pyx_n_u_observable __pyx_string_tab[149]
-#define __pyx_n_u_on_completed __pyx_string_tab[150]
-#define __pyx_n_u_on_error __pyx_string_tab[151]
-#define __pyx_n_u_on_next __pyx_string_tab[152]
-#define __pyx_n_u_operators __pyx_string_tab[153]
-#define __pyx_n_u_ops __pyx_string_tab[154]
-#define __pyx_n_u_pa __pyx_string_tab[155]
-#define __pyx_n_u_permissive __pyx_string_tab[156]
-#define __pyx_n_u_pop __pyx_string_tab[157]
-#define __pyx_n_u_print __pyx_string_tab[158]
-#define __pyx_n_u_promote_options __pyx_string_tab[159]
-#define __pyx_n_u_pyarrow __pyx_string_tab[160]
-#define __pyx_n_u_pyx_checksum __pyx_string_tab[161]
-#define __pyx_n_u_pyx_result __pyx_string_tab[162]
-#define __pyx_n_u_pyx_state __pyx_string_tab[163]
-#define __pyx_n_u_pyx_type __pyx_string_tab[164]
-#define __pyx_n_u_pyx_unpickle_MdApi __pyx_string_tab[165]
-#define __pyx_n_u_pyx_vtable __pyx_string_tab[166]
-#define __pyx_n_u_qualname __pyx_string_tab[167]
-#define __pyx_n_u_reactivex_operators __pyx_string_tab[168]
-#define __pyx_n_u_reduce __pyx_string_tab[169]
-#define __pyx_n_u_reduce_cython __pyx_string_tab[170]
-#define __pyx_n_u_reduce_ex __pyx_string_tab[171]
-#define __pyx_n_u_req_id __pyx_string_tab[172]
-#define __pyx_n_u_res_adjust __pyx_string_tab[173]
-#define __pyx_n_u_res_close __pyx_string_tab[174]
-#define __pyx_n_u_res_right __pyx_string_tab[175]
-#define __pyx_n_u_result __pyx_string_tab[176]
-#define __pyx_n_u_right __pyx_string_tab[177]
-#define __pyx_n_u_run __pyx_string_tab[178]
-#define __pyx_n_u_run_coroutine_threadsafe __pyx_string_tab[179]
-#define __pyx_n_u_run_forever __pyx_string_tab[180]
-#define __pyx_n_u_self __pyx_string_tab[181]
-#define __pyx_n_u_send __pyx_string_tab[182]
-#define __pyx_n_u_set_debug __pyx_string_tab[183]
-#define __pyx_n_u_set_event_loop __pyx_string_tab[184]
-#define __pyx_n_u_set_exception __pyx_string_tab[185]
-#define __pyx_n_u_set_name __pyx_string_tab[186]
-#define __pyx_n_u_set_result __pyx_string_tab[187]
-#define __pyx_n_u_setdefault __pyx_string_tab[188]
-#define __pyx_n_u_setstate __pyx_string_tab[189]
-#define __pyx_n_u_setstate_cython __pyx_string_tab[190]
-#define __pyx_n_u_start __pyx_string_tab[191]
-#define __pyx_n_u_state __pyx_string_tab[192]
-#define __pyx_n_u_subscribe __pyx_string_tab[193]
-#define __pyx_n_u_subscription __pyx_string_tab[194]
-#define __pyx_n_u_tables __pyx_string_tab[195]
-#define __pyx_n_u_target __pyx_string_tab[196]
-#define __pyx_n_u_test __pyx_string_tab[197]
-#define __pyx_n_u_threading __pyx_string_tab[198]
-#define __pyx_n_u_throw __pyx_string_tab[199]
-#define __pyx_n_u_timeout __pyx_string_tab[200]
-#define __pyx_n_u_topic __pyx_string_tab[201]
-#define __pyx_n_u_update __pyx_string_tab[202]
-#define __pyx_n_u_use_setstate __pyx_string_tab[203]
-#define __pyx_n_u_value __pyx_string_tab[204]
-#define __pyx_n_u_values __pyx_string_tab[205]
-#define __pyx_n_u_wait_for __pyx_string_tab[206]
-#define __pyx_n_u_wrap __pyx_string_tab[207]
-#define __pyx_n_u_year __pyx_string_tab[208]
-#define __pyx_kp_b_iso88591_1F __pyx_string_tab[209]
-#define __pyx_kp_b_iso88591_A __pyx_string_tab[210]
-#define __pyx_kp_b_iso88591_A_4s_q_Qc_9 __pyx_string_tab[211]
-#define __pyx_kp_b_iso88591_A_4s_q_Qc_a __pyx_string_tab[212]
-#define __pyx_kp_b_iso88591_A_9G1_1Kq_1_M_q __pyx_string_tab[213]
-#define __pyx_kp_b_iso88591_A_A_E_Q_d_t1HA_q __pyx_string_tab[214]
-#define __pyx_kp_b_iso88591_A_A_E_uA_d_t1HA_q __pyx_string_tab[215]
-#define __pyx_kp_b_iso88591_A_A_E_uA_d_t1HA_q_2 __pyx_string_tab[216]
-#define __pyx_kp_b_iso88591_A_D_1_1_t1_vWA __pyx_string_tab[217]
-#define __pyx_kp_b_iso88591_A_D_1_t1_vWA __pyx_string_tab[218]
-#define __pyx_kp_b_iso88591_A_D_AQ_1_t1_vWA __pyx_string_tab[219]
-#define __pyx_kp_b_iso88591_A_D_Q_1_t1_vWA __pyx_string_tab[220]
-#define __pyx_kp_b_iso88591_A_M_q __pyx_string_tab[221]
-#define __pyx_kp_b_iso88591_A_gQa __pyx_string_tab[222]
-#define __pyx_kp_b_iso88591_A_q __pyx_string_tab[223]
-#define __pyx_kp_b_iso88591_G3b __pyx_string_tab[224]
-#define __pyx_kp_b_iso88591_Qa_4q_3b_7_1 __pyx_string_tab[225]
-#define __pyx_kp_b_iso88591_T_O4wd_G1F_a_vWE_Q_q_q_d_7_WA_d __pyx_string_tab[226]
-#define __pyx_kp_b_iso88591__5 __pyx_string_tab[227]
-#define __pyx_kp_b_iso88591_a __pyx_string_tab[228]
-#define __pyx_kp_b_iso88591_q_0_kQR_5_7_q_a_1 __pyx_string_tab[229]
+#define __pyx_n_u_is_background __pyx_string_tab[129]
+#define __pyx_n_u_is_coroutine __pyx_string_tab[130]
+#define __pyx_n_u_item __pyx_string_tab[131]
+#define __pyx_n_u_items __pyx_string_tab[132]
+#define __pyx_n_u_loop __pyx_string_tab[133]
+#define __pyx_n_u_main __pyx_string_tab[134]
+#define __pyx_n_u_member_names __pyx_string_tab[135]
+#define __pyx_n_u_members __pyx_string_tab[136]
+#define __pyx_n_u_module __pyx_string_tab[137]
+#define __pyx_n_u_module_2 __pyx_string_tab[138]
+#define __pyx_n_u_month __pyx_string_tab[139]
+#define __pyx_n_u_msgspec __pyx_string_tab[140]
+#define __pyx_n_u_name __pyx_string_tab[141]
+#define __pyx_n_u_name_2 __pyx_string_tab[142]
+#define __pyx_n_u_new __pyx_string_tab[143]
+#define __pyx_n_u_new_event_loop __pyx_string_tab[144]
+#define __pyx_n_u_next __pyx_string_tab[145]
+#define __pyx_n_u_obs __pyx_string_tab[146]
+#define __pyx_n_u_obs_adjust __pyx_string_tab[147]
+#define __pyx_n_u_obs_close __pyx_string_tab[148]
+#define __pyx_n_u_obs_right __pyx_string_tab[149]
+#define __pyx_n_u_observable __pyx_string_tab[150]
+#define __pyx_n_u_on_completed __pyx_string_tab[151]
+#define __pyx_n_u_on_error __pyx_string_tab[152]
+#define __pyx_n_u_on_next __pyx_string_tab[153]
+#define __pyx_n_u_operators __pyx_string_tab[154]
+#define __pyx_n_u_ops __pyx_string_tab[155]
+#define __pyx_n_u_pa __pyx_string_tab[156]
+#define __pyx_n_u_permissive __pyx_string_tab[157]
+#define __pyx_n_u_pop __pyx_string_tab[158]
+#define __pyx_n_u_print __pyx_string_tab[159]
+#define __pyx_n_u_promote_options __pyx_string_tab[160]
+#define __pyx_n_u_pyarrow __pyx_string_tab[161]
+#define __pyx_n_u_pyx_checksum __pyx_string_tab[162]
+#define __pyx_n_u_pyx_result __pyx_string_tab[163]
+#define __pyx_n_u_pyx_state __pyx_string_tab[164]
+#define __pyx_n_u_pyx_type __pyx_string_tab[165]
+#define __pyx_n_u_pyx_unpickle_MdApi __pyx_string_tab[166]
+#define __pyx_n_u_pyx_vtable __pyx_string_tab[167]
+#define __pyx_n_u_qualname __pyx_string_tab[168]
+#define __pyx_n_u_reactivex_operators __pyx_string_tab[169]
+#define __pyx_n_u_reduce __pyx_string_tab[170]
+#define __pyx_n_u_reduce_cython __pyx_string_tab[171]
+#define __pyx_n_u_reduce_ex __pyx_string_tab[172]
+#define __pyx_n_u_req_id __pyx_string_tab[173]
+#define __pyx_n_u_res_adjust __pyx_string_tab[174]
+#define __pyx_n_u_res_close __pyx_string_tab[175]
+#define __pyx_n_u_res_right __pyx_string_tab[176]
+#define __pyx_n_u_result __pyx_string_tab[177]
+#define __pyx_n_u_right __pyx_string_tab[178]
+#define __pyx_n_u_run __pyx_string_tab[179]
+#define __pyx_n_u_run_coroutine_threadsafe __pyx_string_tab[180]
+#define __pyx_n_u_run_forever __pyx_string_tab[181]
+#define __pyx_n_u_self __pyx_string_tab[182]
+#define __pyx_n_u_send __pyx_string_tab[183]
+#define __pyx_n_u_set_debug __pyx_string_tab[184]
+#define __pyx_n_u_set_event_loop __pyx_string_tab[185]
+#define __pyx_n_u_set_exception __pyx_string_tab[186]
+#define __pyx_n_u_set_name __pyx_string_tab[187]
+#define __pyx_n_u_set_result __pyx_string_tab[188]
+#define __pyx_n_u_setdefault __pyx_string_tab[189]
+#define __pyx_n_u_setstate __pyx_string_tab[190]
+#define __pyx_n_u_setstate_cython __pyx_string_tab[191]
+#define __pyx_n_u_start __pyx_string_tab[192]
+#define __pyx_n_u_state __pyx_string_tab[193]
+#define __pyx_n_u_subscribe __pyx_string_tab[194]
+#define __pyx_n_u_subscription __pyx_string_tab[195]
+#define __pyx_n_u_tables __pyx_string_tab[196]
+#define __pyx_n_u_target __pyx_string_tab[197]
+#define __pyx_n_u_test __pyx_string_tab[198]
+#define __pyx_n_u_threading __pyx_string_tab[199]
+#define __pyx_n_u_throw __pyx_string_tab[200]
+#define __pyx_n_u_timeout __pyx_string_tab[201]
+#define __pyx_n_u_topic __pyx_string_tab[202]
+#define __pyx_n_u_update __pyx_string_tab[203]
+#define __pyx_n_u_use_setstate __pyx_string_tab[204]
+#define __pyx_n_u_value __pyx_string_tab[205]
+#define __pyx_n_u_values __pyx_string_tab[206]
+#define __pyx_n_u_wait_for __pyx_string_tab[207]
+#define __pyx_n_u_wrap __pyx_string_tab[208]
+#define __pyx_n_u_year __pyx_string_tab[209]
+#define __pyx_kp_b_iso88591_1F __pyx_string_tab[210]
+#define __pyx_kp_b_iso88591_A __pyx_string_tab[211]
+#define __pyx_kp_b_iso88591_A_4s_q_Qc_9 __pyx_string_tab[212]
+#define __pyx_kp_b_iso88591_A_4s_q_Qc_a __pyx_string_tab[213]
+#define __pyx_kp_b_iso88591_A_9G1_1Kq_1_M_q __pyx_string_tab[214]
+#define __pyx_kp_b_iso88591_A_A_E_Q_d_t1HA_q __pyx_string_tab[215]
+#define __pyx_kp_b_iso88591_A_A_E_uA_d_t1HA_q __pyx_string_tab[216]
+#define __pyx_kp_b_iso88591_A_A_E_uA_d_t1HA_q_2 __pyx_string_tab[217]
+#define __pyx_kp_b_iso88591_A_D_1_1_t1_vWA __pyx_string_tab[218]
+#define __pyx_kp_b_iso88591_A_D_1_t1_vWA __pyx_string_tab[219]
+#define __pyx_kp_b_iso88591_A_D_AQ_1_t1_vWA __pyx_string_tab[220]
+#define __pyx_kp_b_iso88591_A_D_Q_1_t1_vWA __pyx_string_tab[221]
+#define __pyx_kp_b_iso88591_A_M_q __pyx_string_tab[222]
+#define __pyx_kp_b_iso88591_A_gQa __pyx_string_tab[223]
+#define __pyx_kp_b_iso88591_A_q __pyx_string_tab[224]
+#define __pyx_kp_b_iso88591_G3b __pyx_string_tab[225]
+#define __pyx_kp_b_iso88591_Qa_4q_3b_7_1 __pyx_string_tab[226]
+#define __pyx_kp_b_iso88591_T_O4wd_G1F_a_vWE_Q_q_q_d_7_WA_d __pyx_string_tab[227]
+#define __pyx_kp_b_iso88591__5 __pyx_string_tab[228]
+#define __pyx_kp_b_iso88591_a __pyx_string_tab[229]
+#define __pyx_kp_b_iso88591_q_0_kQR_5_7_q_a_1 __pyx_string_tab[230]
 #define __pyx_int_8888 __pyx_number_tab[0]
 #define __pyx_int_110759008 __pyx_number_tab[1]
 /* #### Code section: module_state_clear ### */
@@ -3541,7 +3573,7 @@ static CYTHON_SMALL_CODE int __pyx_m_clear(PyObject *m) {
   Py_CLEAR(clear_module_state->__pyx_scope_struct____Pyx_CFunc_6bt_sdk_4core_6client_5mdapi_5MdApi_void__lParenMdApi__rParen_to_py_4self);
   for (int i=0; i<3; ++i) { Py_CLEAR(clear_module_state->__pyx_tuple[i]); }
   for (int i=0; i<26; ++i) { Py_CLEAR(clear_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<230; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<231; ++i) { Py_CLEAR(clear_module_state->__pyx_string_tab[i]); }
   for (int i=0; i<2; ++i) { Py_CLEAR(clear_module_state->__pyx_number_tab[i]); }
 /* #### Code section: module_state_clear_contents ### */
 /* CommonTypesMetaclass.module_state_clear */
@@ -3592,7 +3624,7 @@ static CYTHON_SMALL_CODE int __pyx_m_traverse(PyObject *m, visitproc visit, void
   Py_VISIT(traverse_module_state->__pyx_scope_struct____Pyx_CFunc_6bt_sdk_4core_6client_5mdapi_5MdApi_void__lParenMdApi__rParen_to_py_4self);
   for (int i=0; i<3; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_tuple[i]); }
   for (int i=0; i<26; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_codeobj_tab[i]); }
-  for (int i=0; i<230; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
+  for (int i=0; i<231; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_string_tab[i]); }
   for (int i=0; i<2; ++i) { __Pyx_VISIT_CONST(traverse_module_state->__pyx_number_tab[i]); }
 /* #### Code section: module_state_traverse_contents ### */
 /* CommonTypesMetaclass.module_state_traverse */
@@ -5026,7 +5058,7 @@ static CYTHON_INLINE int64_t __pyx_f_6bt_sdk_4core_6client_4util_ts_to_int_date(
 }
 static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "bt_sdk/core/client/mdapi.pyx":15
+/* "bt_sdk/core/client/mdapi.pyx":16
  * 
  * 
  * async def _collect_async(observable, timeout):             # <<<<<<<<<<<<<<
@@ -5074,39 +5106,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_observable,&__pyx_mstate_global->__pyx_n_u_timeout,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 15, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 16, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 15, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 16, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 15, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 16, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_collect_async", 0) < (0)) __PYX_ERR(0, 15, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "_collect_async", 0) < (0)) __PYX_ERR(0, 16, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_collect_async", 1, 2, 2, i); __PYX_ERR(0, 15, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("_collect_async", 1, 2, 2, i); __PYX_ERR(0, 16, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 15, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 16, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 15, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 16, __pyx_L3_error)
     }
     __pyx_v_observable = values[0];
     __pyx_v_timeout = values[1];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_collect_async", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 15, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("_collect_async", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 16, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5139,7 +5171,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi__collect_async(CYTHON_UNU
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 15, __pyx_L1_error)
+    __PYX_ERR(0, 16, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -5150,7 +5182,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi__collect_async(CYTHON_UNU
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_timeout);
   __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_timeout);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_collect_async, __pyx_mstate_global->__pyx_n_u_collect_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 15, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_collect_async, __pyx_mstate_global->__pyx_n_u_collect_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 16, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -5166,7 +5198,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi__collect_async(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":24
+/* "bt_sdk/core/client/mdapi.pyx":25
  *     fut = loop.create_future()
  * 
  *     def on_next(item):             # <<<<<<<<<<<<<<
@@ -5213,32 +5245,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_item,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 24, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 25, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 24, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 25, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "on_next", 0) < (0)) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "on_next", 0) < (0)) __PYX_ERR(0, 25, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("on_next", 1, 1, 1, i); __PYX_ERR(0, 24, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("on_next", 1, 1, 1, i); __PYX_ERR(0, 25, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 24, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 25, __pyx_L3_error)
     }
     __pyx_v_item = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("on_next", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 24, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("on_next", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 25, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5272,21 +5304,21 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_on_next(
   __pyx_outer_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __pyx_cur_scope = __pyx_outer_scope;
 
-  /* "bt_sdk/core/client/mdapi.pyx":25
+  /* "bt_sdk/core/client/mdapi.pyx":26
  * 
  *     def on_next(item):
  *         buffer.append(item)             # <<<<<<<<<<<<<<
  * 
  *     def on_completed():
 */
-  if (unlikely(!__pyx_cur_scope->__pyx_v_buffer)) { __Pyx_RaiseClosureNameError("buffer"); __PYX_ERR(0, 25, __pyx_L1_error) }
+  if (unlikely(!__pyx_cur_scope->__pyx_v_buffer)) { __Pyx_RaiseClosureNameError("buffer"); __PYX_ERR(0, 26, __pyx_L1_error) }
   if (unlikely(__pyx_cur_scope->__pyx_v_buffer == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(0, 25, __pyx_L1_error)
+    __PYX_ERR(0, 26, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyList_Append(__pyx_cur_scope->__pyx_v_buffer, __pyx_v_item); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyList_Append(__pyx_cur_scope->__pyx_v_buffer, __pyx_v_item); if (unlikely(__pyx_t_1 == ((int)-1))) __PYX_ERR(0, 26, __pyx_L1_error)
 
-  /* "bt_sdk/core/client/mdapi.pyx":24
+  /* "bt_sdk/core/client/mdapi.pyx":25
  *     fut = loop.create_future()
  * 
  *     def on_next(item):             # <<<<<<<<<<<<<<
@@ -5306,7 +5338,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_on_next(
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":27
+/* "bt_sdk/core/client/mdapi.pyx":28
  *         buffer.append(item)
  * 
  *     def on_completed():             # <<<<<<<<<<<<<<
@@ -5348,14 +5380,14 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_2on_comp
   __pyx_outer_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __pyx_cur_scope = __pyx_outer_scope;
 
-  /* "bt_sdk/core/client/mdapi.pyx":28
+  /* "bt_sdk/core/client/mdapi.pyx":29
  * 
  *     def on_completed():
  *         if not fut.done():             # <<<<<<<<<<<<<<
  *             loop.call_soon_threadsafe(fut.set_result, "DONE")
  * 
 */
-  if (unlikely(!__pyx_cur_scope->__pyx_v_fut)) { __Pyx_RaiseClosureNameError("fut"); __PYX_ERR(0, 28, __pyx_L1_error) }
+  if (unlikely(!__pyx_cur_scope->__pyx_v_fut)) { __Pyx_RaiseClosureNameError("fut"); __PYX_ERR(0, 29, __pyx_L1_error) }
   __pyx_t_2 = __pyx_cur_scope->__pyx_v_fut;
   __Pyx_INCREF(__pyx_t_2);
   __pyx_t_3 = 0;
@@ -5363,26 +5395,26 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_2on_comp
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_done, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 29, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_5 = (!__pyx_t_4);
   if (__pyx_t_5) {
 
-    /* "bt_sdk/core/client/mdapi.pyx":29
+    /* "bt_sdk/core/client/mdapi.pyx":30
  *     def on_completed():
  *         if not fut.done():
  *             loop.call_soon_threadsafe(fut.set_result, "DONE")             # <<<<<<<<<<<<<<
  * 
  *     def on_error(err):
 */
-    if (unlikely(!__pyx_cur_scope->__pyx_v_loop)) { __Pyx_RaiseClosureNameError("loop"); __PYX_ERR(0, 29, __pyx_L1_error) }
+    if (unlikely(!__pyx_cur_scope->__pyx_v_loop)) { __Pyx_RaiseClosureNameError("loop"); __PYX_ERR(0, 30, __pyx_L1_error) }
     __pyx_t_2 = __pyx_cur_scope->__pyx_v_loop;
     __Pyx_INCREF(__pyx_t_2);
-    if (unlikely(!__pyx_cur_scope->__pyx_v_fut)) { __Pyx_RaiseClosureNameError("fut"); __PYX_ERR(0, 29, __pyx_L1_error) }
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_fut, __pyx_mstate_global->__pyx_n_u_set_result); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 29, __pyx_L1_error)
+    if (unlikely(!__pyx_cur_scope->__pyx_v_fut)) { __Pyx_RaiseClosureNameError("fut"); __PYX_ERR(0, 30, __pyx_L1_error) }
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_fut, __pyx_mstate_global->__pyx_n_u_set_result); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 30, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_3 = 0;
     {
@@ -5390,12 +5422,12 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_2on_comp
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_call_soon_threadsafe, __pyx_callargs+__pyx_t_3, (3-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 30, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "bt_sdk/core/client/mdapi.pyx":28
+    /* "bt_sdk/core/client/mdapi.pyx":29
  * 
  *     def on_completed():
  *         if not fut.done():             # <<<<<<<<<<<<<<
@@ -5404,7 +5436,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_2on_comp
 */
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":27
+  /* "bt_sdk/core/client/mdapi.pyx":28
  *         buffer.append(item)
  * 
  *     def on_completed():             # <<<<<<<<<<<<<<
@@ -5427,7 +5459,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_2on_comp
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":31
+/* "bt_sdk/core/client/mdapi.pyx":32
  *             loop.call_soon_threadsafe(fut.set_result, "DONE")
  * 
  *     def on_error(err):             # <<<<<<<<<<<<<<
@@ -5474,32 +5506,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_err,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 31, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 32, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 31, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 32, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "on_error", 0) < (0)) __PYX_ERR(0, 31, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "on_error", 0) < (0)) __PYX_ERR(0, 32, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("on_error", 1, 1, 1, i); __PYX_ERR(0, 31, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("on_error", 1, 1, 1, i); __PYX_ERR(0, 32, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 31, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 32, __pyx_L3_error)
     }
     __pyx_v_err = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("on_error", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 31, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("on_error", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 32, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5538,14 +5570,14 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_4on_erro
   __pyx_outer_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async *) __Pyx_CyFunction_GetClosure(__pyx_self);
   __pyx_cur_scope = __pyx_outer_scope;
 
-  /* "bt_sdk/core/client/mdapi.pyx":32
+  /* "bt_sdk/core/client/mdapi.pyx":33
  * 
  *     def on_error(err):
  *         if not fut.done():             # <<<<<<<<<<<<<<
  *             loop.call_soon_threadsafe(fut.set_exception, err)
  * 
 */
-  if (unlikely(!__pyx_cur_scope->__pyx_v_fut)) { __Pyx_RaiseClosureNameError("fut"); __PYX_ERR(0, 32, __pyx_L1_error) }
+  if (unlikely(!__pyx_cur_scope->__pyx_v_fut)) { __Pyx_RaiseClosureNameError("fut"); __PYX_ERR(0, 33, __pyx_L1_error) }
   __pyx_t_2 = __pyx_cur_scope->__pyx_v_fut;
   __Pyx_INCREF(__pyx_t_2);
   __pyx_t_3 = 0;
@@ -5553,26 +5585,26 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_4on_erro
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_done, __pyx_callargs+__pyx_t_3, (1-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 33, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 32, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely((__pyx_t_4 < 0))) __PYX_ERR(0, 33, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_5 = (!__pyx_t_4);
   if (__pyx_t_5) {
 
-    /* "bt_sdk/core/client/mdapi.pyx":33
+    /* "bt_sdk/core/client/mdapi.pyx":34
  *     def on_error(err):
  *         if not fut.done():
  *             loop.call_soon_threadsafe(fut.set_exception, err)             # <<<<<<<<<<<<<<
  * 
  *     subscription = observable.subscribe(
 */
-    if (unlikely(!__pyx_cur_scope->__pyx_v_loop)) { __Pyx_RaiseClosureNameError("loop"); __PYX_ERR(0, 33, __pyx_L1_error) }
+    if (unlikely(!__pyx_cur_scope->__pyx_v_loop)) { __Pyx_RaiseClosureNameError("loop"); __PYX_ERR(0, 34, __pyx_L1_error) }
     __pyx_t_2 = __pyx_cur_scope->__pyx_v_loop;
     __Pyx_INCREF(__pyx_t_2);
-    if (unlikely(!__pyx_cur_scope->__pyx_v_fut)) { __Pyx_RaiseClosureNameError("fut"); __PYX_ERR(0, 33, __pyx_L1_error) }
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_fut, __pyx_mstate_global->__pyx_n_u_set_exception); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 33, __pyx_L1_error)
+    if (unlikely(!__pyx_cur_scope->__pyx_v_fut)) { __Pyx_RaiseClosureNameError("fut"); __PYX_ERR(0, 34, __pyx_L1_error) }
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_cur_scope->__pyx_v_fut, __pyx_mstate_global->__pyx_n_u_set_exception); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 34, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_3 = 0;
     {
@@ -5580,12 +5612,12 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_4on_erro
       __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_call_soon_threadsafe, __pyx_callargs+__pyx_t_3, (3-__pyx_t_3) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 33, __pyx_L1_error)
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "bt_sdk/core/client/mdapi.pyx":32
+    /* "bt_sdk/core/client/mdapi.pyx":33
  * 
  *     def on_error(err):
  *         if not fut.done():             # <<<<<<<<<<<<<<
@@ -5594,7 +5626,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_4on_erro
 */
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":31
+  /* "bt_sdk/core/client/mdapi.pyx":32
  *             loop.call_soon_threadsafe(fut.set_result, "DONE")
  * 
  *     def on_error(err):             # <<<<<<<<<<<<<<
@@ -5617,7 +5649,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_14_collect_async_4on_erro
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":15
+/* "bt_sdk/core/client/mdapi.pyx":16
  * 
  * 
  * async def _collect_async(observable, timeout):             # <<<<<<<<<<<<<<
@@ -5666,23 +5698,23 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 15, __pyx_L1_error)
+    __PYX_ERR(0, 16, __pyx_L1_error)
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":17
+  /* "bt_sdk/core/client/mdapi.pyx":18
  * async def _collect_async(observable, timeout):
  * 
  *     cdef list buffer = []             # <<<<<<<<<<<<<<
  *     cdef object fut
  *     cdef object subscription
 */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_buffer = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":21
+  /* "bt_sdk/core/client/mdapi.pyx":22
  *     cdef object subscription
  * 
  *     loop = asyncio.get_running_loop()             # <<<<<<<<<<<<<<
@@ -5690,9 +5722,9 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
  * 
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 22, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_get_running_loop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 21, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_get_running_loop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 22, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_5 = 1;
@@ -5712,14 +5744,14 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
     __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 21, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_loop = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":22
+  /* "bt_sdk/core/client/mdapi.pyx":23
  * 
  *     loop = asyncio.get_running_loop()
  *     fut = loop.create_future()             # <<<<<<<<<<<<<<
@@ -5733,53 +5765,53 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
     PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_create_future, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 22, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 23, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_fut = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":24
+  /* "bt_sdk/core/client/mdapi.pyx":25
  *     fut = loop.create_future()
  * 
  *     def on_next(item):             # <<<<<<<<<<<<<<
  *         buffer.append(item)
  * 
 */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_14_collect_async_1on_next, 0, __pyx_mstate_global->__pyx_n_u_collect_async_locals_on_next, ((PyObject*)__pyx_cur_scope), __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 24, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_14_collect_async_1on_next, 0, __pyx_mstate_global->__pyx_n_u_collect_async_locals_on_next, ((PyObject*)__pyx_cur_scope), __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[2])); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_on_next = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":27
+  /* "bt_sdk/core/client/mdapi.pyx":28
  *         buffer.append(item)
  * 
  *     def on_completed():             # <<<<<<<<<<<<<<
  *         if not fut.done():
  *             loop.call_soon_threadsafe(fut.set_result, "DONE")
 */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_14_collect_async_3on_completed, 0, __pyx_mstate_global->__pyx_n_u_collect_async_locals_on_complet, ((PyObject*)__pyx_cur_scope), __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_14_collect_async_3on_completed, 0, __pyx_mstate_global->__pyx_n_u_collect_async_locals_on_complet, ((PyObject*)__pyx_cur_scope), __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[3])); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_on_completed = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":31
+  /* "bt_sdk/core/client/mdapi.pyx":32
  *             loop.call_soon_threadsafe(fut.set_result, "DONE")
  * 
  *     def on_error(err):             # <<<<<<<<<<<<<<
  *         if not fut.done():
  *             loop.call_soon_threadsafe(fut.set_exception, err)
 */
-  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_14_collect_async_5on_error, 0, __pyx_mstate_global->__pyx_n_u_collect_async_locals_on_error, ((PyObject*)__pyx_cur_scope), __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_14_collect_async_5on_error, 0, __pyx_mstate_global->__pyx_n_u_collect_async_locals_on_error, ((PyObject*)__pyx_cur_scope), __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[4])); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 32, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_on_error = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":35
+  /* "bt_sdk/core/client/mdapi.pyx":36
  *             loop.call_soon_threadsafe(fut.set_exception, err)
  * 
  *     subscription = observable.subscribe(             # <<<<<<<<<<<<<<
@@ -5789,33 +5821,33 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
   __pyx_t_4 = __pyx_cur_scope->__pyx_v_observable;
   __Pyx_INCREF(__pyx_t_4);
 
-  /* "bt_sdk/core/client/mdapi.pyx":38
+  /* "bt_sdk/core/client/mdapi.pyx":39
  *         on_next=on_next,
  *         on_error=on_error,
  *         on_completed=on_completed             # <<<<<<<<<<<<<<
  *     )
- * 
+ *     # .pipe( # pipe return observal
 */
   __pyx_t_5 = 0;
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 3 : 0)] = {__pyx_t_4, NULL};
-    __pyx_t_2 = __Pyx_MakeVectorcallBuilderKwds(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 35, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_MakeVectorcallBuilderKwds(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 36, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_on_next, __pyx_cur_scope->__pyx_v_on_next, __pyx_t_2, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 35, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_on_error, __pyx_cur_scope->__pyx_v_on_error, __pyx_t_2, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 35, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_on_completed, __pyx_cur_scope->__pyx_v_on_completed, __pyx_t_2, __pyx_callargs+1, 2) < (0)) __PYX_ERR(0, 35, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_on_next, __pyx_cur_scope->__pyx_v_on_next, __pyx_t_2, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 36, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_on_error, __pyx_cur_scope->__pyx_v_on_error, __pyx_t_2, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 36, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_on_completed, __pyx_cur_scope->__pyx_v_on_completed, __pyx_t_2, __pyx_callargs+1, 2) < (0)) __PYX_ERR(0, 36, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_VectorcallMethod_CallFromBuilder((PyObject*)__pyx_mstate_global->__pyx_n_u_subscribe, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_2);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 35, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 36, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_subscription = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":41
- *     )
+  /* "bt_sdk/core/client/mdapi.pyx":49
+ *     # )
  * 
  *     try:             # <<<<<<<<<<<<<<
  *         await asyncio.wait_for(fut, timeout=timeout)
@@ -5829,7 +5861,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
       __Pyx_XGOTREF(__pyx_t_8);
       /*try:*/ {
 
-        /* "bt_sdk/core/client/mdapi.pyx":42
+        /* "bt_sdk/core/client/mdapi.pyx":50
  * 
  *     try:
  *         await asyncio.wait_for(fut, timeout=timeout)             # <<<<<<<<<<<<<<
@@ -5837,9 +5869,9 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
  *     except asyncio.TimeoutError:
 */
         __pyx_t_2 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 42, __pyx_L7_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 50, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_wait_for); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 42, __pyx_L7_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_wait_for); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 50, __pyx_L7_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __pyx_t_5 = 1;
@@ -5856,14 +5888,14 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
         #endif
         {
           PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_fut};
-          __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 42, __pyx_L7_error)
+          __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 50, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_4);
-          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_timeout, __pyx_cur_scope->__pyx_v_timeout, __pyx_t_4, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 42, __pyx_L7_error)
+          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_timeout, __pyx_cur_scope->__pyx_v_timeout, __pyx_t_4, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 50, __pyx_L7_error)
           __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_4);
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L7_error)
+          if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L7_error)
           __Pyx_GOTREF(__pyx_t_1);
         }
         __pyx_t_9 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
@@ -5892,16 +5924,16 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
           __pyx_t_8 = __pyx_cur_scope->__pyx_t_2;
           __pyx_cur_scope->__pyx_t_2 = 0;
           __Pyx_XGOTREF(__pyx_t_8);
-          if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 42, __pyx_L7_error)
+          if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 50, __pyx_L7_error)
         } else if (likely(__pyx_t_9 == PYGEN_RETURN)) {
           __Pyx_GOTREF(__pyx_r);
           __Pyx_DECREF(__pyx_r); __pyx_r = 0;
         } else {
           __Pyx_XGOTREF(__pyx_r);
-          __PYX_ERR(0, 42, __pyx_L7_error)
+          __PYX_ERR(0, 50, __pyx_L7_error)
         }
 
-        /* "bt_sdk/core/client/mdapi.pyx":43
+        /* "bt_sdk/core/client/mdapi.pyx":51
  *     try:
  *         await asyncio.wait_for(fut, timeout=timeout)
  *         return buffer             # <<<<<<<<<<<<<<
@@ -5913,8 +5945,8 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
         __pyx_r = __pyx_cur_scope->__pyx_v_buffer;
         goto __pyx_L11_try_return;
 
-        /* "bt_sdk/core/client/mdapi.pyx":41
- *     )
+        /* "bt_sdk/core/client/mdapi.pyx":49
+ *     # )
  * 
  *     try:             # <<<<<<<<<<<<<<
  *         await asyncio.wait_for(fut, timeout=timeout)
@@ -5927,7 +5959,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "bt_sdk/core/client/mdapi.pyx":44
+      /* "bt_sdk/core/client/mdapi.pyx":52
  *         await asyncio.wait_for(fut, timeout=timeout)
  *         return buffer
  *     except asyncio.TimeoutError:             # <<<<<<<<<<<<<<
@@ -5935,9 +5967,9 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
  *         return []
 */
       __Pyx_ErrFetch(&__pyx_t_1, &__pyx_t_3, &__pyx_t_4);
-      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 44, __pyx_L9_except_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 52, __pyx_L9_except_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_TimeoutError); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 44, __pyx_L9_except_error)
+      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_TimeoutError); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 52, __pyx_L9_except_error)
       __Pyx_GOTREF(__pyx_t_10);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_11 = __Pyx_PyErr_GivenExceptionMatches(__pyx_t_1, __pyx_t_10);
@@ -5946,12 +5978,12 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
       __pyx_t_1 = 0; __pyx_t_3 = 0; __pyx_t_4 = 0;
       if (__pyx_t_11) {
         __Pyx_AddTraceback("bt_sdk.core.client.mdapi._collect_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_3, &__pyx_t_1) < 0) __PYX_ERR(0, 44, __pyx_L9_except_error)
+        if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_3, &__pyx_t_1) < 0) __PYX_ERR(0, 52, __pyx_L9_except_error)
         __Pyx_XGOTREF(__pyx_t_4);
         __Pyx_XGOTREF(__pyx_t_3);
         __Pyx_XGOTREF(__pyx_t_1);
 
-        /* "bt_sdk/core/client/mdapi.pyx":45
+        /* "bt_sdk/core/client/mdapi.pyx":53
  *         return buffer
  *     except asyncio.TimeoutError:
  *         print(f"[MdApi] Timeout collecting data.")             # <<<<<<<<<<<<<<
@@ -5964,12 +5996,12 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
           PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_mstate_global->__pyx_kp_u_MdApi_Timeout_collecting_data};
           __pyx_t_10 = __Pyx_PyObject_FastCall((PyObject*)__pyx_builtin_print, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 45, __pyx_L9_except_error)
+          if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 53, __pyx_L9_except_error)
           __Pyx_GOTREF(__pyx_t_10);
         }
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-        /* "bt_sdk/core/client/mdapi.pyx":46
+        /* "bt_sdk/core/client/mdapi.pyx":54
  *     except asyncio.TimeoutError:
  *         print(f"[MdApi] Timeout collecting data.")
  *         return []             # <<<<<<<<<<<<<<
@@ -5977,7 +6009,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
  *         print(f"[MdApi] Error collecting data: {e}")
 */
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_10 = PyList_New(0); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 46, __pyx_L9_except_error)
+        __pyx_t_10 = PyList_New(0); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 54, __pyx_L9_except_error)
         __Pyx_GOTREF(__pyx_t_10);
         __pyx_r = __pyx_t_10;
         __pyx_t_10 = 0;
@@ -5987,7 +6019,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
         goto __pyx_L10_except_return;
       }
 
-      /* "bt_sdk/core/client/mdapi.pyx":47
+      /* "bt_sdk/core/client/mdapi.pyx":55
  *         print(f"[MdApi] Timeout collecting data.")
  *         return []
  *     except Exception as e:             # <<<<<<<<<<<<<<
@@ -5997,7 +6029,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
       __pyx_t_11 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
       if (__pyx_t_11) {
         __Pyx_AddTraceback("bt_sdk.core.client.mdapi._collect_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_3, &__pyx_t_4) < 0) __PYX_ERR(0, 47, __pyx_L9_except_error)
+        if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_3, &__pyx_t_4) < 0) __PYX_ERR(0, 55, __pyx_L9_except_error)
         __Pyx_XGOTREF(__pyx_t_1);
         __Pyx_XGOTREF(__pyx_t_3);
         __Pyx_XGOTREF(__pyx_t_4);
@@ -6006,7 +6038,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
         __pyx_cur_scope->__pyx_v_e = __pyx_t_3;
         /*try:*/ {
 
-          /* "bt_sdk/core/client/mdapi.pyx":48
+          /* "bt_sdk/core/client/mdapi.pyx":56
  *         return []
  *     except Exception as e:
  *         print(f"[MdApi] Error collecting data: {e}")             # <<<<<<<<<<<<<<
@@ -6014,9 +6046,9 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
  *     finally:
 */
           __pyx_t_2 = NULL;
-          __pyx_t_12 = __Pyx_PyObject_FormatSimple(__pyx_cur_scope->__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 48, __pyx_L21_error)
+          __pyx_t_12 = __Pyx_PyObject_FormatSimple(__pyx_cur_scope->__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 56, __pyx_L21_error)
           __Pyx_GOTREF(__pyx_t_12);
-          __pyx_t_13 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_MdApi_Error_collecting_data, __pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 48, __pyx_L21_error)
+          __pyx_t_13 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_MdApi_Error_collecting_data, __pyx_t_12); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 56, __pyx_L21_error)
           __Pyx_GOTREF(__pyx_t_13);
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
           __pyx_t_5 = 1;
@@ -6025,12 +6057,12 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
             __pyx_t_10 = __Pyx_PyObject_FastCall((PyObject*)__pyx_builtin_print, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
             __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 48, __pyx_L21_error)
+            if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 56, __pyx_L21_error)
             __Pyx_GOTREF(__pyx_t_10);
           }
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-          /* "bt_sdk/core/client/mdapi.pyx":49
+          /* "bt_sdk/core/client/mdapi.pyx":57
  *     except Exception as e:
  *         print(f"[MdApi] Error collecting data: {e}")
  *         raise e             # <<<<<<<<<<<<<<
@@ -6038,10 +6070,10 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
  *         subscription.dispose()
 */
           __Pyx_Raise(__pyx_cur_scope->__pyx_v_e, 0, 0, 0);
-          __PYX_ERR(0, 49, __pyx_L21_error)
+          __PYX_ERR(0, 57, __pyx_L21_error)
         }
 
-        /* "bt_sdk/core/client/mdapi.pyx":47
+        /* "bt_sdk/core/client/mdapi.pyx":55
  *         print(f"[MdApi] Timeout collecting data.")
  *         return []
  *     except Exception as e:             # <<<<<<<<<<<<<<
@@ -6086,8 +6118,8 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
       }
       goto __pyx_L9_except_error;
 
-      /* "bt_sdk/core/client/mdapi.pyx":41
- *     )
+      /* "bt_sdk/core/client/mdapi.pyx":49
+ *     # )
  * 
  *     try:             # <<<<<<<<<<<<<<
  *         await asyncio.wait_for(fut, timeout=timeout)
@@ -6114,7 +6146,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
     }
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":51
+  /* "bt_sdk/core/client/mdapi.pyx":59
  *         raise e
  *     finally:
  *         subscription.dispose()             # <<<<<<<<<<<<<<
@@ -6150,7 +6182,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
           PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
           __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_dispose, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 51, __pyx_L28_error)
+          if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L28_error)
           __Pyx_GOTREF(__pyx_t_4);
         }
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -6187,7 +6219,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
         PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
         __pyx_t_4 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_dispose, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 51, __pyx_L1_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 59, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -6198,7 +6230,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
   }
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "bt_sdk/core/client/mdapi.pyx":15
+  /* "bt_sdk/core/client/mdapi.pyx":16
  * 
  * 
  * async def _collect_async(observable, timeout):             # <<<<<<<<<<<<<<
@@ -6230,7 +6262,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_2generator(__pyx_Coroutin
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":54
+/* "bt_sdk/core/client/mdapi.pyx":62
  * 
  * 
  * cdef inline object _merge_tables(list result):             # <<<<<<<<<<<<<<
@@ -6270,7 +6302,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_merge_tables", 0);
 
-  /* "bt_sdk/core/client/mdapi.pyx":55
+  /* "bt_sdk/core/client/mdapi.pyx":63
  * 
  * cdef inline object _merge_tables(list result):
  *     if result and len(result) > 0:             # <<<<<<<<<<<<<<
@@ -6281,7 +6313,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
   else
   {
     Py_ssize_t __pyx_temp = __Pyx_PyList_GET_SIZE(__pyx_v_result);
-    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 55, __pyx_L1_error)
+    if (unlikely(((!CYTHON_ASSUME_SAFE_SIZE) && __pyx_temp < 0))) __PYX_ERR(0, 63, __pyx_L1_error)
     __pyx_t_2 = (__pyx_temp != 0);
   }
 
@@ -6292,15 +6324,15 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
   }
   if (unlikely(__pyx_v_result == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 55, __pyx_L1_error)
+    __PYX_ERR(0, 63, __pyx_L1_error)
   }
-  __pyx_t_3 = __Pyx_PyList_GET_SIZE(__pyx_v_result); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyList_GET_SIZE(__pyx_v_result); if (unlikely(__pyx_t_3 == ((Py_ssize_t)-1))) __PYX_ERR(0, 63, __pyx_L1_error)
   __pyx_t_2 = (__pyx_t_3 > 0);
   __pyx_t_1 = __pyx_t_2;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "bt_sdk/core/client/mdapi.pyx":56
+    /* "bt_sdk/core/client/mdapi.pyx":64
  * cdef inline object _merge_tables(list result):
  *     if result and len(result) > 0:
  *         try:             # <<<<<<<<<<<<<<
@@ -6316,7 +6348,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
       __Pyx_XGOTREF(__pyx_t_6);
       /*try:*/ {
 
-        /* "bt_sdk/core/client/mdapi.pyx":58
+        /* "bt_sdk/core/client/mdapi.pyx":66
  *         try:
  *             # return pa.Table.from_batches(result)  # pa.RecordBatch
  *             return pa.concat_tables(result, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks()             # <<<<<<<<<<<<<<
@@ -6325,9 +6357,9 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
 */
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_8 = NULL;
-        __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L6_error)
+        __Pyx_GetModuleGlobalName(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_pa); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 66, __pyx_L6_error)
         __Pyx_GOTREF(__pyx_t_9);
-        __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_concat_tables); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 58, __pyx_L6_error)
+        __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_concat_tables); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 66, __pyx_L6_error)
         __Pyx_GOTREF(__pyx_t_10);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __pyx_t_11 = 1;
@@ -6344,21 +6376,21 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
         #endif
         {
           PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_8, __pyx_v_result};
-          __pyx_t_9 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 58, __pyx_L6_error)
+          __pyx_t_9 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 66, __pyx_L6_error)
           __Pyx_GOTREF(__pyx_t_9);
-          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_promote_options, __pyx_mstate_global->__pyx_n_u_permissive, __pyx_t_9, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 58, __pyx_L6_error)
+          if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_promote_options, __pyx_mstate_global->__pyx_n_u_permissive, __pyx_t_9, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 66, __pyx_L6_error)
           __pyx_t_7 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_10, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_9);
           __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 58, __pyx_L6_error)
+          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 66, __pyx_L6_error)
           __Pyx_GOTREF(__pyx_t_7);
         }
         __pyx_r = __pyx_t_7;
         __pyx_t_7 = 0;
         goto __pyx_L10_try_return;
 
-        /* "bt_sdk/core/client/mdapi.pyx":56
+        /* "bt_sdk/core/client/mdapi.pyx":64
  * cdef inline object _merge_tables(list result):
  *     if result and len(result) > 0:
  *         try:             # <<<<<<<<<<<<<<
@@ -6372,7 +6404,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "bt_sdk/core/client/mdapi.pyx":59
+      /* "bt_sdk/core/client/mdapi.pyx":67
  *             # return pa.Table.from_batches(result)  # pa.RecordBatch
  *             return pa.concat_tables(result, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks()
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -6382,7 +6414,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
       __pyx_t_12 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
       if (__pyx_t_12) {
         __Pyx_AddTraceback("bt_sdk.core.client.mdapi._merge_tables", __pyx_clineno, __pyx_lineno, __pyx_filename);
-        if (__Pyx_GetException(&__pyx_t_7, &__pyx_t_10, &__pyx_t_9) < 0) __PYX_ERR(0, 59, __pyx_L8_except_error)
+        if (__Pyx_GetException(&__pyx_t_7, &__pyx_t_10, &__pyx_t_9) < 0) __PYX_ERR(0, 67, __pyx_L8_except_error)
         __Pyx_XGOTREF(__pyx_t_7);
         __Pyx_XGOTREF(__pyx_t_10);
         __Pyx_XGOTREF(__pyx_t_9);
@@ -6390,7 +6422,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
         __pyx_v_e = __pyx_t_10;
         /*try:*/ {
 
-          /* "bt_sdk/core/client/mdapi.pyx":60
+          /* "bt_sdk/core/client/mdapi.pyx":68
  *             return pa.concat_tables(result, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks()
  *         except Exception as e:
  *             print(f"[MdApi] Merge error: {e}")             # <<<<<<<<<<<<<<
@@ -6398,9 +6430,9 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
  *     return None
 */
           __pyx_t_13 = NULL;
-          __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 60, __pyx_L17_error)
+          __pyx_t_14 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 68, __pyx_L17_error)
           __Pyx_GOTREF(__pyx_t_14);
-          __pyx_t_15 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_MdApi_Merge_error, __pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 60, __pyx_L17_error)
+          __pyx_t_15 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_MdApi_Merge_error, __pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 68, __pyx_L17_error)
           __Pyx_GOTREF(__pyx_t_15);
           __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
           __pyx_t_11 = 1;
@@ -6409,12 +6441,12 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
             __pyx_t_8 = __Pyx_PyObject_FastCall((PyObject*)__pyx_builtin_print, __pyx_callargs+__pyx_t_11, (2-__pyx_t_11) | (__pyx_t_11*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
             __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
             __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
-            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 60, __pyx_L17_error)
+            if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 68, __pyx_L17_error)
             __Pyx_GOTREF(__pyx_t_8);
           }
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-          /* "bt_sdk/core/client/mdapi.pyx":61
+          /* "bt_sdk/core/client/mdapi.pyx":69
  *         except Exception as e:
  *             print(f"[MdApi] Merge error: {e}")
  *             return None             # <<<<<<<<<<<<<<
@@ -6429,7 +6461,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
           goto __pyx_L16_return;
         }
 
-        /* "bt_sdk/core/client/mdapi.pyx":59
+        /* "bt_sdk/core/client/mdapi.pyx":67
  *             # return pa.Table.from_batches(result)  # pa.RecordBatch
  *             return pa.concat_tables(result, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks()
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -6482,7 +6514,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
       }
       goto __pyx_L8_except_error;
 
-      /* "bt_sdk/core/client/mdapi.pyx":56
+      /* "bt_sdk/core/client/mdapi.pyx":64
  * cdef inline object _merge_tables(list result):
  *     if result and len(result) > 0:
  *         try:             # <<<<<<<<<<<<<<
@@ -6509,7 +6541,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
       goto __pyx_L0;
     }
 
-    /* "bt_sdk/core/client/mdapi.pyx":55
+    /* "bt_sdk/core/client/mdapi.pyx":63
  * 
  * cdef inline object _merge_tables(list result):
  *     if result and len(result) > 0:             # <<<<<<<<<<<<<<
@@ -6518,7 +6550,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
 */
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":62
+  /* "bt_sdk/core/client/mdapi.pyx":70
  *             print(f"[MdApi] Merge error: {e}")
  *             return None
  *     return None             # <<<<<<<<<<<<<<
@@ -6529,7 +6561,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":54
+  /* "bt_sdk/core/client/mdapi.pyx":62
  * 
  * 
  * cdef inline object _merge_tables(list result):             # <<<<<<<<<<<<<<
@@ -6555,7 +6587,7 @@ static CYTHON_INLINE PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi__merge_table
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":67
+/* "bt_sdk/core/client/mdapi.pyx":75
  * cdef class MdApi:
  * 
  *     def __init__(self,             # <<<<<<<<<<<<<<
@@ -6586,24 +6618,24 @@ static int __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_1__init__(PyObject *__py
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_addr,&__pyx_mstate_global->__pyx_n_u_timeout,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_VARARGS(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 67, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 75, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 67, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 75, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 67, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 75, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < (0)) __PYX_ERR(0, 67, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__init__", 0) < (0)) __PYX_ERR(0, 75, __pyx_L3_error)
 
-      /* "bt_sdk/core/client/mdapi.pyx":68
+      /* "bt_sdk/core/client/mdapi.pyx":76
  * 
  *     def __init__(self,
  *                     tuple addr=("127.0.0.1", 8888),             # <<<<<<<<<<<<<<
@@ -6615,11 +6647,11 @@ static int __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_1__init__(PyObject *__py
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_VARARGS(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 67, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 75, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_VARARGS(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 67, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 75, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
@@ -6628,14 +6660,14 @@ static int __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_1__init__(PyObject *__py
     }
     __pyx_v_addr = ((PyObject*)values[0]);
     if (values[1]) {
-      __pyx_v_timeout = __Pyx_PyLong_As_int(values[1]); if (unlikely((__pyx_v_timeout == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 69, __pyx_L3_error)
+      __pyx_v_timeout = __Pyx_PyLong_As_int(values[1]); if (unlikely((__pyx_v_timeout == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 77, __pyx_L3_error)
     } else {
       __pyx_v_timeout = ((int)30);
     }
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 2, __pyx_nargs); __PYX_ERR(0, 67, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 2, __pyx_nargs); __PYX_ERR(0, 75, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -6646,10 +6678,10 @@ static int __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_1__init__(PyObject *__py
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_addr), (&PyTuple_Type), 1, "addr", 1))) __PYX_ERR(0, 68, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_addr), (&PyTuple_Type), 1, "addr", 1))) __PYX_ERR(0, 76, __pyx_L1_error)
   __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi___init__(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_addr, __pyx_v_timeout);
 
-  /* "bt_sdk/core/client/mdapi.pyx":67
+  /* "bt_sdk/core/client/mdapi.pyx":75
  * cdef class MdApi:
  * 
  *     def __init__(self,             # <<<<<<<<<<<<<<
@@ -6688,7 +6720,7 @@ static int __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi___init__(struct __pyx_ob
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "bt_sdk/core/client/mdapi.pyx":70
+  /* "bt_sdk/core/client/mdapi.pyx":78
  *                     tuple addr=("127.0.0.1", 8888),
  *                     int timeout = 30):
  *         async_client = AsyncZmqClient(addr=addr, timeout=timeout)             # <<<<<<<<<<<<<<
@@ -6696,26 +6728,26 @@ static int __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi___init__(struct __pyx_ob
  *         self.async_client = async_client
 */
   __pyx_t_2 = NULL;
-  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_v_timeout); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_v_timeout); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = 1;
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_5 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 70, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 78, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_addr, __pyx_v_addr, __pyx_t_5, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 70, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_timeout, __pyx_t_3, __pyx_t_5, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 70, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_addr, __pyx_v_addr, __pyx_t_5, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 78, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_timeout, __pyx_t_3, __pyx_t_5, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 78, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_12async_client_AsyncZmqClient, __pyx_callargs+__pyx_t_4, (1-__pyx_t_4) | (__pyx_t_4*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_5);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 70, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L1_error)
     __Pyx_GOTREF((PyObject *)__pyx_t_1);
   }
   __pyx_v_async_client = ((struct __pyx_obj_6bt_sdk_4core_6client_12async_client_AsyncZmqClient *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":72
+  /* "bt_sdk/core/client/mdapi.pyx":80
  *         async_client = AsyncZmqClient(addr=addr, timeout=timeout)
  * 
  *         self.async_client = async_client             # <<<<<<<<<<<<<<
@@ -6728,7 +6760,7 @@ static int __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi___init__(struct __pyx_ob
   __Pyx_DECREF(__pyx_v_self->async_client);
   __pyx_v_self->async_client = ((PyObject *)__pyx_v_async_client);
 
-  /* "bt_sdk/core/client/mdapi.pyx":73
+  /* "bt_sdk/core/client/mdapi.pyx":81
  * 
  *         self.async_client = async_client
  *         self.timeout = timeout             # <<<<<<<<<<<<<<
@@ -6737,16 +6769,16 @@ static int __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi___init__(struct __pyx_ob
 */
   __pyx_v_self->timeout = __pyx_v_timeout;
 
-  /* "bt_sdk/core/client/mdapi.pyx":75
+  /* "bt_sdk/core/client/mdapi.pyx":83
  *         self.timeout = timeout
  * 
  *         self._init_event_loop() # used for sync             # <<<<<<<<<<<<<<
  * 
  *     def __enter__(self):
 */
-  ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self->__pyx_vtab)->_init_event_loop(__pyx_v_self); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 75, __pyx_L1_error)
+  ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self->__pyx_vtab)->_init_event_loop(__pyx_v_self); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L1_error)
 
-  /* "bt_sdk/core/client/mdapi.pyx":67
+  /* "bt_sdk/core/client/mdapi.pyx":75
  * cdef class MdApi:
  * 
  *     def __init__(self,             # <<<<<<<<<<<<<<
@@ -6770,7 +6802,7 @@ static int __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi___init__(struct __pyx_ob
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":77
+/* "bt_sdk/core/client/mdapi.pyx":85
  *         self._init_event_loop() # used for sync
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
@@ -6825,7 +6857,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_2__enter__(struct 
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__enter__", 0);
 
-  /* "bt_sdk/core/client/mdapi.pyx":78
+  /* "bt_sdk/core/client/mdapi.pyx":86
  * 
  *     def __enter__(self):
  *         return self             # <<<<<<<<<<<<<<
@@ -6837,7 +6869,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_2__enter__(struct 
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":77
+  /* "bt_sdk/core/client/mdapi.pyx":85
  *         self._init_event_loop() # used for sync
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
@@ -6852,7 +6884,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_2__enter__(struct 
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":80
+/* "bt_sdk/core/client/mdapi.pyx":88
  *         return self
  * 
  *     cdef void _init_event_loop(self):             # <<<<<<<<<<<<<<
@@ -6861,6 +6893,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_2__enter__(struct 
 */
 
 static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self) {
+  int __pyx_v_is_background;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
@@ -6885,7 +6918,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_init_event_loop", 0);
 
-  /* "bt_sdk/core/client/mdapi.pyx":81
+  /* "bt_sdk/core/client/mdapi.pyx":89
  * 
  *     cdef void _init_event_loop(self):
  *         try:             # <<<<<<<<<<<<<<
@@ -6901,17 +6934,17 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
     __Pyx_XGOTREF(__pyx_t_3);
     /*try:*/ {
 
-      /* "bt_sdk/core/client/mdapi.pyx":82
+      /* "bt_sdk/core/client/mdapi.pyx":90
  *     cdef void _init_event_loop(self):
  *         try:
  *             self.loop = asyncio.get_running_loop() # Ray Actor Loop             # <<<<<<<<<<<<<<
  *             print(f"[{self.__class__.__name__}] Attached to existing Event Loop: {id(self.loop)}")
- *         except RuntimeError:
+ *             is_background = False
 */
       __pyx_t_5 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 82, __pyx_L3_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 90, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_get_running_loop); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 82, __pyx_L3_error)
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_get_running_loop); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 90, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_8 = 1;
@@ -6931,7 +6964,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
         __pyx_t_4 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_7, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 82, __pyx_L3_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 90, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
       __Pyx_GIVEREF(__pyx_t_4);
@@ -6940,25 +6973,25 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
       __pyx_v_self->loop = __pyx_t_4;
       __pyx_t_4 = 0;
 
-      /* "bt_sdk/core/client/mdapi.pyx":83
+      /* "bt_sdk/core/client/mdapi.pyx":91
  *         try:
  *             self.loop = asyncio.get_running_loop() # Ray Actor Loop
  *             print(f"[{self.__class__.__name__}] Attached to existing Event Loop: {id(self.loop)}")             # <<<<<<<<<<<<<<
+ *             is_background = False
  *         except RuntimeError:
- *             self.loop = asyncio.new_event_loop()
 */
       __pyx_t_7 = NULL;
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_class); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 83, __pyx_L3_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_class); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 91, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 83, __pyx_L3_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 91, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 83, __pyx_L3_error)
+      __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 91, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_builtin_id, __pyx_v_self->loop); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 83, __pyx_L3_error)
+      __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_builtin_id, __pyx_v_self->loop); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 91, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_9 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 83, __pyx_L3_error)
+      __pyx_t_9 = __Pyx_PyObject_FormatSimple(__pyx_t_6, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 91, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_10[0] = __pyx_mstate_global->__pyx_kp_u_;
@@ -6966,7 +6999,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
       __pyx_t_10[2] = __pyx_mstate_global->__pyx_kp_u_Attached_to_existing_Event_Loop;
       __pyx_t_10[3] = __pyx_t_9;
       __pyx_t_6 = __Pyx_PyUnicode_Join(__pyx_t_10, 4, 1 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5) + 35 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_9), 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_9));
-      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 83, __pyx_L3_error)
+      if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 91, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -6976,12 +7009,21 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
         __pyx_t_4 = __Pyx_PyObject_FastCall((PyObject*)__pyx_builtin_print, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 83, __pyx_L3_error)
+        if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 91, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_4);
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-      /* "bt_sdk/core/client/mdapi.pyx":81
+      /* "bt_sdk/core/client/mdapi.pyx":92
+ *             self.loop = asyncio.get_running_loop() # Ray Actor Loop
+ *             print(f"[{self.__class__.__name__}] Attached to existing Event Loop: {id(self.loop)}")
+ *             is_background = False             # <<<<<<<<<<<<<<
+ *         except RuntimeError:
+ *             self.loop = asyncio.new_event_loop()
+*/
+      __pyx_v_is_background = 0;
+
+      /* "bt_sdk/core/client/mdapi.pyx":89
  * 
  *     cdef void _init_event_loop(self):
  *         try:             # <<<<<<<<<<<<<<
@@ -7000,9 +7042,9 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-    /* "bt_sdk/core/client/mdapi.pyx":84
- *             self.loop = asyncio.get_running_loop() # Ray Actor Loop
+    /* "bt_sdk/core/client/mdapi.pyx":93
  *             print(f"[{self.__class__.__name__}] Attached to existing Event Loop: {id(self.loop)}")
+ *             is_background = False
  *         except RuntimeError:             # <<<<<<<<<<<<<<
  *             self.loop = asyncio.new_event_loop()
  *             if hasattr(self.loop, 'set_debug'):
@@ -7010,22 +7052,22 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
     __pyx_t_11 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_RuntimeError))));
     if (__pyx_t_11) {
       __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi._init_event_loop", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_6, &__pyx_t_7) < 0) __PYX_ERR(0, 84, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_6, &__pyx_t_7) < 0) __PYX_ERR(0, 93, __pyx_L5_except_error)
       __Pyx_XGOTREF(__pyx_t_4);
       __Pyx_XGOTREF(__pyx_t_6);
       __Pyx_XGOTREF(__pyx_t_7);
 
-      /* "bt_sdk/core/client/mdapi.pyx":85
- *             print(f"[{self.__class__.__name__}] Attached to existing Event Loop: {id(self.loop)}")
+      /* "bt_sdk/core/client/mdapi.pyx":94
+ *             is_background = False
  *         except RuntimeError:
  *             self.loop = asyncio.new_event_loop()             # <<<<<<<<<<<<<<
  *             if hasattr(self.loop, 'set_debug'):
  *                 self.loop.set_debug(False)
 */
       __pyx_t_5 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 85, __pyx_L5_except_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 94, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_new_event_loop); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 85, __pyx_L5_except_error)
+      __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_12, __pyx_mstate_global->__pyx_n_u_new_event_loop); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 94, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_13);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __pyx_t_8 = 1;
@@ -7045,7 +7087,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
         __pyx_t_9 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_13, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 85, __pyx_L5_except_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 94, __pyx_L5_except_error)
         __Pyx_GOTREF(__pyx_t_9);
       }
       __Pyx_GIVEREF(__pyx_t_9);
@@ -7054,7 +7096,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
       __pyx_v_self->loop = __pyx_t_9;
       __pyx_t_9 = 0;
 
-      /* "bt_sdk/core/client/mdapi.pyx":86
+      /* "bt_sdk/core/client/mdapi.pyx":95
  *         except RuntimeError:
  *             self.loop = asyncio.new_event_loop()
  *             if hasattr(self.loop, 'set_debug'):             # <<<<<<<<<<<<<<
@@ -7063,11 +7105,11 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
 */
       __pyx_t_9 = __pyx_v_self->loop;
       __Pyx_INCREF(__pyx_t_9);
-      __pyx_t_14 = __Pyx_HasAttr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_set_debug); if (unlikely(__pyx_t_14 == ((int)-1))) __PYX_ERR(0, 86, __pyx_L5_except_error)
+      __pyx_t_14 = __Pyx_HasAttr(__pyx_t_9, __pyx_mstate_global->__pyx_n_u_set_debug); if (unlikely(__pyx_t_14 == ((int)-1))) __PYX_ERR(0, 95, __pyx_L5_except_error)
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       if (__pyx_t_14) {
 
-        /* "bt_sdk/core/client/mdapi.pyx":87
+        /* "bt_sdk/core/client/mdapi.pyx":96
  *             self.loop = asyncio.new_event_loop()
  *             if hasattr(self.loop, 'set_debug'):
  *                 self.loop.set_debug(False)             # <<<<<<<<<<<<<<
@@ -7081,12 +7123,12 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
           PyObject *__pyx_callargs[2] = {__pyx_t_13, Py_False};
           __pyx_t_9 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_set_debug, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
-          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 87, __pyx_L5_except_error)
+          if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 96, __pyx_L5_except_error)
           __Pyx_GOTREF(__pyx_t_9);
         }
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-        /* "bt_sdk/core/client/mdapi.pyx":86
+        /* "bt_sdk/core/client/mdapi.pyx":95
  *         except RuntimeError:
  *             self.loop = asyncio.new_event_loop()
  *             if hasattr(self.loop, 'set_debug'):             # <<<<<<<<<<<<<<
@@ -7095,7 +7137,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
 */
       }
 
-      /* "bt_sdk/core/client/mdapi.pyx":89
+      /* "bt_sdk/core/client/mdapi.pyx":98
  *                 self.loop.set_debug(False)
  * 
  *             self._loop_thread = threading.Thread(             # <<<<<<<<<<<<<<
@@ -7103,13 +7145,13 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
  *                 daemon=True,
 */
       __pyx_t_13 = NULL;
-      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_threading); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 89, __pyx_L5_except_error)
+      __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_threading); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 98, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_Thread); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 89, __pyx_L5_except_error)
+      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_mstate_global->__pyx_n_u_Thread); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 98, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "bt_sdk/core/client/mdapi.pyx":90
+      /* "bt_sdk/core/client/mdapi.pyx":99
  * 
  *             self._loop_thread = threading.Thread(
  *                 target=self._run_event_loop,             # <<<<<<<<<<<<<<
@@ -7118,17 +7160,17 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
 */
       __Pyx_INCREF((PyObject *)__pyx_v_self);
       __pyx_t_15 = __pyx_v_self;
-      __pyx_t_5 = __Pyx_CFunc_6bt_sdk_4core_6client_5mdapi_5MdApi_void__lParenMdApi__rParen_to_py_4self(((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_t_15->__pyx_vtab)->_run_event_loop); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 90, __pyx_L5_except_error)
+      __pyx_t_5 = __Pyx_CFunc_6bt_sdk_4core_6client_5mdapi_5MdApi_void__lParenMdApi__rParen_to_py_4self(((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_t_15->__pyx_vtab)->_run_event_loop); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 99, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_16 = ((PyObject *)__pyx_t_15);
       __Pyx_INCREF(__pyx_t_16);
-      __pyx_t_17 = __Pyx_PyMethod_New2Arg(__pyx_t_5, __pyx_t_16); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 90, __pyx_L5_except_error)
+      __pyx_t_17 = __Pyx_PyMethod_New2Arg(__pyx_t_5, __pyx_t_16); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 99, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_17);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
       __Pyx_DECREF((PyObject *)__pyx_t_15); __pyx_t_15 = 0;
 
-      /* "bt_sdk/core/client/mdapi.pyx":91
+      /* "bt_sdk/core/client/mdapi.pyx":100
  *             self._loop_thread = threading.Thread(
  *                 target=self._run_event_loop,
  *                 daemon=True,             # <<<<<<<<<<<<<<
@@ -7149,21 +7191,21 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
       #endif
       {
         PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 3 : 0)] = {__pyx_t_13, NULL};
-        __pyx_t_16 = __Pyx_MakeVectorcallBuilderKwds(3); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 89, __pyx_L5_except_error)
+        __pyx_t_16 = __Pyx_MakeVectorcallBuilderKwds(3); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 98, __pyx_L5_except_error)
         __Pyx_GOTREF(__pyx_t_16);
-        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_target, __pyx_t_17, __pyx_t_16, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 89, __pyx_L5_except_error)
-        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_daemon, Py_True, __pyx_t_16, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 89, __pyx_L5_except_error)
-        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_name_2, __pyx_mstate_global->__pyx_kp_u_AsyncClient_EventLoop, __pyx_t_16, __pyx_callargs+1, 2) < (0)) __PYX_ERR(0, 89, __pyx_L5_except_error)
+        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_target, __pyx_t_17, __pyx_t_16, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 98, __pyx_L5_except_error)
+        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_daemon, Py_True, __pyx_t_16, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 98, __pyx_L5_except_error)
+        if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_name_2, __pyx_mstate_global->__pyx_kp_u_AsyncClient_EventLoop, __pyx_t_16, __pyx_callargs+1, 2) < (0)) __PYX_ERR(0, 98, __pyx_L5_except_error)
         __pyx_t_9 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_12, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_16);
         __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
         __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
         __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 89, __pyx_L5_except_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 98, __pyx_L5_except_error)
         __Pyx_GOTREF(__pyx_t_9);
       }
 
-      /* "bt_sdk/core/client/mdapi.pyx":89
+      /* "bt_sdk/core/client/mdapi.pyx":98
  *                 self.loop.set_debug(False)
  * 
  *             self._loop_thread = threading.Thread(             # <<<<<<<<<<<<<<
@@ -7176,12 +7218,12 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
       __pyx_v_self->_loop_thread = __pyx_t_9;
       __pyx_t_9 = 0;
 
-      /* "bt_sdk/core/client/mdapi.pyx":94
+      /* "bt_sdk/core/client/mdapi.pyx":103
  *                 name="AsyncClient-EventLoop"
  *             )
  *             self._loop_thread.start()             # <<<<<<<<<<<<<<
  *             print(f"[{self.__class__.__name__}] Started internal background thread.")
- * 
+ *             is_background = True
 */
       __pyx_t_12 = __pyx_v_self->_loop_thread;
       __Pyx_INCREF(__pyx_t_12);
@@ -7190,32 +7232,32 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
         PyObject *__pyx_callargs[2] = {__pyx_t_12, NULL};
         __pyx_t_9 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_start, __pyx_callargs+__pyx_t_8, (1-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 94, __pyx_L5_except_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 103, __pyx_L5_except_error)
         __Pyx_GOTREF(__pyx_t_9);
       }
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
-      /* "bt_sdk/core/client/mdapi.pyx":95
+      /* "bt_sdk/core/client/mdapi.pyx":104
  *             )
  *             self._loop_thread.start()
  *             print(f"[{self.__class__.__name__}] Started internal background thread.")             # <<<<<<<<<<<<<<
+ *             is_background = True
  * 
- *     cdef void _run_event_loop(self):
 */
       __pyx_t_12 = NULL;
-      __pyx_t_16 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_class); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 95, __pyx_L5_except_error)
+      __pyx_t_16 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_class); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 104, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_16);
-      __pyx_t_17 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 95, __pyx_L5_except_error)
+      __pyx_t_17 = __Pyx_PyObject_GetAttrStr(__pyx_t_16, __pyx_mstate_global->__pyx_n_u_name); if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 104, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_17);
       __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
-      __pyx_t_16 = __Pyx_PyObject_FormatSimple(__pyx_t_17, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 95, __pyx_L5_except_error)
+      __pyx_t_16 = __Pyx_PyObject_FormatSimple(__pyx_t_17, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 104, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_16);
       __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
       __pyx_t_18[0] = __pyx_mstate_global->__pyx_kp_u_;
       __pyx_t_18[1] = __pyx_t_16;
       __pyx_t_18[2] = __pyx_mstate_global->__pyx_kp_u_Started_internal_background_thr;
       __pyx_t_17 = __Pyx_PyUnicode_Join(__pyx_t_18, 3, 1 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_16) + 37, 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_16));
-      if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 95, __pyx_L5_except_error)
+      if (unlikely(!__pyx_t_17)) __PYX_ERR(0, 104, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_17);
       __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
       __pyx_t_8 = 1;
@@ -7224,10 +7266,19 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
         __pyx_t_9 = __Pyx_PyObject_FastCall((PyObject*)__pyx_builtin_print, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (__pyx_t_8*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
         __Pyx_DECREF(__pyx_t_17); __pyx_t_17 = 0;
-        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 95, __pyx_L5_except_error)
+        if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 104, __pyx_L5_except_error)
         __Pyx_GOTREF(__pyx_t_9);
       }
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+
+      /* "bt_sdk/core/client/mdapi.pyx":105
+ *             self._loop_thread.start()
+ *             print(f"[{self.__class__.__name__}] Started internal background thread.")
+ *             is_background = True             # <<<<<<<<<<<<<<
+ * 
+ *         self.async_client.attach_loop(self.loop, is_background=is_background)
+*/
+      __pyx_v_is_background = 1;
       __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -7235,7 +7286,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
     }
     goto __pyx_L5_except_error;
 
-    /* "bt_sdk/core/client/mdapi.pyx":81
+    /* "bt_sdk/core/client/mdapi.pyx":89
  * 
  *     cdef void _init_event_loop(self):
  *         try:             # <<<<<<<<<<<<<<
@@ -7256,7 +7307,33 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
     __pyx_L8_try_end:;
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":80
+  /* "bt_sdk/core/client/mdapi.pyx":107
+ *             is_background = True
+ * 
+ *         self.async_client.attach_loop(self.loop, is_background=is_background)             # <<<<<<<<<<<<<<
+ * 
+ *     cdef void _run_event_loop(self):
+*/
+  __pyx_t_6 = __pyx_v_self->async_client;
+  __Pyx_INCREF(__pyx_t_6);
+  __pyx_t_4 = __Pyx_PyBool_FromLong(__pyx_v_is_background); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 107, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_8 = 0;
+  {
+    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_6, __pyx_v_self->loop};
+    __pyx_t_9 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 107, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_9);
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_is_background, __pyx_t_4, __pyx_t_9, __pyx_callargs+2, 0) < (0)) __PYX_ERR(0, 107, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_Object_VectorcallMethod_CallFromBuilder((PyObject*)__pyx_mstate_global->__pyx_n_u_attach_loop, __pyx_callargs+__pyx_t_8, (2-__pyx_t_8) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_9);
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 107, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+  }
+  __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":88
  *         return self
  * 
  *     cdef void _init_event_loop(self):             # <<<<<<<<<<<<<<
@@ -7282,8 +7359,8 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__init_event_loop(struct 
   __Pyx_RefNannyFinishContext();
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":97
- *             print(f"[{self.__class__.__name__}] Started internal background thread.")
+/* "bt_sdk/core/client/mdapi.pyx":109
+ *         self.async_client.attach_loop(self.loop, is_background=is_background)
  * 
  *     cdef void _run_event_loop(self):             # <<<<<<<<<<<<<<
  *         asyncio.set_event_loop(self.loop)
@@ -7318,7 +7395,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_run_event_loop", 0);
 
-  /* "bt_sdk/core/client/mdapi.pyx":98
+  /* "bt_sdk/core/client/mdapi.pyx":110
  * 
  *     cdef void _run_event_loop(self):
  *         asyncio.set_event_loop(self.loop)             # <<<<<<<<<<<<<<
@@ -7326,9 +7403,9 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
  *             self.loop.run_forever()
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 110, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_set_event_loop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 98, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_set_event_loop); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 110, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_5 = 1;
@@ -7348,12 +7425,12 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
     __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 98, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 110, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":99
+  /* "bt_sdk/core/client/mdapi.pyx":111
  *     cdef void _run_event_loop(self):
  *         asyncio.set_event_loop(self.loop)
  *         try:             # <<<<<<<<<<<<<<
@@ -7369,7 +7446,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
     __Pyx_XGOTREF(__pyx_t_8);
     /*try:*/ {
 
-      /* "bt_sdk/core/client/mdapi.pyx":100
+      /* "bt_sdk/core/client/mdapi.pyx":112
  *         asyncio.set_event_loop(self.loop)
  *         try:
  *             self.loop.run_forever()             # <<<<<<<<<<<<<<
@@ -7383,12 +7460,12 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
         PyObject *__pyx_callargs[2] = {__pyx_t_4, NULL};
         __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_run_forever, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 100, __pyx_L3_error)
+        if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L3_error)
         __Pyx_GOTREF(__pyx_t_1);
       }
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "bt_sdk/core/client/mdapi.pyx":99
+      /* "bt_sdk/core/client/mdapi.pyx":111
  *     cdef void _run_event_loop(self):
  *         asyncio.set_event_loop(self.loop)
  *         try:             # <<<<<<<<<<<<<<
@@ -7406,7 +7483,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "bt_sdk/core/client/mdapi.pyx":101
+    /* "bt_sdk/core/client/mdapi.pyx":113
  *         try:
  *             self.loop.run_forever()
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -7416,7 +7493,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
     __pyx_t_9 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(((PyTypeObject*)PyExc_Exception))));
     if (__pyx_t_9) {
       __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi._run_event_loop", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_4, &__pyx_t_2) < 0) __PYX_ERR(0, 101, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_1, &__pyx_t_4, &__pyx_t_2) < 0) __PYX_ERR(0, 113, __pyx_L5_except_error)
       __Pyx_XGOTREF(__pyx_t_1);
       __Pyx_XGOTREF(__pyx_t_4);
       __Pyx_XGOTREF(__pyx_t_2);
@@ -7424,17 +7501,17 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
       __pyx_v_e = __pyx_t_4;
       /*try:*/ {
 
-        /* "bt_sdk/core/client/mdapi.pyx":102
+        /* "bt_sdk/core/client/mdapi.pyx":114
  *             self.loop.run_forever()
  *         except Exception as e:
  *             print(f"Event loop error: {e}")             # <<<<<<<<<<<<<<
  * 
- *     async def get_calendar_async(self):
+ * # --------------------------------------------------------------- Ray Async Actor --------------------------------------------------------
 */
         __pyx_t_10 = NULL;
-        __pyx_t_11 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 102, __pyx_L14_error)
+        __pyx_t_11 = __Pyx_PyObject_FormatSimple(__pyx_v_e, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 114, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_11);
-        __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Event_loop_error, __pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 102, __pyx_L14_error)
+        __pyx_t_12 = __Pyx_PyUnicode_Concat(__pyx_mstate_global->__pyx_kp_u_Event_loop_error, __pyx_t_11); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 114, __pyx_L14_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __pyx_t_5 = 1;
@@ -7443,13 +7520,13 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
           __pyx_t_3 = __Pyx_PyObject_FastCall((PyObject*)__pyx_builtin_print, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 102, __pyx_L14_error)
+          if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 114, __pyx_L14_error)
           __Pyx_GOTREF(__pyx_t_3);
         }
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       }
 
-      /* "bt_sdk/core/client/mdapi.pyx":101
+      /* "bt_sdk/core/client/mdapi.pyx":113
  *         try:
  *             self.loop.run_forever()
  *         except Exception as e:             # <<<<<<<<<<<<<<
@@ -7503,7 +7580,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
     }
     goto __pyx_L5_except_error;
 
-    /* "bt_sdk/core/client/mdapi.pyx":99
+    /* "bt_sdk/core/client/mdapi.pyx":111
  *     cdef void _run_event_loop(self):
  *         asyncio.set_event_loop(self.loop)
  *         try:             # <<<<<<<<<<<<<<
@@ -7524,8 +7601,8 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
     __pyx_L8_try_end:;
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":97
- *             print(f"[{self.__class__.__name__}] Started internal background thread.")
+  /* "bt_sdk/core/client/mdapi.pyx":109
+ *         self.async_client.attach_loop(self.loop, is_background=is_background)
  * 
  *     cdef void _run_event_loop(self):             # <<<<<<<<<<<<<<
  *         asyncio.set_event_loop(self.loop)
@@ -7549,8 +7626,8 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi__run_event_loop(struct _
 }
 static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "bt_sdk/core/client/mdapi.pyx":104
- *             print(f"Event loop error: {e}")
+/* "bt_sdk/core/client/mdapi.pyx":118
+ * # --------------------------------------------------------------- Ray Async Actor --------------------------------------------------------
  * 
  *     async def get_calendar_async(self):             # <<<<<<<<<<<<<<
  *         """
@@ -7612,7 +7689,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_4get_calendar_asyn
   if (unlikely(!__pyx_cur_scope)) {
     __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async *)Py_None);
     __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 104, __pyx_L1_error)
+    __PYX_ERR(0, 118, __pyx_L1_error)
   } else {
     __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
   }
@@ -7620,7 +7697,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_4get_calendar_asyn
   __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
   {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_calendar_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_calendar_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 104, __pyx_L1_error)
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_calendar_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_calendar_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_DECREF(__pyx_cur_scope);
     __Pyx_RefNannyFinishContext();
     return (PyObject *) gen;
@@ -7662,23 +7739,23 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1(__pyx_
   __pyx_L3_first_run:;
   if (unlikely(__pyx_sent_value != Py_None)) {
     if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 104, __pyx_L1_error)
+    __PYX_ERR(0, 118, __pyx_L1_error)
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":108
+  /* "bt_sdk/core/client/mdapi.pyx":122
  *             request calendar
  *         """
  *         cdef bytes req_id = fast_uuid4_bytes()             # <<<<<<<<<<<<<<
  *         cdef object event = Event(topic=RpcTopic.Calendar)
  * 
 */
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 108, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_req_id = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":109
+  /* "bt_sdk/core/client/mdapi.pyx":123
  *         """
  *         cdef bytes req_id = fast_uuid4_bytes()
  *         cdef object event = Event(topic=RpcTopic.Calendar)             # <<<<<<<<<<<<<<
@@ -7686,9 +7763,9 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1(__pyx_
  *         obs = self.async_client.run(req_id, event)
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 109, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_Enum_6a1f7d__6bt_sdk_4core_6client_5mdapi_enum__dunderpyx_t__etc_to_py(__pyx_e_6bt_sdk_4core_6client_5mdapi_Calendar); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 109, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Enum_6a1f7d__6bt_sdk_4core_6client_5mdapi_enum__dunderpyx_t__etc_to_py(__pyx_e_6bt_sdk_4core_6client_5mdapi_Calendar); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 123, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -7704,22 +7781,22 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1(__pyx_
   #endif
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 109, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_4, __pyx_t_6, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 109, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_4, __pyx_t_6, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 123, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 109, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_event = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":111
+  /* "bt_sdk/core/client/mdapi.pyx":125
  *         cdef object event = Event(topic=RpcTopic.Calendar)
  * 
  *         obs = self.async_client.run(req_id, event)             # <<<<<<<<<<<<<<
@@ -7733,14 +7810,14 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1(__pyx_
     PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_req_id, __pyx_cur_scope->__pyx_v_event};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_run, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 111, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_obs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":112
+  /* "bt_sdk/core/client/mdapi.pyx":126
  * 
  *         obs = self.async_client.run(req_id, event)
  *         tables = await _collect_async(obs, self.timeout)             # <<<<<<<<<<<<<<
@@ -7748,9 +7825,9 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1(__pyx_
  *         return data
 */
   __pyx_t_3 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 112, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 126, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -7770,7 +7847,7 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1(__pyx_
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 112, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_t_7 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
@@ -7784,20 +7861,20 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1(__pyx_
     __pyx_generator->resume_label = 1;
     return __pyx_r;
     __pyx_L4_resume_from_await:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 112, __pyx_L1_error)
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 126, __pyx_L1_error)
     __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
   } else if (likely(__pyx_t_7 == PYGEN_RETURN)) {
     __Pyx_GOTREF(__pyx_r);
     __pyx_t_1 = __pyx_r; __pyx_r = NULL;
   } else {
     __Pyx_XGOTREF(__pyx_r);
-    __PYX_ERR(0, 112, __pyx_L1_error)
+    __PYX_ERR(0, 126, __pyx_L1_error)
   }
   __Pyx_GIVEREF(__pyx_t_1);
   __pyx_cur_scope->__pyx_v_tables = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":113
+  /* "bt_sdk/core/client/mdapi.pyx":127
  *         obs = self.async_client.run(req_id, event)
  *         tables = await _collect_async(obs, self.timeout)
  *         data = _merge_tables(tables)             # <<<<<<<<<<<<<<
@@ -7806,20 +7883,20 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1(__pyx_
 */
   __pyx_t_1 = __pyx_cur_scope->__pyx_v_tables;
   __Pyx_INCREF(__pyx_t_1);
-  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 113, __pyx_L1_error)
-  __pyx_t_6 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 113, __pyx_L1_error)
+  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 127, __pyx_L1_error)
+  __pyx_t_6 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 127, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_GIVEREF(__pyx_t_6);
   __pyx_cur_scope->__pyx_v_data = __pyx_t_6;
   __pyx_t_6 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":114
+  /* "bt_sdk/core/client/mdapi.pyx":128
  *         tables = await _collect_async(obs, self.timeout)
  *         data = _merge_tables(tables)
  *         return data             # <<<<<<<<<<<<<<
  * 
- *     cpdef object get_calendar(self):
+ *     async def get_instrument_async(self):
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_cur_scope->__pyx_v_data);
@@ -7827,8 +7904,8 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1(__pyx_
   goto __pyx_L0;
   CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
 
-  /* "bt_sdk/core/client/mdapi.pyx":104
- *             print(f"Event loop error: {e}")
+  /* "bt_sdk/core/client/mdapi.pyx":118
+ * # --------------------------------------------------------------- Ray Async Actor --------------------------------------------------------
  * 
  *     async def get_calendar_async(self):             # <<<<<<<<<<<<<<
  *         """
@@ -7856,16 +7933,1832 @@ static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_6generator1(__pyx_
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
+static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_9generator2(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "bt_sdk/core/client/mdapi.pyx":116
+/* "bt_sdk/core/client/mdapi.pyx":130
  *         return data
+ * 
+ *     async def get_instrument_async(self):             # <<<<<<<<<<<<<<
+ *         """
+ *             request instruments
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_instrument_async(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+PyDoc_STRVAR(__pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_7get_instrument_async, "\n            request instruments\n        ");
+static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_instrument_async = {"get_instrument_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_instrument_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_7get_instrument_async};
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_instrument_async(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_instrument_async (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  if (unlikely(__pyx_nargs > 0)) { __Pyx_RaiseArgtupleInvalid("get_instrument_async", 1, 0, 0, __pyx_nargs); return NULL; }
+  const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+  if (unlikely(__pyx_kwds_len < 0)) return NULL;
+  if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("get_instrument_async", __pyx_kwds); return NULL;}
+  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_7get_instrument_async(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_7get_instrument_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self) {
+  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async *__pyx_cur_scope;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_instrument_async", 0);
+  __pyx_cur_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async *)__pyx_tp_new_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async, __pyx_mstate_global->__pyx_empty_tuple, NULL);
+  if (unlikely(!__pyx_cur_scope)) {
+    __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async *)Py_None);
+    __Pyx_INCREF(Py_None);
+    __PYX_ERR(0, 130, __pyx_L1_error)
+  } else {
+    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
+  }
+  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
+  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  {
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_9generator2, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_instrument_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_instrument_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 130, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_cur_scope);
+    __Pyx_RefNannyFinishContext();
+    return (PyObject *) gen;
+  }
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_instrument_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_9generator2(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+{
+  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async *__pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async *)__pyx_generator->closure);
+  PyObject *__pyx_r = NULL;
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
+  __Pyx_PySendResult __pyx_t_7;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_instrument_async", 0);
+  switch (__pyx_generator->resume_label) {
+    case 0: goto __pyx_L3_first_run;
+    case 1: goto __pyx_L4_resume_from_await;
+    default: /* CPython raises the right error here */
+    __Pyx_RefNannyFinishContext();
+    return NULL;
+  }
+  __pyx_L3_first_run:;
+  if (unlikely(__pyx_sent_value != Py_None)) {
+    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
+    __PYX_ERR(0, 130, __pyx_L1_error)
+  }
+
+  /* "bt_sdk/core/client/mdapi.pyx":134
+ *             request instruments
+ *         """
+ *         cdef bytes req_id = fast_uuid4_bytes()             # <<<<<<<<<<<<<<
+ *         cdef object event = Event(topic=RpcTopic.Instrument)
+ * 
+*/
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_req_id = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":135
+ *         """
+ *         cdef bytes req_id = fast_uuid4_bytes()
+ *         cdef object event = Event(topic=RpcTopic.Instrument)             # <<<<<<<<<<<<<<
+ * 
+ *         obs = self.async_client.run(req_id, event)
+*/
+  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_Enum_6a1f7d__6bt_sdk_4core_6client_5mdapi_enum__dunderpyx_t__etc_to_py(__pyx_e_6bt_sdk_4core_6client_5mdapi_Instrument); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    assert(__pyx_t_2);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_2, NULL};
+    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 135, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_4, __pyx_t_6, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 135, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_event = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":137
+ *         cdef object event = Event(topic=RpcTopic.Instrument)
+ * 
+ *         obs = self.async_client.run(req_id, event)             # <<<<<<<<<<<<<<
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)
+*/
+  __pyx_t_3 = __pyx_cur_scope->__pyx_v_self->async_client;
+  __Pyx_INCREF(__pyx_t_3);
+  __pyx_t_5 = 0;
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_req_id, __pyx_cur_scope->__pyx_v_event};
+    __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_run, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_obs = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":138
+ * 
+ *         obs = self.async_client.run(req_id, event)
+ *         tables = await _collect_async(obs, self.timeout)             # <<<<<<<<<<<<<<
+ *         data = _merge_tables(tables)
+ *         return data
+*/
+  __pyx_t_3 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_6))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_6);
+    assert(__pyx_t_3);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_6);
+    __Pyx_INCREF(__pyx_t_3);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_6, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_obs, __pyx_t_4};
+    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_6, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 138, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __pyx_t_7 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (likely(__pyx_t_7 == PYGEN_NEXT)) {
+    __Pyx_GOTREF(__pyx_r);
+    __Pyx_XGIVEREF(__pyx_r);
+    __Pyx_RefNannyFinishContext();
+    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+    /* return from generator, awaiting value */
+    __pyx_generator->resume_label = 1;
+    return __pyx_r;
+    __pyx_L4_resume_from_await:;
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 138, __pyx_L1_error)
+    __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
+  } else if (likely(__pyx_t_7 == PYGEN_RETURN)) {
+    __Pyx_GOTREF(__pyx_r);
+    __pyx_t_1 = __pyx_r; __pyx_r = NULL;
+  } else {
+    __Pyx_XGOTREF(__pyx_r);
+    __PYX_ERR(0, 138, __pyx_L1_error)
+  }
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_tables = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":139
+ *         obs = self.async_client.run(req_id, event)
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)             # <<<<<<<<<<<<<<
+ *         return data
+ * 
+*/
+  __pyx_t_1 = __pyx_cur_scope->__pyx_v_tables;
+  __Pyx_INCREF(__pyx_t_1);
+  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_t_6 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_GIVEREF(__pyx_t_6);
+  __pyx_cur_scope->__pyx_v_data = __pyx_t_6;
+  __pyx_t_6 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":140
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)
+ *         return data             # <<<<<<<<<<<<<<
+ * 
+ *     async def get_benchmark_async(self, object body):
+*/
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_data);
+  __pyx_r = __pyx_cur_scope->__pyx_v_data;
+  goto __pyx_L0;
+  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
+
+  /* "bt_sdk/core/client/mdapi.pyx":130
+ *         return data
+ * 
+ *     async def get_instrument_async(self):             # <<<<<<<<<<<<<<
+ *         """
+ *             request instruments
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_6);
+  if (__Pyx_PyErr_Occurred()) {
+    __Pyx_Generator_Replace_StopIteration(0);
+    __Pyx_AddTraceback("get_instrument_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  }
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  #if !CYTHON_USE_EXC_INFO_STACK
+  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+  #endif
+  __pyx_generator->resume_label = -1;
+  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_12generator3(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+
+/* "bt_sdk/core/client/mdapi.pyx":142
+ *         return data
+ * 
+ *     async def get_benchmark_async(self, object body):             # <<<<<<<<<<<<<<
+ *         cdef bytes req_id = fast_uuid4_bytes()
+ *         cdef object event = Event(topic=RpcTopic.Index, body=body)
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_11get_benchmark_async(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_11get_benchmark_async = {"get_benchmark_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_11get_benchmark_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_11get_benchmark_async(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  PyObject *__pyx_v_body = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_benchmark_async (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_body,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 142, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 142, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_benchmark_async", 0) < (0)) __PYX_ERR(0, 142, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_benchmark_async", 1, 1, 1, i); __PYX_ERR(0, 142, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 142, __pyx_L3_error)
+    }
+    __pyx_v_body = values[0];
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("get_benchmark_async", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 142, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_benchmark_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_10get_benchmark_async(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_10get_benchmark_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
+  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async *__pyx_cur_scope;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_benchmark_async", 0);
+  __pyx_cur_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async *)__pyx_tp_new_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async, __pyx_mstate_global->__pyx_empty_tuple, NULL);
+  if (unlikely(!__pyx_cur_scope)) {
+    __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async *)Py_None);
+    __Pyx_INCREF(Py_None);
+    __PYX_ERR(0, 142, __pyx_L1_error)
+  } else {
+    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
+  }
+  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
+  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __pyx_cur_scope->__pyx_v_body = __pyx_v_body;
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_body);
+  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_body);
+  {
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_12generator3, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_benchmark_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_benchmark_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_cur_scope);
+    __Pyx_RefNannyFinishContext();
+    return (PyObject *) gen;
+  }
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_benchmark_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_12generator3(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+{
+  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async *__pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async *)__pyx_generator->closure);
+  PyObject *__pyx_r = NULL;
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
+  __Pyx_PySendResult __pyx_t_7;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_benchmark_async", 0);
+  switch (__pyx_generator->resume_label) {
+    case 0: goto __pyx_L3_first_run;
+    case 1: goto __pyx_L4_resume_from_await;
+    default: /* CPython raises the right error here */
+    __Pyx_RefNannyFinishContext();
+    return NULL;
+  }
+  __pyx_L3_first_run:;
+  if (unlikely(__pyx_sent_value != Py_None)) {
+    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
+    __PYX_ERR(0, 142, __pyx_L1_error)
+  }
+
+  /* "bt_sdk/core/client/mdapi.pyx":143
+ * 
+ *     async def get_benchmark_async(self, object body):
+ *         cdef bytes req_id = fast_uuid4_bytes()             # <<<<<<<<<<<<<<
+ *         cdef object event = Event(topic=RpcTopic.Index, body=body)
+ * 
+*/
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_req_id = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":144
+ *     async def get_benchmark_async(self, object body):
+ *         cdef bytes req_id = fast_uuid4_bytes()
+ *         cdef object event = Event(topic=RpcTopic.Index, body=body)             # <<<<<<<<<<<<<<
+ * 
+ *         obs = self.async_client.run(req_id, event)
+*/
+  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_Enum_6a1f7d__6bt_sdk_4core_6client_5mdapi_enum__dunderpyx_t__etc_to_py(__pyx_e_6bt_sdk_4core_6client_5mdapi_Index); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 144, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    assert(__pyx_t_2);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_2, NULL};
+    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_4, __pyx_t_6, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 144, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_body, __pyx_cur_scope->__pyx_v_body, __pyx_t_6, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_event = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":146
+ *         cdef object event = Event(topic=RpcTopic.Index, body=body)
+ * 
+ *         obs = self.async_client.run(req_id, event)             # <<<<<<<<<<<<<<
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)
+*/
+  __pyx_t_3 = __pyx_cur_scope->__pyx_v_self->async_client;
+  __Pyx_INCREF(__pyx_t_3);
+  __pyx_t_5 = 0;
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_req_id, __pyx_cur_scope->__pyx_v_event};
+    __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_run, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_obs = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":147
+ * 
+ *         obs = self.async_client.run(req_id, event)
+ *         tables = await _collect_async(obs, self.timeout)             # <<<<<<<<<<<<<<
+ *         data = _merge_tables(tables)
+ *         return data
+*/
+  __pyx_t_3 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_6))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_6);
+    assert(__pyx_t_3);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_6);
+    __Pyx_INCREF(__pyx_t_3);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_6, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_obs, __pyx_t_4};
+    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_6, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __pyx_t_7 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (likely(__pyx_t_7 == PYGEN_NEXT)) {
+    __Pyx_GOTREF(__pyx_r);
+    __Pyx_XGIVEREF(__pyx_r);
+    __Pyx_RefNannyFinishContext();
+    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+    /* return from generator, awaiting value */
+    __pyx_generator->resume_label = 1;
+    return __pyx_r;
+    __pyx_L4_resume_from_await:;
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 147, __pyx_L1_error)
+    __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
+  } else if (likely(__pyx_t_7 == PYGEN_RETURN)) {
+    __Pyx_GOTREF(__pyx_r);
+    __pyx_t_1 = __pyx_r; __pyx_r = NULL;
+  } else {
+    __Pyx_XGOTREF(__pyx_r);
+    __PYX_ERR(0, 147, __pyx_L1_error)
+  }
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_tables = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":148
+ *         obs = self.async_client.run(req_id, event)
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)             # <<<<<<<<<<<<<<
+ *         return data
+ * 
+*/
+  __pyx_t_1 = __pyx_cur_scope->__pyx_v_tables;
+  __Pyx_INCREF(__pyx_t_1);
+  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 148, __pyx_L1_error)
+  __pyx_t_6 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 148, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_6);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_GIVEREF(__pyx_t_6);
+  __pyx_cur_scope->__pyx_v_data = __pyx_t_6;
+  __pyx_t_6 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":149
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)
+ *         return data             # <<<<<<<<<<<<<<
+ * 
+ *     async def get_close_async(self, object body):
+*/
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_data);
+  __pyx_r = __pyx_cur_scope->__pyx_v_data;
+  goto __pyx_L0;
+  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
+
+  /* "bt_sdk/core/client/mdapi.pyx":142
+ *         return data
+ * 
+ *     async def get_benchmark_async(self, object body):             # <<<<<<<<<<<<<<
+ *         cdef bytes req_id = fast_uuid4_bytes()
+ *         cdef object event = Event(topic=RpcTopic.Index, body=body)
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_6);
+  if (__Pyx_PyErr_Occurred()) {
+    __Pyx_Generator_Replace_StopIteration(0);
+    __Pyx_AddTraceback("get_benchmark_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  }
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  #if !CYTHON_USE_EXC_INFO_STACK
+  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+  #endif
+  __pyx_generator->resume_label = -1;
+  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_15generator4(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+
+/* "bt_sdk/core/client/mdapi.pyx":151
+ *         return data
+ * 
+ *     async def get_close_async(self, object body):             # <<<<<<<<<<<<<<
+ *         obs = self.get_close_obs(body)
+ *         tables = await _collect_async(obs, self.timeout)
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_14get_close_async(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_14get_close_async = {"get_close_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_14get_close_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_14get_close_async(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  PyObject *__pyx_v_body = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_close_async (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_body,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 151, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 151, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_close_async", 0) < (0)) __PYX_ERR(0, 151, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_close_async", 1, 1, 1, i); __PYX_ERR(0, 151, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 151, __pyx_L3_error)
+    }
+    __pyx_v_body = values[0];
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("get_close_async", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 151, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_close_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_13get_close_async(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_13get_close_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
+  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async *__pyx_cur_scope;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_close_async", 0);
+  __pyx_cur_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async *)__pyx_tp_new_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async, __pyx_mstate_global->__pyx_empty_tuple, NULL);
+  if (unlikely(!__pyx_cur_scope)) {
+    __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async *)Py_None);
+    __Pyx_INCREF(Py_None);
+    __PYX_ERR(0, 151, __pyx_L1_error)
+  } else {
+    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
+  }
+  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
+  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __pyx_cur_scope->__pyx_v_body = __pyx_v_body;
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_body);
+  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_body);
+  {
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_15generator4, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_close_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_close_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 151, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_cur_scope);
+    __Pyx_RefNannyFinishContext();
+    return (PyObject *) gen;
+  }
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_close_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_15generator4(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+{
+  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async *__pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async *)__pyx_generator->closure);
+  PyObject *__pyx_r = NULL;
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  __Pyx_PySendResult __pyx_t_6;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_close_async", 0);
+  switch (__pyx_generator->resume_label) {
+    case 0: goto __pyx_L3_first_run;
+    case 1: goto __pyx_L4_resume_from_await;
+    default: /* CPython raises the right error here */
+    __Pyx_RefNannyFinishContext();
+    return NULL;
+  }
+  __pyx_L3_first_run:;
+  if (unlikely(__pyx_sent_value != Py_None)) {
+    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
+    __PYX_ERR(0, 151, __pyx_L1_error)
+  }
+
+  /* "bt_sdk/core/client/mdapi.pyx":152
+ * 
+ *     async def get_close_async(self, object body):
+ *         obs = self.get_close_obs(body)             # <<<<<<<<<<<<<<
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)
+*/
+  __pyx_t_1 = ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_close_obs(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_body, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_obs = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":153
+ *     async def get_close_async(self, object body):
+ *         obs = self.get_close_obs(body)
+ *         tables = await _collect_async(obs, self.timeout)             # <<<<<<<<<<<<<<
+ *         data = _merge_tables(tables)
+ *         return data
+*/
+  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    assert(__pyx_t_2);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_obs, __pyx_t_4};
+    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __pyx_t_6 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (likely(__pyx_t_6 == PYGEN_NEXT)) {
+    __Pyx_GOTREF(__pyx_r);
+    __Pyx_XGIVEREF(__pyx_r);
+    __Pyx_RefNannyFinishContext();
+    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+    /* return from generator, awaiting value */
+    __pyx_generator->resume_label = 1;
+    return __pyx_r;
+    __pyx_L4_resume_from_await:;
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 153, __pyx_L1_error)
+    __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
+  } else if (likely(__pyx_t_6 == PYGEN_RETURN)) {
+    __Pyx_GOTREF(__pyx_r);
+    __pyx_t_1 = __pyx_r; __pyx_r = NULL;
+  } else {
+    __Pyx_XGOTREF(__pyx_r);
+    __PYX_ERR(0, 153, __pyx_L1_error)
+  }
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_tables = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":154
+ *         obs = self.get_close_obs(body)
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)             # <<<<<<<<<<<<<<
+ *         return data
+ * 
+*/
+  __pyx_t_1 = __pyx_cur_scope->__pyx_v_tables;
+  __Pyx_INCREF(__pyx_t_1);
+  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 154, __pyx_L1_error)
+  __pyx_t_3 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_GIVEREF(__pyx_t_3);
+  __pyx_cur_scope->__pyx_v_data = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":155
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)
+ *         return data             # <<<<<<<<<<<<<<
+ * 
+ *     async def get_event_async(self, int topic, object body):
+*/
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_data);
+  __pyx_r = __pyx_cur_scope->__pyx_v_data;
+  goto __pyx_L0;
+  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
+
+  /* "bt_sdk/core/client/mdapi.pyx":151
+ *         return data
+ * 
+ *     async def get_close_async(self, object body):             # <<<<<<<<<<<<<<
+ *         obs = self.get_close_obs(body)
+ *         tables = await _collect_async(obs, self.timeout)
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  if (__Pyx_PyErr_Occurred()) {
+    __Pyx_Generator_Replace_StopIteration(0);
+    __Pyx_AddTraceback("get_close_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  }
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  #if !CYTHON_USE_EXC_INFO_STACK
+  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+  #endif
+  __pyx_generator->resume_label = -1;
+  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_18generator5(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+
+/* "bt_sdk/core/client/mdapi.pyx":157
+ *         return data
+ * 
+ *     async def get_event_async(self, int topic, object body):             # <<<<<<<<<<<<<<
+ *         obs = self.get_event_obs(topic, body)
+ *         tables = await _collect_async(obs, self.timeout)
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_event_async(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_event_async = {"get_event_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_event_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_event_async(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  int __pyx_v_topic;
+  PyObject *__pyx_v_body = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[2] = {0,0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_event_async (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_topic,&__pyx_mstate_global->__pyx_n_u_body,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 157, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  2:
+        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 157, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 157, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_event_async", 0) < (0)) __PYX_ERR(0, 157, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_event_async", 1, 2, 2, i); __PYX_ERR(0, 157, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 2)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 157, __pyx_L3_error)
+      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 157, __pyx_L3_error)
+    }
+    __pyx_v_topic = __Pyx_PyLong_As_int(values[0]); if (unlikely((__pyx_v_topic == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 157, __pyx_L3_error)
+    __pyx_v_body = values[1];
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("get_event_async", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 157, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_event_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_16get_event_async(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_topic, __pyx_v_body);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_16get_event_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, int __pyx_v_topic, PyObject *__pyx_v_body) {
+  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async *__pyx_cur_scope;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_event_async", 0);
+  __pyx_cur_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async *)__pyx_tp_new_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async, __pyx_mstate_global->__pyx_empty_tuple, NULL);
+  if (unlikely(!__pyx_cur_scope)) {
+    __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async *)Py_None);
+    __Pyx_INCREF(Py_None);
+    __PYX_ERR(0, 157, __pyx_L1_error)
+  } else {
+    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
+  }
+  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
+  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __pyx_cur_scope->__pyx_v_topic = __pyx_v_topic;
+  __pyx_cur_scope->__pyx_v_body = __pyx_v_body;
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_body);
+  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_body);
+  {
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_18generator5, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_event_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_event_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 157, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_cur_scope);
+    __Pyx_RefNannyFinishContext();
+    return (PyObject *) gen;
+  }
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_event_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_18generator5(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+{
+  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async *__pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async *)__pyx_generator->closure);
+  PyObject *__pyx_r = NULL;
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  __Pyx_PySendResult __pyx_t_6;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_event_async", 0);
+  switch (__pyx_generator->resume_label) {
+    case 0: goto __pyx_L3_first_run;
+    case 1: goto __pyx_L4_resume_from_await;
+    default: /* CPython raises the right error here */
+    __Pyx_RefNannyFinishContext();
+    return NULL;
+  }
+  __pyx_L3_first_run:;
+  if (unlikely(__pyx_sent_value != Py_None)) {
+    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
+    __PYX_ERR(0, 157, __pyx_L1_error)
+  }
+
+  /* "bt_sdk/core/client/mdapi.pyx":158
+ * 
+ *     async def get_event_async(self, int topic, object body):
+ *         obs = self.get_event_obs(topic, body)             # <<<<<<<<<<<<<<
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)
+*/
+  __pyx_t_1 = ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_event_obs(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_topic, __pyx_cur_scope->__pyx_v_body, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 158, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_obs = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":159
+ *     async def get_event_async(self, int topic, object body):
+ *         obs = self.get_event_obs(topic, body)
+ *         tables = await _collect_async(obs, self.timeout)             # <<<<<<<<<<<<<<
+ *         data = _merge_tables(tables)
+ *         return data
+*/
+  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 159, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    assert(__pyx_t_2);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_obs, __pyx_t_4};
+    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __pyx_t_6 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (likely(__pyx_t_6 == PYGEN_NEXT)) {
+    __Pyx_GOTREF(__pyx_r);
+    __Pyx_XGIVEREF(__pyx_r);
+    __Pyx_RefNannyFinishContext();
+    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+    /* return from generator, awaiting value */
+    __pyx_generator->resume_label = 1;
+    return __pyx_r;
+    __pyx_L4_resume_from_await:;
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
+  } else if (likely(__pyx_t_6 == PYGEN_RETURN)) {
+    __Pyx_GOTREF(__pyx_r);
+    __pyx_t_1 = __pyx_r; __pyx_r = NULL;
+  } else {
+    __Pyx_XGOTREF(__pyx_r);
+    __PYX_ERR(0, 159, __pyx_L1_error)
+  }
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_tables = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":160
+ *         obs = self.get_event_obs(topic, body)
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)             # <<<<<<<<<<<<<<
+ *         return data
+ * 
+*/
+  __pyx_t_1 = __pyx_cur_scope->__pyx_v_tables;
+  __Pyx_INCREF(__pyx_t_1);
+  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 160, __pyx_L1_error)
+  __pyx_t_3 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 160, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_GIVEREF(__pyx_t_3);
+  __pyx_cur_scope->__pyx_v_data = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":161
+ *         tables = await _collect_async(obs, self.timeout)
+ *         data = _merge_tables(tables)
+ *         return data             # <<<<<<<<<<<<<<
+ * 
+ *     async def get_factor_async(self, object body):
+*/
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_data);
+  __pyx_r = __pyx_cur_scope->__pyx_v_data;
+  goto __pyx_L0;
+  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
+
+  /* "bt_sdk/core/client/mdapi.pyx":157
+ *         return data
+ * 
+ *     async def get_event_async(self, int topic, object body):             # <<<<<<<<<<<<<<
+ *         obs = self.get_event_obs(topic, body)
+ *         tables = await _collect_async(obs, self.timeout)
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  if (__Pyx_PyErr_Occurred()) {
+    __Pyx_Generator_Replace_StopIteration(0);
+    __Pyx_AddTraceback("get_event_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  }
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  #if !CYTHON_USE_EXC_INFO_STACK
+  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+  #endif
+  __pyx_generator->resume_label = -1;
+  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_21generator6(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
+
+/* "bt_sdk/core/client/mdapi.pyx":163
+ *         return data
+ * 
+ *     async def get_factor_async(self, object body):             # <<<<<<<<<<<<<<
+ *         obs_close = self.get_close_obs(body)
+ *         obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)
+*/
+
+/* Python wrapper */
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_20get_factor_async(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+); /*proto*/
+static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_20get_factor_async = {"get_factor_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_20get_factor_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_20get_factor_async(PyObject *__pyx_v_self, 
+#if CYTHON_METH_FASTCALL
+PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
+#else
+PyObject *__pyx_args, PyObject *__pyx_kwds
+#endif
+) {
+  PyObject *__pyx_v_body = 0;
+  #if !CYTHON_METH_FASTCALL
+  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
+  #endif
+  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
+  PyObject* values[1] = {0};
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_factor_async (wrapper)", 0);
+  #if !CYTHON_METH_FASTCALL
+  #if CYTHON_ASSUME_SAFE_SIZE
+  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
+  #else
+  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
+  #endif
+  #endif
+  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
+  {
+    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_body,0};
+    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 163, __pyx_L3_error)
+    if (__pyx_kwds_len > 0) {
+      switch (__pyx_nargs) {
+        case  1:
+        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 163, __pyx_L3_error)
+        CYTHON_FALLTHROUGH;
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      const Py_ssize_t kwd_pos_args = __pyx_nargs;
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_factor_async", 0) < (0)) __PYX_ERR(0, 163, __pyx_L3_error)
+      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_factor_async", 1, 1, 1, i); __PYX_ERR(0, 163, __pyx_L3_error) }
+      }
+    } else if (unlikely(__pyx_nargs != 1)) {
+      goto __pyx_L5_argtuple_error;
+    } else {
+      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 163, __pyx_L3_error)
+    }
+    __pyx_v_body = values[0];
+  }
+  goto __pyx_L6_skip;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("get_factor_async", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 163, __pyx_L3_error)
+  __pyx_L6_skip:;
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L3_error:;
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_factor_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_19get_factor_async(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
+
+  /* function exit code */
+  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
+    Py_XDECREF(values[__pyx_temp]);
+  }
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_19get_factor_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
+  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async *__pyx_cur_scope;
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("get_factor_async", 0);
+  __pyx_cur_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async *)__pyx_tp_new_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async, __pyx_mstate_global->__pyx_empty_tuple, NULL);
+  if (unlikely(!__pyx_cur_scope)) {
+    __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async *)Py_None);
+    __Pyx_INCREF(Py_None);
+    __PYX_ERR(0, 163, __pyx_L1_error)
+  } else {
+    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
+  }
+  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
+  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
+  __pyx_cur_scope->__pyx_v_body = __pyx_v_body;
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_body);
+  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_body);
+  {
+    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_21generator6, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_factor_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_factor_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 163, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_cur_scope);
+    __Pyx_RefNannyFinishContext();
+    return (PyObject *) gen;
+  }
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_factor_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_21generator6(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
+{
+  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async *__pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async *)__pyx_generator->closure);
+  PyObject *__pyx_r = NULL;
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  size_t __pyx_t_5;
+  __Pyx_PySendResult __pyx_t_6;
+  PyObject *__pyx_t_7 = NULL;
+  PyObject *(*__pyx_t_8)(PyObject *);
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("get_factor_async", 0);
+  switch (__pyx_generator->resume_label) {
+    case 0: goto __pyx_L3_first_run;
+    case 1: goto __pyx_L4_resume_from_await;
+    default: /* CPython raises the right error here */
+    __Pyx_RefNannyFinishContext();
+    return NULL;
+  }
+  __pyx_L3_first_run:;
+  if (unlikely(__pyx_sent_value != Py_None)) {
+    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
+    __PYX_ERR(0, 163, __pyx_L1_error)
+  }
+
+  /* "bt_sdk/core/client/mdapi.pyx":164
+ * 
+ *     async def get_factor_async(self, object body):
+ *         obs_close = self.get_close_obs(body)             # <<<<<<<<<<<<<<
+ *         obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)
+ *         obs_right = self.get_event_obs(RpcTopic.Rightment, body)
+*/
+  __pyx_t_1 = ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_close_obs(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_body, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_obs_close = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":165
+ *     async def get_factor_async(self, object body):
+ *         obs_close = self.get_close_obs(body)
+ *         obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)             # <<<<<<<<<<<<<<
+ *         obs_right = self.get_event_obs(RpcTopic.Rightment, body)
+ * 
+*/
+  __pyx_t_1 = ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_event_obs(__pyx_cur_scope->__pyx_v_self, __pyx_e_6bt_sdk_4core_6client_5mdapi_Adjustment, __pyx_cur_scope->__pyx_v_body, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_obs_adjust = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":166
+ *         obs_close = self.get_close_obs(body)
+ *         obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)
+ *         obs_right = self.get_event_obs(RpcTopic.Rightment, body)             # <<<<<<<<<<<<<<
+ * 
+ *         coro1 = _collect_async(obs_close, self.timeout)
+*/
+  __pyx_t_1 = ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_event_obs(__pyx_cur_scope->__pyx_v_self, __pyx_e_6bt_sdk_4core_6client_5mdapi_Rightment, __pyx_cur_scope->__pyx_v_body, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_obs_right = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":168
+ *         obs_right = self.get_event_obs(RpcTopic.Rightment, body)
+ * 
+ *         coro1 = _collect_async(obs_close, self.timeout)             # <<<<<<<<<<<<<<
+ *         coro2 = _collect_async(obs_adjust, self.timeout)
+ *         coro3 = _collect_async(obs_right, self.timeout)
+*/
+  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 168, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 168, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_3))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
+    assert(__pyx_t_2);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_obs_close, __pyx_t_4};
+    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 168, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_coro1 = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":169
+ * 
+ *         coro1 = _collect_async(obs_close, self.timeout)
+ *         coro2 = _collect_async(obs_adjust, self.timeout)             # <<<<<<<<<<<<<<
+ *         coro3 = _collect_async(obs_right, self.timeout)
+ *         res_close, res_adjust, res_right = await asyncio.gather(coro1, coro2, coro3)
+*/
+  __pyx_t_3 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
+    assert(__pyx_t_3);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
+    __Pyx_INCREF(__pyx_t_3);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_obs_adjust, __pyx_t_2};
+    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 169, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_coro2 = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":170
+ *         coro1 = _collect_async(obs_close, self.timeout)
+ *         coro2 = _collect_async(obs_adjust, self.timeout)
+ *         coro3 = _collect_async(obs_right, self.timeout)             # <<<<<<<<<<<<<<
+ *         res_close, res_adjust, res_right = await asyncio.gather(coro1, coro2, coro3)
+ * 
+*/
+  __pyx_t_4 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+    assert(__pyx_t_4);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_2);
+    __Pyx_INCREF(__pyx_t_4);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_2, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[3] = {__pyx_t_4, __pyx_cur_scope->__pyx_v_obs_right, __pyx_t_3};
+    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_2, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 170, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_coro3 = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":171
+ *         coro2 = _collect_async(obs_adjust, self.timeout)
+ *         coro3 = _collect_async(obs_right, self.timeout)
+ *         res_close, res_adjust, res_right = await asyncio.gather(coro1, coro2, coro3)             # <<<<<<<<<<<<<<
+ * 
+ *         close = _merge_tables(res_close)
+*/
+  __pyx_t_2 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 171, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_gather); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 171, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_4);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_4))) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_4);
+    assert(__pyx_t_2);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
+    __Pyx_INCREF(__pyx_t_2);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[4] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_coro1, __pyx_cur_scope->__pyx_v_coro2, __pyx_cur_scope->__pyx_v_coro3};
+    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (4-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+  }
+  __pyx_t_6 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (likely(__pyx_t_6 == PYGEN_NEXT)) {
+    __Pyx_GOTREF(__pyx_r);
+    __Pyx_XGIVEREF(__pyx_r);
+    __Pyx_RefNannyFinishContext();
+    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+    /* return from generator, awaiting value */
+    __pyx_generator->resume_label = 1;
+    return __pyx_r;
+    __pyx_L4_resume_from_await:;
+    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
+  } else if (likely(__pyx_t_6 == PYGEN_RETURN)) {
+    __Pyx_GOTREF(__pyx_r);
+    __pyx_t_1 = __pyx_r; __pyx_r = NULL;
+  } else {
+    __Pyx_XGOTREF(__pyx_r);
+    __PYX_ERR(0, 171, __pyx_L1_error)
+  }
+  if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
+    PyObject* sequence = __pyx_t_1;
+    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
+    if (unlikely(size != 3)) {
+      if (size > 3) __Pyx_RaiseTooManyValuesError(3);
+      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+      __PYX_ERR(0, 171, __pyx_L1_error)
+    }
+    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+    if (likely(PyTuple_CheckExact(sequence))) {
+      __pyx_t_4 = PyTuple_GET_ITEM(sequence, 0);
+      __Pyx_INCREF(__pyx_t_4);
+      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1);
+      __Pyx_INCREF(__pyx_t_2);
+      __pyx_t_3 = PyTuple_GET_ITEM(sequence, 2);
+      __Pyx_INCREF(__pyx_t_3);
+    } else {
+      __pyx_t_4 = __Pyx_PyList_GetItemRefFast(sequence, 0, __Pyx_ReferenceSharing_SharedReference);
+      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 171, __pyx_L1_error)
+      __Pyx_XGOTREF(__pyx_t_4);
+      __pyx_t_2 = __Pyx_PyList_GetItemRefFast(sequence, 1, __Pyx_ReferenceSharing_SharedReference);
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
+      __Pyx_XGOTREF(__pyx_t_2);
+      __pyx_t_3 = __Pyx_PyList_GetItemRefFast(sequence, 2, __Pyx_ReferenceSharing_SharedReference);
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 171, __pyx_L1_error)
+      __Pyx_XGOTREF(__pyx_t_3);
+    }
+    #else
+    __pyx_t_4 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_2 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    #endif
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  } else {
+    Py_ssize_t index = -1;
+    __pyx_t_7 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __pyx_t_8 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_7);
+    index = 0; __pyx_t_4 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_4)) goto __pyx_L5_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_4);
+    index = 1; __pyx_t_2 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_2)) goto __pyx_L5_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_2);
+    index = 2; __pyx_t_3 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_3)) goto __pyx_L5_unpacking_failed;
+    __Pyx_GOTREF(__pyx_t_3);
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 3) < (0)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __pyx_t_8 = NULL;
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    goto __pyx_L6_unpacking_done;
+    __pyx_L5_unpacking_failed:;
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_t_8 = NULL;
+    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+    __PYX_ERR(0, 171, __pyx_L1_error)
+    __pyx_L6_unpacking_done:;
+  }
+  __Pyx_GIVEREF(__pyx_t_4);
+  __pyx_cur_scope->__pyx_v_res_close = __pyx_t_4;
+  __pyx_t_4 = 0;
+  __Pyx_GIVEREF(__pyx_t_2);
+  __pyx_cur_scope->__pyx_v_res_adjust = __pyx_t_2;
+  __pyx_t_2 = 0;
+  __Pyx_GIVEREF(__pyx_t_3);
+  __pyx_cur_scope->__pyx_v_res_right = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":173
+ *         res_close, res_adjust, res_right = await asyncio.gather(coro1, coro2, coro3)
+ * 
+ *         close = _merge_tables(res_close)             # <<<<<<<<<<<<<<
+ *         adjust = _merge_tables(res_adjust)
+ *         right = _merge_tables(res_right)
+*/
+  __pyx_t_1 = __pyx_cur_scope->__pyx_v_res_close;
+  __Pyx_INCREF(__pyx_t_1);
+  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 173, __pyx_L1_error)
+  __pyx_t_3 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_GIVEREF(__pyx_t_3);
+  __pyx_cur_scope->__pyx_v_close = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":174
+ * 
+ *         close = _merge_tables(res_close)
+ *         adjust = _merge_tables(res_adjust)             # <<<<<<<<<<<<<<
+ *         right = _merge_tables(res_right)
+ * 
+*/
+  __pyx_t_3 = __pyx_cur_scope->__pyx_v_res_adjust;
+  __Pyx_INCREF(__pyx_t_3);
+  if (!(likely(PyList_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_3))) __PYX_ERR(0, 174, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_3)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  __Pyx_GIVEREF(__pyx_t_1);
+  __pyx_cur_scope->__pyx_v_adjust = __pyx_t_1;
+  __pyx_t_1 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":175
+ *         close = _merge_tables(res_close)
+ *         adjust = _merge_tables(res_adjust)
+ *         right = _merge_tables(res_right)             # <<<<<<<<<<<<<<
+ * 
+ *         factors = calc_factor(close, adjust, right)
+*/
+  __pyx_t_1 = __pyx_cur_scope->__pyx_v_res_right;
+  __Pyx_INCREF(__pyx_t_1);
+  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 175, __pyx_L1_error)
+  __pyx_t_3 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_3);
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __Pyx_GIVEREF(__pyx_t_3);
+  __pyx_cur_scope->__pyx_v_right = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":177
+ *         right = _merge_tables(res_right)
+ * 
+ *         factors = calc_factor(close, adjust, right)             # <<<<<<<<<<<<<<
+ *         return factors
+ * 
+*/
+  __pyx_t_1 = NULL;
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_calc_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 177, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_5 = 1;
+  #if CYTHON_UNPACK_METHODS
+  if (unlikely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
+    assert(__pyx_t_1);
+    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_2);
+    __Pyx_INCREF(__pyx_t_1);
+    __Pyx_INCREF(__pyx__function);
+    __Pyx_DECREF_SET(__pyx_t_2, __pyx__function);
+    __pyx_t_5 = 0;
+  }
+  #endif
+  {
+    PyObject *__pyx_callargs[4] = {__pyx_t_1, __pyx_cur_scope->__pyx_v_close, __pyx_cur_scope->__pyx_v_adjust, __pyx_cur_scope->__pyx_v_right};
+    __pyx_t_3 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_2, __pyx_callargs+__pyx_t_5, (4-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
+    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+  }
+  __Pyx_GIVEREF(__pyx_t_3);
+  __pyx_cur_scope->__pyx_v_factors = __pyx_t_3;
+  __pyx_t_3 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":178
+ * 
+ *         factors = calc_factor(close, adjust, right)
+ *         return factors             # <<<<<<<<<<<<<<
+ * 
+ * # --------------------------------------------------------------- Sync and Local --------------------------------------------------------
+*/
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_factors);
+  __pyx_r = __pyx_cur_scope->__pyx_v_factors;
+  goto __pyx_L0;
+  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
+
+  /* "bt_sdk/core/client/mdapi.pyx":163
+ *         return data
+ * 
+ *     async def get_factor_async(self, object body):             # <<<<<<<<<<<<<<
+ *         obs_close = self.get_close_obs(body)
+ *         obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)
+*/
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_7);
+  if (__Pyx_PyErr_Occurred()) {
+    __Pyx_Generator_Replace_StopIteration(0);
+    __Pyx_AddTraceback("get_factor_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  }
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  #if !CYTHON_USE_EXC_INFO_STACK
+  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
+  #endif
+  __pyx_generator->resume_label = -1;
+  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "bt_sdk/core/client/mdapi.pyx":182
+ * # --------------------------------------------------------------- Sync and Local --------------------------------------------------------
  * 
  *     cpdef object get_calendar(self):             # <<<<<<<<<<<<<<
  *         coroutine = self.get_calendar_async()
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
 */
 
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_calendar(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_23get_calendar(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -7902,9 +9795,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_calendar(struct
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_calendar); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_calendar); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_calendar)) {
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_23get_calendar)) {
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
@@ -7926,7 +9819,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_calendar(struct
           __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 116, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 182, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_r = __pyx_t_2;
@@ -7947,7 +9840,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_calendar(struct
     #endif
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":117
+  /* "bt_sdk/core/client/mdapi.pyx":183
  * 
  *     cpdef object get_calendar(self):
  *         coroutine = self.get_calendar_async()             # <<<<<<<<<<<<<<
@@ -7961,13 +9854,13 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_calendar(struct
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_get_calendar_async, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_coroutine = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":118
+  /* "bt_sdk/core/client/mdapi.pyx":184
  *     cpdef object get_calendar(self):
  *         coroutine = self.get_calendar_async()
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)             # <<<<<<<<<<<<<<
@@ -7975,9 +9868,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_calendar(struct
  * 
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 118, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 184, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_run_coroutine_threadsafe); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 118, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_run_coroutine_threadsafe); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 184, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_5 = 1;
@@ -7994,26 +9887,26 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_calendar(struct
   #endif
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 118, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_coro, __pyx_v_coroutine, __pyx_t_4, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 118, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_loop, __pyx_v_self->loop, __pyx_t_4, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 118, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_coro, __pyx_v_coroutine, __pyx_t_4, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 184, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_loop, __pyx_v_self->loop, __pyx_t_4, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 184, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 184, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_future = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":119
+  /* "bt_sdk/core/client/mdapi.pyx":185
  *         coroutine = self.get_calendar_async()
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
  *         return future.result()             # <<<<<<<<<<<<<<
  * 
- *     async def get_instrument_async(self):
+ *     cpdef object get_instrument(self):
 */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_3 = __pyx_v_future;
@@ -8023,15 +9916,15 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_calendar(struct
     PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_result, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 119, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":116
- *         return data
+  /* "bt_sdk/core/client/mdapi.pyx":182
+ * # --------------------------------------------------------------- Sync and Local --------------------------------------------------------
  * 
  *     cpdef object get_calendar(self):             # <<<<<<<<<<<<<<
  *         coroutine = self.get_calendar_async()
@@ -8055,15 +9948,15 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_calendar(struct
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_calendar(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_23get_calendar(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_calendar = {"get_calendar", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_calendar, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_calendar(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_23get_calendar = {"get_calendar", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_23get_calendar, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_23get_calendar(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -8089,14 +9982,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("get_calendar", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_7get_calendar(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self));
+  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_22get_calendar(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_7get_calendar(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self) {
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_22get_calendar(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -8105,7 +9998,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_7get_calendar(stru
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_calendar", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_calendar(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_calendar(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -8121,325 +10014,16 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_7get_calendar(stru
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_11generator2(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "bt_sdk/core/client/mdapi.pyx":121
+/* "bt_sdk/core/client/mdapi.pyx":187
  *         return future.result()
- * 
- *     async def get_instrument_async(self):             # <<<<<<<<<<<<<<
- *         """
- *             request instruments
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_10get_instrument_async(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-PyDoc_STRVAR(__pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_9get_instrument_async, "\n            request instruments\n        ");
-static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_10get_instrument_async = {"get_instrument_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_10get_instrument_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_9get_instrument_async};
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_10get_instrument_async(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_instrument_async (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  if (unlikely(__pyx_nargs > 0)) { __Pyx_RaiseArgtupleInvalid("get_instrument_async", 1, 0, 0, __pyx_nargs); return NULL; }
-  const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-  if (unlikely(__pyx_kwds_len < 0)) return NULL;
-  if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("get_instrument_async", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_9get_instrument_async(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self));
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_9get_instrument_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self) {
-  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async *__pyx_cur_scope;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("get_instrument_async", 0);
-  __pyx_cur_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async *)__pyx_tp_new_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async, __pyx_mstate_global->__pyx_empty_tuple, NULL);
-  if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async *)Py_None);
-    __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 121, __pyx_L1_error)
-  } else {
-    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
-  }
-  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
-  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_11generator2, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_instrument_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_instrument_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 121, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_cur_scope);
-    __Pyx_RefNannyFinishContext();
-    return (PyObject *) gen;
-  }
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_instrument_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_11generator2(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
-{
-  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async *__pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async *)__pyx_generator->closure);
-  PyObject *__pyx_r = NULL;
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  size_t __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
-  __Pyx_PySendResult __pyx_t_7;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_instrument_async", 0);
-  switch (__pyx_generator->resume_label) {
-    case 0: goto __pyx_L3_first_run;
-    case 1: goto __pyx_L4_resume_from_await;
-    default: /* CPython raises the right error here */
-    __Pyx_RefNannyFinishContext();
-    return NULL;
-  }
-  __pyx_L3_first_run:;
-  if (unlikely(__pyx_sent_value != Py_None)) {
-    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 121, __pyx_L1_error)
-  }
-
-  /* "bt_sdk/core/client/mdapi.pyx":125
- *             request instruments
- *         """
- *         cdef bytes req_id = fast_uuid4_bytes()             # <<<<<<<<<<<<<<
- *         cdef object event = Event(topic=RpcTopic.Instrument)
- * 
-*/
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 125, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_req_id = ((PyObject*)__pyx_t_1);
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":126
- *         """
- *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic=RpcTopic.Instrument)             # <<<<<<<<<<<<<<
- * 
- *         obs = self.async_client.run(req_id, event)
-*/
-  __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 126, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_Enum_6a1f7d__6bt_sdk_4core_6client_5mdapi_enum__dunderpyx_t__etc_to_py(__pyx_e_6bt_sdk_4core_6client_5mdapi_Instrument); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 126, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    assert(__pyx_t_2);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
-    __Pyx_INCREF(__pyx_t_2);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
-    __pyx_t_5 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 1 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 126, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_4, __pyx_t_6, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 126, __pyx_L1_error)
-    __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 126, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_event = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":128
- *         cdef object event = Event(topic=RpcTopic.Instrument)
- * 
- *         obs = self.async_client.run(req_id, event)             # <<<<<<<<<<<<<<
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)
-*/
-  __pyx_t_3 = __pyx_cur_scope->__pyx_v_self->async_client;
-  __Pyx_INCREF(__pyx_t_3);
-  __pyx_t_5 = 0;
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_req_id, __pyx_cur_scope->__pyx_v_event};
-    __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_run, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 128, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_obs = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":129
- * 
- *         obs = self.async_client.run(req_id, event)
- *         tables = await _collect_async(obs, self.timeout)             # <<<<<<<<<<<<<<
- *         data = _merge_tables(tables)
- *         return data
-*/
-  __pyx_t_3 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 129, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 129, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_6))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_6);
-    assert(__pyx_t_3);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_6);
-    __Pyx_INCREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_6, __pyx__function);
-    __pyx_t_5 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_obs, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_6, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 129, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __pyx_t_7 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (likely(__pyx_t_7 == PYGEN_NEXT)) {
-    __Pyx_GOTREF(__pyx_r);
-    __Pyx_XGIVEREF(__pyx_r);
-    __Pyx_RefNannyFinishContext();
-    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-    /* return from generator, awaiting value */
-    __pyx_generator->resume_label = 1;
-    return __pyx_r;
-    __pyx_L4_resume_from_await:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 129, __pyx_L1_error)
-    __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
-  } else if (likely(__pyx_t_7 == PYGEN_RETURN)) {
-    __Pyx_GOTREF(__pyx_r);
-    __pyx_t_1 = __pyx_r; __pyx_r = NULL;
-  } else {
-    __Pyx_XGOTREF(__pyx_r);
-    __PYX_ERR(0, 129, __pyx_L1_error)
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_tables = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":130
- *         obs = self.async_client.run(req_id, event)
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)             # <<<<<<<<<<<<<<
- *         return data
- * 
-*/
-  __pyx_t_1 = __pyx_cur_scope->__pyx_v_tables;
-  __Pyx_INCREF(__pyx_t_1);
-  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 130, __pyx_L1_error)
-  __pyx_t_6 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 130, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_GIVEREF(__pyx_t_6);
-  __pyx_cur_scope->__pyx_v_data = __pyx_t_6;
-  __pyx_t_6 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":131
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)
- *         return data             # <<<<<<<<<<<<<<
- * 
- *     cpdef object get_instrument(self):
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_data);
-  __pyx_r = __pyx_cur_scope->__pyx_v_data;
-  goto __pyx_L0;
-  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
-
-  /* "bt_sdk/core/client/mdapi.pyx":121
- *         return future.result()
- * 
- *     async def get_instrument_async(self):             # <<<<<<<<<<<<<<
- *         """
- *             request instruments
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_6);
-  if (__Pyx_PyErr_Occurred()) {
-    __Pyx_Generator_Replace_StopIteration(0);
-    __Pyx_AddTraceback("get_instrument_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  }
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  #if !CYTHON_USE_EXC_INFO_STACK
-  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-  #endif
-  __pyx_generator->resume_label = -1;
-  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "bt_sdk/core/client/mdapi.pyx":133
- *         return data
  * 
  *     cpdef object get_instrument(self):             # <<<<<<<<<<<<<<
  *         coroutine = self.get_instrument_async()
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
 */
 
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_13get_instrument(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_25get_instrument(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -8476,9 +10060,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_instrument(stru
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_instrument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_instrument); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_13get_instrument)) {
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_25get_instrument)) {
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
@@ -8500,7 +10084,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_instrument(stru
           __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 133, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 187, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_r = __pyx_t_2;
@@ -8521,7 +10105,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_instrument(stru
     #endif
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":134
+  /* "bt_sdk/core/client/mdapi.pyx":188
  * 
  *     cpdef object get_instrument(self):
  *         coroutine = self.get_instrument_async()             # <<<<<<<<<<<<<<
@@ -8535,13 +10119,13 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_instrument(stru
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_get_instrument_async, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 134, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_coroutine = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":135
+  /* "bt_sdk/core/client/mdapi.pyx":189
  *     cpdef object get_instrument(self):
  *         coroutine = self.get_instrument_async()
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)             # <<<<<<<<<<<<<<
@@ -8549,9 +10133,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_instrument(stru
  * 
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 189, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_run_coroutine_threadsafe); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_run_coroutine_threadsafe); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 189, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_5 = 1;
@@ -8568,26 +10152,26 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_instrument(stru
   #endif
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 135, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 189, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_coro, __pyx_v_coroutine, __pyx_t_4, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 135, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_loop, __pyx_v_self->loop, __pyx_t_4, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_coro, __pyx_v_coroutine, __pyx_t_4, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 189, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_loop, __pyx_v_self->loop, __pyx_t_4, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 189, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 135, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_future = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":136
+  /* "bt_sdk/core/client/mdapi.pyx":190
  *         coroutine = self.get_instrument_async()
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
  *         return future.result()             # <<<<<<<<<<<<<<
  * 
- *     async def get_benchmark_async(self, object body):
+ *     cpdef object get_benchmark(self, object body):
 */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_3 = __pyx_v_future;
@@ -8597,15 +10181,15 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_instrument(stru
     PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_result, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 136, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":133
- *         return data
+  /* "bt_sdk/core/client/mdapi.pyx":187
+ *         return future.result()
  * 
  *     cpdef object get_instrument(self):             # <<<<<<<<<<<<<<
  *         coroutine = self.get_instrument_async()
@@ -8629,15 +10213,15 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_instrument(stru
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_13get_instrument(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_25get_instrument(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_13get_instrument = {"get_instrument", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_13get_instrument, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_13get_instrument(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_25get_instrument = {"get_instrument", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_25get_instrument, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_25get_instrument(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -8663,14 +10247,14 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   const Py_ssize_t __pyx_kwds_len = unlikely(__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
   if (unlikely(__pyx_kwds_len < 0)) return NULL;
   if (unlikely(__pyx_kwds_len > 0)) {__Pyx_RejectKeywords("get_instrument", __pyx_kwds); return NULL;}
-  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_12get_instrument(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self));
+  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_24get_instrument(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_12get_instrument(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self) {
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_24get_instrument(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -8679,7 +10263,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_12get_instrument(s
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_instrument", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_instrument(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_instrument(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -8695,371 +10279,16 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_12get_instrument(s
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_16generator3(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "bt_sdk/core/client/mdapi.pyx":138
+/* "bt_sdk/core/client/mdapi.pyx":192
  *         return future.result()
- * 
- *     async def get_benchmark_async(self, object body):             # <<<<<<<<<<<<<<
- *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic=RpcTopic.Index, body=body)
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_15get_benchmark_async(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_15get_benchmark_async = {"get_benchmark_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_15get_benchmark_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_15get_benchmark_async(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_body = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[1] = {0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_benchmark_async (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_body,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 138, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 138, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_benchmark_async", 0) < (0)) __PYX_ERR(0, 138, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_benchmark_async", 1, 1, 1, i); __PYX_ERR(0, 138, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 1)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 138, __pyx_L3_error)
-    }
-    __pyx_v_body = values[0];
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_benchmark_async", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 138, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_benchmark_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_14get_benchmark_async(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_14get_benchmark_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
-  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async *__pyx_cur_scope;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("get_benchmark_async", 0);
-  __pyx_cur_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async *)__pyx_tp_new_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async, __pyx_mstate_global->__pyx_empty_tuple, NULL);
-  if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async *)Py_None);
-    __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 138, __pyx_L1_error)
-  } else {
-    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
-  }
-  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
-  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __pyx_cur_scope->__pyx_v_body = __pyx_v_body;
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_body);
-  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_body);
-  {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_16generator3, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_benchmark_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_benchmark_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 138, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_cur_scope);
-    __Pyx_RefNannyFinishContext();
-    return (PyObject *) gen;
-  }
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_benchmark_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_16generator3(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
-{
-  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async *__pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async *)__pyx_generator->closure);
-  PyObject *__pyx_r = NULL;
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  size_t __pyx_t_5;
-  PyObject *__pyx_t_6 = NULL;
-  __Pyx_PySendResult __pyx_t_7;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_benchmark_async", 0);
-  switch (__pyx_generator->resume_label) {
-    case 0: goto __pyx_L3_first_run;
-    case 1: goto __pyx_L4_resume_from_await;
-    default: /* CPython raises the right error here */
-    __Pyx_RefNannyFinishContext();
-    return NULL;
-  }
-  __pyx_L3_first_run:;
-  if (unlikely(__pyx_sent_value != Py_None)) {
-    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 138, __pyx_L1_error)
-  }
-
-  /* "bt_sdk/core/client/mdapi.pyx":139
- * 
- *     async def get_benchmark_async(self, object body):
- *         cdef bytes req_id = fast_uuid4_bytes()             # <<<<<<<<<<<<<<
- *         cdef object event = Event(topic=RpcTopic.Index, body=body)
- * 
-*/
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_req_id = ((PyObject*)__pyx_t_1);
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":140
- *     async def get_benchmark_async(self, object body):
- *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic=RpcTopic.Index, body=body)             # <<<<<<<<<<<<<<
- * 
- *         obs = self.async_client.run(req_id, event)
-*/
-  __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_Enum_6a1f7d__6bt_sdk_4core_6client_5mdapi_enum__dunderpyx_t__etc_to_py(__pyx_e_6bt_sdk_4core_6client_5mdapi_Index); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 140, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    assert(__pyx_t_2);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
-    __Pyx_INCREF(__pyx_t_2);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
-    __pyx_t_5 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 140, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_6);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_4, __pyx_t_6, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 140, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_body, __pyx_cur_scope->__pyx_v_body, __pyx_t_6, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 140, __pyx_L1_error)
-    __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_event = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":142
- *         cdef object event = Event(topic=RpcTopic.Index, body=body)
- * 
- *         obs = self.async_client.run(req_id, event)             # <<<<<<<<<<<<<<
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)
-*/
-  __pyx_t_3 = __pyx_cur_scope->__pyx_v_self->async_client;
-  __Pyx_INCREF(__pyx_t_3);
-  __pyx_t_5 = 0;
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_req_id, __pyx_cur_scope->__pyx_v_event};
-    __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_run, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_obs = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":143
- * 
- *         obs = self.async_client.run(req_id, event)
- *         tables = await _collect_async(obs, self.timeout)             # <<<<<<<<<<<<<<
- *         data = _merge_tables(tables)
- *         return data
-*/
-  __pyx_t_3 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 143, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 143, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_6))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_6);
-    assert(__pyx_t_3);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_6);
-    __Pyx_INCREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_6, __pyx__function);
-    __pyx_t_5 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_obs, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_6, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 143, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __pyx_t_7 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (likely(__pyx_t_7 == PYGEN_NEXT)) {
-    __Pyx_GOTREF(__pyx_r);
-    __Pyx_XGIVEREF(__pyx_r);
-    __Pyx_RefNannyFinishContext();
-    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-    /* return from generator, awaiting value */
-    __pyx_generator->resume_label = 1;
-    return __pyx_r;
-    __pyx_L4_resume_from_await:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 143, __pyx_L1_error)
-    __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
-  } else if (likely(__pyx_t_7 == PYGEN_RETURN)) {
-    __Pyx_GOTREF(__pyx_r);
-    __pyx_t_1 = __pyx_r; __pyx_r = NULL;
-  } else {
-    __Pyx_XGOTREF(__pyx_r);
-    __PYX_ERR(0, 143, __pyx_L1_error)
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_tables = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":144
- *         obs = self.async_client.run(req_id, event)
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)             # <<<<<<<<<<<<<<
- *         return data
- * 
-*/
-  __pyx_t_1 = __pyx_cur_scope->__pyx_v_tables;
-  __Pyx_INCREF(__pyx_t_1);
-  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 144, __pyx_L1_error)
-  __pyx_t_6 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 144, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_6);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_GIVEREF(__pyx_t_6);
-  __pyx_cur_scope->__pyx_v_data = __pyx_t_6;
-  __pyx_t_6 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":145
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)
- *         return data             # <<<<<<<<<<<<<<
- * 
- *     cpdef object get_benchmark(self, object body):
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_data);
-  __pyx_r = __pyx_cur_scope->__pyx_v_data;
-  goto __pyx_L0;
-  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
-
-  /* "bt_sdk/core/client/mdapi.pyx":138
- *         return future.result()
- * 
- *     async def get_benchmark_async(self, object body):             # <<<<<<<<<<<<<<
- *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic=RpcTopic.Index, body=body)
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_6);
-  if (__Pyx_PyErr_Occurred()) {
-    __Pyx_Generator_Replace_StopIteration(0);
-    __Pyx_AddTraceback("get_benchmark_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  }
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  #if !CYTHON_USE_EXC_INFO_STACK
-  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-  #endif
-  __pyx_generator->resume_label = -1;
-  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "bt_sdk/core/client/mdapi.pyx":147
- *         return data
  * 
  *     cpdef object get_benchmark(self, object body):             # <<<<<<<<<<<<<<
  *         coroutine = self.get_benchmark_async(body)
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
 */
 
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_18get_benchmark(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_benchmark(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -9096,9 +10325,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_benchmark(struc
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_benchmark); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_benchmark); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 192, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_18get_benchmark)) {
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_benchmark)) {
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
@@ -9120,7 +10349,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_benchmark(struc
           __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 147, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 192, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_r = __pyx_t_2;
@@ -9141,7 +10370,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_benchmark(struc
     #endif
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":148
+  /* "bt_sdk/core/client/mdapi.pyx":193
  * 
  *     cpdef object get_benchmark(self, object body):
  *         coroutine = self.get_benchmark_async(body)             # <<<<<<<<<<<<<<
@@ -9155,13 +10384,13 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_benchmark(struc
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_body};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_get_benchmark_async, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 148, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 193, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_coroutine = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":149
+  /* "bt_sdk/core/client/mdapi.pyx":194
  *     cpdef object get_benchmark(self, object body):
  *         coroutine = self.get_benchmark_async(body)
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)             # <<<<<<<<<<<<<<
@@ -9169,9 +10398,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_benchmark(struc
  * 
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 194, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_run_coroutine_threadsafe); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 149, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_run_coroutine_threadsafe); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 194, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_5 = 1;
@@ -9188,21 +10417,21 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_benchmark(struc
   #endif
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 149, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 194, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_coro, __pyx_v_coroutine, __pyx_t_4, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 149, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_loop, __pyx_v_self->loop, __pyx_t_4, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 149, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_coro, __pyx_v_coroutine, __pyx_t_4, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 194, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_loop, __pyx_v_self->loop, __pyx_t_4, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 194, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 149, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_future = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":150
+  /* "bt_sdk/core/client/mdapi.pyx":195
  *         coroutine = self.get_benchmark_async(body)
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
  *         return future.result()             # <<<<<<<<<<<<<<
@@ -9217,15 +10446,15 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_benchmark(struc
     PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_result, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 150, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 195, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":147
- *         return data
+  /* "bt_sdk/core/client/mdapi.pyx":192
+ *         return future.result()
  * 
  *     cpdef object get_benchmark(self, object body):             # <<<<<<<<<<<<<<
  *         coroutine = self.get_benchmark_async(body)
@@ -9249,15 +10478,15 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_benchmark(struc
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_18get_benchmark(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_benchmark(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_18get_benchmark = {"get_benchmark", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_18get_benchmark, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_18get_benchmark(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_benchmark = {"get_benchmark", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_benchmark, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_benchmark(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -9287,32 +10516,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_body,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 147, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 192, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 147, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 192, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_benchmark", 0) < (0)) __PYX_ERR(0, 147, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_benchmark", 0) < (0)) __PYX_ERR(0, 192, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_benchmark", 1, 1, 1, i); __PYX_ERR(0, 147, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_benchmark", 1, 1, 1, i); __PYX_ERR(0, 192, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 147, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 192, __pyx_L3_error)
     }
     __pyx_v_body = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_benchmark", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 147, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("get_benchmark", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 192, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9323,7 +10552,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_benchmark(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
+  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_26get_benchmark(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -9333,7 +10562,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_benchmark(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_26get_benchmark(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9342,7 +10571,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_benchmark(st
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_benchmark", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_benchmark(__pyx_v_self, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_benchmark(__pyx_v_self, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 192, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9359,7 +10588,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_benchmark(st
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":152
+/* "bt_sdk/core/client/mdapi.pyx":197
  *         return future.result()
  * 
  *     cpdef object subscribe(self, object body):             # <<<<<<<<<<<<<<
@@ -9367,7 +10596,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_benchmark(st
  *         cdef object event = Event(topic=RpcTopic.Tick, body=body)
 */
 
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_20subscribe(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_29subscribe(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -9406,9 +10635,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_subscribe(struct __
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_subscribe); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_subscribe); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_20subscribe)) {
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_29subscribe)) {
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
@@ -9430,7 +10659,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_subscribe(struct __
           __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 197, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_r = __pyx_t_2;
@@ -9451,19 +10680,19 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_subscribe(struct __
     #endif
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":153
+  /* "bt_sdk/core/client/mdapi.pyx":198
  * 
  *     cpdef object subscribe(self, object body):
  *         cdef bytes req_id = fast_uuid4_bytes()             # <<<<<<<<<<<<<<
  *         cdef object event = Event(topic=RpcTopic.Tick, body=body)
  * 
 */
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_req_id = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":154
+  /* "bt_sdk/core/client/mdapi.pyx":199
  *     cpdef object subscribe(self, object body):
  *         cdef bytes req_id = fast_uuid4_bytes()
  *         cdef object event = Event(topic=RpcTopic.Tick, body=body)             # <<<<<<<<<<<<<<
@@ -9471,9 +10700,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_subscribe(struct __
  *         obs = self.async_client.run(req_id, event)
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_Enum_6a1f7d__6bt_sdk_4core_6client_5mdapi_enum__dunderpyx_t__etc_to_py(__pyx_e_6bt_sdk_4core_6client_5mdapi_Tick); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 154, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_Enum_6a1f7d__6bt_sdk_4core_6client_5mdapi_enum__dunderpyx_t__etc_to_py(__pyx_e_6bt_sdk_4core_6client_5mdapi_Tick); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 199, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_5 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -9489,22 +10718,22 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_subscribe(struct __
   #endif
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 199, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_3, __pyx_t_6, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 154, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_body, __pyx_v_body, __pyx_t_6, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 154, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_3, __pyx_t_6, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 199, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_body, __pyx_v_body, __pyx_t_6, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 199, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_event = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":156
+  /* "bt_sdk/core/client/mdapi.pyx":201
  *         cdef object event = Event(topic=RpcTopic.Tick, body=body)
  * 
  *         obs = self.async_client.run(req_id, event)             # <<<<<<<<<<<<<<
@@ -9518,13 +10747,13 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_subscribe(struct __
     PyObject *__pyx_callargs[3] = {__pyx_t_4, __pyx_v_req_id, __pyx_v_event};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_run, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 156, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_obs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":157
+  /* "bt_sdk/core/client/mdapi.pyx":202
  * 
  *         obs = self.async_client.run(req_id, event)
  *         return obs             # <<<<<<<<<<<<<<
@@ -9536,7 +10765,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_subscribe(struct __
   __pyx_r = __pyx_v_obs;
   goto __pyx_L0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":152
+  /* "bt_sdk/core/client/mdapi.pyx":197
  *         return future.result()
  * 
  *     cpdef object subscribe(self, object body):             # <<<<<<<<<<<<<<
@@ -9563,15 +10792,15 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_subscribe(struct __
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_20subscribe(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_29subscribe(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_20subscribe = {"subscribe", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_20subscribe, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_20subscribe(PyObject *__pyx_v_self, 
+static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_29subscribe = {"subscribe", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_29subscribe, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_29subscribe(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -9601,32 +10830,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_body,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 152, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 197, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 152, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 197, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "subscribe", 0) < (0)) __PYX_ERR(0, 152, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "subscribe", 0) < (0)) __PYX_ERR(0, 197, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("subscribe", 1, 1, 1, i); __PYX_ERR(0, 152, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("subscribe", 1, 1, 1, i); __PYX_ERR(0, 197, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 152, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 197, __pyx_L3_error)
     }
     __pyx_v_body = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("subscribe", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 152, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("subscribe", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 197, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9637,7 +10866,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_19subscribe(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
+  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_28subscribe(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -9647,7 +10876,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_19subscribe(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_28subscribe(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9656,7 +10885,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_19subscribe(struct
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("subscribe", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_subscribe(__pyx_v_self, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_subscribe(__pyx_v_self, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9673,7 +10902,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_19subscribe(struct
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":159
+/* "bt_sdk/core/client/mdapi.pyx":204
  *         return obs
  * 
  *     cpdef object get_close_obs(self, object body):             # <<<<<<<<<<<<<<
@@ -9681,7 +10910,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_19subscribe(struct
  *             request instruments
 */
 
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_22get_close_obs(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_31get_close_obs(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -9720,9 +10949,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_close_obs(struc
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_close_obs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_close_obs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_22get_close_obs)) {
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_31get_close_obs)) {
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
@@ -9744,7 +10973,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_close_obs(struc
           __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 204, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_r = __pyx_t_2;
@@ -9765,19 +10994,19 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_close_obs(struc
     #endif
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":163
+  /* "bt_sdk/core/client/mdapi.pyx":208
  *             request instruments
  *         """
  *         cdef bytes req_id = fast_uuid4_bytes()             # <<<<<<<<<<<<<<
  *         cdef object event = Event(topic=RpcTopic.Close, body=body)
  * 
 */
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 163, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_req_id = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":164
+  /* "bt_sdk/core/client/mdapi.pyx":209
  *         """
  *         cdef bytes req_id = fast_uuid4_bytes()
  *         cdef object event = Event(topic=RpcTopic.Close, body=body)             # <<<<<<<<<<<<<<
@@ -9785,9 +11014,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_close_obs(struc
  *         obs = self.async_client.run(req_id, event)
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_Enum_6a1f7d__6bt_sdk_4core_6client_5mdapi_enum__dunderpyx_t__etc_to_py(__pyx_e_6bt_sdk_4core_6client_5mdapi_Close); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_Enum_6a1f7d__6bt_sdk_4core_6client_5mdapi_enum__dunderpyx_t__etc_to_py(__pyx_e_6bt_sdk_4core_6client_5mdapi_Close); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 209, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_5 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -9803,22 +11032,22 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_close_obs(struc
   #endif
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 209, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_3, __pyx_t_6, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 164, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_body, __pyx_v_body, __pyx_t_6, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 164, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_3, __pyx_t_6, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 209, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_body, __pyx_v_body, __pyx_t_6, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 209, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_6);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_event = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":166
+  /* "bt_sdk/core/client/mdapi.pyx":211
  *         cdef object event = Event(topic=RpcTopic.Close, body=body)
  * 
  *         obs = self.async_client.run(req_id, event)             # <<<<<<<<<<<<<<
@@ -9832,25 +11061,25 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_close_obs(struc
     PyObject *__pyx_callargs[3] = {__pyx_t_4, __pyx_v_req_id, __pyx_v_event};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_run, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_obs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":167
+  /* "bt_sdk/core/client/mdapi.pyx":212
  * 
  *         obs = self.async_client.run(req_id, event)
  *         return obs             # <<<<<<<<<<<<<<
  * 
- *     async def get_close_async(self, object body):
+ *     cpdef object get_event_obs(self, int topic, object body):
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_obs);
   __pyx_r = __pyx_v_obs;
   goto __pyx_L0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":159
+  /* "bt_sdk/core/client/mdapi.pyx":204
  *         return obs
  * 
  *     cpdef object get_close_obs(self, object body):             # <<<<<<<<<<<<<<
@@ -9877,16 +11106,16 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_close_obs(struc
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_22get_close_obs(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_31get_close_obs(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_21get_close_obs, "\n            request instruments\n        ");
-static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_22get_close_obs = {"get_close_obs", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_22get_close_obs, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_21get_close_obs};
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_22get_close_obs(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_30get_close_obs, "\n            request instruments\n        ");
+static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_31get_close_obs = {"get_close_obs", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_31get_close_obs, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_30get_close_obs};
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_31get_close_obs(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -9916,32 +11145,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_body,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 159, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 204, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 159, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 204, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_close_obs", 0) < (0)) __PYX_ERR(0, 159, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_close_obs", 0) < (0)) __PYX_ERR(0, 204, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_close_obs", 1, 1, 1, i); __PYX_ERR(0, 159, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_close_obs", 1, 1, 1, i); __PYX_ERR(0, 204, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 159, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 204, __pyx_L3_error)
     }
     __pyx_v_body = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_close_obs", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 159, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("get_close_obs", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 204, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -9952,7 +11181,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_21get_close_obs(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
+  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_30get_close_obs(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -9962,7 +11191,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_21get_close_obs(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_30get_close_obs(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -9971,7 +11200,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_21get_close_obs(st
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_close_obs", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_close_obs(__pyx_v_self, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_close_obs(__pyx_v_self, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9987,306 +11216,16 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_21get_close_obs(st
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_25generator4(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "bt_sdk/core/client/mdapi.pyx":169
+/* "bt_sdk/core/client/mdapi.pyx":214
  *         return obs
- * 
- *     async def get_close_async(self, object body):             # <<<<<<<<<<<<<<
- *         obs = self.get_close_obs(body)
- *         tables = await _collect_async(obs, self.timeout)
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_24get_close_async(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_24get_close_async = {"get_close_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_24get_close_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_24get_close_async(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_body = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[1] = {0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_close_async (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_body,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 169, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 169, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_close_async", 0) < (0)) __PYX_ERR(0, 169, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_close_async", 1, 1, 1, i); __PYX_ERR(0, 169, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 1)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 169, __pyx_L3_error)
-    }
-    __pyx_v_body = values[0];
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_close_async", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 169, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_close_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_23get_close_async(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_23get_close_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
-  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async *__pyx_cur_scope;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("get_close_async", 0);
-  __pyx_cur_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async *)__pyx_tp_new_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async, __pyx_mstate_global->__pyx_empty_tuple, NULL);
-  if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async *)Py_None);
-    __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 169, __pyx_L1_error)
-  } else {
-    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
-  }
-  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
-  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __pyx_cur_scope->__pyx_v_body = __pyx_v_body;
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_body);
-  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_body);
-  {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_25generator4, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_close_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_close_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 169, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_cur_scope);
-    __Pyx_RefNannyFinishContext();
-    return (PyObject *) gen;
-  }
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_close_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_25generator4(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
-{
-  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async *__pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async *)__pyx_generator->closure);
-  PyObject *__pyx_r = NULL;
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  size_t __pyx_t_5;
-  __Pyx_PySendResult __pyx_t_6;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_close_async", 0);
-  switch (__pyx_generator->resume_label) {
-    case 0: goto __pyx_L3_first_run;
-    case 1: goto __pyx_L4_resume_from_await;
-    default: /* CPython raises the right error here */
-    __Pyx_RefNannyFinishContext();
-    return NULL;
-  }
-  __pyx_L3_first_run:;
-  if (unlikely(__pyx_sent_value != Py_None)) {
-    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 169, __pyx_L1_error)
-  }
-
-  /* "bt_sdk/core/client/mdapi.pyx":170
- * 
- *     async def get_close_async(self, object body):
- *         obs = self.get_close_obs(body)             # <<<<<<<<<<<<<<
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)
-*/
-  __pyx_t_1 = ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_close_obs(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_body, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 170, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_obs = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":171
- *     async def get_close_async(self, object body):
- *         obs = self.get_close_obs(body)
- *         tables = await _collect_async(obs, self.timeout)             # <<<<<<<<<<<<<<
- *         data = _merge_tables(tables)
- *         return data
-*/
-  __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 171, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 171, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    assert(__pyx_t_2);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
-    __Pyx_INCREF(__pyx_t_2);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
-    __pyx_t_5 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_obs, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 171, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __pyx_t_6 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (likely(__pyx_t_6 == PYGEN_NEXT)) {
-    __Pyx_GOTREF(__pyx_r);
-    __Pyx_XGIVEREF(__pyx_r);
-    __Pyx_RefNannyFinishContext();
-    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-    /* return from generator, awaiting value */
-    __pyx_generator->resume_label = 1;
-    return __pyx_r;
-    __pyx_L4_resume_from_await:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 171, __pyx_L1_error)
-    __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
-  } else if (likely(__pyx_t_6 == PYGEN_RETURN)) {
-    __Pyx_GOTREF(__pyx_r);
-    __pyx_t_1 = __pyx_r; __pyx_r = NULL;
-  } else {
-    __Pyx_XGOTREF(__pyx_r);
-    __PYX_ERR(0, 171, __pyx_L1_error)
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_tables = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":172
- *         obs = self.get_close_obs(body)
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)             # <<<<<<<<<<<<<<
- *         return data
- * 
-*/
-  __pyx_t_1 = __pyx_cur_scope->__pyx_v_tables;
-  __Pyx_INCREF(__pyx_t_1);
-  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 172, __pyx_L1_error)
-  __pyx_t_3 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 172, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_GIVEREF(__pyx_t_3);
-  __pyx_cur_scope->__pyx_v_data = __pyx_t_3;
-  __pyx_t_3 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":173
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)
- *         return data             # <<<<<<<<<<<<<<
- * 
- *     cpdef object get_event_obs(self, int topic, object body):
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_data);
-  __pyx_r = __pyx_cur_scope->__pyx_v_data;
-  goto __pyx_L0;
-  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
-
-  /* "bt_sdk/core/client/mdapi.pyx":169
- *         return obs
- * 
- *     async def get_close_async(self, object body):             # <<<<<<<<<<<<<<
- *         obs = self.get_close_obs(body)
- *         tables = await _collect_async(obs, self.timeout)
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  if (__Pyx_PyErr_Occurred()) {
-    __Pyx_Generator_Replace_StopIteration(0);
-    __Pyx_AddTraceback("get_close_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  }
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  #if !CYTHON_USE_EXC_INFO_STACK
-  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-  #endif
-  __pyx_generator->resume_label = -1;
-  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "bt_sdk/core/client/mdapi.pyx":175
- *         return data
  * 
  *     cpdef object get_event_obs(self, int topic, object body):             # <<<<<<<<<<<<<<
  *         """
  *             request instruments
 */
 
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_event_obs(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_33get_event_obs(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -10325,14 +11264,14 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_event_obs(struc
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_event_obs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 175, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_event_obs); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 214, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_event_obs)) {
+      if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_33get_event_obs)) {
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_3 = NULL;
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; 
-        __pyx_t_5 = __Pyx_PyLong_From_int(__pyx_v_topic); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 175, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyLong_From_int(__pyx_v_topic); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 214, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __pyx_t_6 = 1;
         #if CYTHON_UNPACK_METHODS
@@ -10352,7 +11291,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_event_obs(struc
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 175, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 214, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_r = __pyx_t_2;
@@ -10373,19 +11312,19 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_event_obs(struc
     #endif
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":179
+  /* "bt_sdk/core/client/mdapi.pyx":218
  *             request instruments
  *         """
  *         cdef bytes req_id = fast_uuid4_bytes()             # <<<<<<<<<<<<<<
  *         cdef object event = Event(topic=topic, body=body)
  * 
 */
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_4util_fast_uuid4_bytes(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_req_id = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":180
+  /* "bt_sdk/core/client/mdapi.pyx":219
  *         """
  *         cdef bytes req_id = fast_uuid4_bytes()
  *         cdef object event = Event(topic=topic, body=body)             # <<<<<<<<<<<<<<
@@ -10393,9 +11332,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_event_obs(struc
  *         obs = self.async_client.run(req_id, event)
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 180, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_Event); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 219, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyLong_From_int(__pyx_v_topic); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 180, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyLong_From_int(__pyx_v_topic); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = 1;
   #if CYTHON_UNPACK_METHODS
@@ -10411,22 +11350,22 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_event_obs(struc
   #endif
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_3 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_5, __pyx_t_3, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 180, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_body, __pyx_v_body, __pyx_t_3, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 180, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_topic, __pyx_t_5, __pyx_t_3, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 219, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_body, __pyx_v_body, __pyx_t_3, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 219, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_6, (1-__pyx_t_6) | (__pyx_t_6*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_3);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_event = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":182
+  /* "bt_sdk/core/client/mdapi.pyx":221
  *         cdef object event = Event(topic=topic, body=body)
  * 
  *         obs = self.async_client.run(req_id, event)             # <<<<<<<<<<<<<<
@@ -10440,26 +11379,26 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_event_obs(struc
     PyObject *__pyx_callargs[3] = {__pyx_t_4, __pyx_v_req_id, __pyx_v_event};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_run, __pyx_callargs+__pyx_t_6, (3-__pyx_t_6) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_obs = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":183
+  /* "bt_sdk/core/client/mdapi.pyx":222
  * 
  *         obs = self.async_client.run(req_id, event)
  *         return obs             # <<<<<<<<<<<<<<
  * 
- *     async def get_event_async(self, int topic, object body):
+ *     cpdef object get_factor(self, object body):
 */
   __Pyx_XDECREF(__pyx_r);
   __Pyx_INCREF(__pyx_v_obs);
   __pyx_r = __pyx_v_obs;
   goto __pyx_L0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":175
- *         return data
+  /* "bt_sdk/core/client/mdapi.pyx":214
+ *         return obs
  * 
  *     cpdef object get_event_obs(self, int topic, object body):             # <<<<<<<<<<<<<<
  *         """
@@ -10485,16 +11424,16 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_event_obs(struc
 }
 
 /* Python wrapper */
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_event_obs(PyObject *__pyx_v_self, 
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_33get_event_obs(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_26get_event_obs, "\n            request instruments\n        ");
-static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_event_obs = {"get_event_obs", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_event_obs, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_26get_event_obs};
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_event_obs(PyObject *__pyx_v_self, 
+PyDoc_STRVAR(__pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_32get_event_obs, "\n            request instruments\n        ");
+static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_33get_event_obs = {"get_event_obs", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_33get_event_obs, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_32get_event_obs};
+static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_33get_event_obs(PyObject *__pyx_v_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -10525,39 +11464,39 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_topic,&__pyx_mstate_global->__pyx_n_u_body,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 175, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 214, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 175, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 214, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 175, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 214, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_event_obs", 0) < (0)) __PYX_ERR(0, 175, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_event_obs", 0) < (0)) __PYX_ERR(0, 214, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_event_obs", 1, 2, 2, i); __PYX_ERR(0, 175, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_event_obs", 1, 2, 2, i); __PYX_ERR(0, 214, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 2)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 175, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 214, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 175, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 214, __pyx_L3_error)
     }
-    __pyx_v_topic = __Pyx_PyLong_As_int(values[0]); if (unlikely((__pyx_v_topic == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 175, __pyx_L3_error)
+    __pyx_v_topic = __Pyx_PyLong_As_int(values[0]); if (unlikely((__pyx_v_topic == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 214, __pyx_L3_error)
     __pyx_v_body = values[1];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_event_obs", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 175, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("get_event_obs", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 214, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10568,7 +11507,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_26get_event_obs(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_topic, __pyx_v_body);
+  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_32get_event_obs(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_topic, __pyx_v_body);
 
   /* function exit code */
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
@@ -10578,7 +11517,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_26get_event_obs(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, int __pyx_v_topic, PyObject *__pyx_v_body) {
+static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_32get_event_obs(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, int __pyx_v_topic, PyObject *__pyx_v_body) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -10587,7 +11526,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_26get_event_obs(st
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_event_obs", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_event_obs(__pyx_v_self, __pyx_v_topic, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 175, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_event_obs(__pyx_v_self, __pyx_v_topic, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 214, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -10603,904 +11542,9 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_26get_event_obs(st
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
-static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_30generator5(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
 
-/* "bt_sdk/core/client/mdapi.pyx":185
+/* "bt_sdk/core/client/mdapi.pyx":224
  *         return obs
- * 
- *     async def get_event_async(self, int topic, object body):             # <<<<<<<<<<<<<<
- *         obs = self.get_event_obs(topic, body)
- *         tables = await _collect_async(obs, self.timeout)
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_29get_event_async(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_29get_event_async = {"get_event_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_29get_event_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_29get_event_async(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  int __pyx_v_topic;
-  PyObject *__pyx_v_body = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[2] = {0,0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_event_async (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_topic,&__pyx_mstate_global->__pyx_n_u_body,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 185, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  2:
-        values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 185, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 185, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_event_async", 0) < (0)) __PYX_ERR(0, 185, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 2; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_event_async", 1, 2, 2, i); __PYX_ERR(0, 185, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 2)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 185, __pyx_L3_error)
-      values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 185, __pyx_L3_error)
-    }
-    __pyx_v_topic = __Pyx_PyLong_As_int(values[0]); if (unlikely((__pyx_v_topic == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 185, __pyx_L3_error)
-    __pyx_v_body = values[1];
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_event_async", 1, 2, 2, __pyx_nargs); __PYX_ERR(0, 185, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_event_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_28get_event_async(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_topic, __pyx_v_body);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_28get_event_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, int __pyx_v_topic, PyObject *__pyx_v_body) {
-  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async *__pyx_cur_scope;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("get_event_async", 0);
-  __pyx_cur_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async *)__pyx_tp_new_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async, __pyx_mstate_global->__pyx_empty_tuple, NULL);
-  if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async *)Py_None);
-    __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 185, __pyx_L1_error)
-  } else {
-    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
-  }
-  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
-  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __pyx_cur_scope->__pyx_v_topic = __pyx_v_topic;
-  __pyx_cur_scope->__pyx_v_body = __pyx_v_body;
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_body);
-  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_body);
-  {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_30generator5, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_event_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_event_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 185, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_cur_scope);
-    __Pyx_RefNannyFinishContext();
-    return (PyObject *) gen;
-  }
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_event_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_30generator5(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
-{
-  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async *__pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async *)__pyx_generator->closure);
-  PyObject *__pyx_r = NULL;
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  size_t __pyx_t_5;
-  __Pyx_PySendResult __pyx_t_6;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_event_async", 0);
-  switch (__pyx_generator->resume_label) {
-    case 0: goto __pyx_L3_first_run;
-    case 1: goto __pyx_L4_resume_from_await;
-    default: /* CPython raises the right error here */
-    __Pyx_RefNannyFinishContext();
-    return NULL;
-  }
-  __pyx_L3_first_run:;
-  if (unlikely(__pyx_sent_value != Py_None)) {
-    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 185, __pyx_L1_error)
-  }
-
-  /* "bt_sdk/core/client/mdapi.pyx":186
- * 
- *     async def get_event_async(self, int topic, object body):
- *         obs = self.get_event_obs(topic, body)             # <<<<<<<<<<<<<<
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)
-*/
-  __pyx_t_1 = ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_event_obs(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_topic, __pyx_cur_scope->__pyx_v_body, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 186, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_obs = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":187
- *     async def get_event_async(self, int topic, object body):
- *         obs = self.get_event_obs(topic, body)
- *         tables = await _collect_async(obs, self.timeout)             # <<<<<<<<<<<<<<
- *         data = _merge_tables(tables)
- *         return data
-*/
-  __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 187, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 187, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    assert(__pyx_t_2);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
-    __Pyx_INCREF(__pyx_t_2);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
-    __pyx_t_5 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_obs, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __pyx_t_6 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (likely(__pyx_t_6 == PYGEN_NEXT)) {
-    __Pyx_GOTREF(__pyx_r);
-    __Pyx_XGIVEREF(__pyx_r);
-    __Pyx_RefNannyFinishContext();
-    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-    /* return from generator, awaiting value */
-    __pyx_generator->resume_label = 1;
-    return __pyx_r;
-    __pyx_L4_resume_from_await:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 187, __pyx_L1_error)
-    __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
-  } else if (likely(__pyx_t_6 == PYGEN_RETURN)) {
-    __Pyx_GOTREF(__pyx_r);
-    __pyx_t_1 = __pyx_r; __pyx_r = NULL;
-  } else {
-    __Pyx_XGOTREF(__pyx_r);
-    __PYX_ERR(0, 187, __pyx_L1_error)
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_tables = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":188
- *         obs = self.get_event_obs(topic, body)
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)             # <<<<<<<<<<<<<<
- *         return data
- * 
-*/
-  __pyx_t_1 = __pyx_cur_scope->__pyx_v_tables;
-  __Pyx_INCREF(__pyx_t_1);
-  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 188, __pyx_L1_error)
-  __pyx_t_3 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 188, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_GIVEREF(__pyx_t_3);
-  __pyx_cur_scope->__pyx_v_data = __pyx_t_3;
-  __pyx_t_3 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":189
- *         tables = await _collect_async(obs, self.timeout)
- *         data = _merge_tables(tables)
- *         return data             # <<<<<<<<<<<<<<
- * 
- *     async def get_factor_async(self, object body):
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_data);
-  __pyx_r = __pyx_cur_scope->__pyx_v_data;
-  goto __pyx_L0;
-  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
-
-  /* "bt_sdk/core/client/mdapi.pyx":185
- *         return obs
- * 
- *     async def get_event_async(self, int topic, object body):             # <<<<<<<<<<<<<<
- *         obs = self.get_event_obs(topic, body)
- *         tables = await _collect_async(obs, self.timeout)
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  if (__Pyx_PyErr_Occurred()) {
-    __Pyx_Generator_Replace_StopIteration(0);
-    __Pyx_AddTraceback("get_event_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  }
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  #if !CYTHON_USE_EXC_INFO_STACK
-  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-  #endif
-  __pyx_generator->resume_label = -1;
-  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_33generator6(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value); /* proto */
-
-/* "bt_sdk/core/client/mdapi.pyx":191
- *         return data
- * 
- *     async def get_factor_async(self, object body):             # <<<<<<<<<<<<<<
- *         obs_close = self.get_close_obs(body)
- *         obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)
-*/
-
-/* Python wrapper */
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_32get_factor_async(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-); /*proto*/
-static PyMethodDef __pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_32get_factor_async = {"get_factor_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_32get_factor_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0};
-static PyObject *__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_32get_factor_async(PyObject *__pyx_v_self, 
-#if CYTHON_METH_FASTCALL
-PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
-#else
-PyObject *__pyx_args, PyObject *__pyx_kwds
-#endif
-) {
-  PyObject *__pyx_v_body = 0;
-  #if !CYTHON_METH_FASTCALL
-  CYTHON_UNUSED Py_ssize_t __pyx_nargs;
-  #endif
-  CYTHON_UNUSED PyObject *const *__pyx_kwvalues;
-  PyObject* values[1] = {0};
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_factor_async (wrapper)", 0);
-  #if !CYTHON_METH_FASTCALL
-  #if CYTHON_ASSUME_SAFE_SIZE
-  __pyx_nargs = PyTuple_GET_SIZE(__pyx_args);
-  #else
-  __pyx_nargs = PyTuple_Size(__pyx_args); if (unlikely(__pyx_nargs < 0)) return NULL;
-  #endif
-  #endif
-  __pyx_kwvalues = __Pyx_KwValues_FASTCALL(__pyx_args, __pyx_nargs);
-  {
-    PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_body,0};
-    const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 191, __pyx_L3_error)
-    if (__pyx_kwds_len > 0) {
-      switch (__pyx_nargs) {
-        case  1:
-        values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 191, __pyx_L3_error)
-        CYTHON_FALLTHROUGH;
-        case  0: break;
-        default: goto __pyx_L5_argtuple_error;
-      }
-      const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_factor_async", 0) < (0)) __PYX_ERR(0, 191, __pyx_L3_error)
-      for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_factor_async", 1, 1, 1, i); __PYX_ERR(0, 191, __pyx_L3_error) }
-      }
-    } else if (unlikely(__pyx_nargs != 1)) {
-      goto __pyx_L5_argtuple_error;
-    } else {
-      values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 191, __pyx_L3_error)
-    }
-    __pyx_v_body = values[0];
-  }
-  goto __pyx_L6_skip;
-  __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_factor_async", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 191, __pyx_L3_error)
-  __pyx_L6_skip:;
-  goto __pyx_L4_argument_unpacking_done;
-  __pyx_L3_error:;
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_factor_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __Pyx_RefNannyFinishContext();
-  return NULL;
-  __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_31get_factor_async(((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_v_self), __pyx_v_body);
-
-  /* function exit code */
-  for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
-    Py_XDECREF(values[__pyx_temp]);
-  }
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_31get_factor_async(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *__pyx_v_self, PyObject *__pyx_v_body) {
-  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async *__pyx_cur_scope;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("get_factor_async", 0);
-  __pyx_cur_scope = (struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async *)__pyx_tp_new_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async, __pyx_mstate_global->__pyx_empty_tuple, NULL);
-  if (unlikely(!__pyx_cur_scope)) {
-    __pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async *)Py_None);
-    __Pyx_INCREF(Py_None);
-    __PYX_ERR(0, 191, __pyx_L1_error)
-  } else {
-    __Pyx_GOTREF((PyObject *)__pyx_cur_scope);
-  }
-  __pyx_cur_scope->__pyx_v_self = __pyx_v_self;
-  __Pyx_INCREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __Pyx_GIVEREF((PyObject *)__pyx_cur_scope->__pyx_v_self);
-  __pyx_cur_scope->__pyx_v_body = __pyx_v_body;
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_body);
-  __Pyx_GIVEREF(__pyx_cur_scope->__pyx_v_body);
-  {
-    __pyx_CoroutineObject *gen = __Pyx_Coroutine_New((__pyx_coroutine_body_t) __pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_33generator6, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10]), (PyObject *) __pyx_cur_scope, __pyx_mstate_global->__pyx_n_u_get_factor_async, __pyx_mstate_global->__pyx_n_u_MdApi_get_factor_async, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi); if (unlikely(!gen)) __PYX_ERR(0, 191, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_cur_scope);
-    __Pyx_RefNannyFinishContext();
-    return (PyObject *) gen;
-  }
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_AddTraceback("bt_sdk.core.client.mdapi.MdApi.get_factor_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __Pyx_DECREF((PyObject *)__pyx_cur_scope);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_gb_6bt_sdk_4core_6client_5mdapi_5MdApi_33generator6(__pyx_CoroutineObject *__pyx_generator, CYTHON_UNUSED PyThreadState *__pyx_tstate, PyObject *__pyx_sent_value) /* generator body */
-{
-  struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async *__pyx_cur_scope = ((struct __pyx_obj_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async *)__pyx_generator->closure);
-  PyObject *__pyx_r = NULL;
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  size_t __pyx_t_5;
-  __Pyx_PySendResult __pyx_t_6;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *(*__pyx_t_8)(PyObject *);
-  PyObject *__pyx_t_9 = NULL;
-  Py_ssize_t __pyx_t_10;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_factor_async", 0);
-  switch (__pyx_generator->resume_label) {
-    case 0: goto __pyx_L3_first_run;
-    case 1: goto __pyx_L4_resume_from_await;
-    default: /* CPython raises the right error here */
-    __Pyx_RefNannyFinishContext();
-    return NULL;
-  }
-  __pyx_L3_first_run:;
-  if (unlikely(__pyx_sent_value != Py_None)) {
-    if (unlikely(__pyx_sent_value)) PyErr_SetString(PyExc_TypeError, "can't send non-None value to a just-started coroutine");
-    __PYX_ERR(0, 191, __pyx_L1_error)
-  }
-
-  /* "bt_sdk/core/client/mdapi.pyx":192
- * 
- *     async def get_factor_async(self, object body):
- *         obs_close = self.get_close_obs(body)             # <<<<<<<<<<<<<<
- *         obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)
- *         obs_right = self.get_event_obs(RpcTopic.Rightment, body)
-*/
-  __pyx_t_1 = ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_close_obs(__pyx_cur_scope->__pyx_v_self, __pyx_cur_scope->__pyx_v_body, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 192, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_obs_close = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":193
- *     async def get_factor_async(self, object body):
- *         obs_close = self.get_close_obs(body)
- *         obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)             # <<<<<<<<<<<<<<
- *         obs_right = self.get_event_obs(RpcTopic.Rightment, body)
- * 
-*/
-  __pyx_t_1 = ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_event_obs(__pyx_cur_scope->__pyx_v_self, __pyx_e_6bt_sdk_4core_6client_5mdapi_Adjustment, __pyx_cur_scope->__pyx_v_body, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 193, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_obs_adjust = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":194
- *         obs_close = self.get_close_obs(body)
- *         obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)
- *         obs_right = self.get_event_obs(RpcTopic.Rightment, body)             # <<<<<<<<<<<<<<
- * 
- *         coro1 = _collect_async(obs_close, self.timeout)
-*/
-  __pyx_t_1 = ((struct __pyx_vtabstruct_6bt_sdk_4core_6client_5mdapi_MdApi *)__pyx_cur_scope->__pyx_v_self->__pyx_vtab)->get_event_obs(__pyx_cur_scope->__pyx_v_self, __pyx_e_6bt_sdk_4core_6client_5mdapi_Rightment, __pyx_cur_scope->__pyx_v_body, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_obs_right = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":196
- *         obs_right = self.get_event_obs(RpcTopic.Rightment, body)
- * 
- *         coro1 = _collect_async(obs_close, self.timeout)             # <<<<<<<<<<<<<<
- *         coro2 = _collect_async(obs_adjust, self.timeout)
- *         coro3 = _collect_async(obs_right, self.timeout)
-*/
-  __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 196, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 196, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_3);
-    assert(__pyx_t_2);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_3);
-    __Pyx_INCREF(__pyx_t_2);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_3, __pyx__function);
-    __pyx_t_5 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_obs_close, __pyx_t_4};
-    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 196, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_coro1 = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":197
- * 
- *         coro1 = _collect_async(obs_close, self.timeout)
- *         coro2 = _collect_async(obs_adjust, self.timeout)             # <<<<<<<<<<<<<<
- *         coro3 = _collect_async(obs_right, self.timeout)
- *         res_close, res_adjust, res_right = await asyncio.gather(coro1, coro2, coro3)
-*/
-  __pyx_t_3 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 197, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_2 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 197, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_4))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_4);
-    assert(__pyx_t_3);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
-    __Pyx_INCREF(__pyx_t_3);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
-    __pyx_t_5 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_3, __pyx_cur_scope->__pyx_v_obs_adjust, __pyx_t_2};
-    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_coro2 = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":198
- *         coro1 = _collect_async(obs_close, self.timeout)
- *         coro2 = _collect_async(obs_adjust, self.timeout)
- *         coro3 = _collect_async(obs_right, self.timeout)             # <<<<<<<<<<<<<<
- *         res_close, res_adjust, res_right = await asyncio.gather(coro1, coro2, coro3)
- * 
-*/
-  __pyx_t_4 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_mstate_global->__pyx_n_u_collect_async); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 198, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyLong_From_int(__pyx_cur_scope->__pyx_v_self->timeout); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 198, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
-    assert(__pyx_t_4);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_2);
-    __Pyx_INCREF(__pyx_t_4);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_2, __pyx__function);
-    __pyx_t_5 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[3] = {__pyx_t_4, __pyx_cur_scope->__pyx_v_obs_right, __pyx_t_3};
-    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_2, __pyx_callargs+__pyx_t_5, (3-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_coro3 = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":199
- *         coro2 = _collect_async(obs_adjust, self.timeout)
- *         coro3 = _collect_async(obs_right, self.timeout)
- *         res_close, res_adjust, res_right = await asyncio.gather(coro1, coro2, coro3)             # <<<<<<<<<<<<<<
- * 
- *         close = _merge_tables(res_close)
-*/
-  __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 199, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_mstate_global->__pyx_n_u_gather); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_4);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_4))) {
-    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_4);
-    assert(__pyx_t_2);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_4);
-    __Pyx_INCREF(__pyx_t_2);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_4, __pyx__function);
-    __pyx_t_5 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[4] = {__pyx_t_2, __pyx_cur_scope->__pyx_v_coro1, __pyx_cur_scope->__pyx_v_coro2, __pyx_cur_scope->__pyx_v_coro3};
-    __pyx_t_1 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (4-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_1);
-  }
-  __pyx_t_6 = __Pyx_Coroutine_Yield_From(__pyx_generator, __pyx_t_1, &__pyx_r);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (likely(__pyx_t_6 == PYGEN_NEXT)) {
-    __Pyx_GOTREF(__pyx_r);
-    __Pyx_XGIVEREF(__pyx_r);
-    __Pyx_RefNannyFinishContext();
-    __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-    /* return from generator, awaiting value */
-    __pyx_generator->resume_label = 1;
-    return __pyx_r;
-    __pyx_L4_resume_from_await:;
-    if (unlikely(!__pyx_sent_value)) __PYX_ERR(0, 199, __pyx_L1_error)
-    __pyx_t_1 = __pyx_sent_value; __Pyx_INCREF(__pyx_t_1);
-  } else if (likely(__pyx_t_6 == PYGEN_RETURN)) {
-    __Pyx_GOTREF(__pyx_r);
-    __pyx_t_1 = __pyx_r; __pyx_r = NULL;
-  } else {
-    __Pyx_XGOTREF(__pyx_r);
-    __PYX_ERR(0, 199, __pyx_L1_error)
-  }
-  if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
-    PyObject* sequence = __pyx_t_1;
-    Py_ssize_t size = __Pyx_PySequence_SIZE(sequence);
-    if (unlikely(size != 3)) {
-      if (size > 3) __Pyx_RaiseTooManyValuesError(3);
-      else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      __PYX_ERR(0, 199, __pyx_L1_error)
-    }
-    #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    if (likely(PyTuple_CheckExact(sequence))) {
-      __pyx_t_4 = PyTuple_GET_ITEM(sequence, 0);
-      __Pyx_INCREF(__pyx_t_4);
-      __pyx_t_2 = PyTuple_GET_ITEM(sequence, 1);
-      __Pyx_INCREF(__pyx_t_2);
-      __pyx_t_3 = PyTuple_GET_ITEM(sequence, 2);
-      __Pyx_INCREF(__pyx_t_3);
-    } else {
-      __pyx_t_4 = __Pyx_PyList_GetItemRefFast(sequence, 0, __Pyx_ReferenceSharing_SharedReference);
-      if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L1_error)
-      __Pyx_XGOTREF(__pyx_t_4);
-      __pyx_t_2 = __Pyx_PyList_GetItemRefFast(sequence, 1, __Pyx_ReferenceSharing_SharedReference);
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 199, __pyx_L1_error)
-      __Pyx_XGOTREF(__pyx_t_2);
-      __pyx_t_3 = __Pyx_PyList_GetItemRefFast(sequence, 2, __Pyx_ReferenceSharing_SharedReference);
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 199, __pyx_L1_error)
-      __Pyx_XGOTREF(__pyx_t_3);
-    }
-    #else
-    __pyx_t_4 = __Pyx_PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 199, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 199, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PySequence_ITEM(sequence, 2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 199, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    #endif
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  } else {
-    Py_ssize_t index = -1;
-    __pyx_t_7 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 199, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_7);
-    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_8 = (CYTHON_COMPILING_IN_LIMITED_API) ? PyIter_Next : __Pyx_PyObject_GetIterNextFunc(__pyx_t_7);
-    index = 0; __pyx_t_4 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_4)) goto __pyx_L5_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_4);
-    index = 1; __pyx_t_2 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_2)) goto __pyx_L5_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_2);
-    index = 2; __pyx_t_3 = __pyx_t_8(__pyx_t_7); if (unlikely(!__pyx_t_3)) goto __pyx_L5_unpacking_failed;
-    __Pyx_GOTREF(__pyx_t_3);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_8(__pyx_t_7), 3) < (0)) __PYX_ERR(0, 199, __pyx_L1_error)
-    __pyx_t_8 = NULL;
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    goto __pyx_L6_unpacking_done;
-    __pyx_L5_unpacking_failed:;
-    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_8 = NULL;
-    if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    __PYX_ERR(0, 199, __pyx_L1_error)
-    __pyx_L6_unpacking_done:;
-  }
-  __Pyx_GIVEREF(__pyx_t_4);
-  __pyx_cur_scope->__pyx_v_res_close = __pyx_t_4;
-  __pyx_t_4 = 0;
-  __Pyx_GIVEREF(__pyx_t_2);
-  __pyx_cur_scope->__pyx_v_res_adjust = __pyx_t_2;
-  __pyx_t_2 = 0;
-  __Pyx_GIVEREF(__pyx_t_3);
-  __pyx_cur_scope->__pyx_v_res_right = __pyx_t_3;
-  __pyx_t_3 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":201
- *         res_close, res_adjust, res_right = await asyncio.gather(coro1, coro2, coro3)
- * 
- *         close = _merge_tables(res_close)             # <<<<<<<<<<<<<<
- *         adjust = _merge_tables(res_adjust)
- *         right = _merge_tables(res_right)
-*/
-  __pyx_t_1 = __pyx_cur_scope->__pyx_v_res_close;
-  __Pyx_INCREF(__pyx_t_1);
-  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 201, __pyx_L1_error)
-  __pyx_t_3 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_GIVEREF(__pyx_t_3);
-  __pyx_cur_scope->__pyx_v_close = __pyx_t_3;
-  __pyx_t_3 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":202
- * 
- *         close = _merge_tables(res_close)
- *         adjust = _merge_tables(res_adjust)             # <<<<<<<<<<<<<<
- *         right = _merge_tables(res_right)
- * 
-*/
-  __pyx_t_3 = __pyx_cur_scope->__pyx_v_res_adjust;
-  __Pyx_INCREF(__pyx_t_3);
-  if (!(likely(PyList_CheckExact(__pyx_t_3))||((__pyx_t_3) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_3))) __PYX_ERR(0, 202, __pyx_L1_error)
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_3)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 202, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __Pyx_GIVEREF(__pyx_t_1);
-  __pyx_cur_scope->__pyx_v_adjust = __pyx_t_1;
-  __pyx_t_1 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":203
- *         close = _merge_tables(res_close)
- *         adjust = _merge_tables(res_adjust)
- *         right = _merge_tables(res_right)             # <<<<<<<<<<<<<<
- * 
- *         from bt_sdk.core.helper.factor import calc_factor
-*/
-  __pyx_t_1 = __pyx_cur_scope->__pyx_v_res_right;
-  __Pyx_INCREF(__pyx_t_1);
-  if (!(likely(PyList_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None) || __Pyx_RaiseUnexpectedTypeError("list", __pyx_t_1))) __PYX_ERR(0, 203, __pyx_L1_error)
-  __pyx_t_3 = __pyx_f_6bt_sdk_4core_6client_5mdapi__merge_tables(((PyObject*)__pyx_t_1)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __Pyx_GIVEREF(__pyx_t_3);
-  __pyx_cur_scope->__pyx_v_right = __pyx_t_3;
-  __pyx_t_3 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":205
- *         right = _merge_tables(res_right)
- * 
- *         from bt_sdk.core.helper.factor import calc_factor             # <<<<<<<<<<<<<<
- *         factors = calc_factor(close, adjust, right)
- *         return factors
-*/
-  {
-    PyObject* const __pyx_imported_names[] = {__pyx_mstate_global->__pyx_n_u_calc_factor};
-    __pyx_t_9 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_bt_sdk_core_helper_factor, __pyx_imported_names, 1, NULL, 0); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 205, __pyx_L1_error)
-  }
-  __pyx_t_3 = __pyx_t_9;
-  __Pyx_GOTREF(__pyx_t_3);
-  {
-    PyObject* const __pyx_imported_names[] = {__pyx_mstate_global->__pyx_n_u_calc_factor};
-    __pyx_t_10 = 0; {
-      __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_3, __pyx_imported_names[__pyx_t_10]); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      switch (__pyx_t_10) {
-        case 0:
-        __Pyx_INCREF(__pyx_t_1);
-        __Pyx_GIVEREF(__pyx_t_1);
-        __pyx_cur_scope->__pyx_v_calc_factor = __pyx_t_1;
-        break;
-        default:;
-      }
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    }
-  }
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":206
- * 
- *         from bt_sdk.core.helper.factor import calc_factor
- *         factors = calc_factor(close, adjust, right)             # <<<<<<<<<<<<<<
- *         return factors
- * 
-*/
-  __pyx_t_1 = NULL;
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_calc_factor);
-  __pyx_t_2 = __pyx_cur_scope->__pyx_v_calc_factor; 
-  __pyx_t_5 = 1;
-  #if CYTHON_UNPACK_METHODS
-  if (unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_2);
-    assert(__pyx_t_1);
-    PyObject* __pyx__function = PyMethod_GET_FUNCTION(__pyx_t_2);
-    __Pyx_INCREF(__pyx_t_1);
-    __Pyx_INCREF(__pyx__function);
-    __Pyx_DECREF_SET(__pyx_t_2, __pyx__function);
-    __pyx_t_5 = 0;
-  }
-  #endif
-  {
-    PyObject *__pyx_callargs[4] = {__pyx_t_1, __pyx_cur_scope->__pyx_v_close, __pyx_cur_scope->__pyx_v_adjust, __pyx_cur_scope->__pyx_v_right};
-    __pyx_t_3 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_2, __pyx_callargs+__pyx_t_5, (4-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
-    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 206, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-  }
-  __Pyx_GIVEREF(__pyx_t_3);
-  __pyx_cur_scope->__pyx_v_factors = __pyx_t_3;
-  __pyx_t_3 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":207
- *         from bt_sdk.core.helper.factor import calc_factor
- *         factors = calc_factor(close, adjust, right)
- *         return factors             # <<<<<<<<<<<<<<
- * 
- *     cpdef object get_factor(self, object body):
-*/
-  __Pyx_XDECREF(__pyx_r);
-  __Pyx_INCREF(__pyx_cur_scope->__pyx_v_factors);
-  __pyx_r = __pyx_cur_scope->__pyx_v_factors;
-  goto __pyx_L0;
-  CYTHON_MAYBE_UNUSED_VAR(__pyx_cur_scope);
-
-  /* "bt_sdk/core/client/mdapi.pyx":191
- *         return data
- * 
- *     async def get_factor_async(self, object body):             # <<<<<<<<<<<<<<
- *         obs_close = self.get_close_obs(body)
- *         obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)
-*/
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_7);
-  if (__Pyx_PyErr_Occurred()) {
-    __Pyx_Generator_Replace_StopIteration(0);
-    __Pyx_AddTraceback("get_factor_async", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  }
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  #if !CYTHON_USE_EXC_INFO_STACK
-  __Pyx_Coroutine_ResetAndClearException(__pyx_generator);
-  #endif
-  __pyx_generator->resume_label = -1;
-  __Pyx_Coroutine_clear((PyObject*)__pyx_generator);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "bt_sdk/core/client/mdapi.pyx":209
- *         return factors
  * 
  *     cpdef object get_factor(self, object body):             # <<<<<<<<<<<<<<
  *         coroutine = self.get_factor_async(body)
@@ -11544,7 +11588,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_factor(struct _
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_factor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_get_factor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_35get_factor)) {
         __Pyx_XDECREF(__pyx_r);
@@ -11568,7 +11612,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_factor(struct _
           __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 224, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __pyx_r = __pyx_t_2;
@@ -11589,7 +11633,7 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_factor(struct _
     #endif
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":210
+  /* "bt_sdk/core/client/mdapi.pyx":225
  * 
  *     cpdef object get_factor(self, object body):
  *         coroutine = self.get_factor_async(body)             # <<<<<<<<<<<<<<
@@ -11603,13 +11647,13 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_factor(struct _
     PyObject *__pyx_callargs[2] = {__pyx_t_2, __pyx_v_body};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_get_factor_async, __pyx_callargs+__pyx_t_5, (2-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 210, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 225, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_coroutine = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":211
+  /* "bt_sdk/core/client/mdapi.pyx":226
  *     cpdef object get_factor(self, object body):
  *         coroutine = self.get_factor_async(body)
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)             # <<<<<<<<<<<<<<
@@ -11617,9 +11661,9 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_factor(struct _
  * 
 */
   __pyx_t_2 = NULL;
-  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 211, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_asyncio); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 226, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_run_coroutine_threadsafe); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_mstate_global->__pyx_n_u_run_coroutine_threadsafe); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_5 = 1;
@@ -11636,21 +11680,21 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_factor(struct _
   #endif
   {
     PyObject *__pyx_callargs[2 + ((CYTHON_VECTORCALL) ? 2 : 0)] = {__pyx_t_2, NULL};
-    __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 211, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_MakeVectorcallBuilderKwds(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 226, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_coro, __pyx_v_coroutine, __pyx_t_4, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 211, __pyx_L1_error)
-    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_loop, __pyx_v_self->loop, __pyx_t_4, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_coro, __pyx_v_coroutine, __pyx_t_4, __pyx_callargs+1, 0) < (0)) __PYX_ERR(0, 226, __pyx_L1_error)
+    if (__Pyx_VectorcallBuilder_AddArg(__pyx_mstate_global->__pyx_n_u_loop, __pyx_v_self->loop, __pyx_t_4, __pyx_callargs+1, 1) < (0)) __PYX_ERR(0, 226, __pyx_L1_error)
     __pyx_t_1 = __Pyx_Object_Vectorcall_CallFromBuilder((PyObject*)__pyx_t_3, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET), __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 226, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_v_future = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":212
+  /* "bt_sdk/core/client/mdapi.pyx":227
  *         coroutine = self.get_factor_async(body)
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
  *         return future.result()             # <<<<<<<<<<<<<<
@@ -11665,15 +11709,15 @@ static PyObject *__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_factor(struct _
     PyObject *__pyx_callargs[2] = {__pyx_t_3, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_result, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":209
- *         return factors
+  /* "bt_sdk/core/client/mdapi.pyx":224
+ *         return obs
  * 
  *     cpdef object get_factor(self, object body):             # <<<<<<<<<<<<<<
  *         coroutine = self.get_factor_async(body)
@@ -11735,32 +11779,32 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_body,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 209, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 224, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 209, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 224, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_factor", 0) < (0)) __PYX_ERR(0, 209, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "get_factor", 0) < (0)) __PYX_ERR(0, 224, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 1; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_factor", 1, 1, 1, i); __PYX_ERR(0, 209, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("get_factor", 1, 1, 1, i); __PYX_ERR(0, 224, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 1)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 209, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 224, __pyx_L3_error)
     }
     __pyx_v_body = values[0];
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_factor", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 209, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("get_factor", 1, 1, 1, __pyx_nargs); __PYX_ERR(0, 224, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -11790,7 +11834,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_34get_factor(struc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_factor", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_factor(__pyx_v_self, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_factor(__pyx_v_self, __pyx_v_body, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -11807,7 +11851,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_34get_factor(struc
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":214
+/* "bt_sdk/core/client/mdapi.pyx":229
  *         return future.result()
  * 
  *     cpdef void disconnect(self):             # <<<<<<<<<<<<<<
@@ -11849,7 +11893,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_disconnect(struct __pyx_
     if (unlikely(!__Pyx_object_dict_version_matches(((PyObject *)__pyx_v_self), __pyx_tp_dict_version, __pyx_obj_dict_version))) {
       PY_UINT64_T __pyx_typedict_guard = __Pyx_get_tp_dict_version(((PyObject *)__pyx_v_self));
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_disconnect); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 214, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_mstate_global->__pyx_n_u_disconnect); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 229, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!__Pyx_IsSameCFunction(__pyx_t_1, (void(*)(void)) __pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_37disconnect)) {
         __pyx_t_3 = NULL;
@@ -11872,7 +11916,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_disconnect(struct __pyx_
           __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_t_4, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (__pyx_t_5*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
           __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 214, __pyx_L1_error)
+          if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 229, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
         }
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -11892,7 +11936,7 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_disconnect(struct __pyx_
     #endif
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":215
+  /* "bt_sdk/core/client/mdapi.pyx":230
  * 
  *     cpdef void disconnect(self):
  *         self.async_client.close()             # <<<<<<<<<<<<<<
@@ -11906,12 +11950,12 @@ static void __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_disconnect(struct __pyx_
     PyObject *__pyx_callargs[2] = {__pyx_t_2, NULL};
     __pyx_t_1 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_close, __pyx_callargs+__pyx_t_5, (1-__pyx_t_5) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 230, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":214
+  /* "bt_sdk/core/client/mdapi.pyx":229
  *         return future.result()
  * 
  *     cpdef void disconnect(self):             # <<<<<<<<<<<<<<
@@ -11982,8 +12026,8 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_36disconnect(struc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("disconnect", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_disconnect(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 214, __pyx_L1_error)
-  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 214, __pyx_L1_error)
+  __pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_disconnect(__pyx_v_self, 1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 229, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 229, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -12000,7 +12044,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_36disconnect(struc
   return __pyx_r;
 }
 
-/* "bt_sdk/core/client/mdapi.pyx":217
+/* "bt_sdk/core/client/mdapi.pyx":232
  *         self.async_client.close()
  * 
  *     def __exit__(self, exc_type, exc_val, exc_tb):             # <<<<<<<<<<<<<<
@@ -12049,38 +12093,38 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   {
     PyObject ** const __pyx_pyargnames[] = {&__pyx_mstate_global->__pyx_n_u_exc_type,&__pyx_mstate_global->__pyx_n_u_exc_val,&__pyx_mstate_global->__pyx_n_u_exc_tb,0};
     const Py_ssize_t __pyx_kwds_len = (__pyx_kwds) ? __Pyx_NumKwargs_FASTCALL(__pyx_kwds) : 0;
-    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 217, __pyx_L3_error)
+    if (unlikely(__pyx_kwds_len) < 0) __PYX_ERR(0, 232, __pyx_L3_error)
     if (__pyx_kwds_len > 0) {
       switch (__pyx_nargs) {
         case  3:
         values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 217, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 232, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  2:
         values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 217, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 232, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  1:
         values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 217, __pyx_L3_error)
+        if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 232, __pyx_L3_error)
         CYTHON_FALLTHROUGH;
         case  0: break;
         default: goto __pyx_L5_argtuple_error;
       }
       const Py_ssize_t kwd_pos_args = __pyx_nargs;
-      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__exit__", 0) < (0)) __PYX_ERR(0, 217, __pyx_L3_error)
+      if (__Pyx_ParseKeywords(__pyx_kwds, __pyx_kwvalues, __pyx_pyargnames, 0, values, kwd_pos_args, __pyx_kwds_len, "__exit__", 0) < (0)) __PYX_ERR(0, 232, __pyx_L3_error)
       for (Py_ssize_t i = __pyx_nargs; i < 3; i++) {
-        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, i); __PYX_ERR(0, 217, __pyx_L3_error) }
+        if (unlikely(!values[i])) { __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, i); __PYX_ERR(0, 232, __pyx_L3_error) }
       }
     } else if (unlikely(__pyx_nargs != 3)) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = __Pyx_ArgRef_FASTCALL(__pyx_args, 0);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 217, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[0])) __PYX_ERR(0, 232, __pyx_L3_error)
       values[1] = __Pyx_ArgRef_FASTCALL(__pyx_args, 1);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 217, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[1])) __PYX_ERR(0, 232, __pyx_L3_error)
       values[2] = __Pyx_ArgRef_FASTCALL(__pyx_args, 2);
-      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 217, __pyx_L3_error)
+      if (!CYTHON_ASSUME_SAFE_MACROS && unlikely(!values[2])) __PYX_ERR(0, 232, __pyx_L3_error)
     }
     __pyx_v_exc_type = values[0];
     __pyx_v_exc_val = values[1];
@@ -12088,7 +12132,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   }
   goto __pyx_L6_skip;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 217, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__exit__", 1, 3, 3, __pyx_nargs); __PYX_ERR(0, 232, __pyx_L3_error)
   __pyx_L6_skip:;
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -12126,7 +12170,7 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_38__exit__(struct 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__exit__", 0);
 
-  /* "bt_sdk/core/client/mdapi.pyx":218
+  /* "bt_sdk/core/client/mdapi.pyx":233
  * 
  *     def __exit__(self, exc_type, exc_val, exc_tb):
  *         if exc_type is not None:             # <<<<<<<<<<<<<<
@@ -12136,28 +12180,27 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_38__exit__(struct 
   __pyx_t_1 = (__pyx_v_exc_type != Py_None);
   if (__pyx_t_1) {
 
-    /* "bt_sdk/core/client/mdapi.pyx":219
+    /* "bt_sdk/core/client/mdapi.pyx":234
  *     def __exit__(self, exc_type, exc_val, exc_tb):
  *         if exc_type is not None:
  *             print(f"Error: {exc_type}, {exc_val}, {exc_tb}")             # <<<<<<<<<<<<<<
  *         self.async_client.close()
- * 
 */
     __pyx_t_3 = NULL;
-    __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_v_exc_type, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 219, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_FormatSimple(__pyx_v_exc_type, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 234, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_exc_val, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_FormatSimple(__pyx_v_exc_val, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 234, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_v_exc_tb, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 219, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_FormatSimple(__pyx_v_exc_tb, __pyx_mstate_global->__pyx_empty_unicode); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 234, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_7[0] = __pyx_mstate_global->__pyx_kp_u_Error;
     __pyx_t_7[1] = __pyx_t_4;
-    __pyx_t_7[2] = __pyx_mstate_global->__pyx_kp_u__3;
+    __pyx_t_7[2] = __pyx_mstate_global->__pyx_kp_u__2;
     __pyx_t_7[3] = __pyx_t_5;
-    __pyx_t_7[4] = __pyx_mstate_global->__pyx_kp_u__3;
+    __pyx_t_7[4] = __pyx_mstate_global->__pyx_kp_u__2;
     __pyx_t_7[5] = __pyx_t_6;
     __pyx_t_8 = __Pyx_PyUnicode_Join(__pyx_t_7, 6, 7 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_4) + 2 * 2 + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_5) + __Pyx_PyUnicode_GET_LENGTH(__pyx_t_6), 127 | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_4) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_5) | __Pyx_PyUnicode_MAX_CHAR_VALUE(__pyx_t_6));
-    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 219, __pyx_L1_error)
+    if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 234, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -12168,12 +12211,12 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_38__exit__(struct 
       __pyx_t_2 = __Pyx_PyObject_FastCall((PyObject*)__pyx_builtin_print, __pyx_callargs+__pyx_t_9, (2-__pyx_t_9) | (__pyx_t_9*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 219, __pyx_L1_error)
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 234, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "bt_sdk/core/client/mdapi.pyx":218
+    /* "bt_sdk/core/client/mdapi.pyx":233
  * 
  *     def __exit__(self, exc_type, exc_val, exc_tb):
  *         if exc_type is not None:             # <<<<<<<<<<<<<<
@@ -12182,12 +12225,10 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_38__exit__(struct 
 */
   }
 
-  /* "bt_sdk/core/client/mdapi.pyx":220
+  /* "bt_sdk/core/client/mdapi.pyx":235
  *         if exc_type is not None:
  *             print(f"Error: {exc_type}, {exc_val}, {exc_tb}")
  *         self.async_client.close()             # <<<<<<<<<<<<<<
- * 
- * 
 */
   __pyx_t_8 = __pyx_v_self->async_client;
   __Pyx_INCREF(__pyx_t_8);
@@ -12196,12 +12237,12 @@ static PyObject *__pyx_pf_6bt_sdk_4core_6client_5mdapi_5MdApi_38__exit__(struct 
     PyObject *__pyx_callargs[2] = {__pyx_t_8, NULL};
     __pyx_t_2 = __Pyx_PyObject_FastCallMethod((PyObject*)__pyx_mstate_global->__pyx_n_u_close, __pyx_callargs+__pyx_t_9, (1-__pyx_t_9) | (1*__Pyx_PY_VECTORCALL_ARGUMENTS_OFFSET));
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 220, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 235, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":217
+  /* "bt_sdk/core/client/mdapi.pyx":232
  *         self.async_client.close()
  * 
  *     def __exit__(self, exc_type, exc_val, exc_tb):             # <<<<<<<<<<<<<<
@@ -13031,11 +13072,11 @@ static int __pyx_tp_clear_6bt_sdk_4core_6client_5mdapi_MdApi(PyObject *o) {
 static PyMethodDef __pyx_methods_6bt_sdk_4core_6client_5mdapi_MdApi[] = {
   {"__enter__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_3__enter__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {"get_calendar_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_5get_calendar_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_4get_calendar_async},
-  {"get_instrument_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_10get_instrument_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_9get_instrument_async},
-  {"get_benchmark_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_15get_benchmark_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"get_close_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_24get_close_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"get_event_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_29get_event_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
-  {"get_factor_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_32get_factor_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"get_instrument_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_instrument_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_6bt_sdk_4core_6client_5mdapi_5MdApi_7get_instrument_async},
+  {"get_benchmark_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_11get_benchmark_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"get_close_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_14get_close_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"get_event_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_event_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
+  {"get_factor_async", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_20get_factor_async, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {"__exit__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_39__exit__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {"__reduce_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_41__reduce_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
   {"__setstate_cython__", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_6bt_sdk_4core_6client_5mdapi_5MdApi_43__setstate_cython__, __Pyx_METH_FASTCALL|METH_KEYWORDS, 0},
@@ -14259,7 +14300,6 @@ static void __pyx_tp_dealloc_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_g
   PyObject_GC_UnTrack(o);
   Py_CLEAR(p->__pyx_v_adjust);
   Py_CLEAR(p->__pyx_v_body);
-  Py_CLEAR(p->__pyx_v_calc_factor);
   Py_CLEAR(p->__pyx_v_close);
   Py_CLEAR(p->__pyx_v_coro1);
   Py_CLEAR(p->__pyx_v_coro2);
@@ -14307,9 +14347,6 @@ static int __pyx_tp_traverse_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_g
   }
   if (p->__pyx_v_body) {
     e = (*v)(p->__pyx_v_body, a); if (e) return e;
-  }
-  if (p->__pyx_v_calc_factor) {
-    e = (*v)(p->__pyx_v_calc_factor, a); if (e) return e;
   }
   if (p->__pyx_v_close) {
     e = (*v)(p->__pyx_v_close, a); if (e) return e;
@@ -14649,15 +14686,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   __pyx_vtable_6bt_sdk_4core_6client_5mdapi_MdApi.get_factor = (PyObject *(*)(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *, PyObject *, int __pyx_skip_dispatch))__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_get_factor;
   __pyx_vtable_6bt_sdk_4core_6client_5mdapi_MdApi.disconnect = (void (*)(struct __pyx_obj_6bt_sdk_4core_6client_5mdapi_MdApi *, int __pyx_skip_dispatch))__pyx_f_6bt_sdk_4core_6client_5mdapi_5MdApi_disconnect;
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi_MdApi_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi)) __PYX_ERR(0, 65, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi_MdApi_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi_MdApi_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi)) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi_MdApi_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 73, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi = &__pyx_type_6bt_sdk_4core_6client_5mdapi_MdApi;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 73, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi);
@@ -14667,20 +14704,20 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi->tp_getattro = PyObject_GenericGetAttr;
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_vtabptr_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 65, __pyx_L1_error)
-  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 65, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_MdApi, (PyObject *) __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 65, __pyx_L1_error)
-  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 65, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_vtabptr_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (__Pyx_MergeVtables(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_MdApi, (PyObject *) __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 73, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject *) __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi) < (0)) __PYX_ERR(0, 73, __pyx_L1_error)
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async)) __PYX_ERR(0, 15, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async) < (0)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async)) __PYX_ERR(0, 16, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async) < (0)) __PYX_ERR(0, 16, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async = &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async) < (0)) __PYX_ERR(0, 15, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async) < (0)) __PYX_ERR(0, 16, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct___collect_async);
@@ -14691,15 +14728,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async)) __PYX_ERR(0, 104, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async) < (0)) __PYX_ERR(0, 104, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async)) __PYX_ERR(0, 118, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async) < (0)) __PYX_ERR(0, 118, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async = &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async) < (0)) __PYX_ERR(0, 104, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async) < (0)) __PYX_ERR(0, 118, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_1_get_calendar_async);
@@ -14710,15 +14747,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async)) __PYX_ERR(0, 121, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async) < (0)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async)) __PYX_ERR(0, 130, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async) < (0)) __PYX_ERR(0, 130, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async = &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async) < (0)) __PYX_ERR(0, 121, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async) < (0)) __PYX_ERR(0, 130, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_2_get_instrument_async);
@@ -14729,15 +14766,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async)) __PYX_ERR(0, 138, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async) < (0)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async)) __PYX_ERR(0, 142, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async) < (0)) __PYX_ERR(0, 142, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async = &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async) < (0)) __PYX_ERR(0, 138, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async) < (0)) __PYX_ERR(0, 142, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_3_get_benchmark_async);
@@ -14748,15 +14785,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async)) __PYX_ERR(0, 169, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async) < (0)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async)) __PYX_ERR(0, 151, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async) < (0)) __PYX_ERR(0, 151, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async = &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async) < (0)) __PYX_ERR(0, 169, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async) < (0)) __PYX_ERR(0, 151, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_4_get_close_async);
@@ -14767,15 +14804,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async)) __PYX_ERR(0, 185, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async) < (0)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async)) __PYX_ERR(0, 157, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async) < (0)) __PYX_ERR(0, 157, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async = &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async) < (0)) __PYX_ERR(0, 185, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async) < (0)) __PYX_ERR(0, 157, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_5_get_event_async);
@@ -14786,15 +14823,15 @@ static int __Pyx_modinit_type_init_code(__pyx_mstatetype *__pyx_mstate) {
   }
   #endif
   #if CYTHON_USE_TYPE_SPECS
-  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async)) __PYX_ERR(0, 191, __pyx_L1_error)
-  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async) < (0)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async = (PyTypeObject *) __Pyx_PyType_FromModuleAndSpec(__pyx_m, &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async_spec, NULL); if (unlikely(!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async)) __PYX_ERR(0, 163, __pyx_L1_error)
+  if (__Pyx_fix_up_extension_type_from_spec(&__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async_spec, __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async) < (0)) __PYX_ERR(0, 163, __pyx_L1_error)
   #else
   __pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async = &__pyx_type_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async;
   #endif
   #if !CYTHON_COMPILING_IN_LIMITED_API
   #endif
   #if !CYTHON_USE_TYPE_SPECS
-  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async) < (0)) __PYX_ERR(0, 191, __pyx_L1_error)
+  if (__Pyx_PyType_Ready(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async) < (0)) __PYX_ERR(0, 163, __pyx_L1_error)
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount((PyObject*)__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_5mdapi___pyx_scope_struct_6_get_factor_async);
@@ -14869,8 +14906,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_6bt_sdk_4core_6client_12async_client_AsyncStreamClient), __PYX_GET_STRUCT_ALIGNMENT_3_2_3(struct __pyx_obj_6bt_sdk_4core_6client_12async_client_AsyncStreamClient),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_2_3); if (!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_12async_client_AsyncStreamClient) __PYX_ERR(3, 32, __pyx_L1_error)
-  __pyx_vtabptr_6bt_sdk_4core_6client_12async_client_AsyncStreamClient = (struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncStreamClient*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_12async_client_AsyncStreamClient); if (unlikely(!__pyx_vtabptr_6bt_sdk_4core_6client_12async_client_AsyncStreamClient)) __PYX_ERR(3, 32, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_2_3); if (!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_12async_client_AsyncStreamClient) __PYX_ERR(3, 36, __pyx_L1_error)
+  __pyx_vtabptr_6bt_sdk_4core_6client_12async_client_AsyncStreamClient = (struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncStreamClient*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_12async_client_AsyncStreamClient); if (unlikely(!__pyx_vtabptr_6bt_sdk_4core_6client_12async_client_AsyncStreamClient)) __PYX_ERR(3, 36, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -15553,259 +15590,283 @@ __Pyx_RefNannySetupContext("PyInit_mdapi", 0);
   }
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":15
+  /* "bt_sdk/core/client/mdapi.pyx":13
+ * from bt_sdk.core.client.async_client cimport AsyncZmqClient
+ * from bt_sdk.core.client.util cimport fast_uuid4_bytes
+ * from bt_sdk.core.helper.factor import calc_factor             # <<<<<<<<<<<<<<
+ * 
+ * 
+*/
+  {
+    PyObject* const __pyx_imported_names[] = {__pyx_mstate_global->__pyx_n_u_calc_factor};
+    __pyx_t_1 = __Pyx_Import(__pyx_mstate_global->__pyx_n_u_bt_sdk_core_helper_factor, __pyx_imported_names, 1, NULL, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
+  }
+  __pyx_t_5 = __pyx_t_1;
+  __Pyx_GOTREF(__pyx_t_5);
+  {
+    PyObject* const __pyx_imported_names[] = {__pyx_mstate_global->__pyx_n_u_calc_factor};
+    __pyx_t_3 = 0; {
+      __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_5, __pyx_imported_names[__pyx_t_3]); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_imported_names[__pyx_t_3], __pyx_t_2) < (0)) __PYX_ERR(0, 13, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    }
+  }
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":16
  * 
  * 
  * async def _collect_async(observable, timeout):             # <<<<<<<<<<<<<<
  * 
  *     cdef list buffer = []
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_1_collect_async, __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_collect_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_1_collect_async, __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_collect_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 16, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_collect_async, __pyx_t_5) < (0)) __PYX_ERR(0, 15, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_collect_async, __pyx_t_5) < (0)) __PYX_ERR(0, 16, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":77
+  /* "bt_sdk/core/client/mdapi.pyx":85
  *         self._init_event_loop() # used for sync
  * 
  *     def __enter__(self):             # <<<<<<<<<<<<<<
  *         return self
  * 
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_3__enter__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi___enter, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 77, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_3__enter__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi___enter, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[13])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_enter, __pyx_t_5) < (0)) __PYX_ERR(0, 77, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_enter, __pyx_t_5) < (0)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":104
- *             print(f"Event loop error: {e}")
+  /* "bt_sdk/core/client/mdapi.pyx":118
+ * # --------------------------------------------------------------- Ray Async Actor --------------------------------------------------------
  * 
  *     async def get_calendar_async(self):             # <<<<<<<<<<<<<<
  *         """
  *             request calendar
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_5get_calendar_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_calendar_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 104, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_5get_calendar_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_calendar_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[5])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 118, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_calendar_async, __pyx_t_5) < (0)) __PYX_ERR(0, 104, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_calendar_async, __pyx_t_5) < (0)) __PYX_ERR(0, 118, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":116
+  /* "bt_sdk/core/client/mdapi.pyx":130
  *         return data
- * 
- *     cpdef object get_calendar(self):             # <<<<<<<<<<<<<<
- *         coroutine = self.get_calendar_async()
- *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_calendar, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_calendar, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 116, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
-  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
-  #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_calendar, __pyx_t_5) < (0)) __PYX_ERR(0, 116, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":121
- *         return future.result()
  * 
  *     async def get_instrument_async(self):             # <<<<<<<<<<<<<<
  *         """
  *             request instruments
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_10get_instrument_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_instrument_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 121, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_8get_instrument_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_instrument_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[6])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_instrument_async, __pyx_t_5) < (0)) __PYX_ERR(0, 121, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_instrument_async, __pyx_t_5) < (0)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":133
+  /* "bt_sdk/core/client/mdapi.pyx":142
  *         return data
- * 
- *     cpdef object get_instrument(self):             # <<<<<<<<<<<<<<
- *         coroutine = self.get_instrument_async()
- *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_13get_instrument, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_instrument, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[15])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 133, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
-  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
-  #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_instrument, __pyx_t_5) < (0)) __PYX_ERR(0, 133, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":138
- *         return future.result()
  * 
  *     async def get_benchmark_async(self, object body):             # <<<<<<<<<<<<<<
  *         cdef bytes req_id = fast_uuid4_bytes()
  *         cdef object event = Event(topic=RpcTopic.Index, body=body)
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_15get_benchmark_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_benchmark_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 138, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_11get_benchmark_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_benchmark_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[7])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_benchmark_async, __pyx_t_5) < (0)) __PYX_ERR(0, 138, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_benchmark_async, __pyx_t_5) < (0)) __PYX_ERR(0, 142, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":147
+  /* "bt_sdk/core/client/mdapi.pyx":151
  *         return data
- * 
- *     cpdef object get_benchmark(self, object body):             # <<<<<<<<<<<<<<
- *         coroutine = self.get_benchmark_async(body)
- *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_18get_benchmark, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_benchmark, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[16])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 147, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
-  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
-  #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_benchmark, __pyx_t_5) < (0)) __PYX_ERR(0, 147, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":152
- *         return future.result()
- * 
- *     cpdef object subscribe(self, object body):             # <<<<<<<<<<<<<<
- *         cdef bytes req_id = fast_uuid4_bytes()
- *         cdef object event = Event(topic=RpcTopic.Tick, body=body)
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_20subscribe, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_subscribe, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[17])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 152, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
-  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
-  #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_subscribe, __pyx_t_5) < (0)) __PYX_ERR(0, 152, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":159
- *         return obs
- * 
- *     cpdef object get_close_obs(self, object body):             # <<<<<<<<<<<<<<
- *         """
- *             request instruments
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_22get_close_obs, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_close_obs, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[18])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 159, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
-  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
-  #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_close_obs, __pyx_t_5) < (0)) __PYX_ERR(0, 159, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":169
- *         return obs
  * 
  *     async def get_close_async(self, object body):             # <<<<<<<<<<<<<<
  *         obs = self.get_close_obs(body)
  *         tables = await _collect_async(obs, self.timeout)
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_24get_close_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_close_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 169, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_14get_close_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_close_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[8])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 151, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_close_async, __pyx_t_5) < (0)) __PYX_ERR(0, 169, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_close_async, __pyx_t_5) < (0)) __PYX_ERR(0, 151, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":175
+  /* "bt_sdk/core/client/mdapi.pyx":157
  *         return data
- * 
- *     cpdef object get_event_obs(self, int topic, object body):             # <<<<<<<<<<<<<<
- *         """
- *             request instruments
-*/
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_event_obs, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_event_obs, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[19])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 175, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
-  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
-  #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_event_obs, __pyx_t_5) < (0)) __PYX_ERR(0, 175, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":185
- *         return obs
  * 
  *     async def get_event_async(self, int topic, object body):             # <<<<<<<<<<<<<<
  *         obs = self.get_event_obs(topic, body)
  *         tables = await _collect_async(obs, self.timeout)
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_29get_event_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_event_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_17get_event_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_event_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[9])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 157, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_event_async, __pyx_t_5) < (0)) __PYX_ERR(0, 185, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_event_async, __pyx_t_5) < (0)) __PYX_ERR(0, 157, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":191
+  /* "bt_sdk/core/client/mdapi.pyx":163
  *         return data
  * 
  *     async def get_factor_async(self, object body):             # <<<<<<<<<<<<<<
  *         obs_close = self.get_close_obs(body)
  *         obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_32get_factor_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_factor_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_20get_factor_async, __Pyx_CYFUNCTION_CCLASS | __Pyx_CYFUNCTION_COROUTINE, __pyx_mstate_global->__pyx_n_u_MdApi_get_factor_async, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[10])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_factor_async, __pyx_t_5) < (0)) __PYX_ERR(0, 191, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_factor_async, __pyx_t_5) < (0)) __PYX_ERR(0, 163, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":209
- *         return factors
+  /* "bt_sdk/core/client/mdapi.pyx":182
+ * # --------------------------------------------------------------- Sync and Local --------------------------------------------------------
+ * 
+ *     cpdef object get_calendar(self):             # <<<<<<<<<<<<<<
+ *         coroutine = self.get_calendar_async()
+ *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
+*/
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_23get_calendar, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_calendar, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[14])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
+  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
+  #endif
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_calendar, __pyx_t_5) < (0)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":187
+ *         return future.result()
+ * 
+ *     cpdef object get_instrument(self):             # <<<<<<<<<<<<<<
+ *         coroutine = self.get_instrument_async()
+ *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
+*/
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_25get_instrument, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_instrument, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[15])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
+  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
+  #endif
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_instrument, __pyx_t_5) < (0)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":192
+ *         return future.result()
+ * 
+ *     cpdef object get_benchmark(self, object body):             # <<<<<<<<<<<<<<
+ *         coroutine = self.get_benchmark_async(body)
+ *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
+*/
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_27get_benchmark, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_benchmark, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[16])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
+  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
+  #endif
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_benchmark, __pyx_t_5) < (0)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":197
+ *         return future.result()
+ * 
+ *     cpdef object subscribe(self, object body):             # <<<<<<<<<<<<<<
+ *         cdef bytes req_id = fast_uuid4_bytes()
+ *         cdef object event = Event(topic=RpcTopic.Tick, body=body)
+*/
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_29subscribe, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_subscribe, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[17])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 197, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
+  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
+  #endif
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_subscribe, __pyx_t_5) < (0)) __PYX_ERR(0, 197, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":204
+ *         return obs
+ * 
+ *     cpdef object get_close_obs(self, object body):             # <<<<<<<<<<<<<<
+ *         """
+ *             request instruments
+*/
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_31get_close_obs, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_close_obs, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[18])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 204, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
+  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
+  #endif
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_close_obs, __pyx_t_5) < (0)) __PYX_ERR(0, 204, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":214
+ *         return obs
+ * 
+ *     cpdef object get_event_obs(self, int topic, object body):             # <<<<<<<<<<<<<<
+ *         """
+ *             request instruments
+*/
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_33get_event_obs, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_event_obs, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[19])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 214, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
+  PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
+  #endif
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_event_obs, __pyx_t_5) < (0)) __PYX_ERR(0, 214, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+  /* "bt_sdk/core/client/mdapi.pyx":224
+ *         return obs
  * 
  *     cpdef object get_factor(self, object body):             # <<<<<<<<<<<<<<
  *         coroutine = self.get_factor_async(body)
  *         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_35get_factor, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_factor, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[20])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_35get_factor, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_get_factor, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[20])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_factor, __pyx_t_5) < (0)) __PYX_ERR(0, 209, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_get_factor, __pyx_t_5) < (0)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":214
+  /* "bt_sdk/core/client/mdapi.pyx":229
  *         return future.result()
  * 
  *     cpdef void disconnect(self):             # <<<<<<<<<<<<<<
  *         self.async_client.close()
  * 
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_37disconnect, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_disconnect, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[21])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 214, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_37disconnect, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi_disconnect, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[21])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 229, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_disconnect, __pyx_t_5) < (0)) __PYX_ERR(0, 214, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_disconnect, __pyx_t_5) < (0)) __PYX_ERR(0, 229, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "bt_sdk/core/client/mdapi.pyx":217
+  /* "bt_sdk/core/client/mdapi.pyx":232
  *         self.async_client.close()
  * 
  *     def __exit__(self, exc_type, exc_val, exc_tb):             # <<<<<<<<<<<<<<
  *         if exc_type is not None:
  *             print(f"Error: {exc_type}, {exc_val}, {exc_tb}")
 */
-  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_39__exit__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi___exit, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[22])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 217, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_CyFunction_New(&__pyx_mdef_6bt_sdk_4core_6client_5mdapi_5MdApi_39__exit__, __Pyx_CYFUNCTION_CCLASS, __pyx_mstate_global->__pyx_n_u_MdApi___exit, NULL, __pyx_mstate_global->__pyx_n_u_bt_sdk_core_client_mdapi, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[22])); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 232, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030E0000
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
-  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_exit, __pyx_t_5) < (0)) __PYX_ERR(0, 217, __pyx_L1_error)
+  if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_exit, __pyx_t_5) < (0)) __PYX_ERR(0, 232, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
   /* "(tree fragment)":1
@@ -15833,16 +15894,6 @@ __Pyx_RefNannySetupContext("PyInit_mdapi", 0);
   PyUnstable_Object_EnableDeferredRefcount(__pyx_t_5);
   #endif
   if (__Pyx_SetItemOnTypeDict(__pyx_mstate_global->__pyx_ptype_6bt_sdk_4core_6client_5mdapi_MdApi, __pyx_mstate_global->__pyx_n_u_setstate_cython, __pyx_t_5) < (0)) __PYX_ERR(1, 16, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-  /* "bt_sdk/core/client/mdapi.pyx":223
- * 
- * 
- * __all__ = ["MdApi"]             # <<<<<<<<<<<<<<
-*/
-  __pyx_t_5 = __Pyx_PyList_Pack(1, __pyx_mstate_global->__pyx_n_u_MdApi); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 223, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_5);
-  if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_all, __pyx_t_5) < (0)) __PYX_ERR(0, 223, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
   /* "(tree fragment)":4
@@ -15916,8 +15967,8 @@ __Pyx_RefNannySetupContext("PyInit_mdapi", 0);
 
 static int __Pyx_InitCachedBuiltins(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
-  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_print); if (!__pyx_builtin_print) __PYX_ERR(0, 45, __pyx_L1_error)
-  __pyx_builtin_id = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_id); if (!__pyx_builtin_id) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_print); if (!__pyx_builtin_print) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_builtin_id = __Pyx_GetBuiltinName(__pyx_mstate->__pyx_n_u_id); if (!__pyx_builtin_id) __PYX_ERR(0, 91, __pyx_L1_error)
 
   /* Cached unbound methods */
   __pyx_mstate->__pyx_umethod_PyDict_Type_items.type = (PyObject*)&PyDict_Type;
@@ -15937,14 +15988,14 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "bt_sdk/core/client/mdapi.pyx":68
+  /* "bt_sdk/core/client/mdapi.pyx":76
  * 
  *     def __init__(self,
  *                     tuple addr=("127.0.0.1", 8888),             # <<<<<<<<<<<<<<
  *                     int timeout = 30):
  *         async_client = AsyncZmqClient(addr=addr, timeout=timeout)
 */
-  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(2, __pyx_mstate_global->__pyx_kp_u_127_0_0_1, __pyx_mstate_global->__pyx_int_8888); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 68, __pyx_L1_error)
+  __pyx_mstate_global->__pyx_tuple[0] = PyTuple_Pack(2, __pyx_mstate_global->__pyx_kp_u_127_0_0_1, __pyx_mstate_global->__pyx_int_8888); if (unlikely(!__pyx_mstate_global->__pyx_tuple[0])) __PYX_ERR(0, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_mstate_global->__pyx_tuple[0]);
   __Pyx_GIVEREF(__pyx_mstate_global->__pyx_tuple[0]);
 
@@ -15992,31 +16043,31 @@ static int __Pyx_InitCachedConstants(__pyx_mstatetype *__pyx_mstate) {
 static int __Pyx_InitConstants(__pyx_mstatetype *__pyx_mstate) {
   CYTHON_UNUSED_VAR(__pyx_mstate);
   {
-    const struct { const unsigned int length: 8; } index[] = {{1},{9},{21},{35},{7},{18},{31},{21},{32},{179},{37},{1},{2},{1},{8},{24},{28},{27},{7},{6},{2},{9},{87},{14},{10},{8},{5},{4},{5},{5},{10},{7},{7},{5},{15},{14},{23},{25},{16},{19},{25},{18},{24},{21},{19},{21},{19},{16},{22},{20},{26},{15},{99},{20},{9},{8},{6},{4},{12},{4},{6},{7},{7},{18},{9},{4},{24},{23},{25},{20},{6},{11},{20},{11},{9},{18},{5},{14},{36},{32},{31},{13},{4},{5},{5},{5},{13},{6},{4},{8},{3},{8},{5},{10},{7},{4},{1},{9},{4},{3},{5},{6},{8},{7},{8},{7},{16},{14},{11},{13},{8},{3},{6},{3},{13},{19},{12},{18},{15},{13},{15},{13},{10},{16},{14},{20},{16},{12},{2},{13},{4},{5},{4},{8},{14},{11},{6},{10},{5},{7},{8},{4},{7},{14},{4},{3},{10},{9},{9},{10},{12},{8},{7},{9},{3},{2},{10},{3},{5},{15},{7},{14},{12},{11},{10},{20},{14},{12},{19},{10},{17},{13},{6},{10},{9},{9},{6},{5},{3},{24},{11},{4},{4},{9},{14},{13},{12},{10},{10},{12},{19},{5},{5},{9},{12},{6},{6},{8},{9},{5},{7},{5},{6},{12},{5},{6},{8},{4},{4},{11},{9},{28},{27},{39},{47},{45},{47},{41},{43},{43},{41},{11},{11},{7},{20},{38},{103},{2},{2},{55}};
-    #if (CYTHON_COMPRESS_STRINGS) == 2 /* compression: bz2 (1806 bytes) */
-const char* const cstring = "BZh91AY&SY\235\233\022\360\000\001*\377\377\357\375\377\326\353\257\377\375\257\357\374\212\277\377\377\354@@@@@@@@@@@@@\000@\000`\006\356\373+m\203U%\024\000\004+\013\tE\021\350L\246\232\232y\212zM4e\032\00352\036\241\342\200\000\320z\203M\032f\211\352mO)\345\036\2322\207\000\000\320\000\320\006\200\000\r\030\200\001\240\000\000\000\001\240\007\000\000\320\000\320\006\200\000\r\030\200\001\240\000\000\000\001\240\002SD\t\242d\230F\223eM\225?L\251\372\201<\246\232\032a\000\000\0002\000\006@\031\250\034\000\003@\003@\032\000\0004b\000\006\200\000\000\000\006\200\tM S\023F\215\004\302\032\247\246\243\364\240\364\203A\352\r\000\000\000\032\r\003C\324\000\365\003\210\315\260\303\211\177\210b\346D\312\252\262\336\311\232jd\345m\035u\005E@U\004U\021\371\316\306j,CKuZD\215\210'\377\207\030GA\253\317X\230k5\266X\003\306h1$)\205`8\231\0054\223\227\325?\017\265\373/C\354]=\022\222n\227$\336w\356\3530\3141Y\303:m\351\252\364\265\376\272\016\0162`\356F\r\261\326\330\332\214\202\224k \321\245\227E\265\225#Ea\200\300\254S\206\326\2457\273\243\305<\346\354'\014N$\250\234\207\333\3510$w\350\341\010\016\337\273\033\243\306\201\243,g\310\335Q\357&Y9\354&XD\270\327\372\277&=ZUa\020I\230*\313\266\350\363\333\226\364\213\004\261\327\333\034S\344\320\371\260\345\275\2152\232\366\350\004\225At\361\330\300\334\361\2644\366\306L\20127c\351\301\277\227\217]\363\362\364\007\364\360\265\004\217\333\266y\0322\355\307\223h\356\322\226\365\375`\2147\345\007\337}\350\332\223\274W\203\314\324\354v\254\310t\311\264\251\305\317\212V\276{\211\265\251\030\351P\212T\372\313\202\010u\232\321ny\000=\254\304\352i\020\256\200L\253\031\345\344\353\250<\242\006\347\216$\361\2309\nO\343~\227|]SUpz\327\014U6\275\213\310\232<\347e\240\320T\307M%IC\223.\355\257J\303\242\036!\324\204\013\324p\3025(\013\021\245mv\233\205*\304\2073M%!5\223\315\334\222>'\200\302]\271\310\200\026.X\245f\222\363\023f5KP\230 '\265\347\244\363\226\325\215\221Y\273\320\215\221\r+\257<\031\257\204\303\2232h\376s\205\220\3475\315}\032\013m""\273\231\004+~\312\017\312d\230\307\325\303\347\344\323\220\035\007\\\243\334\034p3R\366\320l`\342\231\270\2556\344\327b\371\274\013\222\202\366\237\233\326\362z=\317\217?\210\354\270s\272Y\370\254\321\275\211\262\r5SFW\344\356FV\327\315\217\205\230\253c\224F\n\332\312\201Z\022|\303JZcVN7\014`S\237\220\\[\370\233!\274\020f\203h\215\375\305\230\261\276\235\357D\360\024\356A\261c\020$\223\\\002y\207\t\010\3368\362?\206\006w\202\356\237\210&\306QOd\237\201Y\232\224\201\256Q\256\352\021\374\321p\026\023\305\022\026 \334\336\203l:\373\271T\325\341\253\231\232]\361\035\235jU\315A\300~\016Y\251$\222\302\007O\2037j\234\367[\277Kb\t\026\363\332z\236Z\237Ud\026\036\377\363(\224\350\304\257l\005\241Bd\354\270+b\0314\2445n\222\035\335$\033\004\357\031A\243\226\253.E\3076a\3139R\374MF\031^\355j\354\311\263\304\223\276\022n\353t0\311\t\t\000\204\250=!\323<\226CP\300\313t\247}\261\242=\2337\037\365\240V\215\343M\241\0347.i\234\326:!\262\n-xT\304\357\223\221gI,\223\242!\311H\226\035!L5\324\270\352j\212\334p@u \322\032\231\206\266\344\355%\321\300F\026\231\362\026\003\225\033\022\212\342m\325\275\2445\365\341:\007\010\320\250<\344\023v\232\352\3551K\2420\336\242\214\305\354\356:M\356[\206:B\363Q\247\272}<\267\226\031\332L&\334f\020\214>Jf\203\001\227\371\r\375ZnMk3af5\032!\310r\235\201\007\251\355\342T-S\243\001&\206R~|(%\254\2321\223\302z'gAT$\321\016\345b\246\324w\265S2\021T5A\026\2241/\214\356\3268\217\266\014\033zvi\314\266\025iRD\360\250`0\342\031\241\020\207\177j4h\315\234{\033\342j\005\240*q8g\335\320\3151\013pd\267\344\271)\353\245q\356j\301\"Z\364>\0211fk\353\354Q\301Wn{\004\324d#\035@w\303\204\223;FC]\034\003\232\317o\022\313h\354\221\230x\252\355<\373z\260\222\312\205\243\323`\0350\223\"2R\270\371Y\363\327\272\t\256x\334W\027\032)\371|=\244\313\325\021\362\375v\311\252&\270\257\004BC\352~^\301&\204\271\323\005|cr\3319\032\317\026Dc\2260\353\253(\225\010|IPF\370\240L\240r\232{3G\253\r\032S\264L\225\224\322\034\273\035R\312\036s\346\010\227K\234\203\264r2\"\022\243\273\363""\010xk\201[\215\271z\366\334^\373h_\"\225\331\267Q\2427\254\265\334\345\212y\317\014\026{v\203\354\306\004[P\220Nm\032z6a\317B\314zJ\355\330\200:\305]\355\213\224@:\r\213\235\017\211gsYHE\244$A\231\211 q!\031\300\256b7\345\235\361\221\324\200\305;k\302F\203#LHZJ\306\345\252A\013\250\371\302/6'\024\332hSv\274\321k\260\232\355C\220\335\205\260\353\214o\275g\3005ie\253\006\004Z\206y\302\340\314\265\\`1\256\263u\302\357.\3267\006\023iX\240G\"2,l:;<\253\030\315l\215\333}`\202\276^\020\021\201\356|\354c\003\257\300\035\231\322\203\322\356\t]_}\265\312\311\235a&d\033\2236\257*\005k\201X\014qh\r}\215AQFkCBu,\357\275\213\230%t\030\323M(\255\250\274\t\270\317%\3047C\207g\306\320|\303\270(F\360\226\227\212\220\326\232r\027n\346\343\014\262d\265~xDP\306a\237\275\267\332\367\033\370\226\325]\350\332\236\027\022\2048\217\365M\364\374\26795\365S\035t|8\344/\3229\016\014\255m\021\330\223\252g\362\321 \312\212\221W\257\3450Q\2041\300\025H/|9\237\325\242\017\354\331r~5\263\273\036`\353f\200:!\3401\227\203\307\014\336\022\356\371{|\376\237\022\227\t\367\313\2249\023\010%\316\363r!\266\030 \0172t$U\022\201\317\376.\344\212p\241!;6%\340";
-    PyObject *data = __Pyx_DecompressString(cstring, 1806, 2);
+    const struct { const unsigned int length: 8; } index[] = {{1},{9},{21},{35},{7},{18},{31},{21},{32},{179},{37},{2},{1},{1},{8},{24},{28},{27},{7},{6},{2},{9},{87},{14},{10},{8},{5},{4},{5},{5},{10},{7},{7},{5},{15},{14},{23},{25},{16},{19},{25},{18},{24},{21},{19},{21},{19},{16},{22},{20},{26},{15},{99},{20},{9},{8},{6},{4},{12},{4},{6},{7},{18},{11},{9},{4},{24},{23},{25},{20},{6},{11},{20},{11},{9},{18},{5},{14},{36},{32},{31},{13},{4},{5},{5},{5},{13},{6},{4},{8},{3},{8},{5},{10},{7},{4},{1},{9},{4},{3},{5},{6},{8},{7},{8},{7},{16},{14},{11},{13},{8},{3},{6},{3},{13},{19},{12},{18},{15},{13},{15},{13},{10},{16},{14},{20},{16},{12},{2},{13},{13},{4},{5},{4},{8},{14},{11},{6},{10},{5},{7},{8},{4},{7},{14},{4},{3},{10},{9},{9},{10},{12},{8},{7},{9},{3},{2},{10},{3},{5},{15},{7},{14},{12},{11},{10},{20},{14},{12},{19},{10},{17},{13},{6},{10},{9},{9},{6},{5},{3},{24},{11},{4},{4},{9},{14},{13},{12},{10},{10},{12},{19},{5},{5},{9},{12},{6},{6},{8},{9},{5},{7},{5},{6},{12},{5},{6},{8},{4},{4},{11},{9},{28},{27},{39},{47},{45},{47},{41},{43},{43},{41},{11},{11},{7},{20},{38},{103},{2},{2},{55}};
+    #if (CYTHON_COMPRESS_STRINGS) == 2 /* compression: bz2 (1814 bytes) */
+const char* const cstring = "BZh91AY&SY\021\226\271/\000\001*\377\377\357\375\377\326\353\257\377\375\257\357\374\212\277\377\377\354@@@@@@@@@@@@@\000@\000`\006\356\371\265\2265Q\nJ\224\004\252\230!(\242bj\237\222\233SO\323\023I\210\304@zjd=C\323P\000\032\017Pi\243M\221=L\236S\312=4e\016\000\001\240\001\240\r\000\000\0321\000\003@\000\000\000\003@\016\000\001\240\001\240\r\000\000\0321\000\003@\000\000\000\003@\004\246\210\024\304i\031\031\032&&\247\224\320\311\223@4h\000\000\000\000\000\000m@\340\000\032\000\032\000\320\000\001\243\020\0004\000\000\000\0004\000Jj\000Q\2056\212\237\242O\312i4\365\036(2z\215\r\036\240\000\000\000\320\003&\236\243\020\310\034F\366\303\0265\376!\217\231\0232\252\264\356\\\374\364\313\312\312K\226\202\242\240*\202*\210\364\347c2\213\020\322\323V\221#m\004\377\341\306\021\250\313\321X\230g3\266\031\001\341$\027\244)\005\200p\231\004\365\222\217\337\311>\267mz\277\222\346\352\306)\271\234E\275?\333\257.\325\216\337/k\033\3737\252\305w(\023'+\024\356\310|\250\371=\022\317\267us\207\033?\331\354\254\251\030,\r\203a`\247\r\275:N\367GJs\031\264\234\0218\222\242\207\333\3510\244spP\304\022\035\277\2068\345\304\201\245<O\205\273\222\347\241\205)\260\241y#Q\233\366~\236;\332\225\301\020I\234*\265rX\353\273\2274\213CD\267\231\034S\344\300\361\256\345\315zE5\355\316\t*\202v\315\306\006\325\316\3100\364\006L\20124\346\361^j\333\277\215\260\351\353\016\317\025$$~;%\270\320\217\341\016\216\301\316h\307\205\177t\203\370t\003\270r\311\033Rs\240\272|M?+\255\233p\346\213)S\207\243\024\252\372\016&\316\234d\262\241\024\250,.\027\341\326b{0\017\203\272\315\247SH\205tC\235V3a\335q\324\036Q\003n\307\001;\346\016B\223\361N.\205L+g\336\255\257T\320\366.\2214t\034\226\203\021R\374q\225%\016LM\237\032C\242\036!\326\023p~\253\206H\312\240&F5\265\3157\nU\211\016fM%!5\223\315\334\222;\216\360\254;\274\030D\200\013;\212\223\244R\\\204Y\213\341x\230\036\021\322\350\343\034%\245_dVn\364#DCJ\345\321\006dw\033'I\2314~3\205\200\346\325\306}z\213\256\307\215\003\327\244\203\232$\030\303{o\251\271""\257\020r\016\2217`\033\3572\236\206\357\215L\034\t\233\202\270\350\301\241\213\263<\013\205A\256\373\251\330\354\367]\3473\341\252\333\016G\rN\226=FhibL\203v\263\327\223\272=\210F\353qa\317f+\261\304\321K6j\202\270\"\353\303\tR#>i\303of{(\307\200[[\256h{q \275\006B5m(\305\016\031\361\365eB}\207\265\370\010\022I\261\001:A\264|2\034:'\362\300\316x\227#\364\202\030\333\0256M\365\253\364\326\260o\316W\337\236\304\377Dg\003\002\225\221\027\240\322\335&\3338\371\270je\352e\332f\227<G'\032\225s(5\217\255\3135$\222Y t\371\031\271T\347\246\334\370\332\360H\267E\247\225\345\225\362\326Aa\356\376\360\211N\214J\353d\026\352\212\024\2778\\\304mjHk\235$;\272H6\t\336S\206\226\336K\361E\207\032+\266\370J\333\013\212\347\265\232\223\314\332/\314A\316\254[\302\246\266\031!! \020\225\007\244:g\222\300j\031\0144\312wh\214Q\332\263p\1778\205h\334I\261#^\225\2653j\306\250l\002\213>J\227\234\362r,\351%\202tD9)\022\256\360L\317j\255\372U\221g\016\004\007y\006\260\336f\032\354S\232+\253\272A\367\032\267\n\001\266M\230\222\260\233L\355H\rlk\031\006\353\360&\016\214\001E4\326\316R\364\265FM\305\024f.\263\270\351\007n\332\357|{\024i\351\236\367\016\341a\235\244\302m%\340\364W\2213>\243.\340j\357\3604\246\245\031\253F.0C\207\270\247 A\325\362o*\026\251\253 \223C)>\356J\tg&\213\344\360\236\211\331\320U\t4C\271X\251\241\034\355T\314\204U\rPE\244C\022\351\273\265\r\203\262yV\324\234\315\030\224\254\332\022\201\032\314*0\341\014\317C\320\347r\306-\031\231\307\261\271\023P,AS\200\327\233\233S4\304-!\202\334\301p\251\347\245o\346j\301\"Y\361?\301\r`.\317\310\243Z\256\214\333bj2\021~P9\341\302I\235\243\001\256F\260\332\263\333}\030h\035\2223\006\372\252i\346\345\331\222K\n\026\216\371\200t\302L\210\301J\341\360\263\346\317\246\t\255\330\322V\367\032)\360u<\204\313\254#\303\360\233\006\250\232\341]\004BC\345~\037\030\223B[\251\202\274Cp\355\316Fs\177\002/\302\370u\263\010\225\010{\311PF\344P&P8f\236\314\321\326!\243\032r\211\222\262\232C\2271\262XC\316{A\022\336s\2049G\214\010\212;\273\273\356\016p""\236\326\002v\033J\352SIke\"\331\311OFW\030#R\317\215\215\271\223\243\032\325_\226@\3538D\364\\9\004^\317\303\216\2148\347\321\217\021Y\274\004\001\320\025w\032\367(\200t\033\027Y\017\231#|\246\354\232bD314\016$#P\026\220\216\035\022\310\204N\362`\276W[9\t\214\215p\037q\034\315\301X\204g\253\356\004\236\214RI\265T\257\036\376\2316|\r\374\250r8\360l7\345-\032\026\345\206\262Z+J\"\3443\244\374CJ\246\366%L\027\202\335 \307\226\366:\001q\260\260\236K\004m,Xtru\325\344f[q\247Gd \257_\\\004d;~=\361\220\343\352\003\263:Pw\274\301+\226\215\031n\235\3649D\231\220q\246m\356\324\027-j\360c\245\272\022vg\203\243\210\223\003Fm\031\237{W\260\312\254\333\0140\242\262\242\335M\306\374\227\220\335\016\r\217\033\001\363\016\340\241\033\242[^\032#\024\223\220\277\177?\020f\223-\274\020\004D\354\206(7\266\373^\343\177\032\333\253\275\033\020\005\344\235\0163\375S}?,\315J\372\211\222\312<\034R\030(\234\205\334\314l\221\332\223\252hr\320\037\314\212\221Y\263\3450\320\2042>\025G\370\376\034\317jP\007\2666\234\203\"\355n\307\234:\331\337\rP\360\031\0160\262\020v\027V\265\332\376jJ\325\022\373U\202\242\240\240\325v\033`\224\034\021h\007\241J\222*\211@\347\376.\344\212p\241 #-r^";
+    PyObject *data = __Pyx_DecompressString(cstring, 1814, 2);
     if (unlikely(!data)) __PYX_ERR(0, 1, __pyx_L1_error)
     const char* const bytes = __Pyx_PyBytes_AsString(data);
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (likely(bytes)); else { Py_DECREF(data); __PYX_ERR(0, 1, __pyx_L1_error) }
     #endif
-    #elif (CYTHON_COMPRESS_STRINGS) != 0 /* compression: zlib (1622 bytes) */
-const char* const cstring = "x\332\215V\317o\033E\024nDJ\335\037*\030\n\255P\021\033\241\264\252\332lk\232\266\024\020\310J\023\250\240%\t\221z\250\252\321x\367\331^\262;\263\236\231Ml\301!G\037\367\270G\037}\3641\307\0349\346\350c\377\004\376\004\336\233ql\3071U\225\354\354\2337of\337\274\367}\357\371u\345\233'\376\003\374\253TuG\004kq\004\302\254\254\357\341\370\233\224\351\033\257j\014\017\232\020zFz\320\216\264\211D\303\263\353\036\031|\347\255+%\325w#U\214*\017\234\346\365\213\260\232Fo\234\201\027\3108\206\300\356\016\271\341\223\345\027\240\0320\273g'J@ffv\227\377R\032\360L\223\033o\255c\232Rx\221\366B\210\243\032(n \356x\332\250(0\240\310Hx\233\353\233+\253\337\256z\\\204\236\202?\361$\355\351\254\026\304\\k\320\236\254{\265,\212\361x\317tR\320\276\367\274\356ud\346\tp\027N\321nz\203i\202\3604\030\022\274\333\\\010i\270\211\244`\270\035}\274\355\205\221\"w\367\200vo\360X\203\377\306\373\303pe\360\300H\240c\202\307^\215\007\273\r%3\364\3124\025\360\320\367\357y?\3610dx \324\014\323\341\256\037H\005~`\363\341'!O#\247\277O\372\373N\177\337\352\375\264\323\236\263\226\231(\366\323v\030F\232\327b\000Ac#\210\264\223B\rq\335g\2240\346\234\240X\342\367\275\227R\200\207\031\263\006\234P\301\334\221s\rl\306\247\026~\240\014\210\206\226\231\n\340\307j\370g\246M\202\233\327x\014\"\344j-\226\032\236\375\376r\335\002\346\271\010\241\375\\\340\236,\261S\263.\262\004_\0331oX,\330\301g\014(x\214\215\247\355\310Lf\n\302,\000\026XLL\324\230)\215\t\232]\300\210\004R\010L\224\2337\300\260\032\210\240\231p\265;G\305l\020&\013\301\350*g5g,\351\262\363\225\262\246'*\240X\314\3329\345)\273:\017\214T\263\363\331\215\3218\236\363t\323\326\010m\035(d\017c\233\2356[\333\3100\331\217\035\230\330*\241\211=v\271g\217,\326\330#\273\221\355\311(d,\336\344\n\204\3230e'\314H\226v\330\252\305\306\017\261\304\310\350\037\375}\305S\367\211\315\3163\344'{\tm\263\r\365\355\250\321\264\350\330N\203\035\231F\301\216E\342N\024\354\216*\200-\036\310\014|\010I\214\3618f\356\n\221\034\275\210*h\032\t\320\270\264\317\t\0315\031v\336M""\244Sz\"\313\264\272\tq\n\312w\361\235^H\2254\022\253R-\253\327A\341\355\202Q\022\002rLK\252\005\366\016\232\327!\250c<}\027\021fk\010\275\320OL\0073\212\007@\225\300\341aT\351\330\210p\323\263I\034\361\364@&i\014XN\336ac\213\351;\326\005F\037\031\020p\303\014\325\002M\001\244\247B\30374<\014\360\022\310\234zf2d\027\207D\n\252\300\370\200\301\324\204\034\257\024R*\335k\302)\224R\274P\210\265\000\306\264\005d5ze!\r\355\200\231\232\035\261\350\322{\217\307'\214v\301\324u\216\271\316\262(\\e\265\216\201\3519\342\270\256d\"U\030a-%\221\374A\236'\0101\n8\215\246\301\261Dcc1\247\230<\207\326\323\364=K\345\031\022\237\242\357\014qOQvB\316Y\232\236&\343<j\222NeB`\025u\345\2315N\352\030C\326E\232\215\361\036\031H\350\321\316.\341\210+|A\202\375\220\t\236\020!FS\224\022\031f1L\277\205i&\272\241S\300\240\221\371x\204}7\270\013\321\351\204\031\274\030\3763GE\222l,HPDd\024@\355\021\240\246qz\202\307\021\356dJ\255\032S,S\235r\234$\221\326\3300S\231\246\3308LJ\271\305\253\312\224\032\253N;\0347\2437\330\344\030\376\016\tvu\226\270\231\002\235\305\306\311\243\360\220H\240rR&\260\242\354\342MG\025\212t{\026\360\030\025\326\312x\354n\213H\267=\273\355\217\235\033\267\024v\246\271\214\025\320&\261\2059AOFA!\311\006\205\004\033\024\347\245\0233\201\377\223\354MU\n\322\327%\361CQ\345\304\036\215\375\331\260\020jYC\217\201Ey\260\263v\0006<\266\305\215rF\222\373\030J!\324\271\r\316\270\005\2629\355P\323\017\023\253\0327\202\221`Ow\265\3018^04\242\321\272\214\320DA\356\033W\244\r\225\356,\245\332\220!7N\276\203\264\316\334\240mQ\306\013R#\350\000W\007\013\303\305\257{\225\336F\177\351\240\372\266t\261[\356\2420,]\356\256vu\276\234\267\206W>>\376x\271\267\325\013\216\357<=,\377\317Z\377\313\001wKO\363\237\213\312\360J9/\347w\212J\361k\257\325\2774X\032T\206\245+\335\027\305\347E\353\240\372o\351\334\305/\217o\336\353\343\206\233\305z\257\334\363\007\245\303\363\207[oKW\273a\276R\030t\350\027Z\375\250\333\242So\316\030_\030d\207\325\371\306g\317\276\325\277\320\317\006\325\377;\373Z\376\354""\370\306\335>\372W\316\257\037\337\250\014\312\203\345\301_G\313G\346\237\n\031\355\345\257\212\352\330\360N\277\334_z?St\241\277\365~\246+\357a8\216\336\020/\322\310\267r\033o\272\304\302\333E\212\366\322p\361J\367\347\374a^+\026\016\026\376\375\360\334\245\313\303\322gd8,}Q,\025\253Ek\270x\271\373\260[\313?\310\237\240\242\202V\245s\347\257vw\362\257z\213\275\337\007\253\203\375\303\360htN%\337(\356\365\370p\361\302\301^\367U\276^\\+\320\311O\3603\245\353y\353m\351F\261@k-\364\341\370\243[\275\260\277\324\1772\270{\370\352\010#}J\263\205\200\342\344\344WE\353\330{0\270|\370\375\321\356\361\326\366p\361\323\374QQ\352-\364\312t\320\337\344\323\260t\033\361R\032\\=\344\344k\345?mR'\313";
-    PyObject *data = __Pyx_DecompressString(cstring, 1622, 1);
+    #elif (CYTHON_COMPRESS_STRINGS) != 0 /* compression: zlib (1626 bytes) */
+const char* const cstring = "x\332\215V\317o\033E\024nDJ\335\037*\030\n\255P\021\033\241\264\252\332lk\232\266\024\020\310J\023\250\240%\t\221z\250\252\321x\367\331^\262;\263\236\231Ml\301!G\037\367\270G\037}\3641\307\0349\346\350c\377\004\376\004\336\233ql\3071U\225\354\354\2337of\337\274\367}\357\371u\345\233'\376\003\374\253TuG\004kq\004\302\254\254\357\341\370\233\224\351\033\257j\014\017\232\020zFz\320\216\264\211D\303\263\353\036\031|\347\255+%\325w#U\214*\017\234\346\365\213\260\232Fo\234\201\027\3108\206\300\356\016\271\341\223\345\027\240\0320\273g'J@ffv\227\377R\032\360L\223\033o\255c\232Rx\221\366B\210\243\032(n \356x\332\250(0\240\310Hx\233\353\233+\253\337\256z\\\204\236\202?\361$\355\351\254\026\304\\k\320\236\254{\265,\212\361x\317tR\320\276\367\274\356ud\346\tp\027N\321nz\203i\202\3604\030\022\274\333\\\010i\270\211\244`\270\035}\274\355\205\221\"w\367\200vo\360X\203\377\306\373\303pe\360\300H\240c\202\307^\215\007\273\r%3\364\3124\025\360\320\277\347\371?\3610dx \324\014\323\341\256\037H\005~`\363\341'!O#\247\277O\372\373N\177\337\352\375\264\323\236\263\226\231(\366\323v\030F\232\327b\000Ac#\210\264\223B\rq\335g\2240\346\234\240X\342\367\275\227R\200\207\031\263\006\234P\301\334\221s\rl\306\247\026~\240\014\210\206\226\231\n\340\307j\370g\246M\202\233\327x\014\"\344j-\226\032\236\375\376r\335\002\346\271\010\241\375\\\340\236,\261S\263.\262\004_\0331oX,\330\301g\014(x\214\215\247\355\310Lf\n\302,\000\026XLL\324\230)\215\t\232]\300\210\004R\010L\224\2337\300\260\032\210\240\231p\265;G\305l\020&\013\301\350*g5g,\351\262\363\225\262\246'*\240X\314\3329\345)\273:\017\214T\263\363\331\215\3218\236\363t\323\326\010m\035(d\017c\233\2356[\333\3100\331\217\035\230\330*\241\211=v\271g\217,\326\330#\273\221\355\311(d,\336\344\n\204\3230e'\314H\226v\330\252\305\306\017\261\304\310\350\037\375}\305S\367\211\315\3163\344'{\tm\263\r\365\355\250\321\264\350\330N\203\035\231F\301\216E\342N\024\354\216*\200-\036\310\014|\010I\326\367H\216^\304\021\264\211\004hn\313\224\2033\343\373\234\320Q""\223a\347\335d:\245'\302L\253\233\020\247\240|\027\343\351\205TI#\2612\325\262z\035\024\3360\030%\002\305\230iI\365\300\336C\363:\004u\214\251\357\242\302l\035\241\027\272\214)aF\361\000\250\0328L\214\252\035\033\221nz6\211%\236\036\310$\215\001K\312;llA}\307\272\300\014 \013\002n\230\241z\240)\226\364Th\370\206\206\207\001^\002\331S\317L\206\014\343\220HAU\030\0370\230\236\220\343\225BJ\247{Mx\205R\212\027\n\261\036\300\230\272\200\314F\257,\254\241\0350S\263#\026^z\357\361\370\204\325.\230\272\316\265aY\026\205\253\254\32610=G,\327\225L\244\n#\254\247$\222?\010\217\004\263O\001\247\32148\226il.\346\024\233\347P{\232\302g\351<C\344S\024\236!\357)\332N\010:K\325\323\204\234GO\322\251L\010\254\244#L7Nj\031\2130\272l\322B\030\316\306<\210\014$\364h\267)\341\0102|A\202\r\222\t\2161\032OQJd\230\3050\375\026\246\231\350\206N\001#H\346\343\021\366\335\340nG\247\023\200\360\226\370\317\0347I\262\201!A\021\263Q\000\265G\350\232\006\355\t8G \224)\365n\314\267Lu\312q\222DZc\007Me\232b'1)%\032\357-S\352\264:\355p\334\214\336`\327c\370\303$\330\325Y\342f\nt\026\033'\217bE\"!\314I\231\300\022\263\2137\035\225,\322\355Y\364cTX+\343\261\273-\302\3366\361\266?vn\334c\330\231n3V@\233\304\026&\010=\031\005\205$\033\024\022lP\234\227N\314\004\376O\2627U6H_\227D\026E\245\024\23366l\303B\250e\r=F\031\345\301\316\332\001\330\360\330\2367\312\031I\356c(\205P\34768\343\236\310\346\364GM\277T\254j\334\031F\202=\335\025\n\343H\302\320\210F\3532\342\024\005\271o\\\3256T\313\263\224\nE\206D9\371\016r<s\203\266\025\032/H\235\241\003\\\035,\014\027\277\356Uz\033\375\245\203\352\333\322\305n\271\213\302\260t\271\273\332\325\371r\336\032^\371\370\370\343\345\336V/8\276\363\364\260\374?k\375/\007\334-=\315\177.*\303+\345\274\234\337)*\305\257\275V\377\322`iP\031\226\256t_\024\237\027\255\203\352\277\245s\027\277<\276y\257\217\033n\026\353\275r\317\037\224\016\317\037n\275-]\355\206\371Ja\320\241_h\365\243n\213N\2759c|a\220\035V\347\033\237=\373V\377B?\033T\377\357\354k\371\263\343\033w\373\350_9""\277~|\2432(\017\226\007\177\035-\037\231\177*d\264\227\277*\252c\303;\375r\177\351\375L\321\205\376\326\373\231\256\274\207\3418zC\274H#\337\312m\274\351\022\013o\027)\332K\303\305+\335\237\363\207y\255X8X\370\367\303s\227.\017K\237\221\341\260\364E\261T\254\026\255\341\342\345\356\303n-\377 \177\202\212\nZ\225\316\235\277\332\335\311\277\352-\366~\037\254\016\366\017\303\243\3219\225|\243\270\327\343\303\305\013\007{\335W\371zq\255@'?\301\317\224\256\347\255\267\245\033\305\002\255\265\320\207\343\217n\365\302\376R\377\311\340\356\341\253#\214\364)\315\026\002\212\223\223_\025\255c\357\301\340\362\341\367G\273\307[\333\303\305O\363GE\251\267\320+\323A\177\223O\303\322m\304Kip\365\220\223\257\225\377\000\343g.\377";
+    PyObject *data = __Pyx_DecompressString(cstring, 1626, 1);
     if (unlikely(!data)) __PYX_ERR(0, 1, __pyx_L1_error)
     const char* const bytes = __Pyx_PyBytes_AsString(data);
     #if !CYTHON_ASSUME_SAFE_MACROS
     if (likely(bytes)); else { Py_DECREF(data); __PYX_ERR(0, 1, __pyx_L1_error) }
     #endif
-    #else /* compression: none (3349 bytes) */
-const char* const bytes = "[127.0.0.1AsyncClient-EventLoop] Attached to existing Event Loop: Error: Event loop error: [MdApi] Error collecting data: [MdApi] Merge error: [MdApi] Timeout collecting data.Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.] Started internal background thread.., ?add_notebt_sdk.core.client.mdapibt_sdk/core/client/mdapi.pyxbt_sdk/core/client/util.pxddisableenablegcisenabledself._loop_thread is not None or self.async_client is not None or self.loop is not None<stringsource>AdjustmentCalendarCloseDONEEventIndexInstrumentIntEnumIntFlagMdApiMdApi.__enter__MdApi.__exit__MdApi.__reduce_cython__MdApi.__setstate_cython__MdApi.disconnectMdApi.get_benchmarkMdApi.get_benchmark_asyncMdApi.get_calendarMdApi.get_calendar_asyncMdApi.get_close_asyncMdApi.get_close_obsMdApi.get_event_asyncMdApi.get_event_obsMdApi.get_factorMdApi.get_factor_asyncMdApi.get_instrumentMdApi.get_instrument_asyncMdApi.subscribe__Pyx_CFunc_6bt_sdk_4core_6client_5mdapi_5MdApi_void__lParenMdApi__rParen_to_py_4self.<locals>.wrap__Pyx_PyDict_NextRefRightmentRpcTopicThreadTickTimeoutErroraddradjust__all__asyncioasyncio.coroutines__await__bodybt_sdk.core.client.mdapibt_sdk.core.client.utilbt_sdk.core.helper.factorbt_sdk.core.protocolbuffercalc_factorcall_soon_threadsafecfunc.to_py__class__cline_in_tracebackclose_collect_async_collect_async.<locals>.on_completed_collect_async.<locals>.on_error_collect_async.<locals>.on_nextconcat_tablescorocoro1coro2coro3create_futuredaemondatadatetimeday__dict___dictdisconnectdisposedonee__enter__enumerreventexc_tbexc_typeexc_val__exit__factorsfast_uuid4_bytesfast_uuid4_strfromordinalfromtimestamp__func__futgathergetget_benchmarkget_benchmark_asyncget_calendarget_calendar_asyncget_close_asyncget_close_obsget_event_asyncget_event_obsget_factorget_factor_asyncget_instrumentget_instrument_asyncget_running_loop__getstate__id_is_coroutineitemitemsloop__mai""n___member_names___members__module__module__monthmsgspec__name__name__new__new_event_loopnextobsobs_adjustobs_closeobs_rightobservableon_completedon_erroron_nextoperatorsopspapermissivepopprintpromote_optionspyarrow__pyx_checksum__pyx_result__pyx_state__pyx_type__pyx_unpickle_MdApi__pyx_vtable____qualname__reactivex.operators__reduce____reduce_cython____reduce_ex__req_idres_adjustres_closeres_rightresultrightrunrun_coroutine_threadsaferun_foreverselfsendset_debugset_event_loopset_exception__set_name__set_resultsetdefault__setstate____setstate_cython__startstatesubscribesubscriptiontablestarget__test__threadingthrowtimeouttopicupdateuse_setstatevaluevalueswait_forwrapyear\200\001\330\004#\2401\240F\250!\200A\340\010\t\210\021\210!\200A\330\010\013\2104\210s\220%\220q\330\014\020\320\020%\240Q\240c\320)9\270\021\200A\330\010\013\2104\210s\220%\220q\330\014\020\320\020%\240Q\240c\250\035\260a\200A\330\010\013\2109\220G\2301\330\014\021\220\021\220)\2301\230K\240q\250\n\260!\2601\330\010\014\210M\230\026\230q\200A\360\010\000\t\035\320\034,\250A\330\010\034\230E\240\021\240.\260\010\270\005\270Q\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240.\260\007\260u\270A\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\360\010\000\t\035\320\034,\250A\330\010\034\230E\240\021\240&\250\007\250u\260A\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\024\220D\320\030+\2501\330\010\021\220\027\320\0301\260\021\260%\260{\300%\300t\3101\330\010\017\210v\220W\230A\200A\330\010\024\220D\320\030)\250\021\250!\330\010\021\220\027\320\0301\260\021\260%\260{\300%\300t\3101\330\010\017\210v\220W\230A\200A\330\010\024\220D\320\030,\250A\250Q\330\010\021\220\027\320\0301\260\021\260%\260{\300%\300t\3101\330\010\017\210v\220W\230A\200A\330\010\024\220D\320\030-\250Q\330\010\021\220\027\320\0301\260\021\260%\260{\300%\300t\3101\330\010\017\210v\220W\230A\200A\330\010\014\210M\230\026\230q""\200A\330\010\016\210g\220Q\220a\200A\330\010\017\210q\200\001\340\004\021\220\021\220!\330\004\014\210G\2203\220b\230\001\200\001\360\006\000\n\013\330\010\025\220Q\220a\330\010\032\230!\2304\230q\330\004\013\2103\210b\220\003\2207\230!\2301\200\001\360\010\000\005\016\210T\220\037\240\004\240O\2604\260w\270d\300!\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220E\230\024\230Q\330\010\022\220!\330\010\027\220q\340\010\030\230\001\330\004\007\200q\330\010\017\320\017&\240d\250!\2507\260+\270W\300A\340\010\017\320\017&\240d\250!\2507\260+\270Q\210!\200a\200\001\340\004\037\230q\320 0\260\013\270;\300k\320QR\330\004\023\2205\230\010\240\001\240\021\330\004\007\200|\2207\230!\330\010'\240q\250\010\260\016\270a\330\004\013\2101";
+    #else /* compression: none (3366 bytes) */
+const char* const bytes = "[127.0.0.1AsyncClient-EventLoop] Attached to existing Event Loop: Error: Event loop error: [MdApi] Error collecting data: [MdApi] Merge error: [MdApi] Timeout collecting data.Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.] Started internal background thread., .?add_notebt_sdk.core.client.mdapibt_sdk/core/client/mdapi.pyxbt_sdk/core/client/util.pxddisableenablegcisenabledself._loop_thread is not None or self.async_client is not None or self.loop is not None<stringsource>AdjustmentCalendarCloseDONEEventIndexInstrumentIntEnumIntFlagMdApiMdApi.__enter__MdApi.__exit__MdApi.__reduce_cython__MdApi.__setstate_cython__MdApi.disconnectMdApi.get_benchmarkMdApi.get_benchmark_asyncMdApi.get_calendarMdApi.get_calendar_asyncMdApi.get_close_asyncMdApi.get_close_obsMdApi.get_event_asyncMdApi.get_event_obsMdApi.get_factorMdApi.get_factor_asyncMdApi.get_instrumentMdApi.get_instrument_asyncMdApi.subscribe__Pyx_CFunc_6bt_sdk_4core_6client_5mdapi_5MdApi_void__lParenMdApi__rParen_to_py_4self.<locals>.wrap__Pyx_PyDict_NextRefRightmentRpcTopicThreadTickTimeoutErroraddradjustasyncioasyncio.coroutinesattach_loop__await__bodybt_sdk.core.client.mdapibt_sdk.core.client.utilbt_sdk.core.helper.factorbt_sdk.core.protocolbuffercalc_factorcall_soon_threadsafecfunc.to_py__class__cline_in_tracebackclose_collect_async_collect_async.<locals>.on_completed_collect_async.<locals>.on_error_collect_async.<locals>.on_nextconcat_tablescorocoro1coro2coro3create_futuredaemondatadatetimeday__dict___dictdisconnectdisposedonee__enter__enumerreventexc_tbexc_typeexc_val__exit__factorsfast_uuid4_bytesfast_uuid4_strfromordinalfromtimestamp__func__futgathergetget_benchmarkget_benchmark_asyncget_calendarget_calendar_asyncget_close_asyncget_close_obsget_event_asyncget_event_obsget_factorget_factor_asyncget_instrumentget_instrument_asyncget_running_loop__getstate__idis_background_is_coroutinei""temitemsloop__main___member_names___members__module__module__monthmsgspec__name__name__new__new_event_loopnextobsobs_adjustobs_closeobs_rightobservableon_completedon_erroron_nextoperatorsopspapermissivepopprintpromote_optionspyarrow__pyx_checksum__pyx_result__pyx_state__pyx_type__pyx_unpickle_MdApi__pyx_vtable____qualname__reactivex.operators__reduce____reduce_cython____reduce_ex__req_idres_adjustres_closeres_rightresultrightrunrun_coroutine_threadsaferun_foreverselfsendset_debugset_event_loopset_exception__set_name__set_resultsetdefault__setstate____setstate_cython__startstatesubscribesubscriptiontablestarget__test__threadingthrowtimeouttopicupdateuse_setstatevaluevalueswait_forwrapyear\200\001\330\004#\2401\240F\250!\200A\340\010\t\210\021\210!\200A\330\010\013\2104\210s\220%\220q\330\014\020\320\020%\240Q\240c\320)9\270\021\200A\330\010\013\2104\210s\220%\220q\330\014\020\320\020%\240Q\240c\250\035\260a\200A\330\010\013\2109\220G\2301\330\014\021\220\021\220)\2301\230K\240q\250\n\260!\2601\330\010\014\210M\230\026\230q\200A\360\010\000\t\035\320\034,\250A\330\010\034\230E\240\021\240.\260\010\270\005\270Q\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\034\320\034,\250A\330\010\034\230E\240\021\240.\260\007\260u\270A\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\360\010\000\t\035\320\034,\250A\330\010\034\230E\240\021\240&\250\007\250u\260A\340\010\016\210d\220-\230t\2401\240H\250A\330\010\017\210q\200A\330\010\024\220D\320\030+\2501\330\010\021\220\027\320\0301\260\021\260%\260{\300%\300t\3101\330\010\017\210v\220W\230A\200A\330\010\024\220D\320\030)\250\021\250!\330\010\021\220\027\320\0301\260\021\260%\260{\300%\300t\3101\330\010\017\210v\220W\230A\200A\330\010\024\220D\320\030,\250A\250Q\330\010\021\220\027\320\0301\260\021\260%\260{\300%\300t\3101\330\010\017\210v\220W\230A\200A\330\010\024\220D\320\030-\250Q\330\010\021\220\027\320\0301\260\021\260%\260{\300%\300t\3101\330\010\017\210v\220W\230A\200A\330\010\014""\210M\230\026\230q\200A\330\010\016\210g\220Q\220a\200A\330\010\017\210q\200\001\340\004\021\220\021\220!\330\004\014\210G\2203\220b\230\001\200\001\360\006\000\n\013\330\010\025\220Q\220a\330\010\032\230!\2304\230q\330\004\013\2103\210b\220\003\2207\230!\2301\200\001\360\010\000\005\016\210T\220\037\240\004\240O\2604\260w\270d\300!\330\004\014\210G\2201\220F\230,\240a\330\004\007\200v\210W\220E\230\024\230Q\330\010\022\220!\330\010\027\220q\340\010\030\230\001\330\004\007\200q\330\010\017\320\017&\240d\250!\2507\260+\270W\300A\340\010\017\320\017&\240d\250!\2507\260+\270Q\210!\200a\200\001\340\004\037\230q\320 0\260\013\270;\300k\320QR\330\004\023\2205\230\010\240\001\240\021\330\004\007\200|\2207\230!\330\010'\240q\250\010\260\016\270a\330\004\013\2101";
     PyObject *data = NULL;
     CYTHON_UNUSED_VAR(__Pyx_DecompressString);
     #endif
     PyObject **stringtab = __pyx_mstate->__pyx_string_tab;
     Py_ssize_t pos = 0;
-    for (int i = 0; i < 209; i++) {
+    for (int i = 0; i < 210; i++) {
       Py_ssize_t bytes_length = index[i].length;
       PyObject *string = PyUnicode_DecodeUTF8(bytes + pos, bytes_length, NULL);
       if (likely(string) && i >= 24) PyUnicode_InternInPlace(&string);
@@ -16027,7 +16078,7 @@ const char* const bytes = "[127.0.0.1AsyncClient-EventLoop] Attached to existing
       stringtab[i] = string;
       pos += bytes_length;
     }
-    for (int i = 209; i < 230; i++) {
+    for (int i = 210; i < 231; i++) {
       Py_ssize_t bytes_length = index[i].length;
       PyObject *string = PyBytes_FromStringAndSize(bytes + pos, bytes_length);
       stringtab[i] = string;
@@ -16038,14 +16089,14 @@ const char* const bytes = "[127.0.0.1AsyncClient-EventLoop] Attached to existing
       }
     }
     Py_XDECREF(data);
-    for (Py_ssize_t i = 0; i < 230; i++) {
+    for (Py_ssize_t i = 0; i < 231; i++) {
       if (unlikely(PyObject_Hash(stringtab[i]) == -1)) {
         __PYX_ERR(0, 1, __pyx_L1_error)
       }
     }
     #if CYTHON_IMMORTAL_CONSTANTS
     {
-      PyObject **table = stringtab + 209;
+      PyObject **table = stringtab + 210;
       for (Py_ssize_t i=0; i<21; ++i) {
         #if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
         Py_SET_REFCNT(table[i], _Py_IMMORTAL_REFCNT_LOCAL);
@@ -16086,7 +16137,7 @@ typedef struct {
     unsigned int argcount : 3;
     unsigned int num_posonly_args : 1;
     unsigned int num_kwonly_args : 1;
-    unsigned int nlocals : 5;
+    unsigned int nlocals : 4;
     unsigned int flags : 10;
     unsigned int first_line : 8;
 } __Pyx_PyCode_New_function_description;
@@ -16110,53 +16161,53 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[0] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_stringsource, __pyx_mstate->__pyx_n_u_wrap, __pyx_mstate->__pyx_kp_b_iso88591_A, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[0])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 13, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 15};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 13, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 16};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_observable, __pyx_mstate->__pyx_n_u_timeout, __pyx_mstate->__pyx_n_u_buffer, __pyx_mstate->__pyx_n_u_fut, __pyx_mstate->__pyx_n_u_subscription, __pyx_mstate->__pyx_n_u_loop, __pyx_mstate->__pyx_n_u_on_next, __pyx_mstate->__pyx_n_u_on_next, __pyx_mstate->__pyx_n_u_on_completed, __pyx_mstate->__pyx_n_u_on_completed, __pyx_mstate->__pyx_n_u_on_error, __pyx_mstate->__pyx_n_u_on_error, __pyx_mstate->__pyx_n_u_e};
     __pyx_mstate_global->__pyx_codeobj_tab[1] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_collect_async, __pyx_mstate->__pyx_kp_b_iso88591_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[1])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 24};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 25};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_item};
     __pyx_mstate_global->__pyx_codeobj_tab[2] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_on_next, __pyx_mstate->__pyx_kp_b_iso88591_A_gQa, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[2])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 0, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 27};
+    const __Pyx_PyCode_New_function_description descr = {0, 0, 0, 0, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 28};
     PyObject* const varnames[] = {0};
     __pyx_mstate_global->__pyx_codeobj_tab[3] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_on_completed, __pyx_mstate->__pyx_kp_b_iso88591_A_4s_q_Qc_a, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[3])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 31};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 32};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_err};
     __pyx_mstate_global->__pyx_codeobj_tab[4] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_on_error, __pyx_mstate->__pyx_kp_b_iso88591_A_4s_q_Qc_9, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[4])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 104};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 118};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_req_id, __pyx_mstate->__pyx_n_u_event, __pyx_mstate->__pyx_n_u_obs, __pyx_mstate->__pyx_n_u_tables, __pyx_mstate->__pyx_n_u_data};
     __pyx_mstate_global->__pyx_codeobj_tab[5] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_calendar_async, __pyx_mstate->__pyx_kp_b_iso88591__5, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[5])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 121};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 130};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_req_id, __pyx_mstate->__pyx_n_u_event, __pyx_mstate->__pyx_n_u_obs, __pyx_mstate->__pyx_n_u_tables, __pyx_mstate->__pyx_n_u_data};
     __pyx_mstate_global->__pyx_codeobj_tab[6] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_instrument_async, __pyx_mstate->__pyx_kp_b_iso88591__5, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[6])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 138};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 7, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 142};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_body, __pyx_mstate->__pyx_n_u_req_id, __pyx_mstate->__pyx_n_u_event, __pyx_mstate->__pyx_n_u_obs, __pyx_mstate->__pyx_n_u_tables, __pyx_mstate->__pyx_n_u_data};
     __pyx_mstate_global->__pyx_codeobj_tab[7] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_benchmark_async, __pyx_mstate->__pyx_kp_b_iso88591__5, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[7])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 169};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 5, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 151};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_body, __pyx_mstate->__pyx_n_u_obs, __pyx_mstate->__pyx_n_u_tables, __pyx_mstate->__pyx_n_u_data};
     __pyx_mstate_global->__pyx_codeobj_tab[8] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_close_async, __pyx_mstate->__pyx_kp_b_iso88591__5, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[8])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 185};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 6, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 157};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_topic, __pyx_mstate->__pyx_n_u_body, __pyx_mstate->__pyx_n_u_obs, __pyx_mstate->__pyx_n_u_tables, __pyx_mstate->__pyx_n_u_data};
     __pyx_mstate_global->__pyx_codeobj_tab[9] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_event_async, __pyx_mstate->__pyx_kp_b_iso88591__5, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[9])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 16, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 191};
-    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_body, __pyx_mstate->__pyx_n_u_obs_close, __pyx_mstate->__pyx_n_u_obs_adjust, __pyx_mstate->__pyx_n_u_obs_right, __pyx_mstate->__pyx_n_u_coro1, __pyx_mstate->__pyx_n_u_coro2, __pyx_mstate->__pyx_n_u_coro3, __pyx_mstate->__pyx_n_u_res_close, __pyx_mstate->__pyx_n_u_res_adjust, __pyx_mstate->__pyx_n_u_res_right, __pyx_mstate->__pyx_n_u_close, __pyx_mstate->__pyx_n_u_adjust, __pyx_mstate->__pyx_n_u_right, __pyx_mstate->__pyx_n_u_calc_factor, __pyx_mstate->__pyx_n_u_factors};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 15, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS|CO_COROUTINE), 163};
+    PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_body, __pyx_mstate->__pyx_n_u_obs_close, __pyx_mstate->__pyx_n_u_obs_adjust, __pyx_mstate->__pyx_n_u_obs_right, __pyx_mstate->__pyx_n_u_coro1, __pyx_mstate->__pyx_n_u_coro2, __pyx_mstate->__pyx_n_u_coro3, __pyx_mstate->__pyx_n_u_res_close, __pyx_mstate->__pyx_n_u_res_adjust, __pyx_mstate->__pyx_n_u_res_right, __pyx_mstate->__pyx_n_u_close, __pyx_mstate->__pyx_n_u_adjust, __pyx_mstate->__pyx_n_u_right, __pyx_mstate->__pyx_n_u_factors};
     __pyx_mstate_global->__pyx_codeobj_tab[10] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_factor_async, __pyx_mstate->__pyx_kp_b_iso88591__5, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[10])) goto bad;
   }
   {
@@ -16170,52 +16221,52 @@ static int __Pyx_CreateCodeObjects(__pyx_mstatetype *__pyx_mstate) {
     __pyx_mstate_global->__pyx_codeobj_tab[12] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_util_pxd, __pyx_mstate->__pyx_n_u_fast_uuid4_str, __pyx_mstate->__pyx_kp_b_iso88591_Qa_4q_3b_7_1, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[12])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 77};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 85};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[13] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_enter, __pyx_mstate->__pyx_kp_b_iso88591_A_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[13])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 116};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 182};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[14] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_calendar, __pyx_mstate->__pyx_kp_b_iso88591_A_D_1_1_t1_vWA, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[14])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 133};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 187};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[15] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_instrument, __pyx_mstate->__pyx_kp_b_iso88591_A_D_Q_1_t1_vWA, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[15])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 147};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 192};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_body};
     __pyx_mstate_global->__pyx_codeobj_tab[16] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_benchmark, __pyx_mstate->__pyx_kp_b_iso88591_A_D_AQ_1_t1_vWA, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[16])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 152};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 197};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_body};
     __pyx_mstate_global->__pyx_codeobj_tab[17] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_subscribe, __pyx_mstate->__pyx_kp_b_iso88591_A_A_E_uA_d_t1HA_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[17])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 159};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 204};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_body};
     __pyx_mstate_global->__pyx_codeobj_tab[18] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_close_obs, __pyx_mstate->__pyx_kp_b_iso88591_A_A_E_Q_d_t1HA_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[18])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 175};
+    const __Pyx_PyCode_New_function_description descr = {3, 0, 0, 3, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 214};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_topic, __pyx_mstate->__pyx_n_u_body};
     __pyx_mstate_global->__pyx_codeobj_tab[19] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_event_obs, __pyx_mstate->__pyx_kp_b_iso88591_A_A_E_uA_d_t1HA_q_2, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[19])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 209};
+    const __Pyx_PyCode_New_function_description descr = {2, 0, 0, 2, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 224};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_body};
     __pyx_mstate_global->__pyx_codeobj_tab[20] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_get_factor, __pyx_mstate->__pyx_kp_b_iso88591_A_D_1_t1_vWA, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[20])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 214};
+    const __Pyx_PyCode_New_function_description descr = {1, 0, 0, 1, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 229};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self};
     __pyx_mstate_global->__pyx_codeobj_tab[21] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_disconnect, __pyx_mstate->__pyx_kp_b_iso88591_A_M_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[21])) goto bad;
   }
   {
-    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 217};
+    const __Pyx_PyCode_New_function_description descr = {4, 0, 0, 4, (unsigned int)(CO_OPTIMIZED|CO_NEWLOCALS), 232};
     PyObject* const varnames[] = {__pyx_mstate->__pyx_n_u_self, __pyx_mstate->__pyx_n_u_exc_type, __pyx_mstate->__pyx_n_u_exc_val, __pyx_mstate->__pyx_n_u_exc_tb};
     __pyx_mstate_global->__pyx_codeobj_tab[22] = __Pyx_PyCode_New(descr, varnames, __pyx_mstate->__pyx_kp_u_bt_sdk_core_client_mdapi_pyx, __pyx_mstate->__pyx_n_u_exit, __pyx_mstate->__pyx_kp_b_iso88591_A_9G1_1Kq_1_M_q, tuple_dedup_map); if (unlikely(!__pyx_mstate_global->__pyx_codeobj_tab[22])) goto bad;
   }
@@ -21470,164 +21521,6 @@ bad:
       return __Pyx_IterFinish();
   }
   
-/* ImportImpl (used by Import) */
-  static int __Pyx__Import_GetModule(PyObject *qualname, PyObject **module) {
-      PyObject *imported_module = PyImport_GetModule(qualname);
-      if (unlikely(!imported_module)) {
-          *module = NULL;
-          if (PyErr_Occurred()) {
-              return -1;
-          }
-          return 0;
-      }
-      *module = imported_module;
-      return 1;
-  }
-  static int __Pyx__Import_Lookup(PyObject *qualname, PyObject *const *imported_names, Py_ssize_t len_imported_names, PyObject **module) {
-      PyObject *imported_module;
-      PyObject *top_level_package_name;
-      Py_ssize_t i;
-      int status, module_found;
-      Py_ssize_t dot_index;
-      module_found = __Pyx__Import_GetModule(qualname, &imported_module);
-      if (unlikely(!module_found || module_found == -1)) {
-          *module = NULL;
-          return module_found;
-      }
-      if (imported_names) {
-          for (i = 0; i < len_imported_names; i++) {
-              PyObject *imported_name = imported_names[i];
-  #if __PYX_LIMITED_VERSION_HEX < 0x030d0000
-              int has_imported_attribute = PyObject_HasAttr(imported_module, imported_name);
-  #else
-              int has_imported_attribute = PyObject_HasAttrWithError(imported_module, imported_name);
-              if (unlikely(has_imported_attribute == -1)) goto error;
-  #endif
-              if (!has_imported_attribute) {
-                  goto not_found;
-              }
-          }
-          *module = imported_module;
-          return 1;
-      }
-      dot_index = PyUnicode_FindChar(qualname, '.', 0, PY_SSIZE_T_MAX, 1);
-      if (dot_index == -1) {
-          *module = imported_module;
-          return 1;
-      }
-      if (unlikely(dot_index == -2)) goto error;
-      top_level_package_name = PyUnicode_Substring(qualname, 0, dot_index);
-      if (unlikely(!top_level_package_name)) goto error;
-      Py_DECREF(imported_module);
-      status = __Pyx__Import_GetModule(top_level_package_name, module);
-      Py_DECREF(top_level_package_name);
-      return status;
-  error:
-      Py_DECREF(imported_module);
-      *module = NULL;
-      return -1;
-  not_found:
-      Py_DECREF(imported_module);
-      *module = NULL;
-      return 0;
-  }
-  static PyObject *__Pyx__Import(PyObject *name, PyObject *const *imported_names, Py_ssize_t len_imported_names, PyObject *qualname, PyObject *moddict, int level) {
-      PyObject *module = 0;
-      PyObject *empty_dict = 0;
-      PyObject *from_list = 0;
-      int module_found;
-      if (!qualname) {
-          qualname = name;
-      }
-      module_found = __Pyx__Import_Lookup(qualname, imported_names, len_imported_names, &module);
-      if (likely(module_found == 1)) {
-          return module;
-      } else if (unlikely(module_found == -1)) {
-          return NULL;
-      }
-      empty_dict = PyDict_New();
-      if (unlikely(!empty_dict))
-          goto bad;
-      if (imported_names) {
-  #if CYTHON_COMPILING_IN_CPYTHON
-          from_list = __Pyx_PyList_FromArray(imported_names, len_imported_names);
-          if (unlikely(!from_list))
-              goto bad;
-  #else
-          from_list = PyList_New(len_imported_names);
-          if (unlikely(!from_list)) goto bad;
-          for (Py_ssize_t i=0; i<len_imported_names; ++i) {
-              if (PyList_SetItem(from_list, i, __Pyx_NewRef(imported_names[i])) < 0) goto bad;
-          }
-  #endif
-      }
-      if (level == -1) {
-          const char* package_sep = strchr(__Pyx_MODULE_NAME, '.');
-          if (package_sep != (0)) {
-              module = PyImport_ImportModuleLevelObject(
-                  name, moddict, empty_dict, from_list, 1);
-              if (unlikely(!module)) {
-                  if (unlikely(!PyErr_ExceptionMatches(PyExc_ImportError)))
-                      goto bad;
-                  PyErr_Clear();
-              }
-          }
-          level = 0;
-      }
-      if (!module) {
-          module = PyImport_ImportModuleLevelObject(
-              name, moddict, empty_dict, from_list, level);
-      }
-  bad:
-      Py_XDECREF(from_list);
-      Py_XDECREF(empty_dict);
-      return module;
-  }
-  
-/* Import */
-  static PyObject *__Pyx_Import(PyObject *name, PyObject *const *imported_names, Py_ssize_t len_imported_names, PyObject *qualname, int level) {
-      return __Pyx__Import(name, imported_names, len_imported_names, qualname, __pyx_mstate_global->__pyx_d, level);
-  }
-  
-/* ImportFrom */
-  static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name) {
-      PyObject* value = __Pyx_PyObject_GetAttrStr(module, name);
-      if (unlikely(!value) && PyErr_ExceptionMatches(PyExc_AttributeError)) {
-          const char* module_name_str = 0;
-          PyObject* module_name = 0;
-          PyObject* module_dot = 0;
-          PyObject* full_name = 0;
-          PyErr_Clear();
-          module_name_str = PyModule_GetName(module);
-          if (unlikely(!module_name_str)) { goto modbad; }
-          module_name = PyUnicode_FromString(module_name_str);
-          if (unlikely(!module_name)) { goto modbad; }
-          module_dot = PyUnicode_Concat(module_name, __pyx_mstate_global->__pyx_kp_u__2);
-          if (unlikely(!module_dot)) { goto modbad; }
-          full_name = PyUnicode_Concat(module_dot, name);
-          if (unlikely(!full_name)) { goto modbad; }
-          #if (CYTHON_COMPILING_IN_PYPY && PYPY_VERSION_NUM  < 0x07030400) ||\
-                  CYTHON_COMPILING_IN_GRAAL
-          {
-              PyObject *modules = PyImport_GetModuleDict();
-              if (unlikely(!modules))
-                  goto modbad;
-              value = PyObject_GetItem(modules, full_name);
-          }
-          #else
-          value = PyImport_GetModule(full_name);
-          #endif
-        modbad:
-          Py_XDECREF(full_name);
-          Py_XDECREF(module_dot);
-          Py_XDECREF(module_name);
-      }
-      if (unlikely(!value)) {
-          PyErr_Format(PyExc_ImportError, "cannot import name %S", name);
-      }
-      return value;
-  }
-  
 /* GetAttr3 */
   #if __PYX_LIMITED_VERSION_HEX < 0x030d0000
   static PyObject *__Pyx_GetAttr3Default(PyObject *d) {
@@ -22213,6 +22106,164 @@ bad:
       return NULL;
   }
   #endif
+  
+/* ImportImpl (used by Import) */
+  static int __Pyx__Import_GetModule(PyObject *qualname, PyObject **module) {
+      PyObject *imported_module = PyImport_GetModule(qualname);
+      if (unlikely(!imported_module)) {
+          *module = NULL;
+          if (PyErr_Occurred()) {
+              return -1;
+          }
+          return 0;
+      }
+      *module = imported_module;
+      return 1;
+  }
+  static int __Pyx__Import_Lookup(PyObject *qualname, PyObject *const *imported_names, Py_ssize_t len_imported_names, PyObject **module) {
+      PyObject *imported_module;
+      PyObject *top_level_package_name;
+      Py_ssize_t i;
+      int status, module_found;
+      Py_ssize_t dot_index;
+      module_found = __Pyx__Import_GetModule(qualname, &imported_module);
+      if (unlikely(!module_found || module_found == -1)) {
+          *module = NULL;
+          return module_found;
+      }
+      if (imported_names) {
+          for (i = 0; i < len_imported_names; i++) {
+              PyObject *imported_name = imported_names[i];
+  #if __PYX_LIMITED_VERSION_HEX < 0x030d0000
+              int has_imported_attribute = PyObject_HasAttr(imported_module, imported_name);
+  #else
+              int has_imported_attribute = PyObject_HasAttrWithError(imported_module, imported_name);
+              if (unlikely(has_imported_attribute == -1)) goto error;
+  #endif
+              if (!has_imported_attribute) {
+                  goto not_found;
+              }
+          }
+          *module = imported_module;
+          return 1;
+      }
+      dot_index = PyUnicode_FindChar(qualname, '.', 0, PY_SSIZE_T_MAX, 1);
+      if (dot_index == -1) {
+          *module = imported_module;
+          return 1;
+      }
+      if (unlikely(dot_index == -2)) goto error;
+      top_level_package_name = PyUnicode_Substring(qualname, 0, dot_index);
+      if (unlikely(!top_level_package_name)) goto error;
+      Py_DECREF(imported_module);
+      status = __Pyx__Import_GetModule(top_level_package_name, module);
+      Py_DECREF(top_level_package_name);
+      return status;
+  error:
+      Py_DECREF(imported_module);
+      *module = NULL;
+      return -1;
+  not_found:
+      Py_DECREF(imported_module);
+      *module = NULL;
+      return 0;
+  }
+  static PyObject *__Pyx__Import(PyObject *name, PyObject *const *imported_names, Py_ssize_t len_imported_names, PyObject *qualname, PyObject *moddict, int level) {
+      PyObject *module = 0;
+      PyObject *empty_dict = 0;
+      PyObject *from_list = 0;
+      int module_found;
+      if (!qualname) {
+          qualname = name;
+      }
+      module_found = __Pyx__Import_Lookup(qualname, imported_names, len_imported_names, &module);
+      if (likely(module_found == 1)) {
+          return module;
+      } else if (unlikely(module_found == -1)) {
+          return NULL;
+      }
+      empty_dict = PyDict_New();
+      if (unlikely(!empty_dict))
+          goto bad;
+      if (imported_names) {
+  #if CYTHON_COMPILING_IN_CPYTHON
+          from_list = __Pyx_PyList_FromArray(imported_names, len_imported_names);
+          if (unlikely(!from_list))
+              goto bad;
+  #else
+          from_list = PyList_New(len_imported_names);
+          if (unlikely(!from_list)) goto bad;
+          for (Py_ssize_t i=0; i<len_imported_names; ++i) {
+              if (PyList_SetItem(from_list, i, __Pyx_NewRef(imported_names[i])) < 0) goto bad;
+          }
+  #endif
+      }
+      if (level == -1) {
+          const char* package_sep = strchr(__Pyx_MODULE_NAME, '.');
+          if (package_sep != (0)) {
+              module = PyImport_ImportModuleLevelObject(
+                  name, moddict, empty_dict, from_list, 1);
+              if (unlikely(!module)) {
+                  if (unlikely(!PyErr_ExceptionMatches(PyExc_ImportError)))
+                      goto bad;
+                  PyErr_Clear();
+              }
+          }
+          level = 0;
+      }
+      if (!module) {
+          module = PyImport_ImportModuleLevelObject(
+              name, moddict, empty_dict, from_list, level);
+      }
+  bad:
+      Py_XDECREF(from_list);
+      Py_XDECREF(empty_dict);
+      return module;
+  }
+  
+/* Import */
+  static PyObject *__Pyx_Import(PyObject *name, PyObject *const *imported_names, Py_ssize_t len_imported_names, PyObject *qualname, int level) {
+      return __Pyx__Import(name, imported_names, len_imported_names, qualname, __pyx_mstate_global->__pyx_d, level);
+  }
+  
+/* ImportFrom */
+  static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name) {
+      PyObject* value = __Pyx_PyObject_GetAttrStr(module, name);
+      if (unlikely(!value) && PyErr_ExceptionMatches(PyExc_AttributeError)) {
+          const char* module_name_str = 0;
+          PyObject* module_name = 0;
+          PyObject* module_dot = 0;
+          PyObject* full_name = 0;
+          PyErr_Clear();
+          module_name_str = PyModule_GetName(module);
+          if (unlikely(!module_name_str)) { goto modbad; }
+          module_name = PyUnicode_FromString(module_name_str);
+          if (unlikely(!module_name)) { goto modbad; }
+          module_dot = PyUnicode_Concat(module_name, __pyx_mstate_global->__pyx_kp_u__3);
+          if (unlikely(!module_dot)) { goto modbad; }
+          full_name = PyUnicode_Concat(module_dot, name);
+          if (unlikely(!full_name)) { goto modbad; }
+          #if (CYTHON_COMPILING_IN_PYPY && PYPY_VERSION_NUM  < 0x07030400) ||\
+                  CYTHON_COMPILING_IN_GRAAL
+          {
+              PyObject *modules = PyImport_GetModuleDict();
+              if (unlikely(!modules))
+                  goto modbad;
+              value = PyObject_GetItem(modules, full_name);
+          }
+          #else
+          value = PyImport_GetModule(full_name);
+          #endif
+        modbad:
+          Py_XDECREF(full_name);
+          Py_XDECREF(module_dot);
+          Py_XDECREF(module_name);
+      }
+      if (unlikely(!value)) {
+          PyErr_Format(PyExc_ImportError, "cannot import name %S", name);
+      }
+      return value;
+  }
   
 /* ListPack */
   static PyObject *__Pyx_PyList_Pack(Py_ssize_t n, ...) {

@@ -131,6 +131,12 @@ cdef class AsyncZmqClient(AsyncClient):
         self.timeout = timeout
         self._req_subject = {} # self._global_bus = Subject() # global bus to filter req is heavy cpu operation when max concurrent 
         self._connected = False
+        self.loop = None
+        
+    cpdef void attach_loop(self, loop, bint is_background=False):
+        self.loop = loop
+        self.is_background_loop = is_background
+        print(f"[{self.__class__.__name__}] Attached Loop: {id(loop)} (Background: {is_background})")
         
     async def _ensure_connection(self):
             """
@@ -139,9 +145,7 @@ cdef class AsyncZmqClient(AsyncClient):
             if self._connected:
                 return
             try:
-                loop = asyncio.get_running_loop()
-
-                print(f"[ZMQ] Initializing on Loop: {id(loop)}")
+                print(f"[ZMQ] Initializing on Loop: {id(self.loop)}")
                 self.context = zmq.asyncio.Context()
                 self.socket = self.context.socket(zmq.DEALER)
 
@@ -159,7 +163,7 @@ cdef class AsyncZmqClient(AsyncClient):
                 # self.socket.setsockopt(zmq.HEARTBEAT_TIMEOUT, 15000) 
                 # self.socket.setsockopt(zmq.HEARTBEAT_TTL, 15000) 
                 self.socket.connect(self.addr)
-                self.listen_task = loop.create_task(self._listen_loop())
+                self.listen_task = self.loop.create_task(self._listen_loop())
                 self._connected = True
             except Exception as e:
                 print(f"[ZMQ Init Error] {e}")
@@ -224,14 +228,12 @@ cdef class AsyncZmqClient(AsyncClient):
             ops.map(scale),
             ops.share() 
         ) 
-        try:
-            # coro = self.send_request(req_id, msg) 
-            # future = asyncio.run_coroutine_threadsafe(coro, loop)
-            # future.add_done_callback(lambda f: self._finalize_task(f))
-            loop = asyncio.get_running_loop()
-            loop.create_task(self.send_request(req_id, msg)) 
-        except RuntimeError:
-            print("[Fatal] AsyncZmqClient.run called outside Event Loop!") # sync via wrap
+        if self.is_background_loop: # avoid RuntimeError
+            coro = self.send_request(req_id, msg) 
+            future = asyncio.run_coroutine_threadsafe(coro, self.loop)
+            future.add_done_callback(lambda f: self._finalize_task(f))
+        else:
+            self.loop.create_task(self.send_request(req_id, msg)) 
         return observable
 
     async def send_request(self, bytes req_id, object msg):
@@ -265,7 +267,13 @@ cdef class AsyncStreamClient(AsyncClient):
         self._req_futures = {}
         self.timeout = timeout
         self.listen_task = None
-        
+        self.loop = None
+
+    cpdef void attach_loop(self, loop, bint is_background=False):
+        self.loop = loop
+        self.is_background_loop = is_background
+        print(f"[{self.__class__.__name__}] Attached Loop: {id(loop)} (Background: {is_background})")
+    
     async def _ensure_initialized(self):
         """
             核心延迟初始化逻辑：确保 Loop、Lock、Listen Task 就绪
@@ -273,20 +281,18 @@ cdef class AsyncStreamClient(AsyncClient):
         if self._initialized:
             return
         try:
-            loop = asyncio.get_running_loop()
-            
             if self._conn_lock is None:
                 self._conn_lock = asyncio.Lock()
             
             if self.listen_task is None or self.listen_task.done():
-                print(f"[TCP] Starting listener loop on {self.host}:{self.port} (Loop: {id(loop)})")
-                self.listen_task = loop.create_task(self._listen_loop())
-            
+                print(f"[TCP] Starting listener loop on {self.host}:{self.port} (Loop: {id(self.loop)})")
+                self.listen_task = self.loop.create_task(self._listen_loop())
+
             self._initialized = True
         except Exception as e:
             print(f"[TCP Init Error] {e}")
-            raise e
-    
+            raise  
+
     async def _get_connection(self, str connection_key):
         cdef object reader, writer
 
@@ -360,25 +366,28 @@ cdef class AsyncStreamClient(AsyncClient):
                 print(f"[TCP] Unexpected error: {e}")
                 await asyncio.sleep(1)
 
-    # cdef object wrap_protocol(self, bytes req_id, object msg): # return future to user to determin await or result block
-    #     cdef object fut = Future() # wrap_protocol block  / loop.create_future() # nonblock
-    #     # res = await asyncio.wrap_future(fut) # concurrent.futures.Future wrap to asyncio.Future and concurrent future object can be await in asyncio loop
-    #     self._req_futures[req_id] = fut 
-        
-    #     loop = asyncio.get_running_loop()
-    #     asyncio.run_coroutine_threadsafe(self.send_request(req_id, msg), loop)
-    #     return fut
-
     cdef object wrap_protocol(self, bytes req_id, object msg): 
-        cdef object loop, fut
-        try:
-            loop = asyncio.get_running_loop()
-        except RuntimeError:
-            raise RuntimeError("AsyncStreamClient.run must be called inside an Event Loop")
+        cdef object fut
 
-        fut = loop.create_future() # Loop Future light than concurrent.futures
-        self._req_futures[req_id] = fut
-        loop.create_task(self.send_request(req_id, msg))
+        if self.loop is None:
+             raise RuntimeError("Loop not attached! Call attach_loop() first.")
+        
+        if self.is_background_loop:
+            fut = Future() # sync 
+            
+            async def bridge():
+                try:
+                    await self._ensure_initialized()
+                    self._req_futures[req_id] = fut 
+                    await self.send_request(req_id, msg)
+                except Exception as e:
+                    fut.set_exception(e)
+            asyncio.run_coroutine_threadsafe(bridge(), self.loop)
+        else:
+            fut = self.loop.create_future() # Ray / Async
+            self._req_futures[req_id] = fut
+            
+            self.loop.create_task(self.send_request(req_id, msg))
         return fut 
 
     async def send_request(self, bytes req_id, object msg):
@@ -408,5 +417,3 @@ cdef class AsyncStreamClient(AsyncClient):
                 except: pass
         self._connection_cache.clear()
         print("[TCP] All connections closed.")
-
-    

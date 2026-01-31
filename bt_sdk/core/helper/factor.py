@@ -3,7 +3,7 @@
 
 import os
 import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '../lib/factor/lib'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../lib/factor/lib')) # append C++ binding
 import adj_factor
 
 
@@ -59,15 +59,7 @@ def calc_factor(close, adjust, right, forward=True):
     )
     return factors
 
-
-# #! /usr/bin/env python3
-# # -*- coding: utf-8 -*-
-
-# import os
-# import sys
-# sys.path.append(os.path.join(os.path.dirname(__file__), '../lib/factor/lib'))
-# import adj_factor
-
+# factor.pyx
 
 # cdef list adjust2struct(object table_data):
 #     cdef list events = []
@@ -82,7 +74,6 @@ def calc_factor(close, adjust, right, forward=True):
 #         event.bonus = table_data["bonus"][i]
 #         events.append(event)
 #     return event        
-
 
 # cdef list right2struct(object table_data):
 #     """
@@ -99,7 +90,6 @@ def calc_factor(close, adjust, right, forward=True):
 #         event.ratio = table_data["ratio"][0]
 #         events.append(event)
 #     return events
-
 
 # cdef dict calc_factor(object close, object adjust, object right, bint forward=True):
 #     cdeff list vector_trading, vector_close, vector_adjust_event, vector_right_event

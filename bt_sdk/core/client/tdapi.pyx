@@ -1,6 +1,8 @@
 # cython: language_level=3
 
+import asyncio
 import msgspec
+import threading
 from contextlib import contextmanager
 
 from bt_sdk.core.protocol import Event
@@ -34,49 +36,88 @@ cdef class TdApi:
         self.client_id = client_id
         self.async_client = AsyncStreamClient(addr, timeout)
 
-        self.async_client.attch_loop()
-    
+        try:
+            loop = asyncio.get_running_loop()
+            is_background = False
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+         
+            self._loop_thread = threading.Thread(
+                target=self._run_loop_thread, 
+                args=(loop,), 
+                daemon=True,
+                name="TdApi-Loop"
+            )
+            self._loop_thread.start()
+            is_background = True
+            
+        self.async_client.attach_loop(loop, is_background=is_background)
+
+    cdef void _run_loop_thread(self, loop):
+            asyncio.set_event_loop(loop)
+            loop.run_forever()
+
+    cdef object _send_request(self, int topic, bytes experiment_id=b'', object body=None, int sub_topic=-1):
+            cdef bytes req_id = fast_uuid4_bytes()
+            cdef object event = Event(
+                topic=topic, 
+                body=body, 
+                experiment_id=experiment_id,
+                sub_topic=sub_topic
+            )
+            return self.async_client.run(req_id, event)
+
+# --------------------------------------------------------------- Ray Async Actor --------------------------------------------------------
+
+    async def register_async(self, object body):
+        fut = self._send_request(BrokerTopic.Register, experiment_id=b'', body=body)
+        return await fut
+
+    async def set_cash_async(self, bytes experiment_id, object body):
+        fut = self._send_request(BrokerTopic.SetCash, experiment_id=experiment_id, body=body)
+        return await fut
+
+    async def getvalue_async(self, int topic, bytes experiment_id):
+        fut = self._send_request(BrokerTopic.GetValue, experiment_id=experiment_id, body=None, sub_topic=topic)
+        return await fut
+
+    async def subscribe_async(self, int topic, bytes experiment_id, object body):
+        fut = self._send_request(BrokerTopic.Subscribe, experiment_id=experiment_id, body=body, sub_topic=topic)
+        return await fut
+
+    async def submit_async(self, bytes experiment_id, object body):
+        fut = self._send_request(BrokerTopic.Submit, experiment_id=experiment_id, body=body)
+        return await fut
+
+    async def on_dt_over_async(self, bytes experiment_id, object body):
+        fut = self._send_request(BrokerTopic.DayOver, experiment_id=experiment_id, body=body)
+        return await fut
+
+# --------------------------------------------------------------- Sync and Local --------------------------------------------------------
+
     cpdef object register(self, object body):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=BrokerTopic.Register, body=body)
-        
-        fut = self.async_client.run(req_id, event)
-        return fut
+        fut = self._send_request(topic=BrokerTopic.Register, experiment_id=b'', body=body)
+        return fut.result()
 
     cpdef object set_cash(self, bytes experiment_id, object body): 
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=BrokerTopic.SetCash, experiment_id=experiment_id, body=body)
+        fut = self._send_request(topic=BrokerTopic.SetCash, experiment_id=experiment_id, body=body)
+        return fut.result()
 
-        fut = self.async_client.run(req_id, event)
-        return fut
-
-    cpdef object getvalue(self, bytes experiment_id, int topic):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=BrokerTopic.GetValue, sub_topic=topic, experiment_id=experiment_id)
-
-        fut = self.async_client.run(req_id, event)
-        return fut
+    cpdef object getvalue(self, int topic, bytes experiment_id):
+        fut = self._send_request(topic=BrokerTopic.GetValue, experiment_id=experiment_id, body=None, sub_topic=topic)
+        return fut.result()
     
-    cpdef object subscribe(self, bytes experiment_id, int topic, object body):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=BrokerTopic.Subscribe, sub_topic=topic, experiment_id=experiment_id, body=body)
-
-        fut = self.async_client.run(req_id, event)
-        return fut
+    cpdef object subscribe(self, int topic, bytes experiment_id, object body):
+        fut = self._send_request(topic=BrokerTopic.Subscribe, experiment_id=experiment_id, body=body, sub_topic=topic)
+        return fut.result()
     
     cpdef object submit(self, bytes experiment_id, object body):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=BrokerTopic.Submit, experiment_id=experiment_id, body=body)
-
-        fut = self.async_client.run(req_id, event)
-        return fut
+        fut = self._send_request(topic=BrokerTopic.Submit, experiment_id=experiment_id, body=body)
+        return fut.result()
     
     cpdef object on_dt_over(self, bytes experiment_id, object body):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=BrokerTopic.DayOver, experiment_id=experiment_id, body=body)
-        
-        fut = self.async_client.run(req_id, event)
-        return fut
+        fut = self._send_request(topic=BrokerTopic.DayOver, experiment_id=experiment_id, body=body)
+        return fut.result()
     
     cpdef void disconnect(self):
         self.async_client.close()

@@ -20,12 +20,16 @@ cdef class AsyncClient:
 cdef class AsyncZmqClient(AsyncClient):
     cdef str addr
     cdef int timeout
+    cdef bint is_background_loop
     cdef bint _connected
     cdef object _req_subject
     cdef object context
     cdef object socket
-    cdef readonly object listen_task
+    cdef object loop
+    cdef object listen_task
     
+    cpdef void attach_loop(self, loop, bint is_background=?)
+
     cdef object wrap_protocol(self, bytes req_id, object msg) # virtual / cython not supported nested function
     
     
@@ -33,11 +37,15 @@ cdef class AsyncStreamClient(AsyncClient):
     cdef str host
     cdef int port
     cdef bint _initialized
+    cdef bint is_background_loop
     cdef object _conn_lock
     cdef object _connection_cache
     cdef int timeout
     cdef object _req_futures
-    cdef readonly object listen_task
+    cdef object loop
+    cdef object listen_task
     
+    cpdef void attach_loop(self, loop, bint is_background=?)
+
     cdef object wrap_protocol(self, bytes req_id, object msg)
     

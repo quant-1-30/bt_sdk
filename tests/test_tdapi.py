@@ -27,7 +27,7 @@ class TestTdApi:
     
     @pytest.fixture
     def experiment_id(self): # bytes.fromhex()
-        return b'\xacc\xfb\xa4\x8a\xacF\xca\xa6\xde\xa6$\xa7W7`'
+        return b'\x97s\x18\x9dd\x01D\xe3\x80\xfc&\xdb/\xb0G\x10'
 
     @pytest.fixture
     def td_api(self, client_id):
@@ -63,61 +63,52 @@ class TestTdApi:
     
     @pytest.fixture(scope="function")
     def query(self):
-        start_date = 1589817599
-        end_date = 1589880660
+        start_date = 1745300660
+        end_date = 1745400660
         sid = [b'300308']
         return QueryBody(start_date=start_date, end_date=end_date, sid=sid)
     
-    def test_register(self, td_api, register):
-        fut = td_api.register(register)
-        resp = fut.result()
-        print("resp ", resp)
-        assert resp is not None
+    # def test_register(self, td_api, register):
+    #     resp = td_api.register(register)
+    #     print("resp ", resp)
+    #     assert resp is not None
 
-    # def test_set_cash(self, td_api, cash, experiment_id):
-    #     fut = td_api.set_cash(experiment_id, cash)
-    #     resp = fut.result()
+    # def test_set_cash(self, td_api, experiment_id, cash):
+    #     resp = td_api.set_cash(experiment_id, cash)
     #     print("test_set_cash: ", resp)
     #     assert resp is not None
     
     # def test_submit(self, td_api, experiment_id, order):
-    #     fut = td_api.submit(experiment_id, order)
-    #     resp = fut.result()
+    #     resp = td_api.submit(experiment_id, order)
     #     print("test_submit: ", resp)
     #     assert resp is not None
 
     # def test_getAccount(self, td_api, experiment_id):
-    #     fut = td_api.getvalue(experiment_id, SubTopic.Account)
-    #     resp = fut.result()
+    #     resp = td_api.getvalue(SubTopic.Account, experiment_id)
     #     print("test get_account: ", resp)
     #     assert resp is not None
 
     # def test_getPosition(self, td_api, experiment_id):
-    #     fut = td_api.getvalue(experiment_id, SubTopic.Position)
-    #     resp = fut.result()
+    #     resp = td_api.getvalue(SubTopic.Position, experiment_id)
     #     print("test get_position: ", resp)
     #     assert resp is not None
 
     # def test_subscirbe_order(self, td_api, experiment_id, query):
-    #     fut = td_api.subscribe(experiment_id, SubTopic.Order, query)
-    #     resp = fut.result()
+    #     resp = td_api.subscribe(SubTopic.Order, experiment_id, query)
     #     print("test_reqOrder: ", resp)
     #     assert resp is not None
 
     # def test_subscribe_position(self, td_api, experiment_id, query):
-    #     fut = td_api.subscribe(experiment_id, SubTopic.Position, query)
-    #     resp = fut.result()
+    #     resp = td_api.subscribe(SubTopic.Position, experiment_id, query)
     #     print("test_reqPosition: ", resp)
     #     assert resp is not None
 
     # def test_subscribe_account(self, td_api, experiment_id, query):
-    #     fut = td_api.subscribe(experiment_id, SubTopic.Account, query)
-    #     resp = fut.result()
+    #     resp = td_api.subscribe(SubTopic.Account, experiment_id, query)
     #     print("test_reqAccount: ", resp)
     #     assert resp is not None
     
-    # def test_on_dt_over(self, td_api, experiment_id, query):
-    #     fut = td_api.on_dt_over(experiment_id, query)
-    #     resp = fut.result()
-    #     print("test_on_dt_over: ", resp)
-    #     assert resp is not None
+    def test_on_dt_over(self, td_api, experiment_id, query):
+        resp = td_api.on_dt_over(experiment_id, query)
+        print("test_on_dt_over: ", resp)
+        assert resp is not None

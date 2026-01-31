@@ -10,6 +10,7 @@ import threading
 from bt_sdk.core.protocol import Event
 from bt_sdk.core.client.async_client cimport AsyncZmqClient 
 from bt_sdk.core.client.util cimport fast_uuid4_bytes
+from bt_sdk.core.helper.factor import calc_factor
 
 
 async def _collect_async(observable, timeout):
@@ -37,7 +38,14 @@ async def _collect_async(observable, timeout):
         on_error=on_error,
         on_completed=on_completed
     )
-    
+    # .pipe( # pipe return observal
+    #         ops.buffer_with_time_or_count(
+    #             timespan=0.5,            
+    #             count=self.p.batch_size    
+    #             ),
+    # # ops.do_action(on_next=process_batch)
+    # )
+
     try:
         await asyncio.wait_for(fut, timeout=timeout)
         return buffer
@@ -81,6 +89,7 @@ cdef class MdApi:
         try:
             self.loop = asyncio.get_running_loop() # Ray Actor Loop 
             print(f"[{self.__class__.__name__}] Attached to existing Event Loop: {id(self.loop)}")
+            is_background = False
         except RuntimeError:
             self.loop = asyncio.new_event_loop()
             if hasattr(self.loop, 'set_debug'):
@@ -93,6 +102,9 @@ cdef class MdApi:
             )
             self._loop_thread.start()
             print(f"[{self.__class__.__name__}] Started internal background thread.")
+            is_background = True
+            
+        self.async_client.attach_loop(self.loop, is_background=is_background)
         
     cdef void _run_event_loop(self):
         asyncio.set_event_loop(self.loop)
@@ -101,6 +113,8 @@ cdef class MdApi:
         except Exception as e:
             print(f"Event loop error: {e}")
 
+# --------------------------------------------------------------- Ray Async Actor --------------------------------------------------------
+    
     async def get_calendar_async(self): 
         """
             request calendar
@@ -113,11 +127,6 @@ cdef class MdApi:
         data = _merge_tables(tables)
         return data
 
-    cpdef object get_calendar(self):
-        coroutine = self.get_calendar_async()
-        future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-        return future.result()
-    
     async def get_instrument_async(self):
         """
             request instruments
@@ -130,11 +139,6 @@ cdef class MdApi:
         data = _merge_tables(tables)
         return data
 
-    cpdef object get_instrument(self):
-        coroutine = self.get_instrument_async()
-        future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-        return future.result()
-    
     async def get_benchmark_async(self, object body):
         cdef bytes req_id = fast_uuid4_bytes()
         cdef object event = Event(topic=RpcTopic.Index, body=body)
@@ -143,6 +147,47 @@ cdef class MdApi:
         tables = await _collect_async(obs, self.timeout)
         data = _merge_tables(tables)
         return data
+    
+    async def get_close_async(self, object body):
+        obs = self.get_close_obs(body)
+        tables = await _collect_async(obs, self.timeout)
+        data = _merge_tables(tables)
+        return data
+
+    async def get_event_async(self, int topic, object body):
+        obs = self.get_event_obs(topic, body)
+        tables = await _collect_async(obs, self.timeout)
+        data = _merge_tables(tables)
+        return data
+
+    async def get_factor_async(self, object body):
+        obs_close = self.get_close_obs(body)
+        obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)
+        obs_right = self.get_event_obs(RpcTopic.Rightment, body)
+        
+        coro1 = _collect_async(obs_close, self.timeout)
+        coro2 = _collect_async(obs_adjust, self.timeout)
+        coro3 = _collect_async(obs_right, self.timeout)
+        res_close, res_adjust, res_right = await asyncio.gather(coro1, coro2, coro3)
+        
+        close = _merge_tables(res_close)
+        adjust = _merge_tables(res_adjust)
+        right = _merge_tables(res_right)
+        
+        factors = calc_factor(close, adjust, right)
+        return factors
+
+# --------------------------------------------------------------- Sync and Local --------------------------------------------------------
+
+    cpdef object get_calendar(self):
+        coroutine = self.get_calendar_async()
+        future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
+        return future.result()
+    
+    cpdef object get_instrument(self):
+        coroutine = self.get_instrument_async()
+        future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
+        return future.result()
     
     cpdef object get_benchmark(self, object body):
         coroutine = self.get_benchmark_async(body)
@@ -166,12 +211,6 @@ cdef class MdApi:
         obs = self.async_client.run(req_id, event)
         return obs
 
-    async def get_close_async(self, object body):
-        obs = self.get_close_obs(body)
-        tables = await _collect_async(obs, self.timeout)
-        data = _merge_tables(tables)
-        return data
-
     cpdef object get_event_obs(self, int topic, object body):
         """
             request instruments
@@ -181,30 +220,6 @@ cdef class MdApi:
         
         obs = self.async_client.run(req_id, event)
         return obs
-
-    async def get_event_async(self, int topic, object body):
-        obs = self.get_event_obs(topic, body)
-        tables = await _collect_async(obs, self.timeout)
-        data = _merge_tables(tables)
-        return data
-    
-    async def get_factor_async(self, object body):
-        obs_close = self.get_close_obs(body)
-        obs_adjust = self.get_event_obs(RpcTopic.Adjustment, body)
-        obs_right = self.get_event_obs(RpcTopic.Rightment, body)
-        
-        coro1 = _collect_async(obs_close, self.timeout)
-        coro2 = _collect_async(obs_adjust, self.timeout)
-        coro3 = _collect_async(obs_right, self.timeout)
-        res_close, res_adjust, res_right = await asyncio.gather(coro1, coro2, coro3)
-        
-        close = _merge_tables(res_close)
-        adjust = _merge_tables(res_adjust)
-        right = _merge_tables(res_right)
-        
-        from bt_sdk.core.helper.factor import calc_factor
-        factors = calc_factor(close, adjust, right)
-        return factors
 
     cpdef object get_factor(self, object body):
         coroutine = self.get_factor_async(body)
@@ -218,6 +233,3 @@ cdef class MdApi:
         if exc_type is not None:
             print(f"Error: {exc_type}, {exc_val}, {exc_tb}")
         self.async_client.close()
-
-
-__all__ = ["MdApi"]

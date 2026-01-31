@@ -114,3 +114,20 @@ MANIFEST.in` 决定文件会被包含在 **源码分发包 (sdist, 即 .tar.gz �
 
 python -m build --wheel --no-isolation # setuptool 
 poetry build --format wheel # pure python
+
+
+*结论：必须改为 `async def` 并使用 `await`。绝对不能使用 `fut.result()`。**
+
+在 Ray Async Actor（以及任何单线程 Asyncio 环境）中，调用 `future.result()` 会导致 **即刻死锁**。
+
+### 1. 为什么 `fut.result()` 会死锁？
+
+*   **场景**：你的 `TdApi` 底层依附于 Ray Actor 的主 Event Loop。
+*   **机制**：网络数据的接收（`socket.recv`）和回调的处理（`set_result`）都需要这个 Loop 来驱动。
+*   **死锁流程**：
+    1.  你调用 `fut.result()`。
+    2.  主线程被**阻塞**，停止运行 Event Loop，死等 Future 完成。
+    3.  因为 Loop 停了，底层的 `AsyncStreamClient` 无法读取网络包，也就无法设置 Future 的结果。
+    4.  **结果**：主线程在等 Future，Future 在等主线程（Loop）干活。永久卡死
+
+# cython pxd ? ---> default 不能跳开
