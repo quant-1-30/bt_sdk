@@ -27,7 +27,7 @@ class TestTdApi:
     
     @pytest.fixture
     def experiment_id(self): # bytes.fromhex()
-        return b'\x97s\x18\x9dd\x01D\xe3\x80\xfc&\xdb/\xb0G\x10'
+        return b'\xc7\xc6\xaah\xb3\x0eJ\x9b\xa8\xe68\xde\x8d*\x18\x05'
 
     @pytest.fixture
     def td_api(self, client_id):
@@ -49,7 +49,7 @@ class TestTdApi:
       
     @pytest.fixture
     def order(self):
-        created_str = "2025-04-23 9:31:00" # 原始数据没有设定pytz timezone default to UTC
+        created_str = "2025-04-23 9:31:00" # pytz timezone default to UTC
         created_dt = datetime.strptime(created_str, '%Y-%m-%d %H:%M:%S')
         created_dt = pytz.UTC.localize(created_dt)
         return OrderBody(
@@ -69,9 +69,10 @@ class TestTdApi:
         return QueryBody(start_date=start_date, end_date=end_date, sid=sid)
     
     def test_register(self, td_api, register):
-        resp = td_api.register(register)
-        print("resp ", resp)
-        assert resp is not None
+        # with td_api as client:
+            resp = td_api.register(register)
+            print("resp ", resp)
+            assert resp is not None
 
     # def test_set_cash(self, td_api, experiment_id, cash):
     #     resp = td_api.set_cash(experiment_id, cash)

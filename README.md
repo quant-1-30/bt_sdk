@@ -93,7 +93,7 @@ def bytes_to_table(data: bytes):
         return None
 ```
 
-# .pxd 函数体**：Cython 要求必须inline
+# .pxd 函数体**：Cython 要求必须inline (pure C)
 * .pyx 函数体且没有 pxd` private
 
 # zmq / tcp 长链接问题 

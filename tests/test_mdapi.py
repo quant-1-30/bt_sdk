@@ -17,7 +17,7 @@ class TestMdApi:
     
     @pytest.fixture
     def md_api(self):
-        return MdApi(addr=("127.0.0.1", 9000)) # MdApi(addr=("192.168.2.100", 9000))
+        return MdApi(addr=("127.0.0.1", 50051)) # MdApi(addr=("192.168.2.100", 9000))
     
     @pytest.fixture
     def benchmark(self):
@@ -41,8 +41,8 @@ class TestMdApi:
     @pytest.fixture
     def query(self):
         start_date = 20000101
-        end_date = 20250424
-        sid = [b'002750']
+        end_date = 20260424
+        sid = [b'000001']
         return QueryBody(start_date, end_date, sid)
     
     def test_getCalendar(self, md_api):
@@ -59,14 +59,24 @@ class TestMdApi:
         with md_api as client:
             results = client.get_benchmark(benchmark)
             print(f"Benchmark Results: {results}")
-     
+    
+    def test_adj_event(self, md_api, query):
+        with md_api as client:
+            results = client.get_event(5, query)
+            print(f"Subscribe Adj Results: {results}")
+
+    def test_close(self, md_api, query):
+        with md_api as client:
+            results = client.get_close(query)
+            print(f"Subscribe Close Results: {results}")
+
     def test_subscirbe(self, md_api, query):
         with md_api as client:
-            results = client.subscribe(query)
-            print(f"Subscribe Results: {results}")
+            results = client.get_subscribe(query)
+            print(f"Subscribe Results: {len(results)}")
     
     def test_factor(self, md_api, query):
         with md_api as client:
-            data = client.get_factor(query)
+            data = md_api.get_factor(query)
             print("test_get_factors: ", data.raw_factors, data.adj_factors)
             assert data is not None

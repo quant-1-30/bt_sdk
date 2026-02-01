@@ -33,7 +33,7 @@ def right2struct(table_data):
 
         for i in range(num_rows):
             event = adj_factor.RightmentEvent() 
-            event.ex_date = table_data.column("ex_data")[0]
+            event.ex_date = table_data.column("ex_date")[0]
             event.price = table_data.column("price")[0]
             event.ratio = table_data.column("ratio")[0]
             events.append(event)
@@ -43,7 +43,7 @@ def right2struct(table_data):
 def calc_factor(close, adjust, right, forward=True):
     if not close:
         return {}
-    vector_trading = close.column("date").to_pylist()
+    vector_trading = close.column("day").to_pylist()
     vector_close = close.column("close").to_pylist()
     vector_adjust_event = adjust2struct(adjust)
     vector_right_event = right2struct(right) 

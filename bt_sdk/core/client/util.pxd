@@ -1,8 +1,9 @@
 # distutils: language = c++
 # cython: language_level=3
 
+import asyncio
 import datetime
-from ping3 import ping
+import threading
 import pyarrow as pa
 
 from libc.stdint cimport uint8_t, int64_t
@@ -122,3 +123,33 @@ cdef inline object _merge_tables(list result):
             print(f"[MdApi] Merge error: {e}")
             return None
     return None
+    
+
+cdef inline tuple init_event_loop():
+    try:
+        loop = asyncio.get_running_loop() # Ray Actor Loop 
+        print(f"Attached to existing Event Loop: {id(loop)}")
+        is_background = False
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        if hasattr(loop, 'set_debug'):
+            loop.set_debug(False)
+    
+        _loop_thread = threading.Thread(
+            target=_run_event_loop,
+            args=(loop,),
+            daemon=True,
+            name="AsyncClient-EventLoop"
+        )
+        _loop_thread.start()
+        print(f"Started internal background thread.")
+        is_background = True
+    return (loop, is_background)
+
+
+cdef inline void _run_event_loop(object loop):
+    asyncio.set_event_loop(loop)
+    try:
+        loop.run_forever()
+    except Exception as e:
+        print(f"Event loop error: {e}")

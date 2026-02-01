@@ -38,16 +38,10 @@ cpdef enum ExecType:
     Historical = 8
 
 
-cdef class Api:
-    cdef object _loop_thread
-
-    cdef object _init_event_loop(self)
-
-    cdef void _run_event_loop(self, loop)
-
-
-cdef class TdApi(Api):
+cdef class TdApi:
+    cdef bint is_background
     cdef bytes client_id
+    cdef public object loop
     cdef object async_client
     
     cdef object _send_request(self, int topic, bytes experiment_id=*, object body=*, int sub_topic=*)
@@ -67,10 +61,11 @@ cdef class TdApi(Api):
     cpdef void disconnect(self)
 
 
-cdef class MdApi(Api):
+cdef class MdApi:
+    cdef bint is_background
     cdef int timeout
+    cdef public object loop
     cdef object async_client
-    cdef object loop
     
     cpdef object get_calendar(self)
 
@@ -80,10 +75,12 @@ cdef class MdApi(Api):
 
     cpdef object subscribe(self, object body)
     
-    cpdef object get_event_obs(self, int topic, object body)
-
-    cpdef object get_close_obs(self, object body)
+    cpdef object get_subscribe(self, object body)
     
+    cpdef object get_close(self, object body)
+    
+    cpdef object get_event(self, int topic, object body)
+
     cpdef object get_factor(self, object body)
     
     cpdef void disconnect(self)

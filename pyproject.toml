@@ -4,8 +4,8 @@ build-backend =  "setuptools.build_meta" # "poetry.core.masonry.api" for pure py
 
 [project] # used for setuptools
 name = "bt-sdk"
-version = "0.10.4"
-description = "revise factor bug in mdapi"
+version = "0.10.13"
+description = "rewrite proto with pyarrow instead of message"
 authors = [
     {name = "hengxin.liu", email = "john@example.com"}
 ]
@@ -13,8 +13,8 @@ readme = "README.md"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.10.4"
-description = "revise factor bug in mdapi"
+version = "0.10.13"
+description = "rewrite proto with pyarrow instead of message"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [
@@ -46,6 +46,7 @@ uvloop = "^0.22.1"
 cython = "^3.2.3"
 pyarrow = "^22.0.0"
 msgspec = "^0.20.0"
+grpcio-tools = "^1.76.0"
 
 [tool.poetry.group.build.dependencies]
 setuptools = "^68.0.0"

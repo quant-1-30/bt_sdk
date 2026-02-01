@@ -9,6 +9,18 @@ current_dir = os.path.abspath(os.getcwd())
 
 extensions = [
     Extension(
+        name="bt_sdk.core.rpc.client", 
+        sources=["bt_sdk/core/rpc/client.pyx"],
+        include_dirs=[np.get_include(), current_dir],
+        language="c++",
+        extra_compile_args=["-O3", "-std=c++11"],
+            # "-Wno-unused-function",
+            # "-Wno-unused-variable",
+            # "-Wno-unused-but-set-variable",
+            # "-Wno-unused-parameter",
+            # "-Wno-sign-compare", # O3 极致优化，C++11 标准
+    ),
+    Extension(
         name="bt_sdk.core.client.async_client",  # * 表示匹配目录下所有模块
         sources=["bt_sdk/core/client/async_client.pyx"],
         include_dirs=[np.get_include(), "."],  # 包含 NumPy 和当前目录（用于查找 pxd）
