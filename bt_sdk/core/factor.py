@@ -3,7 +3,7 @@
 
 import os
 import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), '../lib/factor/lib')) # append C++ binding
+sys.path.append(os.path.join(os.path.dirname(__file__), 'lib/factor/lib')) # append C++ binding
 import adj_factor
 
 

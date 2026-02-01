@@ -1,7 +1,7 @@
 import os
 import glob
 import numpy as np
-from setuptools import setup, Extension
+from setuptools import setup, find_packages, Extension
 from Cython.Build import cythonize
 
 # sources = glob.glob("**/*.pyx", recursive=True) # **/*.pyx 会搜索当前目录及其所有子目录下的 .pyx 文件
@@ -32,6 +32,7 @@ extensions = [
 
 setup(
     name="bt_sdk_lib",
+    packages=find_packages(), 
     ext_modules=cythonize(
         extensions,
         compiler_directives={

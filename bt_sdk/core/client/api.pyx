@@ -9,7 +9,7 @@ import threading
 from bt_sdk.core.protocol import Event
 from bt_sdk.core.client.async_client cimport AsyncZmqClient, AsyncStreamClient
 from bt_sdk.core.client.util cimport fast_uuid4_bytes, _merge_tables
-from bt_sdk.core.helper.factor import calc_factor
+from bt_sdk.core.factor import calc_factor
 
 
 async def _collect_async(observable, timeout):
