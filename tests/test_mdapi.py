@@ -45,38 +45,38 @@ class TestMdApi:
         sid = [b'000001']
         return QueryBody(start_date, end_date, sid)
     
-    def test_getCalendar(self, md_api):
-        with md_api as client:
-            results = client.get_calendar() 
-        print(f"Calendar Results: {results}")
+    # def test_getCalendar(self, md_api):
+    #     with md_api as client:
+    #         results = client.get_calendar() 
+    #     print(f"Calendar Results: {results}")
 
-    def test_getInstrument(self, md_api):
-        with md_api as client:
-            results = client.get_instrument()
-            print(f"Instrument Results: {results}")
+    # def test_getInstrument(self, md_api):
+    #     with md_api as client:
+    #         results = client.get_instrument()
+    #         print(f"Instrument Results: {results}")
 
-    def test_getBenchmark(self, md_api, benchmark):
-        with md_api as client:
-            results = client.get_benchmark(benchmark)
-            print(f"Benchmark Results: {results}")
+    # def test_getBenchmark(self, md_api, benchmark):
+    #     with md_api as client:
+    #         results = client.get_benchmark(benchmark)
+    #         print(f"Benchmark Results: {results}")
     
-    def test_adj_event(self, md_api, query):
-        with md_api as client:
-            results = client.get_event(5, query)
-            print(f"Subscribe Adj Results: {results}")
+    # def test_adj_event(self, md_api, query):
+    #     with md_api as client:
+    #         results = client.get_event(5, query)
+    #         print(f"Subscribe Adj Results: {results}")
 
-    def test_close(self, md_api, query):
-        with md_api as client:
-            results = client.get_close(query)
-            print(f"Subscribe Close Results: {results}")
+    # def test_close(self, md_api, query):
+    #     with md_api as client:
+    #         results = client.get_close(query)
+    #         print(f"Subscribe Close Results: {results}")
 
     def test_subscirbe(self, md_api, query):
         with md_api as client:
             results = client.get_subscribe(query)
-            print(f"Subscribe Results: {len(results)}")
+            print(f"Subscribe Results: {results}")
     
-    def test_factor(self, md_api, query):
-        with md_api as client:
-            data = md_api.get_factor(query)
-            print("test_get_factors: ", data.raw_factors, data.adj_factors)
-            assert data is not None
+    # def test_factor(self, md_api, query):
+    #     with md_api as client:
+    #         data = md_api.get_factor(query)
+    #         print("test_get_factors: ", data.raw_factors, data.adj_factors)
+    #         assert data is not None

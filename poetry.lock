@@ -1113,6 +1113,22 @@ url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 reference = "tuna"
 
 [[package]]
+name = "poetry-core"
+version = "2.3.1"
+description = "Poetry PEP 517 Build Backend"
+optional = false
+python-versions = ">=3.10, <4.0"
+files = [
+    {file = "poetry_core-2.3.1-py3-none-any.whl", hash = "sha256:db1cf63b782570deb38bfba61e2304a553eef0740dc17959a50cc0f5115ee634"},
+    {file = "poetry_core-2.3.1.tar.gz", hash = "sha256:96f791d5d7d4e040f3983d76779425cf9532690e2756a24fd5ca0f86af19ef82"},
+]
+
+[package.source]
+type = "legacy"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+reference = "tuna"
+
+[[package]]
 name = "protobuf"
 version = "6.33.5"
 description = ""
@@ -1868,4 +1884,4 @@ reference = "tuna"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b7129d4e08e50c683351a573bc9a2051eeeeebaeec99bf33f3dce10d0edb6738"
+content-hash = "37abe7e3b1c68152bac772088d6a5f2f282ff84e3d37d06baf676e2b92643876"

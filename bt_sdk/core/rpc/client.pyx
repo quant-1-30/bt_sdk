@@ -9,7 +9,7 @@ import pyarrow.compute as pc
 from typing import Iterator, AsyncIterator
 from google.protobuf import empty_pb2
 from google.protobuf.json_format import MessageToDict
-from .serialize.pb import service_pb2_grpc, service_pb2
+from .serialize import service_pb2_grpc, service_pb2
 from libc.stdint cimport int32_t
 
 cdef int32_t MaxDate=30000000

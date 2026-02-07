@@ -28,6 +28,8 @@ cdef class AsyncStreamClient(AsyncClient):
     cdef object _req_futures
     cdef object loop
     cdef object listen_task
+    cdef _background_tasks
+    cdef _bridge_tasks
     
     cpdef void attach_loop(self, loop, bint is_background=?)
 

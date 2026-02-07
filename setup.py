@@ -44,7 +44,8 @@ extensions = [
 
 setup(
     name="bt_sdk_lib",
-    packages=find_packages(), 
+    packages=find_packages(),
+    include_package_data=True, 
     ext_modules=cythonize(
         extensions,
         compiler_directives={

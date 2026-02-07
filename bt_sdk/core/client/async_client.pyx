@@ -93,7 +93,6 @@ cdef class AsyncClient:
     cpdef void close(self):
         if not self._running: return
         self._running = False
-        
         try:
             loop = asyncio.get_running_loop()
             if loop.is_running():
@@ -119,6 +118,8 @@ cdef class AsyncStreamClient(AsyncClient):
         self.timeout = timeout
         self.listen_task = None
         self.loop = None
+        self._background_tasks = set() # to ref asyncio task avoid gc
+        self._bridge_tasks = set() # to ref future task void gc
 
     cpdef void attach_loop(self, loop, bint is_background=False):
         self.loop = loop
@@ -227,18 +228,24 @@ cdef class AsyncStreamClient(AsyncClient):
             fut = Future() # sync 
             
             async def bridge():
+                current_task = asyncio.current_task()
+                self._bridge_tasks.add(current_task)
                 try:
                     self._req_futures[req_id] = fut 
                     await self.send_request(req_id, msg)
                 except Exception as e:
                     fut.set_exception(e)
+                finally:
+                    self._bridge_tasks.discard(current_task)
 
             asyncio.run_coroutine_threadsafe(bridge(), self.loop)
         else:
             fut = self.loop.create_future() # Ray / Async
             self._req_futures[req_id] = fut
             
-            self.loop.create_task(self.send_request(req_id, msg))
+            task = self.loop.create_task(self.send_request(req_id, msg))
+            self._background_tasks.add(task)
+            task.add_done_callback(self._background_tasks.discard)
         return fut 
 
     async def send_request(self, bytes req_id, object msg):
@@ -286,8 +293,7 @@ cdef class AsyncStreamClient(AsyncClient):
 
         try:
             current_task = asyncio.current_task()
-            all_tasks = asyncio.all_tasks()
-            
+            all_tasks = asyncio.all_tasks(loop=self.loop)
             pending_tasks = [t for t in all_tasks if t is not current_task and not t.done()]
             
             if pending_tasks:

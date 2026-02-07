@@ -1587,8 +1587,8 @@ struct __pyx_obj___pyx_scope_struct____Pyx_CFunc_6bt_sdk_4core_6client_4util_voi
 struct __pyx_opt_args_6bt_sdk_4core_6client_12async_client_17AsyncStreamClient_attach_loop;
 struct __pyx_opt_args_6bt_sdk_4core_6client_12async_client_14AsyncRpcClient_attach_loop;
 
-/* "bt_sdk/core/client/async_client.pxd":32
- *     cdef object listen_task
+/* "bt_sdk/core/client/async_client.pxd":34
+ *     cdef _bridge_tasks
  * 
  *     cpdef void attach_loop(self, loop, bint is_background=?)             # <<<<<<<<<<<<<<
  * 
@@ -1599,7 +1599,7 @@ struct __pyx_opt_args_6bt_sdk_4core_6client_12async_client_17AsyncStreamClient_a
   int is_background;
 };
 
-/* "bt_sdk/core/client/async_client.pxd":45
+/* "bt_sdk/core/client/async_client.pxd":47
  *     cdef object rpc_client
  * 
  *     cpdef void attach_loop(self, loop, bint is_background=?)             # <<<<<<<<<<<<<<
@@ -1803,10 +1803,12 @@ struct __pyx_obj_6bt_sdk_4core_6client_12async_client_AsyncStreamClient {
   PyObject *_req_futures;
   PyObject *loop;
   PyObject *listen_task;
+  PyObject *_background_tasks;
+  PyObject *_bridge_tasks;
 };
 
 
-/* "bt_sdk/core/client/async_client.pxd":37
+/* "bt_sdk/core/client/async_client.pxd":39
  * 
  * 
  * cdef class AsyncRpcClient(AsyncClient):             # <<<<<<<<<<<<<<
@@ -2159,7 +2161,7 @@ struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncStreamClient {
 static struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncStreamClient *__pyx_vtabptr_6bt_sdk_4core_6client_12async_client_AsyncStreamClient;
 
 
-/* "bt_sdk/core/client/async_client.pxd":37
+/* "bt_sdk/core/client/async_client.pxd":39
  * 
  * 
  * cdef class AsyncRpcClient(AsyncClient):             # <<<<<<<<<<<<<<
@@ -22643,8 +22645,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_6bt_sdk_4core_6client_12async_client_AsyncRpcClient), __PYX_GET_STRUCT_ALIGNMENT_3_2_3(struct __pyx_obj_6bt_sdk_4core_6client_12async_client_AsyncRpcClient),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_2_3); if (!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_12async_client_AsyncRpcClient) __PYX_ERR(3, 37, __pyx_L1_error)
-  __pyx_vtabptr_6bt_sdk_4core_6client_12async_client_AsyncRpcClient = (struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncRpcClient*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_12async_client_AsyncRpcClient); if (unlikely(!__pyx_vtabptr_6bt_sdk_4core_6client_12async_client_AsyncRpcClient)) __PYX_ERR(3, 37, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_2_3); if (!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_12async_client_AsyncRpcClient) __PYX_ERR(3, 39, __pyx_L1_error)
+  __pyx_vtabptr_6bt_sdk_4core_6client_12async_client_AsyncRpcClient = (struct __pyx_vtabstruct_6bt_sdk_4core_6client_12async_client_AsyncRpcClient*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_6client_12async_client_AsyncRpcClient); if (unlikely(!__pyx_vtabptr_6bt_sdk_4core_6client_12async_client_AsyncRpcClient)) __PYX_ERR(3, 39, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;

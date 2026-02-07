@@ -4,4 +4,4 @@ include bt_sdk/core/lib/factor/*.pyd
 
 recursive-include bt_sdk *.so
 recursive-include bt_sdk *.pyd
-
+recursive-inlcude bt_sdk/core/rpc/serialize/*
