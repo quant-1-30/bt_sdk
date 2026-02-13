@@ -27,7 +27,7 @@ class TestTdApi:
     
     @pytest.fixture
     def experiment_id(self): # bytes.fromhex()
-        return b'\xe4\xb2Yj\x1a\xecK1\x9f\xa4i[w\xd1\xe7k'
+        return b'\x9eG\x10\x88\xb0vHI\x97wC{\xf5\x14\xf8\xf0'
 
     @pytest.fixture
     def td_api(self, client_id):
@@ -63,8 +63,15 @@ class TestTdApi:
     
     @pytest.fixture(scope="function")
     def query(self):
-        start_date = 1745300660
+        start_date = 0
         end_date = 1745400660
+        sid = [b'300308']
+        return QueryBody(start_date=start_date, end_date=end_date, sid=sid)
+    
+    @pytest.fixture(scope="function")
+    def dt_over_query(self):
+        start_date = 1745400660
+        end_date = 1746500660
         sid = [b'300308']
         return QueryBody(start_date=start_date, end_date=end_date, sid=sid)
     
@@ -86,15 +93,9 @@ class TestTdApi:
     #         print("test_submit: ", resp)
     #         assert resp is not None
 
-    # def test_getAccount(self, td_api, experiment_id):
+    # def test_getValue(self, td_api, experiment_id):
     #     with td_api as client:
-    #         resp = client.getvalue(SubTopic.Account, experiment_id)
-    #         print("test get_account: ", resp)
-    #         assert resp is not None
-
-    # def test_getPosition(self, td_api, experiment_id):
-    #     with td_api as client:
-    #         resp = client.getvalue(SubTopic.Position, experiment_id)
+    #         resp = client.getvalue(experiment_id)
     #         print("test get_position: ", resp)
     #         assert resp is not None
 
@@ -110,14 +111,14 @@ class TestTdApi:
     #         print("test_reqAccount: ", resp)
     #         assert resp is not None
     
-    def test_subscirbe_order(self, td_api, experiment_id, query):
-        with td_api as client:
-            resp = client.subscribe(SubTopic.Order, experiment_id, query)
-            print("test_reqOrder: ", resp)
-            assert resp is not None
-    
-    # def test_on_dt_over(self, td_api, experiment_id, query):
+    # def test_subscirbe_order(self, td_api, experiment_id, query):
     #     with td_api as client:
-    #         resp = client.on_dt_over(experiment_id, query)
-    #         print("test_on_dt_over: ", resp)
+    #         resp = client.subscribe(SubTopic.Order, experiment_id, query)
+    #         print("test_reqOrder: ", resp)
     #         assert resp is not None
+    
+    def test_on_dt_over(self, td_api, experiment_id, dt_over_query):
+        with td_api as client:
+            resp = client.on_dt_over(experiment_id, dt_over_query)
+            print("test_on_dt_over: ", resp)
+            assert resp is not None

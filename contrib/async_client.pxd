@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
 cdef class AsyncClient:
     cdef bint _running
     cdef object listen_task
@@ -13,6 +17,25 @@ cdef class AsyncClient:
     cpdef void close(self)
 
     
+cdef class AsyncStreamClient(AsyncClient):
+    cdef str host
+    cdef int port
+    cdef bint _initialized
+    cdef bint is_background_loop
+    cdef object _conn_lock
+    cdef object _connection_cache
+    cdef int timeout
+    cdef object _req_futures
+    cdef object loop
+    cdef object listen_task
+    cdef _background_tasks
+    cdef _bridge_tasks
+    
+    cpdef void attach_loop(self, loop, bint is_background=?)
+
+    cdef object wrap_protocol(self, bytes req_id, object msg)
+
+
 cdef class AsyncRpcClient(AsyncClient):
     cdef str addr
     cdef int timeout

@@ -131,3 +131,6 @@ poetry build --format wheel # pure python
     4.  **结果**：主线程在等 Future，Future 在等主线程（Loop）干活。永久卡死
 
 # cython pxd ? ---> default 不能跳开
+
+
+# gprc-aio conflict with uvloop

@@ -15,20 +15,45 @@ from libc.stdint cimport int32_t
 cdef int32_t MaxDate=30000000
 
 
+cdef object Scale = {
+        "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1e-3, "amount": 1e-3, # tick
+        "bonus_share": 1e-3, "transfer": 1e-3, "bonus": 1e-3, # adjustment
+        "price": 1e-3, "ratio": 1e-3 # rightment
+}
+
+
 cdef inline object rpc_callback(bytes arrow_bytes): # inline function embed to reduce overhead when hundrends
     if not arrow_bytes:
-        return None   
-    # pa.py_buffer to wrap Python bytes
-    table = pa.ipc.open_stream(pa.py_buffer(arrow_bytes)).read_all() # open_stream zero_copy parse and pc zero_copy and vectorize 
-    for col_name in ["name"]:
-        if col_name in table.column_names:
-            col = table.column(col_name)
-            table = table.set_column(
-                table.column_names.index(col_name),
-                col_name,
-                pc.cast(col, pa.string())
-            )
+        return None
+
+    cdef object table = pa.ipc.open_stream(pa.py_buffer(arrow_bytes)).read_all() # open_stream zero_copy parse and pc zero_copy and vectorize 
+    cdef int n = table.num_columns
+    cdef list names = table.schema.names
+    cdef list new_cols = [None] * n
+
+    cdef object col
+    cdef object factor
+    cdef object name
+
+    for i in range(n):
+        name = names[i]
+        col  = table.column(i)
+        # ---------- cast ----------
+        if name == "sid" or name == "name":
+            # if pa.types.is_binary(col.type):
+            col = pc.cast(col, pa.string()) # better than table.set_column 
+        # ---------- scale ----------
+        elif name in Scale:
+            factor = Scale[name]
+            col = pc.round(pc.multiply(col, factor), ndigits=2)
+        new_cols[i] = col
+
+    table = pa.Table.from_arrays(
+        new_cols,
+        names=names
+    ).replace_schema_metadata(table.schema.metadata)
     return table
+
 
 
 cdef class RpcClient:

@@ -114,17 +114,6 @@ cdef inline int64_t ts_to_int_date(int64_t ts, bint native=True) nogil: # only c
     return (info.tm_year + 1900) * 10000 + (info.tm_mon + 1) * 100 + info.tm_mday
 
 
-cdef inline object _merge_tables(list result):
-    if result and len(result) > 0:
-        try:
-            # return pa.Table.from_batches(result)  # pa.RecordBatch
-            return pa.concat_tables(result, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks() 
-        except Exception as e:
-            print(f"[MdApi] Merge error: {e}")
-            return None
-    return None
-    
-
 cdef inline tuple init_event_loop():
     try:
         loop = asyncio.get_running_loop() # Ray Actor Loop 
@@ -153,3 +142,38 @@ cdef inline void _run_event_loop(object loop):
         loop.run_forever()
     except Exception as e:
         print(f"Event loop error: {e}")
+
+
+# cdef inline object _merge_tables(list result):
+#     if result and len(result) > 0:
+#         try:
+#             # return pa.Table.from_batches(result)  # pa.RecordBatch
+#             return pa.concat_tables(result, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks() 
+#         except Exception as e:
+#             print(f"[MdApi] Merge error: {e}")
+#             return None
+#     return None
+    
+
+cdef inline object _merge_tables(list batches, bint is_group=True): # cdef reduce python overhead
+    cdef bytes sid_byte
+    cdef dict sid_to_batches = {} 
+    cdef dict aligned = {}
+    cdef list sid_batch
+    cdef object batch, table
+
+    if not is_group:
+        return pa.concat_tables(batches, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks() 
+
+    for batch in batches:
+        print("metadata :", batch.schema.metadata)
+        sid_byte = batch.schema.metadata.get(b"sid")
+        if sid_byte not in sid_to_batches:
+            sid_to_batches[sid_byte] = []
+
+        sid_batch = sid_to_batches[sid_byte]
+        sid_batch.append(batch) # int.from_bytes()
+ 
+    for sid_byte, bulk_batch in sid_to_batches.items():
+        aligned[sid_byte] = pa.concat_tables(bulk_batch, promote_options='default') # pa.Table.from_batches(bulk_batch) # to_pydict() No 
+    return aligned 

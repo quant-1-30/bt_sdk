@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import msgspec
-from typing import List, Union, Any, Dict
+from typing import List, Union, Any, Dict, Optional
 
 
 class QueryBody(msgspec.Struct, frozen=True, tag="query"):
@@ -72,6 +72,11 @@ class AccountBody(msgspec.Struct, frozen=True, tag="account"):
     margin: float
     experiment_id: bytes
 
+class SnapshotBody(msgspec.Struct, frozen=True, tag="snapshot"):
+    account: AccountBody
+    positions: List[PositionBody]
+    order: Union[List[TradeBody], None] = None 
+
 
 class Empty(msgspec.Struct, frozen=True, tag="empty"):
     pass
@@ -85,8 +90,19 @@ class Sentinel(msgspec.Struct, frozen=True, tag="sentinel"):
     pass
 
 
+BodyItem = Union[
+    ExperimentBody, 
+    TradeBody, 
+    PositionBody, 
+    AccountBody,
+    SnapshotBody, 
+    Empty, 
+    ErrMSg, 
+    Sentinel
+]
+
 class Resp(msgspec.Struct, frozen=True):
-    body: Union[ExperimentBody, TradeBody, PositionBody, AccountBody, Empty, ErrMSg, Sentinel, None]=None
+    body: Union[BodyItem, List[BodyItem], None] = None
 
 
 ResponseTypes = List[Resp]

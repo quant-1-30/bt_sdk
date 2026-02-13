@@ -42,7 +42,7 @@ class TestMdApi:
     def query(self):
         start_date = 20000101
         end_date = 20260424
-        sid = [b'000001']
+        sid = [b'300308']
         return QueryBody(start_date, end_date, sid)
     
     # def test_getCalendar(self, md_api):
@@ -68,15 +68,17 @@ class TestMdApi:
     # def test_close(self, md_api, query):
     #     with md_api as client:
     #         results = client.get_close(query)
+    #         print("type ", type(results))
     #         print(f"Subscribe Close Results: {results}")
 
-    def test_subscirbe(self, md_api, query):
-        with md_api as client:
-            results = client.get_subscribe(query)
-            print(f"Subscribe Results: {results}")
-    
-    # def test_factor(self, md_api, query):
+    # def test_subscirbe(self, md_api, query):
     #     with md_api as client:
-    #         data = md_api.get_factor(query)
-    #         print("test_get_factors: ", data.raw_factors, data.adj_factors)
-    #         assert data is not None
+    #         results = client.get_subscribe(query)
+    #         print(f"Subscribe Results: {results}")
+    
+    def test_factor(self, md_api, query):
+        with md_api as client:
+            datas = md_api.get_factor(query)
+            data = datas[b"300308"]
+            print("test_get_factors: ", data.raw_factors, data.adj_factors)
+            assert data is not None
