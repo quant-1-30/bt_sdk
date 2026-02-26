@@ -1,3 +1,5 @@
+from libc.stdint cimport int32_t
+
 cpdef enum RpcTopic:
     Calendar = 0
     Instrument = 1
@@ -39,11 +41,13 @@ cpdef enum ExecType:
 
 
 cdef class MdApi:
-    cdef bint is_background
-    cdef int timeout
+    cdef bint _is_initialized
+    cdef int32_t timeout
     cdef public object loop
     cdef object async_client
     
+    cpdef start(self, object loop)
+
     cpdef object get_calendar(self)
 
     cpdef object get_instrument(self)

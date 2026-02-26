@@ -134,3 +134,9 @@ poetry build --format wheel # pure python
 
 
 # gprc-aio conflict with uvloop
+
+asyncio.run_coroutine_threadsafe + add_done_callback 和 loop.create_task 两种异步任务启动方式的核心区别 —— 本质是跨线程调用异步任务 vs 同线程调用异步任务的差异，前者用于把协程提交到其他线程的事件循环中执行，后者用于在当前线程的事件循环中创建异步任务。
+
+loop.run_until_complete() # loop.start ---> run ---> stop 
+
+# cython __cinit__ allocate memory avoid new

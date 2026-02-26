@@ -1,1 +1,1 @@
-from .api import MdApi, RpcTopic
+from .api import GetMdApi, RpcTopic

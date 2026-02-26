@@ -105,7 +105,7 @@ cdef inline MarketTime market_utc(int64_t ts, bint native=True) nogil :
     mt.open_ts = local_day_start_utc + <int64_t>OPEN_OFFSET
     mt.close_ts = local_day_start_utc + <int64_t>CLOSE_OFFSET
     return mt
-           
+
 
 cdef inline int64_t ts_to_int_date(int64_t ts, bint native=True) nogil: # only cdef nogil
     # C api / tzinfo="Asia/Shanghai" native
@@ -113,47 +113,6 @@ cdef inline int64_t ts_to_int_date(int64_t ts, bint native=True) nogil: # only c
     cdef tm* info = gmtime(&rawtime)
     return (info.tm_year + 1900) * 10000 + (info.tm_mon + 1) * 100 + info.tm_mday
 
-
-cdef inline tuple init_event_loop():
-    try:
-        loop = asyncio.get_running_loop() # Ray Actor Loop 
-        print(f"Attached to existing Event Loop: {id(loop)}")
-        is_background = False
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        if hasattr(loop, 'set_debug'):
-            loop.set_debug(False)
-    
-        _loop_thread = threading.Thread(
-            target=_run_event_loop,
-            args=(loop,),
-            daemon=True,
-            name="AsyncClient-EventLoop"
-        )
-        _loop_thread.start()
-        print(f"Started internal background thread.")
-        is_background = True
-    return (loop, is_background)
-
-
-cdef inline void _run_event_loop(object loop):
-    asyncio.set_event_loop(loop)
-    try:
-        loop.run_forever()
-    except Exception as e:
-        print(f"Event loop error: {e}")
-
-
-# cdef inline object _merge_tables(list result):
-#     if result and len(result) > 0:
-#         try:
-#             # return pa.Table.from_batches(result)  # pa.RecordBatch
-#             return pa.concat_tables(result, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks() 
-#         except Exception as e:
-#             print(f"[MdApi] Merge error: {e}")
-#             return None
-#     return None
-    
 
 cdef inline object _merge_tables(list batches, bint is_group=True): # cdef reduce python overhead
     cdef bytes sid_byte
@@ -166,7 +125,6 @@ cdef inline object _merge_tables(list batches, bint is_group=True): # cdef reduc
         return pa.concat_tables(batches, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks() 
 
     for batch in batches:
-        print("metadata :", batch.schema.metadata)
         sid_byte = batch.schema.metadata.get(b"sid")
         if sid_byte not in sid_to_batches:
             sid_to_batches[sid_byte] = []

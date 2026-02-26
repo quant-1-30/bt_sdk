@@ -55,7 +55,6 @@ cdef inline object rpc_callback(bytes arrow_bytes): # inline function embed to r
     return table
 
 
-
 cdef class RpcClient:
 
     def __init__(self, str host="localhost", int port=50051):

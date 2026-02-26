@@ -4,8 +4,8 @@ build-backend =  "setuptools.build_meta" # "poetry.core.masonry.api" for pure py
 
 [project] # used for setuptools
 name = "bt-sdk"
-version = "0.10.18"
-description = "revise rpc_callback metadata bug"
+version = "0.10.21"
+description = "remove print"
 authors = [
     {name = "hengxin.liu", email = "john@example.com"}
 ]
@@ -13,8 +13,8 @@ readme = "README.md"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.10.18"
-description = "revise rpc_callback metadata bug"
+version = "0.10.21"
+description = "remove print"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [

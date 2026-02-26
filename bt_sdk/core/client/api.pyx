@@ -8,9 +8,13 @@ import threading
 
 from bt_sdk.core.protocol import Event
 from bt_sdk.core.client.async_client cimport AsyncRpcClient
-from bt_sdk.core.client.util cimport fast_uuid4_bytes, _merge_tables, init_event_loop
+from bt_sdk.core.client.util cimport fast_uuid4_bytes, _merge_tables
 from bt_sdk.core.factor import calc_factor
 
+from libc.stdint cimport int32_t
+
+cdef dict _md_api_registry = {} 
+cdef object _md_api_lock = threading.Lock()
 
 async def _collect_async(observable, timeout):
     cdef list buffer = []
@@ -51,18 +55,22 @@ async def _collect_async(observable, timeout):
 
 cdef class MdApi:
 
-    def __init__(self,
-                    tuple addr=("127.0.0.1", 8888),
-                    int timeout = 30):
+    def __init__(self, tuple addr, int32_t timeout):
         self.async_client = AsyncRpcClient(addr=addr, timeout=timeout)
         self.timeout = timeout
-        
-        loop, is_background = init_event_loop() # used for sync
-        self.async_client.attach_loop(loop, is_background=is_background)
+        self.loop = None
+        self._is_initialized = False
+ 
+    cpdef start(self, object loop):
+        if self._is_initialized:
+            return
         self.loop = loop
-    
+        print(f"[MdApi] Attaching to Loop: {id(self.loop)}")
+        self.async_client.attach_loop(self.loop, is_background=False) # reuse main loop avoid cross thread
+        self._is_initialized = True
+ 
     def __enter__(self):
-        return self 
+        return self
         
 # --------------------------------------------------------------- Ray Async Actor --------------------------------------------------------
     
@@ -134,9 +142,6 @@ cdef class MdApi:
         cdef object coro3 = self.get_event_async(RpcTopic.Rightment, body)
         
         close, adj, rgt = await asyncio.gather(coro1, coro2, coro3)
-        print("get_factor close ", close)
-        print("get_factor adj ", adj)
-        print("get_factor rgt ", rgt)
         factors = calc_factor(close, adj, rgt, sids)
         print("get_factor ", factors)
         return factors
@@ -199,3 +204,18 @@ cdef class MdApi:
             print(f"Error: {exc_type}, {exc_val}, {exc_tb}")
         self.async_client.close()
 
+
+cpdef MdApi GetMdApi(tuple addr, int32_t timeout=30):
+    global _md_api_registry
+    
+    cdef MdApi instance
+
+    with _md_api_lock:
+        if addr in _md_api_registry:
+            return _md_api_registry[addr]
+            
+        print(f"[MdApi] Initializing new instance for target: {addr}")
+        instance = MdApi(addr=addr, timeout=timeout)
+        _md_api_registry[addr] = instance
+            
+    return _md_api_registry[addr]
