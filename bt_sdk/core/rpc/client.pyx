@@ -15,14 +15,31 @@ from libc.stdint cimport int32_t
 cdef int32_t MaxDate=30000000
 
 
+# cdef object Scale = {
+#         "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1e-3, "amount": 1e-3, # tick
+#         "bonus_share": 1e-3, "transfer": 1e-3, "bonus": 1e-3, # adjustment
+#         "price": 1e-3, "ratio": 1e-3 # rightment
+# }
+
 cdef object Scale = {
-        "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1e-3, "amount": 1e-3, # tick
-        "bonus_share": 1e-3, "transfer": 1e-3, "bonus": 1e-3, # adjustment
-        "price": 1e-3, "ratio": 1e-3 # rightment
+        RpcTopic.Tick: {
+            "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1e-3, "amount": 1e-3,
+        },
+        RpcTopic.Close: {
+            "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1e-3, "amount": 1e-3,
+        },
+        RpcTopic.Adjustment: {
+            "bonus_share": 1e-3, "transfer": 1e-3, "bonus": 1e-3, # adjustment
+        },
+        RpcTopic.Rightment: {
+            "price": 1e-3, "ratio": 1e-3 # rightment
+        },
+        RpcTopic.Index: {
+            "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1.0, "amount": 1.0,
+        }
 }
 
-
-cdef inline object rpc_callback(bytes arrow_bytes): # inline function embed to reduce overhead when hundrends
+cdef inline object rpc_callback(bytes arrow_bytes, int32_t rpc_type): # inline function embed to reduce overhead when hundrends
     if not arrow_bytes:
         return None
 
@@ -30,6 +47,7 @@ cdef inline object rpc_callback(bytes arrow_bytes): # inline function embed to r
     cdef int n = table.num_columns
     cdef list names = table.schema.names
     cdef list new_cols = [None] * n
+    cdef dict scale = Scale.get(rpc_type, {}) # calendar and instrument
 
     cdef object col
     cdef object factor
@@ -43,8 +61,8 @@ cdef inline object rpc_callback(bytes arrow_bytes): # inline function embed to r
             # if pa.types.is_binary(col.type):
             col = pc.cast(col, pa.string()) # better than table.set_column 
         # ---------- scale ----------
-        elif name in Scale:
-            factor = Scale[name]
+        elif name in scale:
+            factor = scale[name]
             col = pc.round(pc.multiply(col, factor), ndigits=2)
         new_cols[i] = col
 
@@ -168,7 +186,7 @@ cdef class RpcClient:
             raise ValueError(f"Unknown RPC type: {rpc_type}")
         return response_iterator
 
-    async def on_request(self, int rpc_type, object req_body):
+    async def on_request(self, int32_t rpc_type, object req_body):
         cdef object response, callback
         cdef object resp
 
@@ -176,7 +194,7 @@ cdef class RpcClient:
         response = self._dispatch_rpc(rpc_type, req_body)
 
         async for resp in response:
-            yield rpc_callback(resp.payload)
+            yield rpc_callback(resp.payload, rpc_type)
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:

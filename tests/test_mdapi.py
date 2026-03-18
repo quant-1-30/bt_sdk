@@ -70,10 +70,10 @@ class TestMdApi:
     #     results = await md_api.get_calendar_async()
     #     print(f"Calendar Results: {results}")
 
-    @pytest.mark.asyncio
-    async def test_getInstrument(self, md_api):
-        results = await md_api.get_instrument_async()
-        print(f"Instrument Results: {results}")
+    # @pytest.mark.asyncio
+    # async def test_getInstrument(self, md_api):
+    #     results = await md_api.get_instrument_async()
+    #     print(f"Instrument Results: {results}")
 
     # @pytest.mark.asyncio
     # async def test_getBenchmark(self, md_api, benchmark):
@@ -81,8 +81,8 @@ class TestMdApi:
     #     print(f"Benchmark Results: {results}")
     
     # @pytest.mark.asyncio
-    # async def test_adj_event(self, md_api, query):
-    #     results = await md_api.get_event_async(5, query)
+    # async def test_event(self, md_api, query):
+    #     results = await md_api.get_event_async(6, query)
     #     print(f"Subscribe Adj Results: {results}")
 
     # @pytest.mark.asyncio
@@ -95,9 +95,9 @@ class TestMdApi:
     #     results = await md_api.get_subscribe_async(query)
     #     print(f"Subscribe Results: {results}")
     
-    # @pytest.mark.asyncio
-    # async def test_factor(self, md_api, query):
-    #     datas = await md_api.get_factor_async(query)
-    #     data = datas[b"300308"]
-    #     print("test_get_factors: ", data.raw_factors, data.adj_factors)
-    #     assert data is not None
+    @pytest.mark.asyncio
+    async def test_factor(self, md_api, query):
+        datas = await md_api.get_factor_async(query)
+        data = datas[b"300308"]
+        print("test_get_factors: ", data.raw_factors, data.adj_factors)
+        assert data is not None
