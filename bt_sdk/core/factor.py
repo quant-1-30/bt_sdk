@@ -61,13 +61,13 @@ def _calc_factor(c_table: pa.Table, adj_table: pa.Table, rgt_table: pa.Table, fo
     return factors
 
 
-def calc_factor(closes: dict, adjs: dict, rgts: dict, sids: List[bytes], forward: int):
+def calc_factor(closes: dict, adjs: dict, rgts: dict, forward: int):
     if not closes:
         return {}
 
     factor_sids = {}
-    for sid in sids:
-        close_table = closes.get(sid, {})
+    for sid in closes.keys():
+        close_table = closes[sid]
         adj_table = adjs.get(sid, {})
         rgt_table = rgts.get(sid, {})
         factor_sids[sid] = _calc_factor(close_table, adj_table, rgt_table, forward) 
@@ -138,6 +138,6 @@ def apply_factor(raw_data: dict[bytes: pa.Table], adj_factors: dict[bytes: adj_f
         if factor:
             adjusted = _apply_factor(val, factor.adj_factors, adjust_type)
         else:
-            adjusted = val
+            adjusted = pl.from_arrow(val)
         adjusted_array[sid] = adjusted
     return adjusted_array

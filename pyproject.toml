@@ -4,8 +4,8 @@ build-backend =  "setuptools.build_meta" # "poetry.core.masonry.api" for pure py
 
 [project] # used for setuptools
 name = "bt-sdk"
-version = "0.10.24"
-description = "rewriter get_subscribe api"
+version = "0.10.28"
+description = "revise grpcio-tools version"
 authors = [
     {name = "hengxin.liu", email = "john@example.com"}
 ]
@@ -13,8 +13,8 @@ readme = "README.md"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.10.24"
-description = "rewriter get_subscribe api"
+version = "0.10.28"
+description = "revise grpcio-tools version"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [
@@ -45,12 +45,12 @@ reactivex = "^4.1.0"
 cython = "^3.2.3"
 pyarrow = "^22.0.0"
 msgspec = "^0.20.0"
-grpcio-tools = "^1.76.0"
 poetry-core = "^2.3.1"
 polars = "^1.39.3"
+setuptools = "77.0.1"
+grpcio = "1.53.0"
 
 [tool.poetry.group.build.dependencies]
-setuptools = "^68.0.0"
 wheel = "^0.41.0"
 cmake = "^3.26.0"
 pybind11 ="^3.0.1"
@@ -63,7 +63,7 @@ ninja = "^1.11.1"
 [[tool.poetry.source]]
 name = "tuna"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
-priority = "default"  
+priority = "primary"  
 
 [[tool.poetry.source]]
 name = "devpi"

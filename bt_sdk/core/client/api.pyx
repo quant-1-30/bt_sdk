@@ -136,7 +136,8 @@ cdef class MdApi:
         raw_data = _merge_tables(tables)
 
         if forward_type == 0:
-            return raw_data
+            pl_data = {key: pl.from_arrow(val) for key, val in raw_data.items()}
+            return pl_data
 
         factors = await self.get_factor_async(body, forward_type)
         adjusted_array = apply_factor(raw_data, factors, forward_type)
@@ -144,13 +145,12 @@ cdef class MdApi:
 
     async def get_factor_async(self, object body, int32_t forward):
     
-        cdef list[bytes]  sids = body.sid
         cdef object coro1 = self.get_close_async(body)
         cdef object coro2 = self.get_event_async(RpcTopic.Adjustment, body)
         cdef object coro3 = self.get_event_async(RpcTopic.Rightment, body)
         
         close, adj, rgt = await asyncio.gather(coro1, coro2, coro3)
-        factors = calc_factor(close, adj, rgt, sids, forward)
+        factors = calc_factor(close, adj, rgt, forward)
         return factors
 
 # --------------------------------------------------------------- Sync Api --------------------------------------------------------
