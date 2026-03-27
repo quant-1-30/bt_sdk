@@ -27,10 +27,9 @@ enum class AdjustType {
 };
 
 
-// 用于返回两个结果
 struct FactorResult {
     std::map<int, double> raw_factors; // 每天事件因子
-    std::map<int, double> adj_factors; // 累计复权因子
+    std::map<int, double> adj_factors; // 前/后复权累计复权因子
 };
 
 int get_pre_index(const std::vector<int>& trading_dates, int ex_date);

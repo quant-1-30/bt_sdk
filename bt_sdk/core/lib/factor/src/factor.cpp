@@ -75,10 +75,12 @@ FactorResult calc_adjust_factors(
             cum_factor *= it->second;
             adj_factors[it->first] = cum_factor;
         }
-    } else {
+    } else if (type == AdjustType::Backward) {
         double cum_factor = 1.0;
-        for (auto it : sorted_events) {
-            cum_factor *= it.second;
+        for (const auto& it : sorted_events) {
+            if (std::abs(it.second) > 1e-9) { // avoid zero 
+                cum_factor /= it.second; 
+            }
             adj_factors[it.first] = cum_factor;
         }
     }

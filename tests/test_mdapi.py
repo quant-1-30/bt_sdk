@@ -12,7 +12,7 @@ import pyarrow as pa
 import pyarrow.compute as pc
 
 from bt_sdk.core.protocol import QueryBody
-from bt_sdk.core.client import GetMdApi, RpcTopic
+from bt_sdk.core.client import GetMdApi, RpcTopic, FactorTopic
 
 
 @pytest.fixture(scope="session") 
@@ -35,9 +35,7 @@ async def md_api():
 
     loop = asyncio.get_running_loop()  
     api.start(loop)
-
     yield api
-
     api.disconnect()
 
 
@@ -62,8 +60,12 @@ class TestMdApi:
     def query(self):
         start_date = 20000101
         end_date = 20260424
-        sid = [b'300308']
+        sid = [b"600001"]
         return QueryBody(start_date, end_date, sid)
+
+    @pytest.fixture
+    def forward(self):
+        return FactorTopic.Hfq
     
     # @pytest.mark.asyncio
     # async def test_getCalendar(self, md_api):
@@ -90,14 +92,15 @@ class TestMdApi:
     #     results = await md_api.get_close_async(query)
     #     print(f"Subscribe Close Results: {results}")
 
-    # @pytest.mark.asyncio
-    # async def test_subscirbe(self, md_api, query):
-    #     results = await md_api.get_subscribe_async(query)
-    #     print(f"Subscribe Results: {results}")
-    
     @pytest.mark.asyncio
-    async def test_factor(self, md_api, query):
-        datas = await md_api.get_factor_async(query)
-        data = datas[b"300308"]
-        print("test_get_factors: ", data.raw_factors, data.adj_factors)
-        assert data is not None
+    async def test_subscirbe(self, md_api, query, forward):
+        results = await md_api.get_subscribe_async(query, forward)
+        print(f"Subscribe Results: {results}")
+
+    # @pytest.mark.asyncio
+    # async def test_factor(self, md_api, query, forward):
+    #     datas = await md_api.get_factor_async(query, forward)
+    #     data = datas[b"300308"]
+    #     print("raw_factors", data.raw_factors)
+    #     print("adj_factors: ", data.adj_factors)
+    #     assert data is not None

@@ -5,11 +5,13 @@ import msgspec
 import reactivex.operators as ops
 import pyarrow as pa
 import threading
+import polars as pl
+
 
 from bt_sdk.core.protocol import Event
 from bt_sdk.core.client.async_client cimport AsyncRpcClient
 from bt_sdk.core.client.util cimport fast_uuid4_bytes, _merge_tables
-from bt_sdk.core.factor import calc_factor
+from bt_sdk.core.factor import calc_factor, apply_factor
 
 from libc.stdint cimport int32_t
 
@@ -72,7 +74,7 @@ cdef class MdApi:
     def __enter__(self):
         return self
         
-# --------------------------------------------------------------- Ray Async Actor --------------------------------------------------------
+# --------------------------------------------------------------- Async Api --------------------------------------------------------
     
     async def get_calendar_async(self): 
         """
@@ -125,16 +127,22 @@ cdef class MdApi:
         data = _merge_tables(tables)
         return data
 
-    async def get_subscribe_async(self,object body):
+    async def get_subscribe_async(self, object body, int32_t forward_type):
         cdef bytes req_id = fast_uuid4_bytes()
         cdef object event = Event(RpcTopic.Tick, body=body)
 
         obs = self.async_client.run(req_id, event)
         tables = await _collect_async(obs, self.timeout)
-        data = _merge_tables(tables)
-        return data
+        raw_data = _merge_tables(tables)
 
-    async def get_factor_async(self, object body):
+        if forward_type == 0:
+            return raw_data
+
+        factors = await self.get_factor_async(body, forward_type)
+        adjusted_array = apply_factor(raw_data, factors, forward_type)
+        return adjusted_array 
+
+    async def get_factor_async(self, object body, int32_t forward):
     
         cdef list[bytes]  sids = body.sid
         cdef object coro1 = self.get_close_async(body)
@@ -142,11 +150,10 @@ cdef class MdApi:
         cdef object coro3 = self.get_event_async(RpcTopic.Rightment, body)
         
         close, adj, rgt = await asyncio.gather(coro1, coro2, coro3)
-        factors = calc_factor(close, adj, rgt, sids)
-        print("get_factor ", factors)
+        factors = calc_factor(close, adj, rgt, sids, forward)
         return factors
 
-# --------------------------------------------------------------- Sync and Local --------------------------------------------------------
+# --------------------------------------------------------------- Sync Api --------------------------------------------------------
 
     cpdef object get_calendar(self):
         coroutine = self.get_calendar_async()
@@ -163,17 +170,11 @@ cdef class MdApi:
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
         return future.result()
 
-    cpdef object subscribe(self, object body):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=RpcTopic.Tick, body=body)
-
-        obs = self.async_client.run(req_id, event)
-        return obs
-
-    cpdef object get_subscribe(self, object body):
-        coroutine = self.get_subscribe_async(body)
+    cpdef object get_subscribe(self, object body, int32_t forward_type):
+        coroutine = self.get_subscribe_async(body, forward_type)
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-        return future.result() 
+        adjusted_array = future.result()
+        return adjusted_array 
         
     cpdef object get_close(self, object body):
         """
@@ -191,8 +192,8 @@ cdef class MdApi:
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
         return future.result()
 
-    cpdef object get_factor(self, object body):
-        coroutine = self.get_factor_async(body)
+    cpdef object get_factor(self, object body, int32_t forward):
+        coroutine = self.get_factor_async(body, forward)
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
         return future.result()
 

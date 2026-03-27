@@ -4,8 +4,8 @@ build-backend =  "setuptools.build_meta" # "poetry.core.masonry.api" for pure py
 
 [project] # used for setuptools
 name = "bt-sdk"
-version = "0.10.23"
-description = "revise bug in rpc_callback"
+version = "0.10.24"
+description = "rewriter get_subscribe api"
 authors = [
     {name = "hengxin.liu", email = "john@example.com"}
 ]
@@ -13,8 +13,8 @@ readme = "README.md"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.10.23"
-description = "revise bug in rpc_callback"
+version = "0.10.24"
+description = "rewriter get_subscribe api"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [
@@ -47,6 +47,7 @@ pyarrow = "^22.0.0"
 msgspec = "^0.20.0"
 grpcio-tools = "^1.76.0"
 poetry-core = "^2.3.1"
+polars = "^1.39.3"
 
 [tool.poetry.group.build.dependencies]
 setuptools = "^68.0.0"

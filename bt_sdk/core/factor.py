@@ -5,6 +5,9 @@ import os
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'lib/factor/lib')) # append C++ binding
 import adj_factor
+import polars as pl
+import pyarrow as pa
+from typing import List
 
 
 def adjust2struct(table_data):
@@ -40,14 +43,14 @@ def right2struct(table_data):
     return events
 
 
-def _calc_factor(c_table, adj_table, rgt_table, forward):
+def _calc_factor(c_table: pa.Table, adj_table: pa.Table, rgt_table: pa.Table, forward: int):
     vector_trading = c_table.column("day").to_pylist()
     vector_close = c_table.column("close").to_pylist()
     vector_adjust_event = adjust2struct(adj_table)
     vector_right_event = right2struct(rgt_table) 
     # print("calc_factor vector :", vector_trading, vector_close, vector_adjust_event, vector_right_event)
 
-    factor_type = adj_factor.AdjustType.Forward if forward else adj_factor.AdjustType.Backward 
+    factor_type = adj_factor.AdjustType.Forward if forward == 1 else adj_factor.AdjustType.Backward 
     factors = adj_factor.calc_adjust_factors(
         vector_trading, 
         vector_close, 
@@ -58,7 +61,7 @@ def _calc_factor(c_table, adj_table, rgt_table, forward):
     return factors
 
 
-def calc_factor(closes, adjs, rgts, sids, forward=True):
+def calc_factor(closes: dict, adjs: dict, rgts: dict, sids: List[bytes], forward: int):
     if not closes:
         return {}
 
@@ -67,5 +70,74 @@ def calc_factor(closes, adjs, rgts, sids, forward=True):
         close_table = closes.get(sid, {})
         adj_table = adjs.get(sid, {})
         rgt_table = rgts.get(sid, {})
-        factor_sids[sid] = _calc_factor(close_table, adj_table, rgt_table, forward=forward) 
+        factor_sids[sid] = _calc_factor(close_table, adj_table, rgt_table, forward) 
     return factor_sids
+
+
+def _apply_factor(raw_data: pa.Table, adj_factors: adj_factor.FactorResult, adjust_type: int) -> pl.DataFrame:
+    df = pl.from_arrow(raw_data)
+    
+    if not adj_factors:
+        return df
+
+    sorted_dates = sorted(adj_factors.keys())
+    sorted_factors = [adj_factors[d] for d in sorted_dates]
+    factor_dates =[19000101] + sorted_dates 
+    
+    if adjust_type == 1: # qfq
+        factors = sorted_factors +[1.0]
+    else: # hfq
+        factors = [1.0] + sorted_factors
+
+    factor_df = pl.DataFrame({
+        "date_key": factor_dates,
+        "factor": factors
+    })
+
+    # ==========================================
+    # align
+    # ==========================================
+    
+    factor_df = factor_df.with_columns(
+        # pl.col("date_key").cast(pl.Utf8).str.strptime(pl.Datetime, "%Y%m%d")
+        pl.col("date_key").cast(pl.Int32)
+    ).set_sorted("date_key")
+
+    trans_df = df.sort("tick").with_columns(
+        pl.from_epoch(pl.col("tick"), time_unit="s").alias("datetime")
+    ).with_columns(
+    date_key = pl.col("datetime").dt.strftime("%Y%m%d").cast(pl.Int32)
+    )
+
+    joined_df = trans_df.join_asof(
+        factor_df,
+        left_on="date_key",
+        right_on="date_key",
+        strategy="backward" 
+    )
+    # strategy="backward"（默认 ✅ 推荐）右表 ≤ 左表 的最近一行
+    # strategy="forward" 右表 ≥ 左表 的最近一行
+    # strategy="nearest" 左右最近（绝对值最小）时间差最小对齐
+
+    price_cols = [c for c in["open", "high", "low", "close"] if c in joined_df.columns]
+    exprs =[]
+    for col in price_cols:
+        exprs.append((pl.col(col) * pl.col("factor")))
+        
+    if "volume" in joined_df.columns:
+        exprs.append((pl.col("volume") / pl.col("factor")))
+    
+    adjusted_df = joined_df.with_columns(exprs).drop(["date_key", "datetime", "factor"]) # auto replace
+    return adjusted_df
+
+
+def apply_factor(raw_data: dict[bytes: pa.Table], adj_factors: dict[bytes: adj_factor.FactorResult], adjust_type: int) -> pl.DataFrame:
+    adjusted_array = {}
+    for sid, val in raw_data.items():
+        factor = adj_factors.get(sid, {})
+        if factor:
+            adjusted = _apply_factor(val, factor.adj_factors, adjust_type)
+        else:
+            adjusted = val
+        adjusted_array[sid] = adjusted
+    return adjusted_array
