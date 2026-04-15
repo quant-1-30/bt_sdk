@@ -60,7 +60,7 @@ class TestMdApi:
     def query(self):
         start_date = 20000101
         end_date = 20260424
-        sid = [b'301283', b'300362', b'301270']
+        sid = [b'601117']
         return QueryBody(start_date, end_date, sid)
 
     @pytest.fixture
@@ -83,24 +83,21 @@ class TestMdApi:
     #     print(f"Benchmark Results: {results}")
     
     # @pytest.mark.asyncio
-    # async def test_event(self, md_api, query):
-    #     results = await md_api.get_event_async(6, query)
+    # async def test_event(self, md_api, event_type, query):
+    #     results = await md_api.get_event_async(event_type, query)
     #     print(f"Subscribe Adj Results: {results}")
 
-    # @pytest.mark.asyncio
-    # async def test_close(self, md_api, query):
-    #     results = await md_api.get_close_async(query)
-    #     print(f"Subscribe Close Results: {results}")
-
     @pytest.mark.asyncio
-    async def test_subscirbe(self, md_api, query, forward):
-        results = await md_api.get_subscribe_async(query, forward)
-        print(f"Subscribe Results: {results}")
+    async def test_close(self, md_api, query, forward):
+        results = await md_api.get_close_async(query, forward)
+        print(f"Subscribe Close Results: {results}")
+
+    # @pytest.mark.asyncio
+    # async def test_subscirbe(self, md_api, query, forward):
+    #     results = await md_api.get_subscribe_async(query, forward)
+    #     print(f"Subscribe Results: {results}")
 
     # @pytest.mark.asyncio
     # async def test_factor(self, md_api, query, forward):
     #     datas = await md_api.get_factor_async(query, forward)
-    #     data = datas[b"300308"]
-    #     print("raw_factors", data.raw_factors)
-    #     print("adj_factors: ", data.adj_factors)
-    #     assert data is not None
+    #     print("adj_factors: ", datas)

@@ -7,47 +7,43 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'lib/factor/lib')) # app
 import adj_factor
 import polars as pl
 import pyarrow as pa
-from typing import List
+from typing import List, Union
 
 
-def adjust2struct(table_data):
+def adjust2struct(table_df: Union[pa.Table, dict]):
     events = []
-    if table_data:
-        num_rows = table_data.num_rows
-
-        for i in range(num_rows):
+    if len(table_df): # is_empty()
+        # num_rows = table_data.num_rows
+        for i in range(len(table_df)):
             event = adj_factor.AdjustmentEvent()
-            event.ex_date = table_data.column("ex_date")[i]
-            event.bonus_share = table_data.column("bonus_share")[i]
-            event.transfer = table_data.column("transfer")[i]
-            event.bonus = table_data.column("bonus")[i]
+            event.ex_date = table_df["ex_date"][i]
+            event.bonus_share = table_df["bonus_share"][i]
+            event.transfer = table_df["transfer"][i]
+            event.bonus = table_df["bonus"][i]
             events.append(event)
     return events        
 
 
-def right2struct(table_data):
+def right2struct(table_df: Union[pl.DataFrame, dict]):
     """
         Convert rightment data to RgtStruct
     """
     events = []
-
-    if table_data:
-        num_rows = table_data.num_rows
-
-        for i in range(num_rows):
+    if len(table_df):
+        for i in range(len(table_df)):
             event = adj_factor.RightmentEvent() 
-            event.ex_date = table_data.column("ex_date")[0]
-            event.price = table_data.column("price")[0]
-            event.ratio = table_data.column("ratio")[0]
+            event.ex_date = table_df["ex_date"][i]
+            event.price = table_df["price"][i]
+            event.ratio = table_df["ratio"][i]
             events.append(event)
     return events
 
 
-def _calc_factor(c_table: pa.Table, adj_table: pa.Table, rgt_table: pa.Table, forward: int):
-    vector_trading = c_table.column("day").to_pylist()
-    vector_close = c_table.column("close").to_pylist()
-    vector_adjust_event = adjust2struct(adj_table)
-    vector_right_event = right2struct(rgt_table) 
+def _calc_factor(c_df: pl.DataFrame, adj_df: pl.DataFrame, rgt_df: pl.DataFrame, forward: int):
+    vector_trading = c_df["day"].to_pylist()
+    vector_close = c_df["close"].to_pylist()
+    vector_adjust_event = adjust2struct(adj_df)
+    vector_right_event = right2struct(rgt_df) 
     # print("calc_factor vector :", vector_trading, vector_close, vector_adjust_event, vector_right_event)
 
     factor_type = adj_factor.AdjustType.Forward if forward == 1 else adj_factor.AdjustType.Backward 
@@ -67,10 +63,10 @@ def calc_factor(closes: dict, adjs: dict, rgts: dict, forward: int):
 
     factor_sids = {}
     for sid in closes.keys():
-        close_table = closes[sid]
-        adj_table = adjs.get(sid, {})
-        rgt_table = rgts.get(sid, {})
-        factor_sids[sid] = _calc_factor(close_table, adj_table, rgt_table, forward) 
+        close_df = closes[sid]
+        adj_df = adjs.get(sid, {})
+        rgt_df = rgts.get(sid, {})
+        factor_sids[sid] = _calc_factor(close_df, adj_df, rgt_df, forward) 
     return factor_sids
 
 
@@ -90,7 +86,7 @@ def _apply_factor(raw_data: pa.Table, adj_factors: adj_factor.FactorResult, adju
         factors = [1.0] + sorted_factors
 
     factor_df = pl.DataFrame({
-        "date_key": factor_dates,
+        "day": factor_dates,
         "factor": factors
     })
 
@@ -100,19 +96,20 @@ def _apply_factor(raw_data: pa.Table, adj_factors: adj_factor.FactorResult, adju
     
     factor_df = factor_df.with_columns(
         # pl.col("date_key").cast(pl.Utf8).str.strptime(pl.Datetime, "%Y%m%d")
-        pl.col("date_key").cast(pl.Int32)
-    ).set_sorted("date_key")
+        pl.col("day").cast(pl.Int32)
+    ).set_sorted("day")
 
-    trans_df = df.sort("tick").with_columns(
-        pl.from_epoch(pl.col("tick"), time_unit="s").alias("datetime")
-    ).with_columns(
-    date_key = pl.col("datetime").dt.strftime("%Y%m%d").cast(pl.Int32)
-    )
+    if "tick" in df:
+        df = df.sort("tick").with_columns(
+            pl.from_epoch(pl.col("tick"), time_unit="s").alias("datetime")
+        ).with_columns(
+        day = pl.col("datetime").dt.strftime("%Y%m%d").cast(pl.Int32)
+        ).drop("datetime") 
 
-    joined_df = trans_df.join_asof(
+    joined_df = df.join_asof(
         factor_df,
-        left_on="date_key",
-        right_on="date_key",
+        left_on="day",
+        right_on="day",
         strategy="backward" 
     )
     # strategy="backward"（默认 ✅ 推荐）右表 ≤ 左表 的最近一行
@@ -126,8 +123,8 @@ def _apply_factor(raw_data: pa.Table, adj_factors: adj_factor.FactorResult, adju
         
     if "volume" in joined_df.columns:
         exprs.append((pl.col("volume") / pl.col("factor")))
-    
-    adjusted_df = joined_df.with_columns(exprs).drop(["date_key", "datetime", "factor"]) # auto replace
+
+    adjusted_df = joined_df.with_columns(exprs).drop(["factor"]) # auto replace
     return adjusted_df
 
 

@@ -4,8 +4,8 @@ build-backend =  "setuptools.build_meta" # "poetry.core.masonry.api" for pure py
 
 [project] # used for setuptools
 name = "bt-sdk"
-version = "0.10.28"
-description = "revise grpcio-tools version"
+version = "0.11.1"
+description = "keep day column in pl.DataFrame"
 authors = [
     {name = "hengxin.liu", email = "john@example.com"}
 ]
@@ -13,8 +13,8 @@ readme = "README.md"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.10.28"
-description = "revise grpcio-tools version"
+version = "0.11.1"
+description = "keep day column in pl.DataFrame"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [

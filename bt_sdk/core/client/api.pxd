@@ -32,7 +32,7 @@ cdef class MdApi:
 
     cpdef object get_subscribe(self, object body, int32_t forward)
     
-    cpdef object get_close(self, object body)
+    cpdef object get_close(self, object body, int32_t forward)
     
     cpdef object get_event(self, int topic, object body)
 
