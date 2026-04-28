@@ -34,6 +34,9 @@ cdef object Scale = {
         RpcTopic.Rightment: {
             "price": 1e-3, "ratio": 1e-3 # rightment
         },
+        RpcTopic.Index: {
+            "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1.0, "amount": 1.0,
+        }
 }
 
 cdef inline object rpc_callback(bytes arrow_bytes, int32_t rpc_type): # inline function embed to reduce overhead when hundrends
@@ -123,8 +126,21 @@ cdef class RpcClient:
         if self._channel is None:
             await self.initialize()
     
+    cdef object _calendarCall(self, object stub_req, bint wait_for_ready=True): # All fields in Proto3 are optional. This is the recommended way
+        # _calendar_future = self._executor.submit( # Instead of consuming the response on current thread, spawn a consumption thread.
+        #     self._stream_response, response_iterator, callback
+        # )
+        # yield _calendar_future.result()
+        
+        response_iterator = self._stub.CalendarCall(stub_req, wait_for_ready=wait_for_ready)
+        return response_iterator
+    
     cdef object _instrumentCall(self, object stub_req, bint wait_for_ready=True):
         response_iterator = self._stub.InstrumentCall(stub_req, wait_for_ready=wait_for_ready)
+        return response_iterator
+
+    cdef object _indexCall(self, object stub_req, bint wait_for_ready=True):
+        response_iterator = self._stub.IndexStreamCall(stub_req, wait_for_ready=wait_for_ready)
         return response_iterator
 
     cdef object _tickCall(self, object stub_req, bint wait_for_ready=True):
@@ -152,8 +168,12 @@ cdef class RpcClient:
         else:
             request = service_pb2.QuoteRequest(end_date=MaxDate)
             
-        if rpc_type == RpcTopic.Instrument:
+        if rpc_type == RpcTopic.Calendar:
+            response_iterator = self._calendarCall(request, wait_for_ready=True)
+        elif rpc_type == RpcTopic.Instrument:
             response_iterator = self._instrumentCall(request, wait_for_ready=True)
+        elif rpc_type == RpcTopic.Index:
+            response_iterator = self._indexCall(request, wait_for_ready=True)
         elif rpc_type == RpcTopic.Tick:
             response_iterator = self._tickCall(request, wait_for_ready=True)
         elif rpc_type == RpcTopic.Close:

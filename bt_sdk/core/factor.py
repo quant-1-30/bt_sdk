@@ -72,6 +72,11 @@ def calc_factor(closes: dict, adjs: dict, rgts: dict, forward: int):
 
 def _apply_factor(raw_data: pa.Table, adj_factors: adj_factor.FactorResult, adjust_type: int) -> pl.DataFrame:
     df = pl.from_arrow(raw_data)
+
+    if "tick" in df.columns and "day" not in df.columns:
+        df = df.sort("tick").with_columns(
+            day = pl.from_epoch(pl.col("tick"), time_unit="s").dt.strftime("%Y%m%d").cast(pl.Int32)
+        )
     
     if not adj_factors:
         return df
@@ -99,22 +104,15 @@ def _apply_factor(raw_data: pa.Table, adj_factors: adj_factor.FactorResult, adju
         pl.col("day").cast(pl.Int32)
     ).set_sorted("day")
 
-    if "tick" in df:
-        df = df.sort("tick").with_columns(
-            pl.from_epoch(pl.col("tick"), time_unit="s").alias("datetime")
-        ).with_columns(
-        day = pl.col("datetime").dt.strftime("%Y%m%d").cast(pl.Int32)
-        ).drop("datetime") 
-
+    # strategy="backward"（默认 ✅ 推荐）右表 ≤ 左表 的最近一行
+    # strategy="forward" 右表 ≥ 左表 的最近一行
+    # strategy="nearest" 左右最近（绝对值最小）时间差最小对齐
     joined_df = df.join_asof(
         factor_df,
         left_on="day",
         right_on="day",
         strategy="backward" 
     )
-    # strategy="backward"（默认 ✅ 推荐）右表 ≤ 左表 的最近一行
-    # strategy="forward" 右表 ≥ 左表 的最近一行
-    # strategy="nearest" 左右最近（绝对值最小）时间差最小对齐
 
     price_cols = [c for c in["open", "high", "low", "close"] if c in joined_df.columns]
     exprs =[]
@@ -131,10 +129,9 @@ def _apply_factor(raw_data: pa.Table, adj_factors: adj_factor.FactorResult, adju
 def apply_factor(raw_data: dict[bytes: pa.Table], adj_factors: dict[bytes: adj_factor.FactorResult], adjust_type: int) -> pl.DataFrame:
     adjusted_array = {}
     for sid, val in raw_data.items():
-        factor = adj_factors.get(sid, {})
-        if factor:
-            adjusted = _apply_factor(val, factor.adj_factors, adjust_type)
-        else:
-            adjusted = pl.from_arrow(val)
+
+        factor_obj = adj_factors.get(sid, {})
+        factors_dict = factor_obj.adj_factors if factor_obj else {}
+        adjusted = _apply_factor(val, factors_dict, adjust_type)
         adjusted_array[sid] = adjusted
     return adjusted_array

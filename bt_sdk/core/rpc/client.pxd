@@ -14,14 +14,13 @@
 # -------------------------------------------------------------------------------------------------
 from libc.stdint cimport int64_t
 
-cdef enum RpcTopic:
-    Calendar = 0
-    Instrument = 1
-    Index = 2
-    Tick = 3 
-    Close = 4
-    Adjustment = 5
-    Rightment = 6
+
+cpdef enum RpcTopic:
+    Instrument = 0
+    Tick = 1
+    Close = 2
+    Adjustment = 3
+    Rightment = 4
     
 
 cdef class RpcClient:
@@ -30,11 +29,7 @@ cdef class RpcClient:
     cdef str host
     cdef int port
     
-    cdef object _calendarCall(self, object stub_req, bint wait_for_ready=?)
-    
     cdef object _instrumentCall(self, object stub_req, bint wait_for_ready=?)
-
-    cdef object _indexCall(self, object stub_req, bint wait_for_ready=?)
 
     cdef object _tickCall(self, object stub_req, bint wait_for_ready=?)
 

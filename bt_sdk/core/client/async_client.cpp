@@ -1557,69 +1557,41 @@ struct __pyx_obj_6bt_sdk_4core_6client_12async_client___pyx_scope_struct_3___pyx
 struct __pyx_obj_6bt_sdk_4core_6client_12async_client___pyx_scope_struct_4_run;
 struct __pyx_obj_6bt_sdk_4core_6client_12async_client___pyx_scope_struct_5__stream_request;
 struct __pyx_obj___pyx_scope_struct____Pyx_CFunc_6bt_sdk_4core_6client_12async_client_object__lParendict__rParen_to_py_4data;
-struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__calendarCall;
 struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__instrumentCall;
-struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__indexCall;
 struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__tickCall;
 struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__closeCall;
 struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__adjustmentCall;
 struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__rightmentCall;
 
-/* "bt_sdk/core/rpc/client.pxd":17
- * from libc.stdint cimport int64_t
+/* "bt_sdk/core/rpc/client.pxd":18
  * 
- * cdef enum RpcTopic:             # <<<<<<<<<<<<<<
- *     Calendar = 0
- *     Instrument = 1
+ * 
+ * cpdef enum RpcTopic:             # <<<<<<<<<<<<<<
+ *     Instrument = 0
+ *     Tick = 1
 */
 enum __pyx_t_6bt_sdk_4core_3rpc_6client_RpcTopic {
-  __pyx_e_6bt_sdk_4core_3rpc_6client_Calendar = 0,
-  __pyx_e_6bt_sdk_4core_3rpc_6client_Instrument = 1,
-  __pyx_e_6bt_sdk_4core_3rpc_6client_Index = 2,
-  __pyx_e_6bt_sdk_4core_3rpc_6client_Tick = 3,
-  __pyx_e_6bt_sdk_4core_3rpc_6client_Close = 4,
-  __pyx_e_6bt_sdk_4core_3rpc_6client_Adjustment = 5,
-  __pyx_e_6bt_sdk_4core_3rpc_6client_Rightment = 6
+  __pyx_e_6bt_sdk_4core_3rpc_6client_Instrument = 0,
+  __pyx_e_6bt_sdk_4core_3rpc_6client_Tick = 1,
+  __pyx_e_6bt_sdk_4core_3rpc_6client_Close = 2,
+  __pyx_e_6bt_sdk_4core_3rpc_6client_Adjustment = 3,
+  __pyx_e_6bt_sdk_4core_3rpc_6client_Rightment = 4
 };
 
-/* "bt_sdk/core/rpc/client.pxd":33
+/* "bt_sdk/core/rpc/client.pxd":32
  *     cdef int port
- * 
- *     cdef object _calendarCall(self, object stub_req, bint wait_for_ready=?)             # <<<<<<<<<<<<<<
- * 
- *     cdef object _instrumentCall(self, object stub_req, bint wait_for_ready=?)
-*/
-struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__calendarCall {
-  int __pyx_n;
-  int wait_for_ready;
-};
-
-/* "bt_sdk/core/rpc/client.pxd":35
- *     cdef object _calendarCall(self, object stub_req, bint wait_for_ready=?)
  * 
  *     cdef object _instrumentCall(self, object stub_req, bint wait_for_ready=?)             # <<<<<<<<<<<<<<
  * 
- *     cdef object _indexCall(self, object stub_req, bint wait_for_ready=?)
+ *     cdef object _tickCall(self, object stub_req, bint wait_for_ready=?)
 */
 struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__instrumentCall {
   int __pyx_n;
   int wait_for_ready;
 };
 
-/* "bt_sdk/core/rpc/client.pxd":37
+/* "bt_sdk/core/rpc/client.pxd":34
  *     cdef object _instrumentCall(self, object stub_req, bint wait_for_ready=?)
- * 
- *     cdef object _indexCall(self, object stub_req, bint wait_for_ready=?)             # <<<<<<<<<<<<<<
- * 
- *     cdef object _tickCall(self, object stub_req, bint wait_for_ready=?)
-*/
-struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__indexCall {
-  int __pyx_n;
-  int wait_for_ready;
-};
-
-/* "bt_sdk/core/rpc/client.pxd":39
- *     cdef object _indexCall(self, object stub_req, bint wait_for_ready=?)
  * 
  *     cdef object _tickCall(self, object stub_req, bint wait_for_ready=?)             # <<<<<<<<<<<<<<
  * 
@@ -1630,7 +1602,7 @@ struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__tickCall {
   int wait_for_ready;
 };
 
-/* "bt_sdk/core/rpc/client.pxd":41
+/* "bt_sdk/core/rpc/client.pxd":36
  *     cdef object _tickCall(self, object stub_req, bint wait_for_ready=?)
  * 
  *     cdef object _closeCall(self, object stub_req, bint wait_for_ready=?)             # <<<<<<<<<<<<<<
@@ -1642,7 +1614,7 @@ struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__closeCall {
   int wait_for_ready;
 };
 
-/* "bt_sdk/core/rpc/client.pxd":43
+/* "bt_sdk/core/rpc/client.pxd":38
  *     cdef object _closeCall(self, object stub_req, bint wait_for_ready=?)
  * 
  *     cdef object _adjustmentCall(self, object stub_req, bint wait_for_ready=?)             # <<<<<<<<<<<<<<
@@ -1654,7 +1626,7 @@ struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__adjustmentCall {
   int wait_for_ready;
 };
 
-/* "bt_sdk/core/rpc/client.pxd":45
+/* "bt_sdk/core/rpc/client.pxd":40
  *     cdef object _adjustmentCall(self, object stub_req, bint wait_for_ready=?)
  * 
  *     cdef object _rightmentCall(self, object stub_req, bint wait_for_ready=?)             # <<<<<<<<<<<<<<
@@ -1679,7 +1651,7 @@ struct __pyx_opt_args_6bt_sdk_4core_6client_12async_client_14AsyncRpcClient_atta
   int is_background;
 };
 
-/* "bt_sdk/core/rpc/client.pxd":27
+/* "bt_sdk/core/rpc/client.pxd":26
  * 
  * 
  * cdef class RpcClient:             # <<<<<<<<<<<<<<
@@ -1847,7 +1819,7 @@ struct __pyx_obj___pyx_scope_struct____Pyx_CFunc_6bt_sdk_4core_6client_12async_c
 
 
 
-/* "bt_sdk/core/rpc/client.pxd":27
+/* "bt_sdk/core/rpc/client.pxd":26
  * 
  * 
  * cdef class RpcClient:             # <<<<<<<<<<<<<<
@@ -1856,9 +1828,7 @@ struct __pyx_obj___pyx_scope_struct____Pyx_CFunc_6bt_sdk_4core_6client_12async_c
 */
 
 struct __pyx_vtabstruct_6bt_sdk_4core_3rpc_6client_RpcClient {
-  PyObject *(*_calendarCall)(struct __pyx_obj_6bt_sdk_4core_3rpc_6client_RpcClient *, PyObject *, struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__calendarCall *__pyx_optional_args);
   PyObject *(*_instrumentCall)(struct __pyx_obj_6bt_sdk_4core_3rpc_6client_RpcClient *, PyObject *, struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__instrumentCall *__pyx_optional_args);
-  PyObject *(*_indexCall)(struct __pyx_obj_6bt_sdk_4core_3rpc_6client_RpcClient *, PyObject *, struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__indexCall *__pyx_optional_args);
   PyObject *(*_tickCall)(struct __pyx_obj_6bt_sdk_4core_3rpc_6client_RpcClient *, PyObject *, struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__tickCall *__pyx_optional_args);
   PyObject *(*_closeCall)(struct __pyx_obj_6bt_sdk_4core_3rpc_6client_RpcClient *, PyObject *, struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__closeCall *__pyx_optional_args);
   PyObject *(*_adjustmentCall)(struct __pyx_obj_6bt_sdk_4core_3rpc_6client_RpcClient *, PyObject *, struct __pyx_opt_args_6bt_sdk_4core_3rpc_6client_9RpcClient__adjustmentCall *__pyx_optional_args);
@@ -11522,7 +11492,7 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_import_code", 0);
   /*--- Type import code ---*/
-  __pyx_t_1 = PyImport_ImportModule("bt_sdk.core.rpc.client"); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 27, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("bt_sdk.core.rpc.client"); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_mstate->__pyx_ptype_6bt_sdk_4core_3rpc_6client_RpcClient = __Pyx_ImportType_3_2_4(__pyx_t_1, "bt_sdk.core.rpc.client", "RpcClient",
   #if defined(PYPY_VERSION_NUM) && PYPY_VERSION_NUM < 0x050B0000
@@ -11532,8 +11502,8 @@ static int __Pyx_modinit_type_import_code(__pyx_mstatetype *__pyx_mstate) {
   #else
   sizeof(struct __pyx_obj_6bt_sdk_4core_3rpc_6client_RpcClient), __PYX_GET_STRUCT_ALIGNMENT_3_2_4(struct __pyx_obj_6bt_sdk_4core_3rpc_6client_RpcClient),
   #endif
-  __Pyx_ImportType_CheckSize_Warn_3_2_4); if (!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_3rpc_6client_RpcClient) __PYX_ERR(2, 27, __pyx_L1_error)
-  __pyx_vtabptr_6bt_sdk_4core_3rpc_6client_RpcClient = (struct __pyx_vtabstruct_6bt_sdk_4core_3rpc_6client_RpcClient*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_3rpc_6client_RpcClient); if (unlikely(!__pyx_vtabptr_6bt_sdk_4core_3rpc_6client_RpcClient)) __PYX_ERR(2, 27, __pyx_L1_error)
+  __Pyx_ImportType_CheckSize_Warn_3_2_4); if (!__pyx_mstate->__pyx_ptype_6bt_sdk_4core_3rpc_6client_RpcClient) __PYX_ERR(2, 26, __pyx_L1_error)
+  __pyx_vtabptr_6bt_sdk_4core_3rpc_6client_RpcClient = (struct __pyx_vtabstruct_6bt_sdk_4core_3rpc_6client_RpcClient*)__Pyx_GetVtable(__pyx_mstate->__pyx_ptype_6bt_sdk_4core_3rpc_6client_RpcClient); if (unlikely(!__pyx_vtabptr_6bt_sdk_4core_3rpc_6client_RpcClient)) __PYX_ERR(2, 26, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;

@@ -7,7 +7,6 @@ import pyarrow as pa
 import threading
 import polars as pl
 
-
 from bt_sdk.core.protocol import Event
 from bt_sdk.core.client.async_client cimport AsyncRpcClient
 from bt_sdk.core.client.util cimport fast_uuid4_bytes, _merge_tables
@@ -17,6 +16,7 @@ from libc.stdint cimport int32_t
 
 cdef dict _md_api_registry = {} 
 cdef object _md_api_lock = threading.Lock()
+
 
 async def _collect_async(observable, timeout):
     cdef list buffer = []
@@ -76,18 +76,6 @@ cdef class MdApi:
         
 # --------------------------------------------------------------- Async Api --------------------------------------------------------
     
-    async def get_calendar_async(self): 
-        """
-            request calendar
-        """
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=RpcTopic.Calendar)
-
-        obs = self.async_client.run(req_id, event)
-        tables = await _collect_async(obs, self.timeout)
-        data = _merge_tables(tables, is_group=False)
-        return pl.from_arrow(data)
-
     async def get_instrument_async(self):
         """
             request instruments
@@ -99,51 +87,6 @@ cdef class MdApi:
         tables = await _collect_async(obs, self.timeout)
         data = _merge_tables(tables, is_group=False)
         return pl.from_arrow(data)
-
-    async def get_benchmark_async(self, object body):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=RpcTopic.Index, body=body)
-
-        obs = self.async_client.run(req_id, event)
-        tables = await _collect_async(obs, self.timeout)
-        raw_data = _merge_tables(tables)
-        pl_data = {key: pl.from_arrow(val) for key, val in raw_data.items()}
-        return pl_data
-
-    async def get_raw_close_async(self, object body):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=RpcTopic.Close, body=body)
-        
-        obs = self.async_client.run(req_id, event)
-        tables = await _collect_async(obs, self.timeout)
-        raw_data = _merge_tables(tables)
-        return raw_data 
-
-    async def get_close_async(self, object body, int32_t forward_type):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=RpcTopic.Close, body=body)
-        
-        obs = self.async_client.run(req_id, event)
-        tables = await _collect_async(obs, self.timeout)
-        raw_data = _merge_tables(tables)
-
-        if forward_type == 0:
-            pl_data = {key: pl.from_arrow(val) for key, val in raw_data.items()}
-            return pl_data
-
-        factors = await self.get_factor_async(body, forward_type)
-        adjusted_array = apply_factor(raw_data, factors, forward_type)
-        return adjusted_array 
-
-    async def get_event_async(self, int topic, object body):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=topic, body=body)
-        
-        obs = self.async_client.run(req_id, event)
-        tables = await _collect_async(obs, self.timeout)
-        raw_data = _merge_tables(tables)
-        pl_data = {key: pl.from_arrow(val) for key, val in raw_data.items()}
-        return pl_data
 
     async def get_subscribe_async(self, object body, int32_t forward_type):
         cdef bytes req_id = fast_uuid4_bytes()
@@ -161,11 +104,46 @@ cdef class MdApi:
         adjusted_array = apply_factor(raw_data, factors, forward_type)
         return adjusted_array 
 
+    async def get_close_async(self, object body, int32_t forward_type):
+        cdef bytes req_id = fast_uuid4_bytes()
+        cdef object event = Event(topic=RpcTopic.Close, body=body)
+        
+        obs = self.async_client.run(req_id, event)
+        tables = await _collect_async(obs, self.timeout)
+        raw_data = _merge_tables(tables)
+
+        if forward_type == 0:
+            pl_data = {key: pl.from_arrow(val) for key, val in raw_data.items()}
+            return pl_data
+
+        factors = await self.get_factor_async(body, forward_type)
+        adjusted_array = apply_factor(raw_data, factors, forward_type)
+        return adjusted_array 
+
+    async def get_event_async(self, object body, int32_t topic):
+        cdef bytes req_id = fast_uuid4_bytes()
+        cdef object event = Event(topic=topic, body=body)
+        
+        obs = self.async_client.run(req_id, event)
+        tables = await _collect_async(obs, self.timeout)
+        raw_data = _merge_tables(tables)
+        pl_data = {key: pl.from_arrow(val) for key, val in raw_data.items()}
+        return pl_data
+
+    async def get_raw_close_async(self, object body):
+        cdef bytes req_id = fast_uuid4_bytes()
+        cdef object event = Event(topic=RpcTopic.Close, body=body)
+        
+        obs = self.async_client.run(req_id, event)
+        tables = await _collect_async(obs, self.timeout)
+        raw_data = _merge_tables(tables)
+        return raw_data 
+
     async def get_factor_async(self, object body, int32_t forward):
     
         cdef object coro1 = self.get_raw_close_async(body) # raw
-        cdef object coro2 = self.get_event_async(RpcTopic.Adjustment, body)
-        cdef object coro3 = self.get_event_async(RpcTopic.Rightment, body)
+        cdef object coro2 = self.get_event_async(body, RpcTopic.Adjustment)
+        cdef object coro3 = self.get_event_async(body, RpcTopic.Rightment)
         
         close, adj, rgt = await asyncio.gather(coro1, coro2, coro3)
         factors = calc_factor(close, adj, rgt, forward)
@@ -173,21 +151,11 @@ cdef class MdApi:
 
 # --------------------------------------------------------------- Sync Api --------------------------------------------------------
 
-    cpdef object get_calendar(self):
-        coroutine = self.get_calendar_async()
-        future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-        return future.result()
-    
     cpdef object get_instrument(self):
         coroutine = self.get_instrument_async()
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
         return future.result()
     
-    cpdef object get_benchmark(self, object body):
-        coroutine = self.get_benchmark_async(body)
-        future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-        return future.result()
-
     cpdef object get_subscribe(self, object body, int32_t forward_type):
         coroutine = self.get_subscribe_async(body, forward_type)
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
@@ -195,17 +163,11 @@ cdef class MdApi:
         return adjusted_array 
         
     cpdef object get_close(self, object body, int32_t forward):
-        """
-            request instruments
-        """
         coroutine = self.get_close_async(body, forward)
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
         return future.result()
 
-    cpdef object get_event(self, int topic, object body):
-        """
-            request instruments
-        """
+    cpdef object get_event(self, object body, int32_t topic):
         coroutine = self.get_event_async(topic, body)
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
         return future.result()
@@ -214,6 +176,13 @@ cdef class MdApi:
         coroutine = self.get_factor_async(body, forward)
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
         return future.result()
+    
+    cpdef object subscribe(self, object body, int32_t forward_type):
+        cdef bytes req_id = fast_uuid4_bytes()
+        cdef object event = Event(RpcTopic.Tick, body=body)
+
+        obs = self.async_client.run(req_id, event)
+        return obs
 
     cpdef void disconnect(self):
         self.async_client.close()
