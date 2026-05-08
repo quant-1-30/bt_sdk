@@ -51,31 +51,34 @@ class TestMdApi:
 
     @pytest.fixture
     def query(self):
-        start_date = 20000101
-        end_date = 20260424
-        # sid = [b'601117']
-        sid = [b'399001'] # 399006 399001
+        start_date = 20121221
+        end_date = 20121221
+        # start_date = 1721926400
+        # end_date = 1734972800
+        sid = [b'600567']
+        # sid = [b'399001'] # 399006 399001
         return QueryBody(start_date, end_date, sid)
+        # return QueryBody(start_date=1262703480, end_date=1262703480, sid=[b'600592', b'600595', b'600288', b'600337'])
 
     # @pytest.mark.asyncio
     # async def test_getInstrument(self, md_api):
     #     results = await md_api.get_instrument_async()
     #     print(f"Instrument Results: {results}")
 
-    @pytest.mark.asyncio
-    async def test_close(self, md_api, query):
-        results = await md_api.get_close_async(query, FactorTopic.Hfq)
-        print(f"Subscribe Close Results: {results}")
-
     # @pytest.mark.asyncio
-    # async def test_subscirbe(self, md_api, query):
-    #     results = await md_api.get_subscribe_async(query, FactorTopic.Raw)
-    #     print(f"Subscribe Results: {results}")
-    
+    # async def test_close(self, md_api, query):
+    #     results = await md_api.get_close_async(query, FactorTopic.Hfq)
+    #     print(f"Subscribe Close Results: {results}")
+
     @pytest.mark.asyncio
-    async def test_event(self, md_api, query, event_type):
-        results = await md_api.get_event_async(query, event_type)
-        print(f"Subscribe Adj Results: {results}")
+    async def test_subscirbe(self, md_api, query):
+        results = await md_api.get_subscribe_async(query, FactorTopic.Raw)
+        print(f"Subscribe Results: {results}")
+    
+    # @pytest.mark.asyncio
+    # async def test_event(self, md_api, query, event_type):
+    #     results = await md_api.get_event_async(query, event_type)
+    #     print(f"Subscribe Adj Results: {results}")
 
     # @pytest.mark.asyncio
     # async def test_factor(self, md_api, query):
