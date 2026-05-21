@@ -62,8 +62,8 @@ pytest 中执行多个测试用例时，每个测试用例都会创建新的 Api
 
 # cython not support lambda or nested
 # reactivex subject --- on_next / on_complete / on_error 
-            subject.pipe --- obseverable
-            subscribe --- on_next / on_complete / on_error 
+# subject.pipe --- obseverable
+# subscribe --- on_next / on_complete / on_error 
 
 a. async for x in observable.to_async_iterable()
 
@@ -74,24 +74,6 @@ c.  obs.subscribe(
         on_next=q.put,
         on_completed=lambda: q.put(None) # 发送结束信号
     )
-
-import pyarrow as pa
-
-def bytes_to_table(data: bytes):
-    # 1. 将 bytes 包装成 BufferReader (Zero-copy)
-    reader = pa.BufferReader(data)
-    
-    # 2. 打开 IPC 流读取器
-    # open_stream 专门用于解析由 new_stream 生成的数据
-    try:
-        with pa.ipc.open_stream(reader) as stream_reader:
-            # 3. 读取所有 Batch 并合并回 Table
-            table = stream_reader.read_all()
-            return table
-    except pa.ArrowInvalid:
-        # 如果数据为空或格式不正确
-        return None
-```
 
 # .pxd 函数体**：Cython 要求必须inline (pure C)
 * .pyx 函数体且没有 pxd` private

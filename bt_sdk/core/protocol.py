@@ -24,19 +24,23 @@ class CashBody(msgspec.Struct, frozen=True, tag="cash"):
 
 class OrderBody(msgspec.Struct, frozen=True, tag="order"):
     sid: bytes
-    pricelimit: int
-    sizer_ratio: int
     order_type: int
     exec_type: int
+    sizer_ratio: float
+    pricelimit: float
     created_dt: int
     filler: bytes # oco / occ / smooth / likehood
+
+
+class OverBody(msgspec.Struct, frozen=True, tag="over"):
+    tick: int
 
 
 class Event(msgspec.Struct, frozen=True):
     topic: int
     sub_topic: int = -1
     experiment_id: bytes = b""
-    body: Union[QueryBody, RegisterBody, CashBody, OrderBody, None] = None # tag to find body in Union strict
+    body: Union[QueryBody, RegisterBody, CashBody, OrderBody, OverBody, None] = None # tag to find body in Union strict
     # body: EmptyBody = msgspec.field(default_factory=EmptyBody)
 
 
@@ -76,7 +80,7 @@ class AccountBody(msgspec.Struct, frozen=True, tag="account"):
 class SnapshotBody(msgspec.Struct, frozen=True, tag="snapshot"):
     account: AccountBody
     positions: List[PositionBody]
-    order: Union[List[TradeBody], None] = None 
+    trades: Union[List[TradeBody], None] = None 
 
 
 class Empty(msgspec.Struct, frozen=True, tag="empty"):

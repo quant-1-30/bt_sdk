@@ -51,11 +51,11 @@ class TestMdApi:
 
     @pytest.fixture
     def query(self):
-        start_date = 20121221
-        end_date = 20121221
+        start_date = 20000401
+        end_date = 20260430
         # start_date = 1721926400
         # end_date = 1734972800
-        sid = [b'600567']
+        sid = [b'399006']
         # sid = [b'399001'] # 399006 399001
         return QueryBody(start_date, end_date, sid)
         # return QueryBody(start_date=1262703480, end_date=1262703480, sid=[b'600592', b'600595', b'600288', b'600337'])

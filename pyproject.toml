@@ -1,11 +1,7 @@
-[build-system]
-requires = ["poetry-core", "wheel", "pybind11", "cmake", "Cython>=3.0"]
-build-backend =  "setuptools.build_meta" # "poetry.core.masonry.api" for pure python / scikit-build-core for cmake
-
 [project] # used for setuptools
 name = "bt-sdk"
-version = "0.11.6"
-description = "revise protocol and add more api in api.pyx"
+version = "0.11.7"
+description = "add overbody in protocol"
 authors = [
     {name = "hengxin.liu", email = "john@example.com"}
 ]
@@ -13,8 +9,8 @@ readme = "README.md"
 
 [tool.poetry]
 name = "bt-sdk"
-version = "0.11.6"
-description = "revise protocol and add more api in api.pyx"
+version = "0.11.7"
+description = "add overbody in protocol"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 include = [
@@ -30,7 +26,6 @@ pandas = "^2.2.3"
 pytest = "^8.3.5"
 pytest-asyncio = "^0.26.0"
 msgpack = "^1.1.0"
-devpi-client = "^7.2.0"
 pyzmq = "^26.4.0"
 typing-inspection = "^0.4.0"
 pydantic-core = "2.16.3"
@@ -48,7 +43,9 @@ msgspec = "^0.20.0"
 poetry-core = "^2.3.1"
 polars = "^1.39.3"
 setuptools = "77.0.1"
-grpcio = "1.53.0"
+grpcio = ">=1.78.0"
+protobuf = "^7.35.0"
+build = "^1.5.0"
 
 [tool.poetry.group.build.dependencies]
 wheel = "^0.41.0"
@@ -76,3 +73,7 @@ include-package-data = true
 
 [tool.setuptools.package-data]
 "*" = ["*.pyx", "*.pxd", "*.so", "*.pyd", "*.h", "*.cpp", "*.proto", "*.pyi*"]
+
+[build-system]
+requires = ["poetry-core", "wheel", "pybind11", "cmake", "Cython>=3.0"]
+build-backend =  "setuptools.build_meta" # "poetry.core.masonry.api" for pure python / scikit-build-core for cmake
