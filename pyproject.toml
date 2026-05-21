@@ -67,9 +67,17 @@ name = "devpi"
 url = "http://localhost:3141/bt_sdk/dev/+simple/"
 priority = "supplemental"
 
+# [tool.setuptools]
+# packages = ["bt_sdk", "bt_sdk.core", "bt_sdk.core.client", "bt_sdk.core.rpc.serialize"]
+# include-package-data = true 
+
 [tool.setuptools]
-packages = ["bt_sdk", "bt_sdk.core", "bt_sdk.core.client", "bt_sdk.core.rpc.serialize"]
-include-package-data = true 
+include-package-data = true # __init__
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["bt_sdk*"]
+exclude = ["tests*", "docs*", "benchmarks*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.pyx", "*.pxd", "*.so", "*.pyd", "*.h", "*.cpp", "*.proto", "*.pyi*"]
