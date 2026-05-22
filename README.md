@@ -77,3 +77,8 @@ loop.run_until_complete() # loop.start ---> run ---> stop
 python -m grpc_tools.protoc -I . --python_out=. --pyi_out=. --grpc_python_out=. service.proto
 
 add experiment api
+
+这是 PEP 517 标准引入的 **"Isolated Builds"** 特性：
+1. **隔离性**：为了保证打包结果的一致性，构建过程不应该依赖你本地环境中乱七八糟的包。
+2. **构建时依赖 (Build-time deps)**：`[tool.poetry.dependencies]` 是**运行时**依赖（用户装完包后需要的）；而 `[build-system] requires` 是**构建时**依赖（编译二进制文件需要的）。
+3. **Cython + NumPy**：因为你的 `build.py` 需要调用 `numpy.get_include()` 来获取 C 头文件路径，所以 `numpy` 必须作为“构建工具”存在。

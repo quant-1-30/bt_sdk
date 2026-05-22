@@ -1,22 +1,14 @@
-[project] # used for setuptools
-name = "bt-sdk"
-version = "0.11.7"
-description = "add overbody in protocol"
-authors = [
-    {name = "hengxin.liu", email = "john@example.com"}
-]
-readme = "README.md"
-
 [tool.poetry]
 name = "bt-sdk"
-version = "0.11.7"
-description = "add overbody in protocol"
+version = "0.12.0"
+description = "rewrite prproject.toml"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
+build = "build_ext.py"
+
 include = [
-    "bt_sdk/core/lib/factor/lib/*.so",
-    "bt_sdk/core/lib/factor/lib/*.dylib",
-    "bt_sdk/core/lib/factor/lib/*.pyd"
+    { path = "bt_sdk/**/*.so", format = "wheel" },
+    { path = "bt_sdk/**/*.pyx" }
 ]
 
 [tool.poetry.dependencies]
@@ -46,6 +38,7 @@ setuptools = "77.0.1"
 grpcio = ">=1.78.0"
 protobuf = "^7.35.0"
 build = "^1.5.0"
+numpy = "^2.4.6"
 
 [tool.poetry.group.build.dependencies]
 wheel = "^0.41.0"
@@ -68,20 +61,18 @@ url = "http://localhost:3141/bt_sdk/dev/+simple/"
 priority = "supplemental"
 
 # [tool.setuptools]
-# packages = ["bt_sdk", "bt_sdk.core", "bt_sdk.core.client", "bt_sdk.core.rpc.serialize"]
-# include-package-data = true 
+# include-package-data = true # __init__
 
-[tool.setuptools]
-include-package-data = true # __init__
+# [tool.setuptools.packages.find]
+# where = ["."]
+# include = ["bt_sdk*"]
+# exclude = ["tests*", "docs*", "benchmarks*"]
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["bt_sdk*"]
-exclude = ["tests*", "docs*", "benchmarks*"]
+# [tool.setuptools.package-data]
+# "*" = ["*.pyx", "*.pxd", "*.so", "*.pyd", "*.h", "*.cpp", "*.proto", "*.pyi*"]
 
-[tool.setuptools.package-data]
-"*" = ["*.pyx", "*.pxd", "*.so", "*.pyd", "*.h", "*.cpp", "*.proto", "*.pyi*"]
 
 [build-system]
-requires = ["poetry-core", "wheel", "pybind11", "cmake", "Cython>=3.0"]
-build-backend =  "setuptools.build_meta" # "poetry.core.masonry.api" for pure python / scikit-build-core for cmake
+requires = ["poetry-core", "wheel", "pybind11", "cmake", "Cython>=3.0", "numpy", "setuptools"] # used to execute build.py
+# build-backend =  "setuptools.build_meta" # 
+build-backend = "poetry.core.masonry.api" # for pure python / scikit-build-core for cmake
