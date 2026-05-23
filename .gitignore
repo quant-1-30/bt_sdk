@@ -163,3 +163,7 @@ cython_debug/
 #.idea/
 .pytest_cache/
 *.whl
+
+# cython
+*.so
+*.cpp
