@@ -1,7 +1,8 @@
 import os
 import glob
 
-def get_ext_modules(setup_kwargs): # poetry build / backend setuptools
+
+def get_ext_modules(): # poetry build / backend setuptools
     import numpy as np
     from setuptools import Extension
     from Cython.Build import cythonize
@@ -49,12 +50,12 @@ def get_ext_modules(setup_kwargs): # poetry build / backend setuptools
         'wraparound': False,         # 关闭负索引支持（提升性能）
         'initializedcheck': False,   # 关闭内存视图初始化检查
         'cdivision': True,           # 开启 C 级别除法（不检查除零，极快）
-    },
+    }
 
     ext_modules = cythonize(
-            extensions,
-            compiler_directives=compiler_directives,
-            annotate=False # .html 文件，方便查看代码是否实现C 级加速
+        extensions,
+        compiler_directives=compiler_directives,
+        annotate=False # .html 文件，方便查看代码是否实现C 级加速
         )
     return ext_modules
 
