@@ -80,7 +80,7 @@ class TestMdApi:
     #     results = await md_api.get_event_async(query, event_type)
     #     print(f"Subscribe Adj Results: {results}")
 
-    # @pytest.mark.asyncio
-    # async def test_factor(self, md_api, query):
-    #     datas = await md_api.get_factor_async(query, FactorTopic.Qfq)
-    #     print("adj_factors: ", datas)
+    @pytest.mark.asyncio
+    async def test_factor(self, md_api, query):
+        datas = await md_api.get_factor_async(query, FactorTopic.Qfq)
+        print("adj_factors: ", datas)

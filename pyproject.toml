@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.12.1"
-description = "revise bug in setup.py"
+version = "0.12.2"
+description = "add cmake extension in setup.py"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 build = "build_ext.py"
