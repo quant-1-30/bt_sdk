@@ -24,12 +24,15 @@ class CashBody(msgspec.Struct, frozen=True, tag="cash"):
 
 class OrderBody(msgspec.Struct, frozen=True, tag="order"):
     sid: bytes
+    order_id: bytes
     order_type: int
     exec_type: int
     sizer_ratio: float
     pricelimit: float
     created_dt: int
     filler: bytes # oco / occ / smooth / likehood
+
+    # order_id: bytes = msgspec.field(default_factory=fast_uuid4_bytes)
 
 
 class OverBody(msgspec.Struct, frozen=True, tag="over"):
