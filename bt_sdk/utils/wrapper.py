@@ -31,6 +31,7 @@ def singleton(cls):
         return instances[cls]
     return get_instance
 
+
 class Lazyproperty:
     def __init__(self, func):
         self.func = func
@@ -42,6 +43,38 @@ class Lazyproperty:
             value = self.func(instance)
             setattr(instance, self.func.__name__, value)
             return value
+
+
+class LazyFunc(object): # __getattribute__ > __getattr__
+
+    def __init__(self, func):
+        self.func = func
+        self.attr_name = func.__name__
+        # self.cache = weakref.WeakKeyDictionary()
+        self.cache = dict()
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        try:
+            return self.cache[self.attr_name]
+        except KeyError:
+            ret = self.func(instance)
+            self.cache[self.attr_name] = ret
+            return ret
+
+    def __set__(self, instance, value):
+        raise AttributeError("LazyFunc set value!!!")
+
+    def __delete__(self, instance):
+        del self.cache[instance]
+
+
+class LazyClsFunc(LazyFunc):
+
+    def __get__(self, instance, owner):
+        return super(LazyClsFunc, self).__get__(owner, owner)
+
 
 def deprecated(msg=None, stacklevel=2):
     
@@ -185,6 +218,7 @@ def empty_wrapper(func):
         return func(*args, **kwargs)
     return wrapper
 
+
 # noinspection PyUnusedLocal
 def empty_wrapper_with_params(*p_args, **p_kwargs):
 
@@ -207,37 +241,6 @@ def except_debug(func):
             print(e)
             return func(*args, **kwargs)
     return wrapper
-
-
-class LazyFunc(object): # __getattribute__ > __getattr__
-
-    def __init__(self, func):
-        self.func = func
-        self.attr_name = func.__name__
-        # self.cache = weakref.WeakKeyDictionary()
-        self.cache = dict()
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        try:
-            return self.cache[self.attr_name]
-        except KeyError:
-            ret = self.func(instance)
-            self.cache[self.attr_name] = ret
-            return ret
-
-    def __set__(self, instance, value):
-        raise AttributeError("LazyFunc set value!!!")
-
-    def __delete__(self, instance):
-        del self.cache[instance]
-
-
-class LazyClsFunc(LazyFunc):
-
-    def __get__(self, instance, owner):
-        return super(LazyClsFunc, self).__get__(owner, owner)
 
 
 def valid_check(func):
@@ -359,22 +362,3 @@ def coerce_numbers_to_my_dtype(f):
         return f(self, other)
     return method
 
-
-def api_method(f):
-    # Decorator that adds the decorated class method as a callable
-    # function (wrapped) to zipline.api
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        # Get the instance and call the method
-        algo_instance = get_algo_instance()
-        if algo_instance is None:
-            raise RuntimeError(
-                'api method %s'
-                % f.__name__
-            )
-        return getattr(algo_instance, f.__name__)(*args, **kwargs)
-    # Add functor to zipline.api
-    # setattr(zipline.api, f.__name__, wrapped)
-    # zipline.api.__all__.append(f.__name__)
-    # f.is_api_method = True
-    return f

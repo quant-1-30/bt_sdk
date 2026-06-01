@@ -72,7 +72,35 @@ class TestMdApi:
     @pytest.mark.asyncio
     async def test_factor(self, md_api, query):
         data = await md_api.get_factor_async(query, FactorTopic.Qfq)
-        print("adj_factors: ", data)
+        print("adj_factors: ", data[b'000001'].raw_factors, '\n', "rgt_factors: ", data[b'000001'].adj_factors)
+
+    @pytest.mark.asyncio
+    async def test_subscirbe(self, md_api, query):
+        chan = []
+        
+        observable = md_api.subscribe(query, RpcTopic.Tick)
+        print("observable object: ", type(observable)) 
+
+        # RxPy subscribe nonblocking 
+        loop = asyncio.get_running_loop()
+        finished_future = loop.create_future()
+
+        observable.pipe(
+            # ops.sample(0.1),  # 100ms abandon reset 
+            # ops.buffer_with_time_or_count(timespan=1.0, count=500), # up to 500 / 1 second to list
+            # ops.throttle_first(0.05), # on receive / 50ms not receive
+            # ops.publish_replay(1), # cache 1 record 
+            # ops.ref_count()
+            ops.map(lambda data: data["data"]),
+            ops.share()
+        ).subscribe( 
+            on_next=chan.append,
+            on_error=lambda e: loop.call_soon_threadsafe(finished_future.set_exception, e),
+            on_completed=lambda: loop.call_soon_threadsafe(finished_future.set_result, True)
+        )
+        await finished_future
+        df = pa.concat_tables(chan) if chan else chan
+        print(f"Subscribe Tick Results: {df}")
 
     @pytest.mark.asyncio
     async def test_subscirbe(self, md_api, query):
@@ -100,6 +128,63 @@ class TestMdApi:
         )
         
         await finished_future
+        df = pa.concat_tables(chan) if chan else chan
+        print(f"Subscribe Close Results: {df}")
+
+    @pytest.mark.asyncio
+    async def test_subscirbe(self, md_api, query):
+        chan = []
         
-        df = pa.concat_tables(chan)
-        print(f"Subscribe Results: {df}")
+        observable = md_api.subscribe(query, RpcTopic.Adjustment)
+        print("observable object: ", type(observable)) 
+
+        # RxPy subscribe nonblocking 
+        loop = asyncio.get_running_loop()
+        finished_future = loop.create_future()
+
+        observable.pipe(
+            # ops.sample(0.1),  # 100ms abandon reset 
+            # ops.buffer_with_time_or_count(timespan=1.0, count=500), # up to 500 / 1 second to list
+            # ops.throttle_first(0.05), # on receive / 50ms not receive
+            # ops.publish_replay(1), # cache 1 record 
+            # ops.ref_count()
+            ops.map(lambda data: data["data"]),
+            ops.share()
+        ).subscribe( 
+            on_next=chan.append,
+            on_error=lambda e: loop.call_soon_threadsafe(finished_future.set_exception, e),
+            on_completed=lambda: loop.call_soon_threadsafe(finished_future.set_result, True)
+        )
+        
+        await finished_future
+        df = pa.concat_tables(chan) if chan else chan
+        print(f"Subscribe Adjustment Results: {df}")
+
+    @pytest.mark.asyncio
+    async def test_subscirbe(self, md_api, query):
+        chan = []
+        
+        observable = md_api.subscribe(query, RpcTopic.Rightment)
+        print("observable object: ", type(observable)) 
+
+        # RxPy subscribe nonblocking 
+        loop = asyncio.get_running_loop()
+        finished_future = loop.create_future()
+
+        observable.pipe(
+            # ops.sample(0.1),  # 100ms abandon reset 
+            # ops.buffer_with_time_or_count(timespan=1.0, count=500), # up to 500 / 1 second to list
+            # ops.throttle_first(0.05), # on receive / 50ms not receive
+            # ops.publish_replay(1), # cache 1 record 
+            # ops.ref_count()
+            ops.map(lambda data: data["data"]),
+            ops.share()
+        ).subscribe( 
+            on_next=chan.append,
+            on_error=lambda e: loop.call_soon_threadsafe(finished_future.set_exception, e),
+            on_completed=lambda: loop.call_soon_threadsafe(finished_future.set_result, True)
+        )
+        
+        await finished_future
+        df = pa.concat_tables(chan) if chan else chan
+        print(f"Subscribe Rightment Results: {df}")

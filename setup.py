@@ -37,6 +37,18 @@ def get_ext_modules(): # poetry build / backend setuptools
                 # "-Wno-sign-compare", # O3 极致优化，C++11 标准
         ),
         Extension(
+            name="bt_sdk.utils.util",  # * 表示匹配目录下所有模块
+            sources=["bt_sdk/utils/util.pyx"],
+            include_dirs=[np.get_include(), "."],  # 包含 NumPy 和当前目录（用于查找 pxd）
+            language="c++",                         # 如果使用了 vector/map，必须指定
+            extra_compile_args=["-O3", "-std=c++11"]
+                # "-Wno-unused-function",
+                # "-Wno-unused-variable",
+                # "-Wno-unused-but-set-variable",
+                # "-Wno-unused-parameter",
+                # "-Wno-sign-compare", # O3 极致优化，C++11 标准
+        ),
+        Extension(
             name="bt_sdk.core.client.api", 
             sources=["bt_sdk/core/client/api.pyx"],
             include_dirs=[np.get_include(), current_dir, "."],
