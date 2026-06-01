@@ -18,6 +18,11 @@ cdef dict _md_api_registry = {}
 cdef object _md_api_lock = threading.Lock()
 
 
+cdef inline object scale(dict data):
+    cdef object table = data["data"]
+    return table
+
+
 async def _collect_async(observable, timeout):
     cdef list buffer = []
     cdef object fut 
@@ -37,7 +42,16 @@ async def _collect_async(observable, timeout):
         if not fut.done():
             loop.call_soon_threadsafe(fut.set_exception, err)
 
-    subscription = observable.subscribe(
+
+    subscription = observable.pipe(
+        # ops.sample(0.1),  # 100ms abandon reset 
+        # ops.buffer_with_time_or_count(timespan=1.0, count=500), # up to 500 / 1 second to list
+        # ops.throttle_first(0.05), # on receive / 50ms not receive
+        # ops.publish_replay(1), # cache 1 record 
+        # ops.ref_count()
+        ops.map(scale),
+        ops.share()
+    ).subscribe( # nonblocking
         on_next=on_next,
         on_error=on_error,
         on_completed=on_completed
@@ -88,66 +102,23 @@ cdef class MdApi:
         data = _merge_tables(tables, is_group=False)
         return pl.from_arrow(data)
 
-    async def get_subscribe_async(self, object body, int32_t forward_type):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(RpcTopic.Tick, body=body)
-
-        obs = self.async_client.run(req_id, event)
-        tables = await _collect_async(obs, self.timeout)
-        raw_data = _merge_tables(tables)
-
-        if forward_type == 0:
-            pl_data = {key: pl.from_arrow(val) for key, val in raw_data.items()}
-            return pl_data
-
-        factors = await self.get_factor_async(body, forward_type)
-        adjusted_array = apply_factor(raw_data, factors, forward_type)
-        return adjusted_array 
-
-    async def get_close_async(self, object body, int32_t forward_type):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=RpcTopic.Close, body=body)
-        
-        obs = self.async_client.run(req_id, event)
-        tables = await _collect_async(obs, self.timeout)
-        raw_data = _merge_tables(tables)
-
-        if forward_type == 0:
-            pl_data = {key: pl.from_arrow(val) for key, val in raw_data.items()}
-            return pl_data
-
-        factors = await self.get_factor_async(body, forward_type)
-        adjusted_array = apply_factor(raw_data, factors, forward_type)
-        return adjusted_array 
-
-    async def get_event_async(self, object body, int32_t topic):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=topic, body=body)
-        
-        obs = self.async_client.run(req_id, event)
-        tables = await _collect_async(obs, self.timeout)
-        raw_data = _merge_tables(tables)
-        pl_data = {key: pl.from_arrow(val) for key, val in raw_data.items()}
-        return pl_data
-
-    async def get_raw_close_async(self, object body):
-        cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(topic=RpcTopic.Close, body=body)
-        
-        obs = self.async_client.run(req_id, event)
-        tables = await _collect_async(obs, self.timeout)
-        raw_data = _merge_tables(tables)
-        return raw_data 
-
     async def get_factor_async(self, object body, int32_t forward):
-    
-        cdef object coro1 = self.get_raw_close_async(body) # raw
-        cdef object coro2 = self.get_event_async(body, RpcTopic.Adjustment)
-        cdef object coro3 = self.get_event_async(body, RpcTopic.Rightment)
+        # close
+        close_obs = self.async_client.run(fast_uuid4_bytes(), Event(topic=RpcTopic.Close, body=body))
+        cdef object coro1 = _collect_async(close_obs, self.timeout)
+
+        # adjustment
+        adj_obs = self.async_client.run(fast_uuid4_bytes(), Event(topic=RpcTopic.Adjustment, body=body))
+        cdef object coro2 = _collect_async(adj_obs, self.timeout)
         
-        close, adj, rgt = await asyncio.gather(coro1, coro2, coro3)
-        factors = calc_factor(close, adj, rgt, forward)
-        return factors
+        # rightment
+        rgt_obs = self.async_client.run(fast_uuid4_bytes(), Event(topic=RpcTopic.Rightment, body=body))
+        cdef object coro3 = _collect_async(rgt_obs, self.timeout)
+
+        # calculate  
+        close_tables, adj_tables, rgt_tables = await asyncio.gather(coro1, coro2, coro3)
+        factors = calc_factor(_merge_tables(close_tables), _merge_tables(adj_tables), _merge_tables(rgt_tables), forward)
+        return factors 
 
 # --------------------------------------------------------------- Sync Api --------------------------------------------------------
 
@@ -156,30 +127,14 @@ cdef class MdApi:
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
         return future.result()
     
-    cpdef object get_subscribe(self, object body, int32_t forward_type):
-        coroutine = self.get_subscribe_async(body, forward_type)
-        future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-        adjusted_array = future.result()
-        return adjusted_array 
-        
-    cpdef object get_close(self, object body, int32_t forward):
-        coroutine = self.get_close_async(body, forward)
-        future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-        return future.result()
-
-    cpdef object get_event(self, object body, int32_t topic):
-        coroutine = self.get_event_async(topic, body)
-        future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-        return future.result()
-
-    cpdef object get_factor(self, object body, int32_t forward):
-        coroutine = self.get_factor_async(body, forward)
+    cpdef object get_factor(self, object body, int32_t forward_type):
+        coroutine = self.get_factor_async(body, forward_type)
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
         return future.result()
     
-    cpdef object subscribe(self, object body, int32_t forward_type):
+    cpdef object subscribe(self, object body, int32_t topic):
         cdef bytes req_id = fast_uuid4_bytes()
-        cdef object event = Event(RpcTopic.Tick, body=body)
+        cdef object event = Event(topic=topic, body=body)
 
         obs = self.async_client.run(req_id, event)
         return obs

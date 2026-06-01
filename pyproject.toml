@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.12.5"
-description = "downgrade protobuf version"
+version = "0.12.6"
+description = "rewrite api and process with obs"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 build = "build_ext.py"

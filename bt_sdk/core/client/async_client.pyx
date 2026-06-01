@@ -31,11 +31,6 @@ cdef int LENGTH_BYTES = 4
 cdef int REQ_ID_SIZE = 16
 
 
-cdef inline object scale(dict data):
-    cdef object table = data["data"]
-    return table
-
-
 cdef class AsyncClient:
 
     def __init__(self):
@@ -137,15 +132,7 @@ cdef class AsyncRpcClient(AsyncClient):
             req_subject.subscribe(observer)
 
         observable = reactivex.create(factory)
-        return observable.pipe(
-            # ops.sample(0.1),  # 100ms abandon reset 
-            # ops.buffer_with_time_or_count(timespan=1.0, count=500), # up to 500 / 1 second to list
-            # ops.throttle_first(0.05), # on receive / 50ms not receive
-            # ops.publish_replay(1), # cache 1 record 
-            # ops.ref_count()
-            ops.map(scale),
-            ops.share()
-        )
+        return observable
 
     async def _stream_request(self, bytes req_id, object msg, object subject):
             await self._ensure_connection()

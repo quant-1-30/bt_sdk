@@ -7,10 +7,10 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'lib')) # append C++ bin
 import adj_factor
 import polars as pl
 import pyarrow as pa
-from typing import List, Union
+from typing import List, Union, Dict
 
 
-def adjust2struct(table_df: Union[pa.Table, dict]):
+def adjust2struct(table_df: Union[pa.Table, Dict]):
     events = []
     if len(table_df): # is_empty()
         # num_rows = table_data.num_rows
@@ -24,10 +24,7 @@ def adjust2struct(table_df: Union[pa.Table, dict]):
     return events        
 
 
-def right2struct(table_df: Union[pl.DataFrame, dict]):
-    """
-        Convert rightment data to RgtStruct
-    """
+def right2struct(table_df: Union[pa.Table, Dict]):
     events = []
     if len(table_df):
         for i in range(len(table_df)):
@@ -39,7 +36,7 @@ def right2struct(table_df: Union[pl.DataFrame, dict]):
     return events
 
 
-def _calc_factor(c_df: pl.DataFrame, adj_df: pl.DataFrame, rgt_df: pl.DataFrame, forward: int):
+def _calc_factor(c_df: pa.Table, adj_df: pa.Table, rgt_df: pa.Table, forward: int):
     vector_trading = c_df["day"].to_pylist()
     vector_close = c_df["close"].to_pylist()
     vector_adjust_event = adjust2struct(adj_df)
@@ -57,7 +54,7 @@ def _calc_factor(c_df: pl.DataFrame, adj_df: pl.DataFrame, rgt_df: pl.DataFrame,
     return factors
 
 
-def calc_factor(closes: dict, adjs: dict, rgts: dict, forward: int):
+def calc_factor(closes: Dict[bytes, pa.Table], adjs: Dict[bytes, pa.Table], rgts: Dict[bytes, pa.Table], forward: int):
     if not closes:
         return {}
 
@@ -104,9 +101,9 @@ def _apply_factor(raw_data: pa.Table, adj_factors: adj_factor.FactorResult, adju
         pl.col("day").cast(pl.Int32)
     ).set_sorted("day")
 
-    # strategy="backward"（默认 ✅ 推荐）右表 ≤ 左表 的最近一行
-    # strategy="forward" 右表 ≥ 左表 的最近一行
-    # strategy="nearest" 左右最近（绝对值最小）时间差最小对齐
+    # strategy="backward" right <= left nearly row
+    # strategy="forward" right >= left
+    # strategy="nearest" abs(left - right) minimum
     joined_df = df.join_asof(
         factor_df,
         left_on="day",
@@ -126,7 +123,7 @@ def _apply_factor(raw_data: pa.Table, adj_factors: adj_factor.FactorResult, adju
     return adjusted_df
 
 
-def apply_factor(raw_data: dict[bytes: pa.Table], adj_factors: dict[bytes: adj_factor.FactorResult], adjust_type: int) -> pl.DataFrame:
+def apply_factor(raw_data: Dict[bytes, pa.Table], adj_factors: Dict[bytes, adj_factor.FactorResult], adjust_type: int) -> Dict[bytes, pl.DataFrame]:
     adjusted_array = {}
     for sid, val in raw_data.items():
 

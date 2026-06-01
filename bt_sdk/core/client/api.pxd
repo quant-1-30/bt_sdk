@@ -24,14 +24,8 @@ cdef class MdApi:
 
     cpdef object get_instrument(self)
 
-    cpdef object get_subscribe(self, object body, int32_t forward)
-    
-    cpdef object get_close(self, object body, int32_t forward)
-    
-    cpdef object get_event(self, object body, int32_t topic)
-
     cpdef object get_factor(self, object body, int32_t forward)
     
-    cpdef object subscribe(self, object body, int32_t forward_type)
+    cpdef object subscribe(self, object body, int32_t topic)
     
     cpdef void disconnect(self)

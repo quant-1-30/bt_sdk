@@ -40,6 +40,10 @@ async def md_api():
 
 
 class TestMdApi:
+
+    @pytest.fixture
+    def chan(self):
+        return list()
     
     @pytest.fixture
     def session(self):
@@ -62,25 +66,40 @@ class TestMdApi:
 
     @pytest.mark.asyncio
     async def test_getInstrument(self, md_api):
-        results = await md_api.get_instrument_async()
-        print(f"Instrument Results: {results}")
-
-    @pytest.mark.asyncio
-    async def test_close(self, md_api, query):
-        results = await md_api.get_close_async(query, FactorTopic.Hfq)
-        print(f"Subscribe Close Results: {results}")
-
-    @pytest.mark.asyncio
-    async def test_subscirbe(self, md_api, query):
-        results = await md_api.get_subscribe_async(query, FactorTopic.Raw)
-        print(f"Subscribe Results: {results}")
-    
-    @pytest.mark.asyncio
-    async def test_event(self, md_api, query, event_type):
-        results = await md_api.get_event_async(query, event_type)
-        print(f"Subscribe Adj Results: {results}")
+        assets = await md_api.get_instrument_async()
+        print(f"Instrument Results: {assets}")
 
     @pytest.mark.asyncio
     async def test_factor(self, md_api, query):
-        datas = await md_api.get_factor_async(query, FactorTopic.Qfq)
-        print("adj_factors: ", datas)
+        data = await md_api.get_factor_async(query, FactorTopic.Qfq)
+        print("adj_factors: ", data)
+
+    @pytest.mark.asyncio
+    async def test_subscirbe(self, md_api, query):
+        chan = []
+        
+        observable = md_api.subscribe(query, RpcTopic.Close)
+        print("observable object: ", type(observable)) 
+
+        # RxPy subscribe nonblocking 
+        loop = asyncio.get_running_loop()
+        finished_future = loop.create_future()
+
+        observable.pipe(
+            # ops.sample(0.1),  # 100ms abandon reset 
+            # ops.buffer_with_time_or_count(timespan=1.0, count=500), # up to 500 / 1 second to list
+            # ops.throttle_first(0.05), # on receive / 50ms not receive
+            # ops.publish_replay(1), # cache 1 record 
+            # ops.ref_count()
+            ops.map(lambda data: data["data"]),
+            ops.share()
+        ).subscribe( 
+            on_next=chan.append,
+            on_error=lambda e: loop.call_soon_threadsafe(finished_future.set_exception, e),
+            on_completed=lambda: loop.call_soon_threadsafe(finished_future.set_result, True)
+        )
+        
+        await finished_future
+        
+        df = pa.concat_tables(chan)
+        print(f"Subscribe Results: {df}")

@@ -84,3 +84,7 @@ add experiment api
 3. **Cython + NumPy**：因为你的 `build.py` 需要调用 `numpy.get_include()` 来获取 C 头文件路径，所以 `numpy` 必须作为“构建工具”存在。
 
 find bt_core -type f \( -name "*.so" -o -name "*.cpp" \)  -print0 | xargs -0 rm -f
+
+它返回的是一个纯粹的 **RxPy Observable** 对象。
+**陷阱来了：** 在 RxPy 的底层源码中，`Observable` 类实现了 Python 的魔术方法 `__await__`。当你对一个 Observable 使用 `await` 时，RxPy 会**自动订阅这个流，阻塞等待直到流结束（on_completed），然后返回流中发射的最后一个元素（Last Item）！**
+因为你的底层 `_stream_request` 发射的是 `{"id": req_id, "data": payload}` 这样的 `dict`，所以 `await` 结束后，你拿到的就是一个 `dict`，而不是 Observable 对象本身
