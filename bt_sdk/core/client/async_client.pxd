@@ -16,11 +16,10 @@ cdef class AsyncClient:
 cdef class AsyncRpcClient(AsyncClient):
     cdef str addr
     cdef int timeout
-    cdef bint is_background_loop
     cdef bint _connected
     cdef object loop
     cdef object rpc_client
     
-    cpdef void attach_loop(self, loop, bint is_background=?)
+    cpdef void attach_loop(self, loop)
 
     cdef object wrap_protocol(self, bytes req_id, object msg) # virtual / cython not supported nested function 

@@ -82,7 +82,7 @@ cdef class MdApi:
             return
         self.loop = loop
         print(f"[MdApi] Attaching to Loop: {id(self.loop)}")
-        self.async_client.attach_loop(self.loop, is_background=False) # reuse main loop avoid cross thread
+        self.async_client.attach_loop(self.loop) # reuse main loop avoid cross thread
         self._is_initialized = True
  
     def __enter__(self):

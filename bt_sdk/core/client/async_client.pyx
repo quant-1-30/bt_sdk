@@ -91,10 +91,9 @@ cdef class AsyncRpcClient(AsyncClient):
         self._connected = False
         self.loop = None
         
-    cpdef void attach_loop(self, loop, bint is_background=False):
+    cpdef void attach_loop(self, loop):
         self.loop = loop
-        self.is_background_loop = is_background
-        print(f"[{self.__class__.__name__}] Attached Loop: {id(loop)} (Background: {is_background})")
+        print(f"[{self.__class__.__name__}] Attached Loop: {id(loop)}")
         
     async def _ensure_connection(self):
         """
@@ -110,29 +109,6 @@ cdef class AsyncRpcClient(AsyncClient):
             print(f"[gRPC Init Error] {e}")
             raise e
 
-    cdef object wrap_protocol(self, bytes req_id, object msg):
-        cdef object req_subject = Subject() # cold mode avoid hot mode (data into hole when self._stream_request)
-
-        if not self._running:
-            raise RuntimeError("client is not running")
-
-        def factory(observer, scheduler):
-            async def run():
-                try:
-                    await self._stream_request(req_id, msg, req_subject)
-                except Exception as e:
-                    req_subject.on_error(e)
-
-            if self.is_background_loop:
-                future = asyncio.run_coroutine_threadsafe(run(), self.loop)
-                future.add_done_callback(lambda f: self._finalize_task(f))
-            else:
-                self.loop.create_task(run())
-
-            req_subject.subscribe(observer)
-
-        observable = reactivex.create(factory)
-        return observable
 
     async def _stream_request(self, bytes req_id, object msg, object subject):
             await self._ensure_connection()
@@ -155,3 +131,38 @@ cdef class AsyncRpcClient(AsyncClient):
             except Exception as e:
                 print(f"[gRPC Unknown Error] {e}")
                 subject.on_error(e)
+
+    cdef object wrap_protocol(self, bytes req_id, object msg):
+        cdef object req_subject = Subject() 
+
+        if not self._running:
+            raise RuntimeError("client is not running")
+
+        def factory(observer, scheduler):
+            async def run():
+                try:
+                    await self._stream_request(req_id, msg, req_subject)
+                except Exception as e:
+                    req_subject.on_error(e)
+
+            # avoid data loss
+            req_subject.subscribe(observer)
+
+            # ==============================================================
+            # Dynamic Thread Detection
+            # ==============================================================
+            try:
+                curr_loop = asyncio.get_running_loop()
+                if curr_loop is self.loop:
+                    # Case 1: pytest
+                    self.loop.create_task(run())
+                else:
+                    # Case 2: difference loop
+                    asyncio.run_coroutine_threadsafe(run(), self.loop)
+                    
+            except RuntimeError:
+                # Case 3: Cerebro  prepare mdapi 
+                asyncio.run_coroutine_threadsafe(run(), self.loop)
+
+        observable = reactivex.create(factory)
+        return observable
