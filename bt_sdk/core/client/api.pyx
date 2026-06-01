@@ -119,6 +119,18 @@ cdef class MdApi:
         factors = calc_factor(_merge2DataFrame(close_tables), _merge2DataFrame(adj_tables), _merge2DataFrame(rgt_tables), forward)
         return factors 
 
+    async def rpc_async(self, object body, int32_t rpc_type, int32_t timeout=30):
+        cdef bytes req_id = fast_uuid4_bytes()
+        cdef object event = Event(topic=rpc_type, body=body)
+
+        coro = self.async_client.direct_run_async(req_id, event)
+        
+        tables = await asyncio.wait_for(coro, timeout=timeout)
+        
+        cdef bint is_group = False if rpc_type == RpcTopic.Instrument else True
+        df = _merge2DataFrame(tables, is_group)
+        return df
+
 # --------------------------------------------------------------- Sync Api --------------------------------------------------------
 
     cpdef object get_instrument(self):

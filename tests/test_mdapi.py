@@ -188,3 +188,8 @@ class TestMdApi:
         await finished_future
         df = pa.concat_tables(chan) if chan else chan
         print(f"Subscribe Rightment Results: {df}")
+
+    @pytest.mark.asyncio
+    async def test_rpc_async(self, md_api, query):
+        data = await md_api.rpc_async(query, RpcTopic.Adjustment)
+        print(f"Direct Run Async Adjustment Results: {data}")

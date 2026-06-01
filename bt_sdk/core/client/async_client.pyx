@@ -109,7 +109,6 @@ cdef class AsyncRpcClient(AsyncClient):
             print(f"[gRPC Init Error] {e}")
             raise e
 
-
     async def _stream_request(self, bytes req_id, object msg, object subject):
             await self._ensure_connection()
             try:
@@ -166,3 +165,19 @@ cdef class AsyncRpcClient(AsyncClient):
 
         observable = reactivex.create(factory)
         return observable
+
+    async def direct_run_async(self, bytes req_id, object msg):
+        await self._ensure_connection()
+        cdef list buffer = []
+        try:
+            response_iterator = self.rpc_client.on_request(msg.topic, msg.body)
+            async for payload in response_iterator:
+                if payload is not None:
+                    buffer.append(payload)
+            return buffer
+        except grpc.aio.AioRpcError as e:
+            print(f"[gRPC Direct Error] Code: {e.code()}")
+            raise e
+        except Exception as e:
+            print(f"[gRPC Direct Unknown Error] {e}")
+            raise e

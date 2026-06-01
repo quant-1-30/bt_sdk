@@ -35,15 +35,11 @@ class OrderBody(msgspec.Struct, frozen=True, tag="order"):
     # order_id: bytes = msgspec.field(default_factory=fast_uuid4_bytes)
 
 
-class OverBody(msgspec.Struct, frozen=True, tag="over"):
-    tick: int
-
-
 class Event(msgspec.Struct, frozen=True):
     topic: int
     sub_topic: int = -1
     experiment_id: bytes = b""
-    body: Union[QueryBody, RegisterBody, CashBody, OrderBody, OverBody, None] = None # tag to find body in Union strict
+    body: Union[QueryBody, RegisterBody, CashBody, OrderBody] = None # tag to find body in Union strict
     # body: EmptyBody = msgspec.field(default_factory=EmptyBody)
 
 
