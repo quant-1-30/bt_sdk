@@ -5,6 +5,7 @@ import asyncio
 import datetime
 import threading
 import pyarrow as pa
+import polars as pl
 
 from libc.stdint cimport uint8_t, int64_t
 from libc.time cimport gmtime, time_t, tm
@@ -102,7 +103,7 @@ cdef int64_t ts_to_int_date(int64_t ts, bint native=True) nogil: # only cdef nog
     return (info.tm_year + 1900) * 10000 + (info.tm_mon + 1) * 100 + info.tm_mday
 
 
-cpdef object _merge_tables(list batches, bint is_group=True): # cdef reduce python overhead
+cpdef object _merge2DataFrame(list batches, bint is_group=True): # cdef reduce python overhead
     cdef bytes sid_byte
     cdef dict sid_to_batches = {} 
     cdef dict aligned = {}
@@ -110,7 +111,8 @@ cpdef object _merge_tables(list batches, bint is_group=True): # cdef reduce pyth
     cdef object batch, table
 
     if not is_group:
-        return pa.concat_tables(batches, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks() 
+        table = pa.concat_tables(batches, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks() 
+        return pl.from_arrow(table)
 
     for batch in batches:
         sid_byte = batch.schema.metadata.get(b"sid")
@@ -121,5 +123,6 @@ cpdef object _merge_tables(list batches, bint is_group=True): # cdef reduce pyth
         sid_batch.append(batch) # int.from_bytes()
  
     for sid_byte, bulk_batch in sid_to_batches.items():
-        aligned[sid_byte] = pa.concat_tables(bulk_batch, promote_options='default') # pa.Table.from_batches(bulk_batch) # to_pydict() No 
+        aligned_table = pa.concat_tables(bulk_batch, promote_options='default') # pa.Table.from_batches(bulk_batch) # to_pydict() No 
+        aligned[sid_byte] = pl.from_arrow(aligned_table) 
     return aligned 

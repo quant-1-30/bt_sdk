@@ -10,7 +10,7 @@ import polars as pl
 from bt_sdk.core.protocol import Event
 from bt_sdk.core.factor import calc_factor, apply_factor
 from bt_sdk.core.client.async_client cimport AsyncRpcClient
-from bt_sdk.utils.util cimport fast_uuid4_bytes, _merge_tables
+from bt_sdk.utils.util cimport fast_uuid4_bytes, _merge2DataFrame
 
 from libc.stdint cimport int32_t
 
@@ -41,7 +41,6 @@ async def _collect_async(observable, timeout):
     def on_error(err):
         if not fut.done():
             loop.call_soon_threadsafe(fut.set_exception, err)
-
 
     subscription = observable.pipe(
         # ops.sample(0.1),  # 100ms abandon reset 
@@ -99,8 +98,8 @@ cdef class MdApi:
 
         obs = self.async_client.run(req_id, event)
         tables = await _collect_async(obs, self.timeout)
-        data = _merge_tables(tables, is_group=False)
-        return pl.from_arrow(data)
+        data_df = _merge2DataFrame(tables, is_group=False)
+        return data_df
 
     async def get_factor_async(self, object body, int32_t forward):
         # close
@@ -117,7 +116,7 @@ cdef class MdApi:
 
         # calculate  
         close_tables, adj_tables, rgt_tables = await asyncio.gather(coro1, coro2, coro3)
-        factors = calc_factor(_merge_tables(close_tables), _merge_tables(adj_tables), _merge_tables(rgt_tables), forward)
+        factors = calc_factor(_merge2DataFrame(close_tables), _merge2DataFrame(adj_tables), _merge2DataFrame(rgt_tables), forward)
         return factors 
 
 # --------------------------------------------------------------- Sync Api --------------------------------------------------------

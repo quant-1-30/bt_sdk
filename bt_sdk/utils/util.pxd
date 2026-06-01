@@ -33,4 +33,4 @@ cdef MarketTime market_utc(int64_t ts, bint native=?) nogil
 cdef int64_t ts_to_int_date(int64_t ts, bint native=?) nogil
 
 
-cpdef object _merge_tables(list batches, bint is_group=?) # cdef reduce python overhead
+cpdef object _merge2DataFrame(list batches, bint is_group=?) # cdef reduce python overhead
