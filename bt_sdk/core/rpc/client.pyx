@@ -1,6 +1,10 @@
 # cython: language_level=3
 # cython: boundscheck=False
 # cython: wraparound=False
+
+import os 
+os.environ['GRPC_ENABLE_FORK_SUPPORT']='0' # spawn  
+
 import numpy as np
 import pyarrow as pa
 import grpc
@@ -15,16 +19,11 @@ from libc.stdint cimport int32_t
 cdef int32_t MaxDate=30000000
 
 
-# cdef object Scale = {
-#         "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1e-3, "amount": 1e-3, # tick
-#         "bonus_share": 1e-3, "transfer": 1e-3, "bonus": 1e-3, # adjustment
-#         "price": 1e-3, "ratio": 1e-3 # rightment
-# }
-
 cdef object Scale = {
+        # benchmark amount not  1e-3
         RpcTopic.Tick: {
             "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1e-3, "amount": 1e-3,
-        },
+        }, 
         RpcTopic.Close: {
             "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1e-3, "amount": 1e-3,
         },
@@ -80,7 +79,7 @@ cdef class RpcClient:
         await self.initialize()
         return self
 
-    async def initialize(self, MAX_MESSAGE_LENGTH=1024 * 1024 * 100):
+    async def initialize(self, MAX_MESSAGE_LENGTH=512 * 1024 * 100):
         """
          grpc.keepalive_time_ms: The period (in milliseconds) after which a keepalive ping is
              sent on the transport.
@@ -97,19 +96,18 @@ cdef class RpcClient:
             return
             
         channel_options = [
-            # keepalive distinct web rpc and stream
-            ("grpc.keepalive_time_ms", 60000),
-            ("grpc.keepalive_timeout_ms", 20000),
-
-            # flow 
-            ("grpc.http2.initial_window_size", 32 * 1024 * 1024), # http2 frame size 
-            ("grpc.http2.initial_connection_window_size", 64 * 1024 * 1024), # global http2 window size
-
+            # same with server
             ('grpc.max_send_message_length', MAX_MESSAGE_LENGTH),
             ('grpc.max_receive_message_length', MAX_MESSAGE_LENGTH),
-            
-            ("grpc.keepalive_permit_without_calls", 1),
-            ("grpc.http2.max_pings_without_data", 0), # ulimit
+
+            # stream control http2 tcp ack
+            ("grpc.http2.initial_window_size", 32 * 1024 * 1024),
+            ("grpc.http2.initial_connection_window_size", 64 * 1024 * 1024),
+
+            ("grpc.keepalive_time_ms", 30000),             # 30s Ping > Server 10s
+            ("grpc.keepalive_timeout_ms", 10000),          # wait 10s
+            ("grpc.keepalive_permit_without_calls", 1),    # 
+            ("grpc.http2.max_pings_without_data", 0),      #
         ]
         
         self._channel = grpc.aio.insecure_channel(
