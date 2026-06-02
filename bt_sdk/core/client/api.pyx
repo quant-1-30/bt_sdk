@@ -76,9 +76,13 @@ cdef class MdApi:
         self.loop = None
         self._is_initialized = False
  
-    cpdef start(self, object loop):
+    cpdef start(self, object loop): # avoid loop is dead but is still initialized
         if self._is_initialized:
-            return
+            if self.loop is loop and not self.loop.is_closed():
+                return  
+            else:
+                print(f"[MdApi] Old loop is dead or changed. Re-attaching...")
+                
         self.loop = loop
         print(f"[MdApi] Attaching to Loop: {id(self.loop)}")
         self.async_client.attach_loop(self.loop) # reuse main loop avoid cross thread
