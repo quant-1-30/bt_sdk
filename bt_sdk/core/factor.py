@@ -6,7 +6,6 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'lib')) # append C++ binding
 import adj_factor
 import polars as pl
-# import pyarrow as pa
 from typing import List, Union, Dict
 
 

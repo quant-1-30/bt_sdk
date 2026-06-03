@@ -123,19 +123,37 @@ cdef class MdApi:
         factors = calc_factor(_merge2DataFrame(close_tables), _merge2DataFrame(adj_tables), _merge2DataFrame(rgt_tables), forward)
         return factors 
 
+    # ==============================================================
+    #  Support Cross Grpc Loop for Direct Query
+    # ==============================================================
     async def rpc_async(self, object body, int32_t rpc_type, int32_t timeout=30):
         cdef bytes req_id = fast_uuid4_bytes()
         cdef object event = Event(topic=rpc_type, body=body)
+        cdef object tables
 
-        coro = self.async_client.direct_run_async(req_id, event)
-        
-        tables = await asyncio.wait_for(coro, timeout=timeout)
-        
+        # wrap grpc logic
+        async def _internal_run():
+            return await self.async_client.direct_run_async(req_id, event)
+
+        try:
+            curr_loop = asyncio.get_running_loop()
+            if curr_loop is self.loop:
+                tables = await asyncio.wait_for(_internal_run(), timeout=timeout)
+            else:
+                fut = asyncio.run_coroutine_threadsafe(
+                    asyncio.wait_for(_internal_run(), timeout=timeout),
+                    self.loop
+                )
+                # wrap_future ---> asyncio.Future
+                tables = await asyncio.wrap_future(fut) # future.result() blocking
+        except RuntimeError:
+            raise RuntimeError("[MdApi] rpc_async must be awaited inside a running event loop!")
+
         cdef bint is_group = False if rpc_type == RpcTopic.Instrument else True
         df = _merge2DataFrame(tables, is_group)
         return df
 
-# --------------------------------------------------------------- Sync Api --------------------------------------------------------
+ # --------------------------------------------------------------- Sync Api --------------------------------------------------------
 
     cpdef object get_instrument(self):
         coroutine = self.get_instrument_async()
