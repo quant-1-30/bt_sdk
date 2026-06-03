@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.13.5"
-description = "optimize util"
+version = "0.13.6"
+description = "add constant avoid import from api.pyx"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 build = "build_ext.py"
