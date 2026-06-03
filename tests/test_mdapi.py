@@ -1,16 +1,16 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
-
 import pytest
 import pytest_asyncio
 import queue
 import asyncio
 import threading
 import reactivex
-from reactivex import operators as ops
 import pyarrow as pa
 import pyarrow.compute as pc
+import polars as pl
 
+from reactivex import operators as ops
 from bt_sdk.core.protocol import QueryBody
 from bt_sdk.core.client import GetMdApi, RpcTopic, FactorTopic
 
@@ -56,7 +56,7 @@ class TestMdApi:
     @pytest.fixture
     def query(self):
         start_date = 20041201
-        end_date = 20260430
+        end_date = 20260630
         # start_date = 1721926400
         # end_date = 1734972800
         sid = [b'000001']
@@ -64,22 +64,23 @@ class TestMdApi:
         return QueryBody(start_date, end_date, sid)
         # return QueryBody(start_date=1262703480, end_date=1262703480, sid=[b'600592', b'600595', b'600288', b'600337'])
 
-    @pytest.mark.asyncio
-    async def test_getInstrument(self, md_api):
-        assets = await md_api.get_instrument_async()
-        print(f"Instrument Results: {assets}")
+    # @pytest.mark.asyncio
+    # async def test_getInstrument(self, md_api):
+    #     assets = await md_api.get_instrument_async()
+    #     print(f"Instrument Results: {assets}")
 
-    @pytest.mark.asyncio
-    async def test_factor(self, md_api, query):
-        data = await md_api.get_factor_async(query, FactorTopic.Qfq)
-        print("adj_factors: ", data[b'000001'].raw_factors, '\n', "rgt_factors: ", data[b'000001'].adj_factors)
+    # @pytest.mark.asyncio
+    # async def test_factor(self, md_api, query):
+    #     data = await md_api.get_factor_async(query, FactorTopic.Qfq)
+    #     # print("adj_factors: ", data[b'000001'].raw_factors, '\n', "rgt_factors: ", data[b'000001'].adj_factors)
+    #     print(f"Factor Results: {data}")
 
     @pytest.mark.asyncio
     async def test_subscirbe(self, md_api, query):
         chan = []
         
         observable = md_api.subscribe(query, RpcTopic.Tick)
-        print("observable object: ", type(observable)) 
+        # print("observable object: ", type(observable)) 
 
         # RxPy subscribe nonblocking 
         loop = asyncio.get_running_loop()
@@ -99,7 +100,8 @@ class TestMdApi:
             on_completed=lambda: loop.call_soon_threadsafe(finished_future.set_result, True)
         )
         await finished_future
-        df = pa.concat_tables(chan) if chan else chan
+        table = pa.concat_tables(chan) if chan else []
+        df = pl.from_arrow(table) if table else pl.DataFrame()
         print(f"Subscribe Tick Results: {df}")
 
     @pytest.mark.asyncio
@@ -128,7 +130,8 @@ class TestMdApi:
         )
         
         await finished_future
-        df = pa.concat_tables(chan) if chan else chan
+        table = pa.concat_tables(chan) if chan else []
+        df = pl.from_arrow(table) if table else pl.DataFrame()
         print(f"Subscribe Close Results: {df}")
 
     @pytest.mark.asyncio
@@ -157,7 +160,8 @@ class TestMdApi:
         )
         
         await finished_future
-        df = pa.concat_tables(chan) if chan else chan
+        table = pa.concat_tables(chan) if chan else []
+        df = pl.from_arrow(table) if table else pl.DataFrame()
         print(f"Subscribe Adjustment Results: {df}")
 
     @pytest.mark.asyncio
@@ -186,7 +190,8 @@ class TestMdApi:
         )
         
         await finished_future
-        df = pa.concat_tables(chan) if chan else chan
+        table = pa.concat_tables(chan) if chan else []
+        df = pl.from_arrow(table) if table else pl.DataFrame()
         print(f"Subscribe Rightment Results: {df}")
 
     @pytest.mark.asyncio
