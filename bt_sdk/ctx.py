@@ -2,7 +2,6 @@ import os
 import atexit
 import contextlib
 
-from bt_sdk.core.client import GetMdApi
 from bt_sdk.utils.runner import AsyncRunner
 
 _global_runner = None
@@ -28,6 +27,8 @@ def cleanup_runner():
 
 
 def get_md_api(addr_str=None, timeout=30):
+    from bt_sdk.core.client.api import GetMdApi
+
     if not addr_str:
         addr_str = os.getenv("MD_ADDR", "127.0.0.1:50051")
     ip, port = addr_str.split(":")

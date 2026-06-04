@@ -90,3 +90,6 @@ find bt_core -type f \( -name "*.so" -o -name "*.cpp" \)  -print0 | xargs -0 rm 
 因为你的底层 `_stream_request` 发射的是 `{"id": req_id, "data": payload}` 这样的 `dict`，所以 `await` 结束后，你拿到的就是一个 `dict`，而不是 Observable 对象本身
 
 export GRPC_ENABLE_FORK_SUPPORT=0
+
+# import uvloop
+# asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())

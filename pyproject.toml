@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.13.7"
-description = "add ctx and runner"
+version = "0.13.8"
+description = "empty __init__ avoid grpc duplicate importlib"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 build = "build_ext.py"

@@ -12,7 +12,7 @@ import polars as pl
 
 from reactivex import operators as ops
 from bt_sdk.core.protocol import QueryBody
-from bt_sdk.core.client import GetMdApi, RpcTopic, FactorTopic
+from bt_sdk.core.constant import RpcTopic, FactorTopic
 from bt_sdk.ctx import external_mdapi_context
 
 

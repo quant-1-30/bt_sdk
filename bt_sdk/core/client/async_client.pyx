@@ -1,9 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 # cython: language_level=3, boundscheck=False, wraparound=False
 
-# import uvloop
-# asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 import os
 import socket
@@ -24,7 +20,6 @@ from concurrent.futures import Future, ThreadPoolExecutor
 
 from bt_sdk.core.protocol import _ENCODER, _RespDECODER
 from bt_sdk.core.rpc.client cimport RpcClient
-
 
 
 cdef int LENGTH_BYTES = 4
