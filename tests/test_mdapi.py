@@ -11,9 +11,10 @@ import pyarrow.compute as pc
 import polars as pl
 
 from reactivex import operators as ops
-from bt_sdk.core.protocol import QueryBody
-from bt_sdk.core.constant import RpcTopic, FactorTopic
 from bt_sdk.ctx import external_mdapi_context
+
+from bt_protocol._protocol import QueryBody
+from bt_protocol.constant import RpcTopic, FactorTopic
 
 
 class TestMdApi:
@@ -36,7 +37,7 @@ class TestMdApi:
 
     @pytest.fixture
     def query(self):
-        start_date = 20041201
+        start_date = 20260101
         # start_date = 1721926400
         end_date = 20260630
         # end_date = 1734972800

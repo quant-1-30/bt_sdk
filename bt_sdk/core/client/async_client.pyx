@@ -18,12 +18,8 @@ from reactivex.subject import Subject
 from reactivex.scheduler.eventloop import AsyncIOScheduler
 from concurrent.futures import Future, ThreadPoolExecutor
 
-from bt_sdk.core.protocol import _ENCODER, _RespDECODER
+from bt_protocol._protocol import _ENCODER, _RespDECODER
 from bt_sdk.core.rpc.client cimport RpcClient
-
-
-cdef int LENGTH_BYTES = 4
-cdef int REQ_ID_SIZE = 16
 
 
 cdef class AsyncClient:

@@ -1,18 +1,5 @@
 from libc.stdint cimport int32_t
 
-# cpdef enum RpcTopic:
-#     Instrument = 0
-#     Tick = 1
-#     Close = 2
-#     Adjustment = 3
-#     Rightment = 4
-#  
-# 
-# cpdef enum FactorTopic:
-#     Raw = 0
-#     Qfq = 1
-#     Hfq = 2
-# 
 
 cdef class MdApi:
     cdef bint _is_initialized

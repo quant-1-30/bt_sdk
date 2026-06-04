@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.13.8"
-description = "empty __init__ avoid grpc duplicate importlib"
+version = "0.14.2"
+description = "bt_protocol remove orm"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 build = "build_ext.py"
@@ -23,7 +23,6 @@ typing-inspection = "^0.4.0"
 ping3 = "^4.0.8"
 typing-extensions = "^4.14.1"
 annotated-types = "^0.7.0"
-setuptools-cmake-helper = "^0.1.2"
 pygments = "^2.19.2"
 urllib3 = "^2.5.0"
 reactivex = "^4.1.0"
@@ -32,13 +31,12 @@ pyarrow = "^22.0.0"
 msgspec = "^0.20.0"
 poetry-core = "^2.4.0"
 polars = "^1.39.3"
-setuptools = "77.0.1"
-grpcio = ">=1.78.0"
-# protobuf = "^7.35.0"
-protobuf = ">=3.19,<7.0"
+grpcio = ">=1.81.0"
+protobuf = ">=3.19,<7.0" # "^7.35.0" 
 build = "^1.5.0"
 numpy = "^2.4.6"
 pydantic = ">=2.11.0"
+bt-protocol = "0.1.7"
 
 [tool.poetry.group.build.dependencies]
 wheel = "^0.41.0"
@@ -59,18 +57,6 @@ priority = "primary"
 name = "devpi"
 url = "http://localhost:3141/bt_sdk/dev/+simple/"
 priority = "supplemental"
-
-# [tool.setuptools]
-# include-package-data = true # __init__
-
-# [tool.setuptools.packages.find]
-# where = ["."]
-# include = ["bt_sdk*"]
-# exclude = ["tests*", "docs*", "benchmarks*"]
-
-# [tool.setuptools.package-data]
-# "*" = ["*.pyx", "*.pxd", "*.so", "*.pyd", "*.h", "*.cpp", "*.proto", "*.pyi*"]
-
 
 [build-system]
 requires = ["poetry-core", "wheel", "pybind11", "cmake", "Cython>=3.0", "numpy", "setuptools"] # used to execute build.py

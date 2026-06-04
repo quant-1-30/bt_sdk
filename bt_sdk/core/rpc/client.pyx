@@ -2,6 +2,8 @@
 # cython: boundscheck=False
 # cython: wraparound=False
 
+from libc.stdint cimport int32_t
+
 import os 
 os.environ['GRPC_ENABLE_FORK_SUPPORT']='0' # spawn  
 
@@ -13,8 +15,7 @@ import pyarrow.compute as pc
 from typing import Iterator, AsyncIterator
 from google.protobuf import empty_pb2
 from google.protobuf.json_format import MessageToDict
-from .serialize import service_pb2_grpc, service_pb2
-from libc.stdint cimport int32_t
+from bt_protocol.serialize.pb import bt_service_pb2_grpc, bt_service_pb2
 
 cdef int32_t MaxDate=30000000
 
@@ -115,7 +116,7 @@ cdef class RpcClient:
             compression=None, # parrow+lz4 avoid grpc.Compression.Gzip  
             options=channel_options
         )
-        self._stub = service_pb2_grpc.btDataFeedStub(self._channel)
+        self._stub = bt_service_pb2_grpc.btDataFeedStub(self._channel)
 
     async def ensure_initialized(self):
         if self._channel is None:
@@ -146,9 +147,9 @@ cdef class RpcClient:
         cdef object response_iterator
 
         if req_body:
-            request = service_pb2.QuoteRequest(start_date=req_body.start_date, end_date=req_body.end_date, sid=req_body.sid)
+            request = bt_service_pb2.QuoteRequest(start_date=req_body.start_date, end_date=req_body.end_date, sid=req_body.sid)
         else:
-            request = service_pb2.QuoteRequest(end_date=MaxDate)
+            request = bt_service_pb2.QuoteRequest(end_date=MaxDate)
             
         if rpc_type == RpcTopic.Instrument:
             response_iterator = self._instrumentCall(request, wait_for_ready=True)

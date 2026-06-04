@@ -7,11 +7,12 @@ import pyarrow as pa
 import threading
 import polars as pl
 
-from bt_sdk.core.protocol import Event
 from bt_sdk.core.factor import calc_factor, apply_factor
 from bt_sdk.core.client.async_client cimport AsyncRpcClient
 from bt_sdk.utils.util cimport fast_uuid4_bytes, _merge2DataFrame
-from bt_sdk.core.constant import FactorTopic, RpcTopic
+
+from bt_protocol._protocol import Event
+from bt_protocol.constant import FactorTopic, RpcTopic
 
 from libc.stdint cimport int32_t
 
