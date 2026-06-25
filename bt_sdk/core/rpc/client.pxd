@@ -15,14 +15,6 @@
 from libc.stdint cimport int64_t
 
 
-cpdef enum RpcTopic:
-    Instrument = 0
-    Tick = 1
-    Close = 2
-    Adjustment = 3
-    Rightment = 4
-    
-
 cdef class RpcClient:
     cdef object _stub
     cdef object _channel
@@ -34,6 +26,8 @@ cdef class RpcClient:
     cdef object _tickCall(self, object stub_req, bint wait_for_ready=?)
 
     cdef object _closeCall(self, object stub_req, bint wait_for_ready=?)
+    
+    cdef object _dailyCall(self, object stub_req, bint wait_for_ready=?)
 
     cdef object _adjustmentCall(self, object stub_req, bint wait_for_ready=?)
 
