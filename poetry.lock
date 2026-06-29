@@ -116,12 +116,12 @@ reference = "tuna"
 
 [[package]]
 name = "bt-protocol"
-version = "0.2.1"
-description = "remove pricelimit in orderbody"
+version = "0.2.3"
+description = "revise proto name avoid duplicate"
 optional = false
 python-versions = ">=3.11,<3.15"
 files = [
-    {file = "bt_protocol-0.2.1-cp311-cp311-macosx_26_0_arm64.whl", hash = "sha256:5b9920cd3fec6249b2cc3c2aa592e763c5e05f3d909e220872c63b82889440a4"},
+    {file = "bt_protocol-0.2.3-cp311-cp311-macosx_26_0_arm64.whl", hash = "sha256:1e1b3583fe29417276d38b323814730065489c8e63c55875cb8723eb58d8d417"},
 ]
 
 [package.dependencies]
@@ -1957,4 +1957,4 @@ reference = "tuna"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.15"
-content-hash = "2e63f34475e407452ef2b637d4590eea23368fc359a031b339074d902852cfb0"
+content-hash = "c4d2de2c8f2c644f4942fe36e92dd8c33fab15ab482313a3229d9894d6da6d33"
