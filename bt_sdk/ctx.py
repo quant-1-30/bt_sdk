@@ -1,28 +1,35 @@
 import os
 import atexit
 import contextlib
+import logging
 
 from bt_sdk.utils.runner import AsyncRunner
 
+logger = logging.getLogger(__name__)
+
 _global_runner = None
+_atexit_registered = False
+
 
 def initialize_runner():
-    global _global_runner
+    global _global_runner, _atexit_registered
 
-    if _global_runner is None:
+    if _global_runner is None or not getattr(_global_runner, "_started", False):
+        AsyncRunner.reset()  # ensure a fresh instance if previous one was disposed
         _global_runner = AsyncRunner()
         _global_runner.start()
-        print(f"[MdProvider] Global AsyncRunner started. Loop: {id(_global_runner.get_loop())}")
-        # execute when exit Python Airflow Task/Ray Worker
-        atexit.register(cleanup_runner)
+        logger.info(f"[MdProvider] Global AsyncRunner started. Loop: {id(_global_runner.get_loop())}")
+        if not _atexit_registered:
+            atexit.register(cleanup_runner)
+            _atexit_registered = True
     return _global_runner
 
 
 def cleanup_runner():
     global _global_runner
-    if _global_runner:
-        print("[SDK] Process exiting, cleaning up AsyncRunner...")
-        _global_runner.stop()
+    if _global_runner is not None:
+        logger.info("[SDK] Process exiting, cleaning up AsyncRunner...")
+        AsyncRunner.reset()
         _global_runner = None
 
 

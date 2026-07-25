@@ -9,9 +9,9 @@ cdef class MdApi:
     
     cpdef start(self, object loop)
 
-    cpdef object get_instrument(self)
+    cpdef object get_instrument(self, int32_t timeout=*)
 
-    cpdef object get_factor(self, object body, int32_t forward)
+    cpdef object get_factor(self, object body, int32_t forward, int32_t timeout=*)
     
     cpdef object subscribe(self, object body, int32_t topic)
     

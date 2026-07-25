@@ -2,6 +2,7 @@
 
 import asyncio
 import msgspec
+import logging
 import reactivex.operators as ops
 import pyarrow as pa
 import threading
@@ -16,7 +17,9 @@ from bt_protocol.constant import FactorTopic, RpcTopic
 
 from libc.stdint cimport int32_t
 
-cdef dict _md_api_registry = {} 
+logger = logging.getLogger(__name__)
+
+cdef dict _md_api_registry = {}
 cdef object _md_api_lock = threading.Lock()
 
 
@@ -27,7 +30,7 @@ cdef inline object scale(dict data):
 
 async def _collect_async(observable, timeout):
     cdef list buffer = []
-    cdef object fut 
+    cdef object fut
     cdef object subscription
 
     loop = asyncio.get_running_loop()
@@ -45,14 +48,9 @@ async def _collect_async(observable, timeout):
             loop.call_soon_threadsafe(fut.set_exception, err)
 
     subscription = observable.pipe(
-        # ops.sample(0.1),  # 100ms abandon reset 
-        # ops.buffer_with_time_or_count(timespan=1.0, count=500), # up to 500 / 1 second to list
-        # ops.throttle_first(0.05), # on receive / 50ms not receive
-        # ops.publish_replay(1), # cache 1 record 
-        # ops.ref_count()
         ops.map(scale),
         ops.share()
-    ).subscribe( # nonblocking
+    ).subscribe(  # nonblocking
         on_next=on_next,
         on_error=on_error,
         on_completed=on_completed
@@ -61,11 +59,11 @@ async def _collect_async(observable, timeout):
         await asyncio.wait_for(fut, timeout=timeout)
         return buffer
     except asyncio.TimeoutError:
-        print(f"[MdApi] Timeout collecting data.")
-        return []
+        logger.error(f"[MdApi] Timeout collecting data after {timeout}s")
+        raise
     except Exception as e:
-        print(f"[MdApi] Error collecting data: {e}")
-        raise e
+        logger.exception(f"[MdApi] Error collecting data: {e}")
+        raise
     finally:
         subscription.dispose()
 
@@ -77,24 +75,26 @@ cdef class MdApi:
         self.timeout = timeout
         self.loop = None
         self._is_initialized = False
- 
-    cpdef start(self, object loop): # avoid loop is dead but is still initialized
+
+    cpdef start(self, object loop):  # avoid loop is dead but is still initialized
         if self._is_initialized:
             if self.loop is loop and not self.loop.is_closed():
-                return  
+                return
             else:
-                print(f"[MdApi] Old loop is dead or changed. Re-attaching...")
-                
+                logger.info(f"[MdApi] Old loop is dead or changed. Re-attaching...")
+                # reset stale connection so a new gRPC channel is built on the new loop
+                self.async_client._connected = False
+
         self.loop = loop
-        print(f"[MdApi] Attaching to Loop: {id(self.loop)}")
-        self.async_client.attach_loop(self.loop) # reuse main loop avoid cross thread
+        logger.info(f"[MdApi] Attaching to Loop: {id(self.loop)}")
+        self.async_client.attach_loop(self.loop)  # reuse main loop avoid cross thread
         self._is_initialized = True
- 
+
     def __enter__(self):
         return self
-        
+
 # --------------------------------------------------------------- Async Api --------------------------------------------------------
-    
+
     async def get_instrument_async(self):
         """
             request instruments
@@ -115,15 +115,15 @@ cdef class MdApi:
         # adjustment
         adj_obs = self.async_client.run(fast_uuid4_bytes(), Event(topic=RpcTopic.Adjustment, body=body))
         cdef object coro2 = _collect_async(adj_obs, self.timeout)
-        
+
         # rightment
         rgt_obs = self.async_client.run(fast_uuid4_bytes(), Event(topic=RpcTopic.Rightment, body=body))
         cdef object coro3 = _collect_async(rgt_obs, self.timeout)
 
-        # calculate  
+        # calculate
         close_tables, adj_tables, rgt_tables = await asyncio.gather(coro1, coro2, coro3)
         factors = calc_factor(_merge2DataFrame(close_tables), _merge2DataFrame(adj_tables), _merge2DataFrame(rgt_tables), forward)
-        return factors 
+        return factors
 
     # ==============================================================
     #  Support Cross Grpc Loop for Direct Query
@@ -147,7 +147,7 @@ cdef class MdApi:
                     self.loop
                 )
                 # wrap_future ---> asyncio.Future
-                tables = await asyncio.wrap_future(fut) # future.result() blocking
+                tables = await asyncio.wrap_future(fut)  # future.result() blocking
         except RuntimeError:
             raise RuntimeError("[MdApi] rpc_async must be awaited inside a running event loop!")
 
@@ -157,16 +157,16 @@ cdef class MdApi:
 
  # --------------------------------------------------------------- Sync Api --------------------------------------------------------
 
-    cpdef object get_instrument(self):
+    cpdef object get_instrument(self, int32_t timeout=60):
         coroutine = self.get_instrument_async()
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-        return future.result()
-    
-    cpdef object get_factor(self, object body, int32_t forward_type):
+        return future.result(timeout=timeout)
+
+    cpdef object get_factor(self, object body, int32_t forward_type, int32_t timeout=60):
         coroutine = self.get_factor_async(body, forward_type)
         future = asyncio.run_coroutine_threadsafe(coro=coroutine, loop=self.loop)
-        return future.result()
-    
+        return future.result(timeout=timeout)
+
     cpdef object subscribe(self, object body, int32_t topic):
         cdef bytes req_id = fast_uuid4_bytes()
         cdef object event = Event(topic=topic, body=body)
@@ -179,21 +179,22 @@ cdef class MdApi:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:
-            print(f"Error: {exc_type}, {exc_val}, {exc_tb}")
+            logger.error(f"Error: {exc_type}, {exc_val}, {exc_tb}")
         self.async_client.close()
 
 
 cpdef MdApi GetMdApi(tuple addr, int32_t timeout=30):
     global _md_api_registry
-    
+
     cdef MdApi instance
 
     with _md_api_lock:
         if addr in _md_api_registry:
             return _md_api_registry[addr]
-            
-        print(f"[MdApi] Initializing new instance for target: {addr}")
+
+        logger.info(f"[MdApi] Initializing new instance for target: {addr}")
         instance = MdApi(addr=addr, timeout=timeout)
         _md_api_registry[addr] = instance
-            
+
     return _md_api_registry[addr]
+    

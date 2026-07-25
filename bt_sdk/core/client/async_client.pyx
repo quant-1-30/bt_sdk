@@ -9,6 +9,7 @@ import uuid
 import zmq
 import zmq.asyncio
 import threading
+import logging
 import pyarrow as pa
 import pyarrow.compute as pc
 import reactivex.operators as ops
@@ -17,6 +18,8 @@ from reactivex import of
 from reactivex.subject import Subject
 from reactivex.scheduler.eventloop import AsyncIOScheduler
 from concurrent.futures import Future, ThreadPoolExecutor
+
+logger = logging.getLogger(__name__)
 
 from bt_protocol._protocol import _ENCODER, _RespDECODER
 from bt_sdk.core.rpc.client cimport RpcClient
@@ -60,15 +63,23 @@ cdef class AsyncClient:
     cpdef void close(self):
         if not self._running: return
         self._running = False
+        loop = self.loop
         try:
-            loop = asyncio.get_running_loop()
-            if loop.is_running():
-                loop.create_task(self._async_shutdown())
+            if loop is None:
+                loop = asyncio.get_running_loop()
         except RuntimeError:
-            print("Close RuntimeError")
-            pass # No loop running, nothing to clean up
+            loop = None
 
-        print(f"[{self.__class__.__name__}] Shutdown complete.")
+        if loop is not None and loop.is_running():
+            try:
+                fut = asyncio.run_coroutine_threadsafe(self._async_shutdown(), loop)
+                fut.result(timeout=3)
+            except Exception as e:
+                logger.warning(f"[{self.__class__.__name__}] shutdown error: {e}")
+        else:
+            logger.info(f"[{self.__class__.__name__}] No running loop, skipping async shutdown.")
+
+        logger.info(f"[{self.__class__.__name__}] Shutdown complete.")
 
 
 cdef class AsyncRpcClient(AsyncClient):
@@ -113,13 +124,15 @@ cdef class AsyncRpcClient(AsyncClient):
                         })
                 subject.on_completed()
             except grpc.aio.AioRpcError as e:
-                print(f"[gRPC Error] Code: {e.code()}, Details: {e.details()}")
+                logger.error(f"[gRPC Error] Code: {e.code()}, Details: {e.details()}")
                 subject.on_error(e)
             except asyncio.CancelledError:
-                print("[gRPC] Request Cancelled")
+                logger.info("[gRPC] Request Cancelled")
+                # propagate cancellation while keeping subject consistent
                 subject.on_completed()
+                raise
             except Exception as e:
-                print(f"[gRPC Unknown Error] {e}")
+                logger.exception(f"[gRPC Unknown Error] {e}")
                 subject.on_error(e)
 
     cdef object wrap_protocol(self, bytes req_id, object msg):
@@ -132,8 +145,12 @@ cdef class AsyncRpcClient(AsyncClient):
             async def run():
                 try:
                     await self._stream_request(req_id, msg, req_subject)
+                except asyncio.CancelledError:
+                    # already handled inside _stream_request; do not double-report
+                    raise
                 except Exception as e:
-                    req_subject.on_error(e)
+                    if not req_subject.is_disposed:
+                        req_subject.on_error(e)
 
             # avoid data loss
             req_subject.subscribe(observer)
@@ -141,6 +158,10 @@ cdef class AsyncRpcClient(AsyncClient):
             # ==============================================================
             # Dynamic Thread Detection
             # ==============================================================
+            if self.loop is None:
+                req_subject.on_error(RuntimeError("no event loop attached to AsyncRpcClient"))
+                return
+
             try:
                 curr_loop = asyncio.get_running_loop()
                 if curr_loop is self.loop:

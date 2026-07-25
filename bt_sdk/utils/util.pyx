@@ -45,6 +45,11 @@ cpdef object _merge2DataFrame(list batches, bint is_group=True): # cdef reduce p
     cdef list sid_batch
     cdef object batch, table
 
+    if not batches:
+        if is_group:
+            return {}
+        return pl.DataFrame()
+
     if not is_group:
         table = pa.concat_tables(batches, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks() 
         return pl.from_arrow(table)

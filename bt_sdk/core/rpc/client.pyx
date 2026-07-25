@@ -7,10 +7,14 @@ from libc.stdint cimport int32_t
 import os 
 os.environ['GRPC_ENABLE_FORK_SUPPORT']='0' # spawn  
 
+import asyncio
+import logging
 import numpy as np
 import pyarrow as pa
 import grpc
 import pyarrow.compute as pc
+
+logger = logging.getLogger(__name__)
 
 from typing import Iterator, AsyncIterator
 from google.protobuf import empty_pb2
@@ -79,6 +83,9 @@ cdef class RpcClient:
     def __init__(self, str host="localhost", int port=50051):
         self.host = host
         self.port = port
+        self._channel = None
+        self._stub = None
+        self._init_lock = asyncio.Lock()
 
     async def __aenter__(self):
         await self.initialize()
@@ -99,28 +106,33 @@ cdef class RpcClient:
          """
         if self._channel is not None:
             return
-            
-        channel_options = [
-            # same with server
-            ('grpc.max_send_message_length', MAX_MESSAGE_LENGTH),
-            ('grpc.max_receive_message_length', MAX_MESSAGE_LENGTH),
 
-            # stream control http2 tcp ack
-            ("grpc.http2.initial_window_size", 32 * 1024 * 1024),
-            ("grpc.http2.initial_connection_window_size", 64 * 1024 * 1024),
+        async with self._init_lock:
+            # double-check after acquiring the lock
+            if self._channel is not None:
+                return
 
-            ("grpc.keepalive_time_ms", 30000),             # 30s Ping > Server 10s
-            ("grpc.keepalive_timeout_ms", 10000),          # wait 10s
-            ("grpc.keepalive_permit_without_calls", 1),    # 
-            ("grpc.http2.max_pings_without_data", 0),      #
-        ]
-        
-        self._channel = grpc.aio.insecure_channel(
-            f"{self.host}:{self.port}",
-            compression=None, # parrow+lz4 avoid grpc.Compression.Gzip  
-            options=channel_options
-        )
-        self._stub = bt_protocol_service_pb2_grpc.btDataFeedStub(self._channel)
+            channel_options = [
+                # same with server
+                ('grpc.max_send_message_length', MAX_MESSAGE_LENGTH),
+                ('grpc.max_receive_message_length', MAX_MESSAGE_LENGTH),
+
+                # stream control http2 tcp ack
+                ("grpc.http2.initial_window_size", 32 * 1024 * 1024),
+                ("grpc.http2.initial_connection_window_size", 64 * 1024 * 1024),
+
+                ("grpc.keepalive_time_ms", 30000),             # 30s Ping > Server 10s
+                ("grpc.keepalive_timeout_ms", 10000),          # wait 10s
+                ("grpc.keepalive_permit_without_calls", 1),
+                ("grpc.http2.max_pings_without_data", 0),
+            ]
+
+            self._channel = grpc.aio.insecure_channel(
+                f"{self.host}:{self.port}",
+                compression=None, # parrow+lz4 avoid grpc.Compression.Gzip
+                options=channel_options
+            )
+            self._stub = bt_protocol_service_pb2_grpc.btDataFeedStub(self._channel)
 
     async def ensure_initialized(self):
         if self._channel is None:
@@ -185,10 +197,14 @@ cdef class RpcClient:
         async for resp in response:
             yield rpc_callback(resp.payload, rpc_type)
 
+    async def cleanup(self):
+        if self._channel is not None:
+            await self._channel.close()
+            self._channel = None
+            self._stub = None
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:
-            print(f"Error: {exc_type}, {exc_val}, {exc_tb}")
+            logger.error(f"Error: {exc_type}, {exc_val}, {exc_tb}")
+        await self.cleanup()
         return False # True means suppress
-    
-    async def cleanup(self):
-        await self._channel.close()

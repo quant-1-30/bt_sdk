@@ -18,6 +18,7 @@ from libc.stdint cimport int64_t
 cdef class RpcClient:
     cdef object _stub
     cdef object _channel
+    cdef object _init_lock
     cdef str host
     cdef int port
     

@@ -20,12 +20,15 @@ from functools import wraps
 from contextlib import contextmanager
 
 
+_singleton_lock = threading.Lock()
+
+
 def singleton(cls):
 
     instances = {}
     @functools.wraps(cls)
     def get_instance(*args, **kw):
-        with threading.Lock() as lock:
+        with _singleton_lock:
             if cls not in instances:
                 instances[cls] = cls(*args, **kw)
         return instances[cls]
@@ -50,17 +53,16 @@ class LazyFunc(object): # __getattribute__ > __getattr__
     def __init__(self, func):
         self.func = func
         self.attr_name = func.__name__
-        # self.cache = weakref.WeakKeyDictionary()
-        self.cache = dict()
+        self.cache = weakref.WeakKeyDictionary()
 
     def __get__(self, instance, owner):
         if instance is None:
             return self
         try:
-            return self.cache[self.attr_name]
+            return self.cache[instance]
         except KeyError:
             ret = self.func(instance)
-            self.cache[self.attr_name] = ret
+            self.cache[instance] = ret
             return ret
 
     def __set__(self, instance, value):
@@ -178,11 +180,9 @@ def warnings_filter(func):
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        warnings.simplefilter('ignore')
-        ret = func(*args, **kwargs)
-        if not Env.g_ignore_all_warnings:
-            warnings.simplefilter('default')
-        return ret
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            return func(*args, **kwargs)
     return wrapper
 
 def catch_error(return_val=None, log=True):
