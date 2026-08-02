@@ -19,7 +19,8 @@ cdef class AsyncRpcClient(AsyncClient):
     cdef bint _connected
     cdef object loop
     cdef object rpc_client
-    
+
     cpdef void attach_loop(self, loop)
+    cpdef void reset_connection(self)
 
     cdef object wrap_protocol(self, bytes req_id, object msg) # virtual / cython not supported nested function 

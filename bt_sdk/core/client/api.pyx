@@ -83,7 +83,7 @@ cdef class MdApi:
             else:
                 logger.info(f"[MdApi] Old loop is dead or changed. Re-attaching...")
                 # reset stale connection so a new gRPC channel is built on the new loop
-                self.async_client._connected = False
+                self.async_client.reset_connection()
 
         self.loop = loop
         logger.info(f"[MdApi] Attaching to Loop: {id(self.loop)}")
@@ -197,4 +197,26 @@ cpdef MdApi GetMdApi(tuple addr, int32_t timeout=30):
         _md_api_registry[addr] = instance
 
     return _md_api_registry[addr]
+
+
+cdef void destory(tuple addr):
+    """destory addr MdApi and release gRPC channel """
+    global _md_api_registry
+
+    with _md_api_lock:
+        instance = _md_api_registry.pop(addr, None)
+        if instance is not None:
+            try:
+                instance.disconnect()
+            except Exception as e:
+                logger.warning(f"[MdApi] Dispose error for {addr}: {e}")
+
+
+cpdef void dispose():
+    global _md_api_registry
+
+    with _md_api_lock:
+        addrs = list(_md_api_registry.keys())
+    for addr in addrs:
+        destory(addr)
     

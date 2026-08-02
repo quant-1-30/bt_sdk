@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.14.9"
+version = "0.15.0"
 description = "revise signelton bug and other bugs with glm5.2"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
@@ -35,7 +35,7 @@ protobuf = ">=5.29.0" # "^7.35.0"
 build = "^1.5.0"
 numpy = "^2.4.6"
 pydantic = ">=2.11.0"
-bt-protocol = "0.2.4"
+bt-protocol = "0.2.5"
 
 [tool.poetry.group.build.dependencies]
 wheel = "^0.41.0"
@@ -54,7 +54,7 @@ priority = "primary"
 
 [[tool.poetry.source]]
 name = "local-hub"
-url = "http://localhost:3141/"
+url = "http://127.0.0.1:3141/"
 priority = "supplemental"
 
 [build-system]

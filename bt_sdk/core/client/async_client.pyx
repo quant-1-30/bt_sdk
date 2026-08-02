@@ -96,7 +96,37 @@ cdef class AsyncRpcClient(AsyncClient):
     cpdef void attach_loop(self, loop):
         self.loop = loop
         print(f"[{self.__class__.__name__}] Attached Loop: {id(loop)}")
-        
+
+    cpdef void reset_connection(self):
+        """Reset connection state for event loop changes.
+        dispose gRPC channel and _ensure_connection() on new loop
+        reset_connection run_coroutine_threadsafe from sync MdApi.start
+        """
+        self._connected = False
+
+        loop = self.loop
+        if loop is not None and not loop.is_closed() and loop.is_running():
+            try:
+                fut = asyncio.run_coroutine_threadsafe(self.rpc_client.cleanup(), loop)
+                fut.result(timeout=self.timeout)
+            except Exception as e:
+                logger.warning(f"[{self.__class__.__name__}] reset_connection cleanup error: {e}")
+        else:
+            self.rpc_client._channel = None
+            self.rpc_client._stub = None
+
+        print(f"[{self.__class__.__name__}] Connection reset for new loop")
+
+    async def _async_shutdown(self):
+        """覆盖基类：先取消 listen_task，再关闭 gRPC channel。"""
+        await super()._async_shutdown()
+        # 关闭 gRPC channel，防止资源泄漏
+        try:
+            await self.rpc_client.cleanup()
+        except Exception as e:
+            logger.warning(f"[{self.__class__.__name__}] gRPC cleanup error: {e}")
+        self._connected = False
+
     async def _ensure_connection(self):
         """
         Lazy initialize gRPC channel

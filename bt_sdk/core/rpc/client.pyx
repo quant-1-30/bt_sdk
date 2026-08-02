@@ -85,7 +85,7 @@ cdef class RpcClient:
         self.port = port
         self._channel = None
         self._stub = None
-        self._init_lock = asyncio.Lock()
+        self._init_lock = None  # defer to initialize() avoid bind wrong loop
 
     async def __aenter__(self):
         await self.initialize()
@@ -106,6 +106,9 @@ cdef class RpcClient:
          """
         if self._channel is not None:
             return
+
+        if self._init_lock is None:
+            self._init_lock = asyncio.Lock()
 
         async with self._init_lock:
             # double-check after acquiring the lock

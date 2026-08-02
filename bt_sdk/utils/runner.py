@@ -78,7 +78,8 @@ class AsyncRunner:
         """Internal stop logic without acquiring the class lock (avoid deadlock)."""
         if not self._started:
             return
-        if self._loop.is_running():
+        # Check if loop exists and is running before stopping
+        if self._loop and not self._loop.is_closed() and self._loop.is_running():
             self._loop.call_soon_threadsafe(self._loop.stop)
         if self._thread and self._thread.is_alive():
             self._thread.join(timeout=2)
