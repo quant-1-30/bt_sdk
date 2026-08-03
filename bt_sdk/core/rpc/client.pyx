@@ -44,37 +44,30 @@ cdef object Scale = {
         },
 }
 
-cdef inline object rpc_callback(bytes arrow_bytes, int32_t rpc_type): # inline function embed to reduce overhead when hundrends
+cdef inline object rpc_callback(bytes arrow_bytes, int32_t rpc_type):
     if not arrow_bytes:
         return None
 
-    cdef object table = pa.ipc.open_stream(pa.py_buffer(arrow_bytes)).read_all() # open_stream zero_copy parse and pc zero_copy and vectorize 
+    cdef object table = pa.ipc.open_stream(pa.py_buffer(arrow_bytes)).read_all()
     cdef int n = table.num_columns
     cdef list names = table.schema.names
-    cdef list new_cols = [None] * n
-    cdef dict scale = Scale.get(rpc_type, {}) # calendar and instrument
+    cdef dict scale = Scale.get(rpc_type, {})
 
     cdef object col
     cdef object factor
     cdef object name
 
+    # Only modify columns that need cast or scale, leave others untouched (zero-copy)
     for i in range(n):
         name = names[i]
-        col  = table.column(i)
-        # ---------- cast ----------
         if name == "sid" or name == "name":
-            # if pa.types.is_binary(col.type):
-            col = pc.cast(col, pa.string()) # better than table.set_column 
-        # ---------- scale ----------
+            col = pc.cast(table.column(i), pa.string())
+            table = table.set_column(i, name, col)
         elif name in scale:
             factor = scale[name]
-            col = pc.round(pc.multiply(col, factor), ndigits=2)
-        new_cols[i] = col
+            col = pc.round(pc.multiply(table.column(i), factor), ndigits=2)
+            table = table.set_column(i, name, col)
 
-    table = pa.Table.from_arrays(
-        new_cols,
-        names=names
-    ).replace_schema_metadata(table.schema.metadata)
     return table
 
 
@@ -107,6 +100,8 @@ cdef class RpcClient:
         if self._channel is not None:
             return
 
+        # Lazy init lock in coroutine context. Since asyncio is single-threaded per loop,
+        # the check-then-set is safe: no yield point between None check and assignment.
         if self._init_lock is None:
             self._init_lock = asyncio.Lock()
 

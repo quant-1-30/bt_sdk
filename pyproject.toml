@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.15.0"
-description = "revise signelton bug and other bugs with glm5.2"
+version = "0.15.1"
+description = "release gil in pybind11 and optimize async_client"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 build = "build_ext.py"
@@ -35,7 +35,7 @@ protobuf = ">=5.29.0" # "^7.35.0"
 build = "^1.5.0"
 numpy = "^2.4.6"
 pydantic = ">=2.11.0"
-bt-protocol = "0.2.5"
+bt-protocol = "0.2.6"
 
 [tool.poetry.group.build.dependencies]
 wheel = "^0.41.0"

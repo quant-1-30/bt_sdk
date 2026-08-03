@@ -51,8 +51,8 @@ cpdef object _merge2DataFrame(list batches, bint is_group=True): # cdef reduce p
         return pl.DataFrame()
 
     if not is_group:
-        table = pa.concat_tables(batches, promote_options="permissive") # zero_copy accumlate chunk ptr not reallocate / just when combine_chunks() 
-        return pl.from_arrow(table)
+        table = pa.concat_tables(batches, promote_options="permissive")
+        return pl.from_arrow(table, rechunk=False)  # avoid extra copy
 
     for batch in batches:
         sid_byte = batch.schema.metadata.get(b"sid")
@@ -60,9 +60,9 @@ cpdef object _merge2DataFrame(list batches, bint is_group=True): # cdef reduce p
             sid_to_batches[sid_byte] = []
 
         sid_batch = sid_to_batches[sid_byte]
-        sid_batch.append(batch) # int.from_bytes()
+        sid_batch.append(batch)
  
     for sid_byte, bulk_batch in sid_to_batches.items():
-        aligned_table = pa.concat_tables(bulk_batch, promote_options='default') # pa.Table.from_batches(bulk_batch) # to_pydict() No 
-        aligned[sid_byte] = pl.from_arrow(aligned_table) 
-    return aligned 
+        aligned_table = pa.concat_tables(bulk_batch, promote_options='default')
+        aligned[sid_byte] = pl.from_arrow(aligned_table, rechunk=False)  # avoid extra copy
+    return aligned

@@ -1,189 +1,303 @@
-## 1. 项目概览
+# bt_sdk
 
-- **名称**：`bt-sdk`（包目录名为 `bt_sdk`）
-- **版本**：`0.14.3`
-- **定位**：面向市场数据（Market Data）的 Python SDK，封装了与后端 `btDataFeed` gRPC 服务的通信、数据解码、复权因子计算等功能。
-- **核心能力**：
-  - 通过 gRPC 流式拉取 Instrument（合约）、Tick、Daily、Close、Adjustment（除权除息）、Rightment（配股）等行情数据。
-  - 把服务端返回的 Arrow IPC bytes 解码为 `pyarrow.Table`，并转换为 `polars.DataFrame`。
-  - 提供同步和异步两类 API（`get_instrument` / `get_instrument_async`、`get_factor` / `get_factor_async` 等）。
-  - 使用 Cython 编写高性能网络/工具模块，使用 pybind11 + C++17 编写复权因子计算模块。
-- **项目仓库语言**：代码标识符使用英文；注释、README 笔记、提交记录主要使用中文。
+> 高性能量化行情数据 SDK — Cython + C++17 + gRPC Async + ReactiveX
 
-## 2. 技术栈
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
+[![Cython](https://img.shields.io/badge/Cython-3.x-green)](https://cython.org/)
+[![C++](https://img.shields.io/badge/C%2B%2B-17-orange)](https://isocpp.org/)
+[![gRPC](https://img.shields.io/badge/gRPC-async-red)](https://grpc.io/)
 
-- **语言**：Python（要求 `>=3.11,<3.15`），Cython 扩展，C++17 扩展。
-- **包管理**：Poetry（`pyproject.toml` + `poetry.lock`）。
-- **构建工具**：
-  - `poetry-core` 作为 PEP 517 构建后端。
-  - 自定义构建脚本 `build_ext.py`（内部调用 `setup.py` 的 `get_ext_modules()`）。
-  - Cython 3.x 编译 `.pyx`，pybind11 编译 C++ 扩展。
-  - 构建依赖：`poetry-core`、`wheel`、`pybind11`、`cmake`、`Cython>=3.0`、`numpy`、`setuptools`。
-- **网络通信**：`grpcio`（`grpc.aio` 异步通道）、`bt-protocol`（提供 protobuf 定义和序列化）。
-- **数据与计算**：`pyarrow`、`polars`、`pandas`、`numpy`、`msgspec`、`msgpack`。
-- **响应式流**：`reactivex`（RxPY），用于把 gRPC 流封装成 `Observable`。
-- **其他**：`toolz`、`ping3`、`urllib3`、`pydantic`、`typing-extensions`、`annotated-types`、`pygments`。
+---
 
-## 3. 项目结构
+## ✨ 特性亮点
 
-```text
-bt_sdk/
-├── ctx.py                    # 入口：external_mdapi_context / get_md_api / AsyncRunner 全局生命周期
-├── core/
-│   ├── factor.py             # 复权因子 Polars 处理 + 调用 C++ adj_factor
-│   ├── client/
-│   │   ├── api.pyx / api.pxd # MdApi：同步/异步/订阅接口（Cython）
-│   │   └── async_client.pyx / async_client.pxd  # AsyncRpcClient：Observable 包装 gRPC 流（Cython）
-│   ├── rpc/
-│   │   └── client.pyx / client.pxd  # 底层 gRPC 客户端、Arrow 解码、topic 分发（Cython）
-│   └── lib/factor/           # C++17 pybind11 扩展
-│       ├── include/factor.hpp
-│       ├── src/factor.cpp
-│       └── pybind_factor.cpp
-└── utils/
-    ├── runner.py             # AsyncRunner：后台独立 asyncio 事件循环
-    ├── wrapper.py            # 装饰器/工具函数（singleton、LazyProperty、deprecated 等）
-    └── util.pyx / util.pxd   # Cython 工具：fast_uuid4、_merge2DataFrame
+### 🚀 极致性能
 
-tests/
-└── test_mdapi.py             # pytest-asyncio 集成测试
+| 技术 | 实现细节 |
+|------|----------|
+| **Cython 热路径** | gRPC 通信层、Arrow 解码、UUID 生成均用 `cdef`/`cpdef` 编译，关闭 `boundscheck`/`wraparound` |
+| **C++17 因子引擎** | 复权因子计算用 pybind11 绑定，`-O3` 优化，纯计算**释放 GIL** (`py::call_guard<py::gil_scoped_release>()`) |
+| **零拷贝管道** | Arrow IPC `zero_copy` 解析 → `set_column` 原地替换 → `pl.from_arrow(rechunk=False)` 避免冗余拷贝 |
+| **libuuid C 级调用** | UUID 生成直接调 `libuuid`，`nogil` 上下文，无 Python 对象开销 |
 
-scripts/
-└── deploy.sh                 # 构建 wheel 并上传到内部 devpi
+### ⚡ 并发安全
 
-配置：
-├── pyproject.toml            # Poetry 配置、依赖、构建脚本声明
-├── setup.py                  # setuptools 入口，定义所有 Extension
-├── build_ext.py              # Poetry 自定义构建脚本（被 pyproject.toml build 引用）
-├── MANIFEST.in               # sdist 包含规则
-├── pytest.ini               # pytest 配置
-├── Dockerfile                # 基于 python:3.9 的容器镜像（注意与 Python 版本要求不一致）
-└── README.md                 # 开发者笔记（中文）
+| 问题 | 解决方案 |
+|------|----------|
+| **连接初始化竞态** | `asyncio.Lock` + double-check 保护 gRPC channel 创建，防止高并发首波请求创建多 channel |
+| **Task GC 回收** | `_pending_tasks` set 持有 `create_task()` 强引用，`finally` 中自动清理 |
+| **Subject 泄漏** | `wrap_protocol` 返回 `(observable, subject)`，`_collect_async` 显式 `dispose()` |
+| **跨 Loop 调用** | 自动检测当前 loop，`run_coroutine_threadsafe` + `wrap_future` 安全跨线程 |
+
+### 📡 响应式数据流
+
+```python
+# gRPC stream → RxPY Observable → 管道操作
+observable = md_api.subscribe(query, RpcTopic.Tick)
+
+observable.pipe(
+    ops.map(lambda d: d["data"]),
+    ops.buffer_with_time_or_count(1.0, 500),
+    ops.filter(lambda batch: len(batch) > 0)
+).subscribe(on_next=process_batch)
 ```
 
-## 4. 构建与安装
+### 🔀 三模式 API
 
-### 4.1 准备工作
+同一数据源，三种调用方式：
+
+```python
+# 1. 同步（阻塞，适合脚本/回测）
+df = md_api.get_instrument()
+
+# 2. 异步（非阻塞，适合 Ray Actor / asyncio 应用）
+df = await md_api.get_instrument_async()
+
+# 3. 订阅流（持续推送，适合实时策略）
+obs = md_api.subscribe(query, RpcTopic.Tick)
+```
+
+---
+
+## 🏗️ 架构
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      用户代码 / 策略引擎                        │
+├─────────────────────────────────────────────────────────────┤
+│  ctx.py  — external_mdapi_context / initialize_runner        │
+│            全局 AsyncRunner 单例（后台守护线程 + 独立 loop）      │
+├─────────────────────────────────────────────────────────────┤
+│  MdApi (api.pyx)                                            │
+│  ├── get_instrument_async()  →  pl.DataFrame                │
+│  ├── get_factor_async()      →  asyncio.gather × 3 + C++    │
+│  ├── rpc_async()             →  跨 loop 直查                  │
+│  └── subscribe()             →  Observable                   │
+├─────────────────────────────────────────────────────────────┤
+│  AsyncRpcClient (async_client.pyx)                          │
+│  ├── wrap_protocol → (Observable, Subject)                  │
+│  ├── _ensure_connection → asyncio.Lock + double-check       │
+│  └── _pending_tasks → Task 强引用防 GC                         │
+├─────────────────────────────────────────────────────────────┤
+│  RpcClient (rpc/client.pyx)                                 │
+│  ├── grpc.aio channel (keepalive + HTTP2 窗口调优)            │
+│  ├── rpc_callback → Arrow IPC → set_column 原地 scale        │
+│  └── _dispatch_rpc → Instrument/Tick/Daily/Close/Adj/Rgt     │
+├─────────────────────────────────────────────────────────────┤
+│  C++ Factor Engine (lib/factor/)                            │
+│  ├── calc_adjust_factors()  [GIL released]                  │
+│  ├── Forward / Backward 复权                                  │
+│  └── Polars join_asof 应用因子                                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📦 安装
+
+### 从源码构建
 
 ```bash
-# 安装 Poetry（如未安装）
+# 安装 Poetry
 curl -sSL https://install.python-poetry.org | python3 -
 
-# 安装运行时与构建依赖（含 Cython、pybind11、cmake 等）
-poetry install --no-root
-# 或安装当前包（会触发扩展构建）
+# 安装依赖并编译 Cython/C++ 扩展
 poetry install
-```
 
-### 4.2 本地开发构建（原地生成 .so）
-
-```bash
+# 或仅编译扩展（开发模式）
 poetry run python setup.py build_ext --inplace
 ```
 
-### 4.3 打包 wheel
+### 构建 Wheel
 
 ```bash
-# 使用 Poetry（推荐）
 poetry build --format wheel
-
-# 或使用 build（仓库 README 中的笔记）
-python -m build --wheel --no-isolation
 ```
 
-> 注意：`.gitignore` 已忽略 `*.so` 和 `*.cpp`，但仓库中目前仍保留部分生成的 `.cpp` 文件（已被 Git 跟踪），重新构建时会覆盖。
-
-### 4.4 构建产物
-
-- wheel 中通过 `pyproject.toml` 的 `include` 配置打包 `bt_sdk/**/*.so` 与 `bt_sdk/**/*.pyx`。
-- `MANIFEST.in` 控制源码分发包（sdist）内容，包含 `.so` / `.dylib` / `.pyd`。
-
-## 5. 测试
-
-### 5.1 运行测试
-
-```bash
-poetry run pytest
-```
-
-### 5.2 测试特性
-
-- 使用 `pytest-asyncio`，默认 fixture loop scope 为 `function`（见 `pytest.ini`）。
-- 测试文件 `tests/test_mdapi.py` 是**集成测试**，依赖一个真实运行的行情服务：
-  - 默认地址：`127.0.0.1:50051`。
-  - 可通过环境变量 `MD_ADDR` 覆盖，例如 `MD_ADDR=192.168.2.100:50051 poetry run pytest`。
-- 每个测试用例会创建新的 `MdApi` 实例（`GetMdApi` 按地址做全局单例，`external_mdapi_context` 复用全局 `AsyncRunner`）。
-- 订阅类测试会等待流 `on_completed` 后才继续，若服务端不结束流可能导致测试挂起。
-
-## 6. 运行时架构
-
-1. **入口层**：`bt_sdk.ctx`
-   - `initialize_runner()` 启动一个后台守护线程运行独立 `asyncio` 事件循环（`AsyncRunner` 单例）。
-   - `get_md_api(addr)` 调用 `GetMdApi(...)` 获取（或创建）`MdApi` 实例。
-   - `external_mdapi_context(...)` 提供上下文管理器，自动 `start()` API 并复用全局 runner。
-
-2. **API 层**：`bt_sdk.core.client.api.MdApi`
-   - `start(loop)`：把 `MdApi` 绑定到某个事件循环，底层 `AsyncRpcClient.attach_loop(loop)`。
-   - 同步方法（`get_instrument`、`get_factor`、`subscribe`）通过 `asyncio.run_coroutine_threadsafe` 把协程提交到 API 所属事件循环。
-   - 异步方法（`get_instrument_async`、`get_factor_async`、`rpc_async`）直接 await。
-   - `subscribe(...)` 返回一个 **RxPY Observable**，可对数据做 `pipe`/`subscribe`。
-
-3. **客户端层**：`bt_sdk.core.client.async_client.AsyncRpcClient`
-   - 内部持有 `bt_sdk.core.rpc.client.RpcClient`。
-   - `wrap_protocol` 创建一个 `Observable`，其订阅时启动 `_stream_request`，将 gRPC 响应推入 `Subject`。
-   - 会根据当前是否在目标事件循环中，决定用 `loop.create_task` 还是 `asyncio.run_coroutine_threadsafe` 启动流。
-
-4. **RPC 层**：`bt_sdk.core.rpc.client.RpcClient`
-   - 使用 `grpc.aio.insecure_channel` 创建长连接，配置了 keepalive、消息大小、HTTP2 窗口等参数。
-   - 根据 `RpcTopic` 分发到不同的 gRPC stub stream call（`InstrumentCall`、`TickStreamCall`、`DailyStreamCall` 等）。
-   - `rpc_callback` 把 payload bytes 通过 Arrow IPC 流式读取为 `pyarrow.Table`，并对价格/成交量字段按 topic 做缩放。
-
-5. **工具层**：`bt_sdk.utils.util`
-   - `fast_uuid4_bytes()`：调用 libuuid 生成 16 字节 UUID，避免 Python 端开销。
-   - `_merge2DataFrame(batches, is_group=True)`：把 Arrow Table 列表按 `sid` metadata 分组合并成 `polars.DataFrame` 字典。
-
-6. **复权因子层**：`bt_sdk.core.factor` + `bt_sdk.core.lib.adj_factor`
-   - Python 端把 Polars DataFrame 转为 C++ struct 列表，调用 C++ 计算累计复权因子。
-   - 再用 Polars 的 `join_asof` 把因子应用到 open/high/low/close/volume。
-
-## 7. 代码风格与约定
-
-- **文件头**：Python 脚本常见 `#! /usr/bin/env python3` 和 `# -*- coding: utf-8 -*-`。
-- **Cython 编译指令**：
-  - `language_level=3`
-  - 性能模块常关闭边界检查：`boundscheck=False`、`wraparound=False`
-  - 使用 `cdef` / `cpdef` 减少 Python 调用开销，公共接口在 `.pxd` 中声明。
-- **C/C++ 标准**：
-  - Cython 扩展按 `-O3 -std=c++11` 编译。
-  - pybind11 扩展按 `-std=c++17 -O3` 编译。
-- **异步编程约定**（来自 README 笔记与代码）：
-  - 在单线程 `asyncio` 环境（如 Ray Async Actor）中**禁止**调用 `future.result()`，应使用 `await` 或 `asyncio.wrap_future`。
-  - 跨事件循环提交协程统一使用 `asyncio.run_coroutine_threadsafe` + `asyncio.wrap_future`。
-  - 连接关闭时优先 `writer.close()`，不强制 `wait_closed()` 以避免网络差时阻塞恢复流程。
-- **中文注释**：模块与关键实现处注释多为中文，新增代码建议保持中文注释风格。
-
-## 8. 部署
-
-- 脚本：`scripts/deploy.sh`
-- 流程：
-  1. 检查/安装 Poetry。
-  2. 切到 devpi 服务器：`http://192.168.2.100:3141/`。
-  3. 使用 `bt_sdk/dev` channel，用户名 `bt_sdk`，密码硬编码在脚本中。
-  4. 清理 `dist/`，执行 `poetry build --format=wheel`，再 `devpi upload dist/*`。
-- **安全提示**：该脚本包含明文密码与内部地址，请勿在公开环境使用或提交到公共仓库。
-
-## 9. 安全注意事项
-
-- gRPC 通道使用 `grpc.aio.insecure_channel`，**无 TLS 加密**，仅适用于可信内网。
-- `scripts/deploy.sh` 包含硬编码的 devpi 密码和内部 IP，部署前务必审查环境。
-- Cython 扩展关闭了数组边界检查（`boundscheck=False`、`wraparound=False`），输入数据必须保证合法，否则可能触发段错误。
-- `.gitignore` 已忽略 `*.so`、`*.cpp`、`.env`、`.venv` 等敏感/生成文件；注意不要把生产配置文件或凭据加入版本控制。
-
-## 10. 常见陷阱
-
-- **gRPC fork 支持**：`bt_sdk/core/rpc/client.pyx` 已设置 `os.environ['GRPC_ENABLE_FORK_SUPPORT']='0'`，用于避免 macOS / spawn 模式下的 fork 问题。
-- **事件循环归属**：`MdApi` 必须 `start(loop)` 绑定到有效事件循环；跨线程调用同步 API 时会通过 `run_coroutine_threadsafe` 转发。
-- **RxPY Observable 的 `await`**：在 RxPY 中，`await observable` 会自动订阅并等待流结束，返回最后一个元素。需要返回 Observable 对象本身时应避免直接 `await`。
-- **Dockerfile 版本不一致**：`Dockerfile` 基于 `python:3.9`，而 `pyproject.toml` 要求 `>=3.11`，构建/运行前请统一 Python 版本。
+**系统要求**：Python ≥ 3.11、CMake、C++17 编译器（clang/gcc/MSVC）
 
 ---
+
+## 🚀 快速上手
+
+### 异步模式（推荐）
+
+```python
+import asyncio
+from bt_sdk.ctx import external_mdapi_context
+from bt_protocol._protocol import QueryBody
+from bt_protocol.constant import RpcTopic, FactorTopic
+
+async def main():
+    with external_mdapi_context() as md_api:
+        # 查询合约列表
+        instruments = await md_api.get_instrument_async()
+        print(f"Instruments: {len(instruments)} rows")
+
+        # 查询复权因子（内部 3 路 gRPC 并发 + C++ 并行计算）
+        query = QueryBody(start_date=20100101, end_date=20260630, sid=[b"300374"])
+        factors = await md_api.get_factor_async(query, FactorTopic.Qfq)
+        print(f"Factors: {list(factors.keys())}")
+
+asyncio.run(main())
+```
+
+### 同步模式
+
+```python
+from bt_sdk.ctx import external_mdapi_context
+
+with external_mdapi_context() as md_api:
+    df = md_api.get_instrument()  # 阻塞调用，内部转发到 runner loop
+    print(df)
+```
+
+### 订阅实时流
+
+```python
+import asyncio
+import reactivex.operators as ops
+from bt_sdk.ctx import external_mdapi_context
+from bt_protocol.constant import RpcTopic
+
+async def main():
+    with external_mdapi_context() as md_api:
+        query = QueryBody(start_date=20200101, end_date=20260630, sid=[b"300374"])
+        observable = md_api.subscribe(query, RpcTopic.Tick)
+
+        chan = []
+        loop = asyncio.get_running_loop()
+        done = loop.create_future()
+
+        observable.pipe(
+            ops.map(lambda d: d["data"]),
+        ).subscribe(
+            on_next=chan.append,
+            on_completed=lambda: loop.call_soon_threadsafe(done.set_result, True),
+            on_error=lambda e: loop.call_soon_threadsafe(done.set_exception, e),
+        )
+
+        await done
+        print(f"Received {len(chan)} batches")
+
+asyncio.run(main())
+```
+
+---
+
+## 📚 API 参考
+
+### `external_mdapi_context(addr_str=None, timeout=30)`
+
+上下文管理器，自动初始化全局 `AsyncRunner` 并绑定 `MdApi`。
+
+| 参数 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `addr_str` | `str` | `env MD_ADDR` 或 `127.0.0.1:50051` | gRPC 服务地址 |
+| `timeout` | `int` | `30` | 单次请求超时（秒） |
+
+### `MdApi`
+
+| 方法 | 返回类型 | 说明 |
+|------|----------|------|
+| `get_instrument()` | `pl.DataFrame` | 同步查询合约列表 |
+| `get_instrument_async()` | `pl.DataFrame` | 异步查询合约列表 |
+| `get_factor(body, forward)` | `Dict[bytes, FactorResult]` | 同步计算复权因子 |
+| `get_factor_async(body, forward)` | `Dict[bytes, FactorResult]` | 异步并行计算（3 路 gRPC + C++ 并行） |
+| `rpc_async(body, rpc_type)` | `pl.DataFrame` | 跨 loop 直查 |
+| `subscribe(body, topic)` | `Observable` | 订阅实时数据流 |
+
+### 数据主题
+
+| Topic | 说明 | Scale 字段 |
+|-------|------|-----------|
+| `RpcTopic.Instrument` | 合约列表 | — |
+| `RpcTopic.Tick` | Tick 逐笔 | open/high/low/close ×1e-5, volume ×1e-3 |
+| `RpcTopic.Daily` | 日线 | 同 Tick |
+| `RpcTopic.Close` | 收盘价 | 同 Tick |
+| `RpcTopic.Adjustment` | 除权除息 | bonus_share/transfer/bonus ×1e-3 |
+| `RpcTopic.Rightment` | 配股 | price/ratio ×1e-3 |
+
+---
+
+## 🔧 性能优化详解
+
+### GIL 释放（C++ → Python 并行）
+
+```cpp
+// pybind_factor.cpp
+m.def("calc_adjust_factors", &calc_adjust_factors, ...,
+      py::call_guard<py::gil_scoped_release>());  // ← 计算期间释放 GIL
+```
+
+C++ 因子计算不回调 Python，释放 GIL 后其他协程可并发执行。配合 `asyncio.gather` + `run_in_executor` 实现 **N 只股票并行计算**。
+
+### Arrow 零拷贝
+
+```python
+# rpc_callback: 原地 set_column，不重建整表
+table = table.set_column(i, name, pc.round(pc.multiply(col, factor), ndigits=2))
+
+# _merge2DataFrame: rechunk=False 避免 Polars 额外拷贝
+aligned[sid] = pl.from_arrow(table, rechunk=False)
+```
+
+### 批量列提取
+
+```python
+# 旧: iter_rows(named=True) → 逐行 Python dict（慢 10-50x）
+# 新: to_list() → C 级批量提取
+ex_dates = df["ex_date"].to_list()
+bonus_shares = df["bonus_share"].to_list()
+```
+
+---
+
+## 🧪 测试
+
+```bash
+# 运行全部测试（需要 gRPC 服务端）
+MD_ADDR=127.0.0.1:50051 poetry run pytest
+
+# 运行并发修复单元测试（纯本地，无需服务端）
+poetry run pytest tests/test_concurrency_fix.py -v
+```
+
+---
+
+## 📁 项目结构
+
+```
+bt_sdk/
+├── ctx.py                         # 全局入口：runner 生命周期 + context manager
+├── core/
+│   ├── factor.py                  # 复权因子：Polars 处理 + C++ 调度（同步/异步）
+│   ├── client/
+│   │   ├── api.pyx / api.pxd     # MdApi：同步/异步/订阅接口
+│   │   └── async_client.pyx      # AsyncRpcClient：Observable + 并发安全
+│   ├── rpc/
+│   │   └── client.pyx            # gRPC 底层：channel + Arrow 解码 + topic 分发
+│   └── lib/factor/               # C++17 pybind11 复权因子引擎
+│       ├── include/factor.hpp    # 数据结构定义
+│       ├── src/factor.cpp        # 核心算法
+│       └── pybind_factor.cpp     # Python 绑定（GIL released）
+└── utils/
+    ├── runner.py                 # AsyncRunner：后台 asyncio loop 单例
+    ├── util.pyx                  # UUID + DataFrame 合并（Cython 加速）
+    └── wrapper.py                # 装饰器工具集
+```
+
+---
+
+## ⚠️ 注意事项
+
+- **Python 版本**：要求 ≥ 3.11（使用了 `asyncio.Lock` 无参构造等新特性）
+- **gRPC fork**：已设 `GRPC_ENABLE_FORK_SUPPORT=0`，避免 macOS spawn 问题
+- **内网通信**：gRPC 使用 `insecure_channel`（无 TLS），仅适用于可信内网
+- **边界检查关闭**：Cython 模块关闭了 `boundscheck`/`wraparound`，输入数据须保证合法
+
+---
+
+## 📄 License
+
+Proprietary — Internal use only.

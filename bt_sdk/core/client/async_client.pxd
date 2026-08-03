@@ -17,6 +17,8 @@ cdef class AsyncRpcClient(AsyncClient):
     cdef str addr
     cdef int timeout
     cdef bint _connected
+    cdef object _conn_lock
+    cdef object _pending_tasks
     cdef object loop
     cdef object rpc_client
 

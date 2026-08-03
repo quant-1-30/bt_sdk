@@ -8,7 +8,7 @@ import pyarrow as pa
 import threading
 import polars as pl
 
-from bt_sdk.core.factor import calc_factor, apply_factor
+from bt_sdk.core.factor import calc_factor, calc_factor_async
 from bt_sdk.core.client.async_client cimport AsyncRpcClient
 from bt_sdk.utils.util cimport fast_uuid4_bytes, _merge2DataFrame
 
@@ -28,7 +28,7 @@ cdef inline object scale(dict data):
     return table
 
 
-async def _collect_async(observable, timeout):
+async def _collect_async(observable, timeout, subject=None):
     cdef list buffer = []
     cdef object fut
     cdef object subscription
@@ -66,6 +66,8 @@ async def _collect_async(observable, timeout):
         raise
     finally:
         subscription.dispose()
+        if subject is not None and not subject.is_disposed:
+            subject.dispose()  # release observer chain to prevent leak
 
 
 cdef class MdApi:
@@ -102,27 +104,27 @@ cdef class MdApi:
         cdef bytes req_id = fast_uuid4_bytes()
         cdef object event = Event(topic=RpcTopic.Instrument)
 
-        obs = self.async_client.run(req_id, event)
-        tables = await _collect_async(obs, self.timeout)
+        obs, subject = self.async_client.run(req_id, event)
+        tables = await _collect_async(obs, self.timeout, subject)
         data_df = _merge2DataFrame(tables, is_group=False)
         return data_df
 
     async def get_factor_async(self, object body, int32_t forward):
         # close
-        close_obs = self.async_client.run(fast_uuid4_bytes(), Event(topic=RpcTopic.Close, body=body))
-        cdef object coro1 = _collect_async(close_obs, self.timeout)
+        close_obs, close_subj = self.async_client.run(fast_uuid4_bytes(), Event(topic=RpcTopic.Close, body=body))
+        cdef object coro1 = _collect_async(close_obs, self.timeout, close_subj)
 
         # adjustment
-        adj_obs = self.async_client.run(fast_uuid4_bytes(), Event(topic=RpcTopic.Adjustment, body=body))
-        cdef object coro2 = _collect_async(adj_obs, self.timeout)
+        adj_obs, adj_subj = self.async_client.run(fast_uuid4_bytes(), Event(topic=RpcTopic.Adjustment, body=body))
+        cdef object coro2 = _collect_async(adj_obs, self.timeout, adj_subj)
 
         # rightment
-        rgt_obs = self.async_client.run(fast_uuid4_bytes(), Event(topic=RpcTopic.Rightment, body=body))
-        cdef object coro3 = _collect_async(rgt_obs, self.timeout)
+        rgt_obs, rgt_subj = self.async_client.run(fast_uuid4_bytes(), Event(topic=RpcTopic.Rightment, body=body))
+        cdef object coro3 = _collect_async(rgt_obs, self.timeout, rgt_subj)
 
         # calculate
         close_tables, adj_tables, rgt_tables = await asyncio.gather(coro1, coro2, coro3)
-        factors = calc_factor(_merge2DataFrame(close_tables), _merge2DataFrame(adj_tables), _merge2DataFrame(rgt_tables), forward)
+        factors = await calc_factor_async(_merge2DataFrame(close_tables), _merge2DataFrame(adj_tables), _merge2DataFrame(rgt_tables), forward)
         return factors
 
     # ==============================================================
@@ -171,8 +173,11 @@ cdef class MdApi:
         cdef bytes req_id = fast_uuid4_bytes()
         cdef object event = Event(topic=topic, body=body)
 
-        obs = self.async_client.run(req_id, event)
-        return obs
+        result = self.async_client.run(req_id, event)
+        # subscribe returns (observable, subject); return observable for streaming
+        if isinstance(result, tuple):
+            return result[0]
+        return result
 
     cpdef void disconnect(self):
         self.async_client.close()

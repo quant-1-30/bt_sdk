@@ -91,6 +91,8 @@ cdef class AsyncRpcClient(AsyncClient):
         self.rpc_client = RpcClient(host=addr[0], port=addr[1])
         self.timeout = timeout
         self._connected = False
+        self._conn_lock = None  # asyncio.Lock, lazy init in coroutine
+        self._pending_tasks = set()  # hold strong refs to Tasks to prevent GC
         self.loop = None
         
     cpdef void attach_loop(self, loop):
@@ -118,9 +120,8 @@ cdef class AsyncRpcClient(AsyncClient):
         print(f"[{self.__class__.__name__}] Connection reset for new loop")
 
     async def _async_shutdown(self):
-        """覆盖基类：先取消 listen_task，再关闭 gRPC channel。"""
+        """listen_task and gRPC channel"""
         await super()._async_shutdown()
-        # 关闭 gRPC channel，防止资源泄漏
         try:
             await self.rpc_client.cleanup()
         except Exception as e:
@@ -129,17 +130,28 @@ cdef class AsyncRpcClient(AsyncClient):
 
     async def _ensure_connection(self):
         """
-        Lazy initialize gRPC channel
+        Lazy initialize gRPC channel with proper concurrency guard.
+        Uses asyncio.Lock to ensure only one coroutine initializes the channel
+        even under high concurrency (e.g. asyncio.gather of N factor requests).
         """
         if self._connected:
             return
-        try:
-            print(f"[gRPC] Initializing Channel on Loop: {id(self.loop)}")
-            await self.rpc_client.initialize()
-            self._connected = True
-        except Exception as e:
-            print(f"[gRPC Init Error] {e}")
-            raise e
+
+        # Lazy init the lock in coroutine context (correct loop binding)
+        if self._conn_lock is None:
+            self._conn_lock = asyncio.Lock()
+
+        async with self._conn_lock:
+            # Double-check after acquiring lock
+            if self._connected:
+                return
+            try:
+                print(f"[gRPC] Initializing Channel on Loop: {id(self.loop)}")
+                await self.rpc_client.initialize()
+                self._connected = True
+            except Exception as e:
+                print(f"[gRPC Init Error] {e}")
+                raise e
 
     async def _stream_request(self, bytes req_id, object msg, object subject):
             await self._ensure_connection()
@@ -166,7 +178,7 @@ cdef class AsyncRpcClient(AsyncClient):
                 subject.on_error(e)
 
     cdef object wrap_protocol(self, bytes req_id, object msg):
-        cdef object req_subject = Subject() 
+        cdef object req_subject = Subject()
 
         if not self._running:
             raise RuntimeError("client is not running")
@@ -181,6 +193,9 @@ cdef class AsyncRpcClient(AsyncClient):
                 except Exception as e:
                     if not req_subject.is_disposed:
                         req_subject.on_error(e)
+                finally:
+                    # release strong ref to prevent Task accumulation
+                    self._pending_tasks.discard(task_ref[0])
 
             # avoid data loss
             req_subject.subscribe(observer)
@@ -192,21 +207,25 @@ cdef class AsyncRpcClient(AsyncClient):
                 req_subject.on_error(RuntimeError("no event loop attached to AsyncRpcClient"))
                 return
 
+            task_ref = [None]  # mutable holder so run() can access the task
+
             try:
                 curr_loop = asyncio.get_running_loop()
                 if curr_loop is self.loop:
                     # Case 1: pytest
-                    self.loop.create_task(run())
+                    task = self.loop.create_task(run())
+                    task_ref[0] = task
+                    self._pending_tasks.add(task)
                 else:
                     # Case 2: difference loop
                     asyncio.run_coroutine_threadsafe(run(), self.loop)
-                    
+
             except RuntimeError:
-                # Case 3: Cerebro  prepare mdapi 
+                # Case 3: Cerebro  prepare mdapi
                 asyncio.run_coroutine_threadsafe(run(), self.loop)
 
         observable = reactivex.create(factory)
-        return observable
+        return (observable, req_subject)
 
     async def direct_run_async(self, bytes req_id, object msg):
         await self._ensure_connection()
