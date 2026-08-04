@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.15.1"
-description = "release gil in pybind11 and optimize async_client"
+version = "0.15.2"
+description = "upgrade grpc runtime to satisfy the protoc"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 build = "build_ext.py"
@@ -31,7 +31,7 @@ pyarrow = "^22.0.0"
 poetry-core = "^2.4.0"
 polars = "^1.39.3"
 grpcio = ">=1.81.0"
-protobuf = ">=5.29.0" # "^7.35.0" 
+protobuf = ">=7.35.1"
 build = "^1.5.0"
 numpy = "^2.4.6"
 pydantic = ">=2.11.0"
