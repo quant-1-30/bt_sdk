@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.15.2"
-description = "upgrade grpc runtime to satisfy the protoc"
+version = "0.15.3"
+description = "revise grpc client config"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 build = "build_ext.py"

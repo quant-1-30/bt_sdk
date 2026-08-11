@@ -84,7 +84,7 @@ cdef class RpcClient:
         await self.initialize()
         return self
 
-    async def initialize(self, MAX_MESSAGE_LENGTH=512 * 1024 * 100):
+    async def initialize(self, MAX_MESSAGE_LENGTH=64 * 1024 * 1024):
         """
          grpc.keepalive_time_ms: The period (in milliseconds) after which a keepalive ping is
              sent on the transport.
@@ -116,8 +116,8 @@ cdef class RpcClient:
                 ('grpc.max_receive_message_length', MAX_MESSAGE_LENGTH),
 
                 # stream control http2 tcp ack
-                ("grpc.http2.initial_window_size", 32 * 1024 * 1024),
-                ("grpc.http2.initial_connection_window_size", 64 * 1024 * 1024),
+                ("grpc.http2.initial_window_size", 64 * 1024 * 1024),
+                ("grpc.http2.initial_connection_window_size", 512 * 1024 * 1024),
 
                 ("grpc.keepalive_time_ms", 30000),             # 30s Ping > Server 10s
                 ("grpc.keepalive_timeout_ms", 10000),          # wait 10s
