@@ -41,7 +41,7 @@ class TestMdApi:
         # start_date = 1721926400
         end_date = 20260630
         # end_date = 1734972800
-        sid = [b'300374'] # [b'399001'] # 399006 399001
+        sid = [b'300308'] # [b'399001'] # 399006 399001
         return QueryBody(start_date, end_date, sid)
 
     @pytest.mark.asyncio

@@ -140,10 +140,18 @@ async def calc_factor_async(
 
 
 def _apply_factor(df: pl.DataFrame, adj_factors: dict, adjust_type: int) -> pl.DataFrame:
+    if adjust_type not in (1, 2):
+        # mirror the strict validation in _calc_factor: anything that is not
+        # 1 (qfq) / 2 (hfq) must fail fast instead of silently falling back
+        # to hfq
+        raise ValueError(f"Invalid adjust type: {adjust_type}, expected 1 (qfq) or 2 (hfq)")
+
     if df.height == 0:
         return df
 
     # Tick ---> Day
+    # NOTE: server `tick` is second-precision epoch (confirmed with data team);
+    # if the unit ever changes to ms/us this from_epoch time_unit must change too
     if "tick" in df.columns and "day" not in df.columns:
         df = df.sort("tick").with_columns(
             day = pl.from_epoch(pl.col("tick"), time_unit="s").dt.strftime("%Y%m%d").cast(pl.Int32)

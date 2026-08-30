@@ -167,3 +167,7 @@ cython_debug/
 # cython
 *.so
 *.cpp
+# exception: handwritten C++ sources under core/lib are NOT cython-generated
+# (the global *.cpp above is for cython build outputs like client.cpp/api.cpp)
+!bt_sdk/core/lib/**/*.cpp
+!bt_sdk/core/lib/**/*.hpp

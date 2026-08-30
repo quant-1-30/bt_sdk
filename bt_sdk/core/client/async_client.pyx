@@ -201,8 +201,10 @@ cdef class AsyncRpcClient(AsyncClient):
             logger.error(f"[gRPC Error] Code: {e.code()}, Details: {e.details()}")
             self._safe_on_error(subject, e)
         except asyncio.CancelledError:
+            # Consumer cancelled / timed out: the Subject is (or is about to
+            # be) disposed. Emitting on_completed here would mark a partial
+            # buffer as a successful completion — stay silent and propagate.
             logger.info("[gRPC] Request Cancelled")
-            self._safe_on_completed(subject)
             raise
         except Exception as e:
             logger.exception(f"[gRPC Unknown Error] {e}")

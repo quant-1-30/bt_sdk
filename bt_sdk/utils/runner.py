@@ -50,7 +50,12 @@ class AsyncRunner:
         try:
             self._loop.run_forever()
         finally:
-            self._loop.close()
+            # tolerate double close: _stop_impl may close the loop from another
+            # thread while we are between run_forever() returning and close()
+            try:
+                self._loop.close()
+            except RuntimeError:
+                pass
 
     def _ignore_errno35(self, loop, context):
         exc = context.get('exception')
@@ -78,14 +83,41 @@ class AsyncRunner:
         """Internal stop logic without acquiring the class lock (avoid deadlock)."""
         if not self._started:
             return
-        # Check if loop exists and is running before stopping
-        if self._loop and not self._loop.is_closed() and self._loop.is_running():
-            self._loop.call_soon_threadsafe(self._loop.stop)
-        if self._thread and self._thread.is_alive():
-            self._thread.join(timeout=2)
+
+        loop = self._loop
+        thread = self._thread
         self._started = False
         self._disposed = True
-        logger.info("Global AsyncRunner stopped.")
+
+        if loop is not None and not loop.is_closed() and loop.is_running():
+            try:
+                loop.call_soon_threadsafe(loop.stop)
+            except RuntimeError:
+                pass  # loop closed concurrently
+
+        if thread is not None and thread.is_alive():
+            thread.join(timeout=5)
+            if thread.is_alive():
+                # Python cannot force-kill a thread. Surface the leak loudly
+                # (zombie loop thread + pending tasks) instead of silently
+                # replacing it; a fresh runner will be built on next use
+                # because _disposed is already set.
+                logger.warning(
+                    "GlobalAsyncRunner loop thread did not exit within 5s "
+                    "(pending gRPC/asyncio tasks?). Thread leaked; a fresh "
+                    "runner/loop will be created on next use."
+                )
+            else:
+                logger.info("Global AsyncRunner stopped.")
+
+        # Loop never ran (thread died early) or already stopped but not yet
+        # closed by the thread's finally: release selector/fds from this side.
+        # The thread's finally-close tolerates the double close.
+        if loop is not None and not loop.is_closed() and not loop.is_running():
+            try:
+                loop.close()
+            except RuntimeError:
+                pass
 
     def stop(self):
         """Stop the runner and mark it as disposed so a new instance can be created."""

@@ -65,6 +65,8 @@ cpdef object _merge2DataFrame(list batches, bint is_group=True): # cdef reduce p
         sid_batch.append(batch)
  
     for sid_byte, bulk_batch in sid_to_batches.items():
-        aligned_table = pa.concat_tables(bulk_batch, promote_options='default')
+        # permissive (same as the non-group path): tolerate schema drift between
+        # batches (e.g. null-typed vs typed column) instead of raising ArrowInvalid
+        aligned_table = pa.concat_tables(bulk_batch, promote_options='permissive')
         aligned[sid_byte] = pl.from_arrow(aligned_table, rechunk=False)  # avoid extra copy
     return aligned

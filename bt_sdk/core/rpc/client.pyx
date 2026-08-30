@@ -62,7 +62,7 @@ cdef inline object rpc_callback(bytes arrow_bytes, int32_t rpc_type):
 
         cols.append(col)
 
-    return pa.Table.from_arrays(cols, names=names)
+    return pa.Table.from_arrays(cols, names=names, metadata=table.schema.metadata)
 
 
 cdef class RpcClient:

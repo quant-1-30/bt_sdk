@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.15.4"
-description = "revise leak and asynico bug"
+version = "0.15.5"
+description = "revise schema missing and factor calculate bug"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 build = "build_ext.py"

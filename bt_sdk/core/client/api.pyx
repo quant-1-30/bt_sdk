@@ -79,6 +79,15 @@ cdef class MdApi:
         self._is_initialized = False
 
     cpdef start(self, object loop):  # avoid loop is dead but is still initialized
+        # Revive a client closed via __exit__ while still cached in the global
+        # registry (GetMdApi returns a singleton per addr); without this the
+        # instance stays dead ("client is not running") forever.
+        # NOTE: local typed var — self.async_client is a plain object attribute,
+        # so ._running must be reached via C-level access on the cimported type.
+        cdef AsyncRpcClient client = self.async_client
+        if not client._running:
+            client._running = True
+
         if self._is_initialized:
             if self.loop is loop and not self.loop.is_closed():
                 return
@@ -131,6 +140,12 @@ cdef class MdApi:
     #  Support Cross Grpc Loop for Direct Query
     # ==============================================================
     async def rpc_async(self, object body, int32_t rpc_type, int32_t timeout=30):
+        if self.loop is None:
+            raise RuntimeError(
+                "[MdApi] rpc_async called before start(loop) — no event loop attached. "
+                "Create the api via external_mdapi_context() or call start(loop) first."
+            )
+
         cdef bytes req_id = fast_uuid4_bytes()
         cdef object event = Event(topic=rpc_type, body=body)
         cdef object tables
