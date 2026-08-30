@@ -60,20 +60,36 @@ cdef class AsyncClient:
             except asyncio.CancelledError:
                 pass
 
-    cpdef void close(self):
-        if not self._running: return
-        self._running = False
-        loop = self.loop
-        try:
-            if loop is None:
-                loop = asyncio.get_running_loop()
-        except RuntimeError:
-            loop = None
-
-        if loop is not None and loop.is_running():
+    cdef _on_cleanup_done(self, task):
             try:
-                fut = asyncio.run_coroutine_threadsafe(self._async_shutdown(), loop)
-                fut.result(timeout=3)
+                if not task.cancelled() and task.exception():
+                    logger.warning(f"[{self.__class__.__name__}] cleanup error: {task.exception()}")
+            except Exception as e:
+                logger.warning(f"[{self.__class__.__name__}] error reading task result: {e}")
+
+    cpdef void close(self):
+        if not self._running:
+            return
+        self._running = False
+
+        cdef object running
+        try:
+            running = asyncio.get_running_loop()
+        except RuntimeError:
+            running = None
+
+        # fallback running loop
+        cdef object loop = self.loop if self.loop is not None else running
+
+        if loop is not None and not loop.is_closed() and loop.is_running():
+            try:
+                if running is loop:
+                    task = loop.create_task(self._async_shutdown())
+                    task.add_done_callback(self._finalize_task)
+                    logger.info(f"[{self.__class__.__name__}] Shutdown scheduled from loop thread.")
+                else:
+                    fut = asyncio.run_coroutine_threadsafe(self._async_shutdown(), loop)
+                    fut.result(timeout=self.timeout)
             except Exception as e:
                 logger.warning(f"[{self.__class__.__name__}] shutdown error: {e}")
         else:
@@ -105,19 +121,25 @@ cdef class AsyncRpcClient(AsyncClient):
         reset_connection run_coroutine_threadsafe from sync MdApi.start
         """
         self._connected = False
+        self._conn_lock = None
+        cdef object loop = self.loop
 
-        loop = self.loop
         if loop is not None and not loop.is_closed() and loop.is_running():
             try:
-                fut = asyncio.run_coroutine_threadsafe(self.rpc_client.cleanup(), loop)
-                fut.result(timeout=self.timeout)
+                running = asyncio._get_running_loop()
+                
+                if running is loop:
+                    task = loop.create_task(self.rpc_client.cleanup())
+                    # not supported lambda
+                    task.add_done_callback(self._on_cleanup_done)
+                else:
+                    fut = asyncio.run_coroutine_threadsafe(self.rpc_client.cleanup(), loop)
+                    fut.result(timeout=self.timeout)
+                    
             except Exception as e:
                 logger.warning(f"[{self.__class__.__name__}] reset_connection cleanup error: {e}")
         else:
-            self.rpc_client._channel = None
-            self.rpc_client._stub = None
-
-        print(f"[{self.__class__.__name__}] Connection reset for new loop")
+            self.rpc_client.hard_reset()
 
     async def _async_shutdown(self):
         """listen_task and gRPC channel"""
@@ -152,30 +174,39 @@ cdef class AsyncRpcClient(AsyncClient):
             except Exception as e:
                 print(f"[gRPC Init Error] {e}")
                 raise e
+    
+    cdef inline void _safe_on_completed(self, object subject):
+        if subject is not None and not subject.is_disposed:
+            subject.on_completed()
+
+    cdef inline void _safe_on_error(self, object subject, object error):
+        if subject is not None and not subject.is_disposed:
+            subject.on_error(error)
 
     async def _stream_request(self, bytes req_id, object msg, object subject):
-            await self._ensure_connection()
-            try:
-                response_iterator = self.rpc_client.on_request(msg.topic, msg.body)
+        await self._ensure_connection()
+        try:
+            response_iterator = self.rpc_client.on_request(msg.topic, msg.body)
 
-                async for payload in response_iterator: # pyarrow.lib.Table
-                    if payload is not None:
-                        subject.on_next({
-                            "id": req_id,  
-                            "data": payload
-                        })
-                subject.on_completed()
-            except grpc.aio.AioRpcError as e:
-                logger.error(f"[gRPC Error] Code: {e.code()}, Details: {e.details()}")
-                subject.on_error(e)
-            except asyncio.CancelledError:
-                logger.info("[gRPC] Request Cancelled")
-                # propagate cancellation while keeping subject consistent
-                subject.on_completed()
-                raise
-            except Exception as e:
-                logger.exception(f"[gRPC Unknown Error] {e}")
-                subject.on_error(e)
+            async for payload in response_iterator:
+                if payload is None:
+                    continue
+                if subject.is_disposed:
+                    break
+                subject.on_next({"id": req_id, "data": payload})
+
+            self._safe_on_completed(subject)
+
+        except grpc.aio.AioRpcError as e:
+            logger.error(f"[gRPC Error] Code: {e.code()}, Details: {e.details()}")
+            self._safe_on_error(subject, e)
+        except asyncio.CancelledError:
+            logger.info("[gRPC] Request Cancelled")
+            self._safe_on_completed(subject)
+            raise
+        except Exception as e:
+            logger.exception(f"[gRPC Unknown Error] {e}")
+            self._safe_on_error(subject, e)
 
     cdef object wrap_protocol(self, bytes req_id, object msg):
         cdef object req_subject = Subject()
@@ -208,6 +239,21 @@ cdef class AsyncRpcClient(AsyncClient):
                 return
 
             task_ref = [None]  # mutable holder so run() can access the task
+            fut_ref = [None]   # concurrent Future from run_coroutine_threadsafe
+
+            def teardown():
+                # Subscription disposed (consumer cancelled / timed out / errored,
+                # or completed normally): stop the in-flight request instead of
+                # letting it stream into the void until the server closes.
+                # No-op when the task already finished.
+                try:
+                    task = task_ref[0]
+                    if task is not None:
+                        self.loop.call_soon_threadsafe(task.cancel)
+                    elif fut_ref[0] is not None:
+                        fut_ref[0].cancel()
+                except RuntimeError:
+                    pass  # loop already closed: nothing left to cancel onto
 
             try:
                 curr_loop = asyncio.get_running_loop()
@@ -218,11 +264,13 @@ cdef class AsyncRpcClient(AsyncClient):
                     self._pending_tasks.add(task)
                 else:
                     # Case 2: difference loop
-                    asyncio.run_coroutine_threadsafe(run(), self.loop)
+                    fut_ref[0] = asyncio.run_coroutine_threadsafe(run(), self.loop)
 
             except RuntimeError:
                 # Case 3: Cerebro  prepare mdapi
-                asyncio.run_coroutine_threadsafe(run(), self.loop)
+                fut_ref[0] = asyncio.run_coroutine_threadsafe(run(), self.loop)
+
+            return teardown
 
         observable = reactivex.create(factory)
         return (observable, req_subject)

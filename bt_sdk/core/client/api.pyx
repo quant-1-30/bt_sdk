@@ -204,8 +204,8 @@ cpdef MdApi GetMdApi(tuple addr, int32_t timeout=30):
     return _md_api_registry[addr]
 
 
-cdef void destory(tuple addr):
-    """destory addr MdApi and release gRPC channel """
+cdef void destroy(tuple addr):
+    """destroy addr MdApi and release gRPC channel """
     global _md_api_registry
 
     with _md_api_lock:
@@ -223,5 +223,5 @@ cpdef void dispose():
     with _md_api_lock:
         addrs = list(_md_api_registry.keys())
     for addr in addrs:
-        destory(addr)
+        destroy(addr)
     

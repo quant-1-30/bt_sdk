@@ -51,13 +51,6 @@ class TestMdApi:
             print(f"Instrument Results: {assets}")
 
     @pytest.mark.asyncio
-    async def test_factor(self, md_api_ctx, query):
-        with md_api_ctx as md_api:
-            data = await md_api.get_factor_async(query, FactorTopic.Qfq)
-            # print("adj_factors: ", data[b'000001'].raw_factors, '\n', "rgt_factors: ", data[b'000001'].adj_factors)
-            print(f"Factor Results: {data}")
-
-    @pytest.mark.asyncio
     async def test_tick_subscirbe(self, md_api_ctx, query):
         with md_api_ctx as md_api:
 
@@ -196,3 +189,10 @@ class TestMdApi:
 
             data = await md_api.rpc_async(query, RpcTopic.Adjustment)
             print(f"Direct Run Async Adjustment Results: {data}")
+
+    @pytest.mark.asyncio
+    async def test_factor(self, md_api_ctx, query):
+        with md_api_ctx as md_api:
+            data = await md_api.get_factor_async(query, FactorTopic.Qfq)
+            # print("adj_factors: ", data[b'000001'].raw_factors, '\n', "rgt_factors: ", data[b'000001'].adj_factors)
+            print(f"Factor Results: {data}")

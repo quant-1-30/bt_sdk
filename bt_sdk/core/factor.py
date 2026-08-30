@@ -61,6 +61,11 @@ def right2struct(df: pl.DataFrame):
 
 
 def _calc_factor(c_df: pl.DataFrame, adj_df: pl.DataFrame, rgt_df: pl.DataFrame, forward: int):
+    # The C++ engine requires trading_dates sorted ascending (binary search +
+    # preclose = previous row). The server streams ORDER BY day ASC, but sort
+    # here anyway so the contract holds regardless of server-side changes.
+    c_df = c_df.sort("day")
+
     # Polars.to_list() / pa.Table.to_pylist()
     vector_trading = c_df["day"].to_list()
     vector_close = c_df["close"].to_list()

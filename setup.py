@@ -15,7 +15,7 @@ def get_ext_modules(): # poetry build / backend setuptools
         Extension(
             name="bt_sdk.core.rpc.client", 
             sources=["bt_sdk/core/rpc/client.pyx"],
-            include_dirs=[np.get_include(), current_dir],
+            include_dirs=[np.get_include(), '.', current_dir],
             language="c++",
             extra_compile_args=["-O3", "-std=c++11"],
                 # "-Wno-unused-function",

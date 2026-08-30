@@ -35,3 +35,5 @@ cdef class RpcClient:
     cdef object _rightmentCall(self, object stub_req, bint wait_for_ready=?)
     
     cdef object _dispatch_rpc(self, int rpc_type, object req_body)
+
+    cpdef void hard_reset(self)

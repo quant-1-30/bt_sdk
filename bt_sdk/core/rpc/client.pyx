@@ -13,6 +13,7 @@ import numpy as np
 import pyarrow as pa
 import grpc
 import pyarrow.compute as pc
+from math import log10, floor
 
 logger = logging.getLogger(__name__)
 
@@ -21,54 +22,47 @@ from google.protobuf import empty_pb2
 from google.protobuf.json_format import MessageToDict
 from bt_protocol.serialize.pb import bt_protocol_service_pb2, bt_protocol_service_pb2_grpc
 from bt_protocol.constant import RpcTopic
+from bt_sdk.core.rpc.scale_utils cimport get_scale_ndigits
+from bt_sdk.core.rpc.constants import Scale, MaxDate 
 
-cdef int32_t MaxDate=30000000
-
-
-cdef object Scale = {
-        # benchmark amount not  1e-3
-        RpcTopic.Tick: {
-            "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1e-3, "amount": 1e-3,
-        }, 
-        RpcTopic.Close: {
-            "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1e-3, "amount": 1e-3,
-        },
-        RpcTopic.Daily: {
-            "tick": 1.0, "open": 1e-5, "high": 1e-5, "low": 1e-5, "close": 1e-5, "volume": 1e-3, "amount": 1e-3,
-        },
-        RpcTopic.Adjustment: {
-            "bonus_share": 1e-3, "transfer": 1e-3, "bonus": 1e-3, # adjustment
-        },
-        RpcTopic.Rightment: {
-            "price": 1e-3, "ratio": 1e-3 # rightment
-        },
-}
 
 cdef inline object rpc_callback(bytes arrow_bytes, int32_t rpc_type):
     if not arrow_bytes:
         return None
 
     cdef object table = pa.ipc.open_stream(pa.py_buffer(arrow_bytes)).read_all()
-    cdef int n = table.num_columns
     cdef list names = table.schema.names
-    cdef dict scale = Scale.get(rpc_type, {})
-
+    cdef int n = len(names)
+    cdef dict scale = Scale.get(rpc_type)
+    
+    cdef list cols = []
     cdef object col
-    cdef object factor
-    cdef object name
+    cdef object factor_val
+    cdef double factor
+    cdef int ndigits
+    cdef str name
+    cdef int i
 
-    # Only modify columns that need cast or scale, leave others untouched (zero-copy)
     for i in range(n):
         name = names[i]
-        if name == "sid" or name == "name":
-            col = pc.cast(table.column(i), pa.string())
-            table = table.set_column(i, name, col)
-        elif name in scale:
-            factor = scale[name]
-            col = pc.round(pc.multiply(table.column(i), factor), ndigits=2)
-            table = table.set_column(i, name, col)
+        col = table.column(i)
 
-    return table
+        if name == "sid" or name == "name":
+            cols.append(pc.cast(col, pa.string()))
+            continue
+
+        if scale is not None and name in scale:
+            factor_val = scale[name]
+            factor = <double>factor_val
+            ndigits = get_scale_ndigits(factor)
+            
+            # ndigits ==0 ---> int64
+            if ndigits > 0:
+                col = pc.round(pc.multiply(col, factor), ndigits=ndigits)
+
+        cols.append(col)
+
+    return pa.Table.from_arrays(cols, names=names)
 
 
 cdef class RpcClient:
@@ -198,8 +192,24 @@ cdef class RpcClient:
     async def cleanup(self):
         if self._channel is not None:
             await self._channel.close()
-            self._channel = None
-            self._stub = None
+        # asyncio.Lock binds to the loop it first contended on; drop it so
+        # the next initialize() rebuilds the lock on the current loop
+        # (re-attach on a new loop otherwise raises
+        #  "Lock is bound to a different event loop")
+        self._channel = None
+        self._stub = None
+        self._init_lock = None
+
+    cpdef void hard_reset(self):
+        """Drop channel state synchronously, without closing the channel.
+
+        Used when the loop the channel was bound to is already dead and the
+        async close() can never run. C-level access from the owning class only:
+        these cdef attributes are invisible to Python-level setattr.
+        """
+        self._channel = None
+        self._stub = None
+        self._init_lock = None
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if exc_type is not None:

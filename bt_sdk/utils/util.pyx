@@ -55,7 +55,9 @@ cpdef object _merge2DataFrame(list batches, bint is_group=True): # cdef reduce p
         return pl.from_arrow(table, rechunk=False)  # avoid extra copy
 
     for batch in batches:
-        sid_byte = batch.schema.metadata.get(b"sid")
+        meta = batch.schema.metadata or {}
+        sid_byte = meta.get(b"sid")
+
         if sid_byte not in sid_to_batches:
             sid_to_batches[sid_byte] = []
 
