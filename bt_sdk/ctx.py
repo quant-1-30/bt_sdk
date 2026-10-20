@@ -47,8 +47,11 @@ def get_md_api(addr_str=None, timeout=30):
 
     if not addr_str:
         addr_str = os.getenv("MD_ADDR", "127.0.0.1:50051")
-    ip, port = addr_str.split(":")
-    return GetMdApi(addr=(ip, int(port)), timeout=timeout)
+    if ":" not in addr_str:
+        raise ValueError(f"Invalid MD_ADDR {addr_str!r}, expected 'host:port'")
+    ip, port_str = addr_str.rsplit(":", 1)
+    ip = ip.strip("[]")
+    return GetMdApi(addr=(ip, int(port_str)), timeout=timeout)
 
 
 @contextlib.contextmanager

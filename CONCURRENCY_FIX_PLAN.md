@@ -247,51 +247,11 @@ cdef object wrap_protocol(self, bytes req_id, object msg):
 
 ## ✅ 已完成修复（续）
 
-### 修复 5：C6 — rpc_callback 列重建优化（P1，已完成）
+### 修复 5：C6 — rpc_callback 列重建优化（P1，已关闭：无需修改）
 
 **问题**：每条 gRPC 消息触发完整列重建，高频 Tick 流下 CPU/内存瓶颈。
 
-**文件**：`bt_sdk/core/rpc/client.pyx`
-
-**当前代码**：
-
-```python
-cdef inline object rpc_callback(bytes arrow_bytes, int32_t rpc_type):
-    ...
-    for i in range(n):
-        name = names[i]
-        col = table.column(i)
-        if name == "sid" or name == "name":
-            col = pc.cast(col, pa.string())
-        elif name in scale:
-            col = pc.round(pc.multiply(col, factor), ndigits=2)
-        new_cols[i] = col
-
-    table = pa.Table.from_arrays(new_cols, names=names)  # ← 重建
-```
-
-**建议修复**：使用 `table.set_column()` 原地替换，或仅对需要 scale 的列操作：
-
-```python
-cdef inline object rpc_callback(bytes arrow_bytes, int32_t rpc_type):
-    ...
-    cdef list exprs = []
-    for i in range(n):
-        name = names[i]
-        if name == "sid" or name == "name":
-            exprs.append(pc.cast(table.column(i), pa.string()).alias(name))
-        elif name in scale:
-            factor = scale[name]
-            exprs.append(pc.round(pc.multiply(table.column(i), factor), ndigits=2).alias(name))
-
-    if exprs:
-        table = table.set_column(  # 原地替换避免全表重建
-            [names.index(e.name) for e in exprs],
-            [e.name for e in exprs],
-            exprs
-        )
-    return table
-```
+**结论（2026-10 复核）**：实际代码为 `pa.Table.from_arrays(cols, ...)`，对**未修改的列只是数组引用包装（零拷贝）**；真正的分配只发生在 scale/cast 列的输出数组上，这是数值变换语义的必要成本，任何实现（含 `set_column` 方案）都省不掉。原审计对其危害评估偏高，且原建议代码使用了不存在的 `set_column` 批量签名（pyarrow 的 `set_column(i, field, column)` 只接受单列），照抄会直接报错。本项关闭，不再实施。
 
 ---
 

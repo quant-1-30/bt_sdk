@@ -15,18 +15,21 @@
 
 | 技术 | 实现细节 |
 |------|----------|
-| **Cython 热路径** | gRPC 通信层、Arrow 解码、UUID 生成均用 `cdef`/`cpdef` 编译，关闭 `boundscheck`/`wraparound` |
+| **Cython 热路径** | gRPC 通信层、UUID 生成均用 `cdef`/`cpdef` 编译，关闭 `boundscheck`/`wraparound` |
 | **C++17 因子引擎** | 复权因子计算用 pybind11 绑定，`-O3` 优化，纯计算**释放 GIL** (`py::call_guard<py::gil_scoped_release>()`) |
-| **零拷贝管道** | Arrow IPC `zero_copy` 解析 → `set_column` 原地替换 → `pl.from_arrow(rechunk=False)` 避免冗余拷贝 |
+| **Arrow 零拷贝管道** | Arrow IPC `zero_copy` 解析；scale 列变换后用 `Table.from_arrays` 原数组引用重组（不拷贝未修改列）→ `pl.from_arrow(rechunk=False)` |
+| **有界并行因子计算** | `calc_factor_async` 用 `Semaphore(cpu_count)` 限流，避免上千标的全部驻留内存 |
 | **libuuid C 级调用** | UUID 生成直接调 `libuuid`，`nogil` 上下文，无 Python 对象开销 |
 
 ### ⚡ 并发安全
 
 | 问题 | 解决方案 |
 |------|----------|
-| **连接初始化竞态** | `asyncio.Lock` + double-check 保护 gRPC channel 创建，防止高并发首波请求创建多 channel |
-| **Task GC 回收** | `_pending_tasks` set 持有 `create_task()` 强引用，`finally` 中自动清理 |
-| **Subject 泄漏** | `wrap_protocol` 返回 `(observable, subject)`，`_collect_async` 显式 `dispose()` |
+| **连接初始化竞态** | `asyncio.Lock` + double-check 保护 gRPC channel 创建，防止高并发首波请求创建多 channel；`cleanup` 先摘引用再关 channel，避免与并发 `initialize` 交错 |
+| **Task GC 回收** | 同 loop 路径 `_pending_tasks` 持有 Task 强引用；跨 loop 路径 `_pending_futs` 持有 `run_coroutine_threadsafe` Future 强引用，`finally` 中自动清理 |
+| **关闭时在途流未终止** | `_async_shutdown` 主动 cancel 全部在途 Task/Future（有界等待 5s），再关闭 gRPC channel |
+| **pxd 槽位遮蔽** | `loop`/`timeout` 仅在基类声明一次，派生类重复声明会创建第二个 C 槽位导致 `close()` 读到 None（曾使 channel 关闭路径整体失效） |
+| **Subject 隔离与释放** | `wrap_protocol` 为每次订阅隔离 `Subject` 并在 `teardown` 中自动 `dispose()`；查询接口统一走 `fetch_tables_async` 零 RxPY 开销 |
 | **跨 Loop 调用** | 自动检测当前 loop，`run_coroutine_threadsafe` + `wrap_future` 安全跨线程 |
 
 ### 📡 响应式数据流
@@ -81,7 +84,7 @@ obs = md_api.subscribe(query, RpcTopic.Tick)
 ├─────────────────────────────────────────────────────────────┤
 │  RpcClient (rpc/client.pyx)                                 │
 │  ├── grpc.aio channel (keepalive + HTTP2 窗口调优)            │
-│  ├── rpc_callback → Arrow IPC → set_column 原地 scale        │
+│  ├── rpc_callback → Arrow IPC → Table.from_arrays scale     │
 │  └── _dispatch_rpc → Instrument/Tick/Daily/Close/Adj/Rgt     │
 ├─────────────────────────────────────────────────────────────┤
 │  C++ Factor Engine (lib/factor/)                            │
@@ -202,10 +205,16 @@ asyncio.run(main())
 |------|----------|------|
 | `get_instrument()` | `pl.DataFrame` | 同步查询合约列表 |
 | `get_instrument_async()` | `pl.DataFrame` | 异步查询合约列表 |
-| `get_factor(body, forward)` | `Dict[bytes, FactorResult]` | 同步计算复权因子 |
-| `get_factor_async(body, forward)` | `Dict[bytes, FactorResult]` | 异步并行计算（3 路 gRPC + C++ 并行） |
+| `get_factor(body, forward)` | `Dict[bytes, FactorResult]` | 同步计算复权因子（内部自动拉取**全历史** close/adj/rgt 事件） |
+| `get_factor_async(body, forward)` | `Dict[bytes, FactorResult]` | 异步并行计算（3 路 gRPC + C++ 有界并行） |
 | `rpc_async(body, rpc_type)` | `pl.DataFrame` | 跨 loop 直查 |
 | `subscribe(body, topic)` | `Observable` | 订阅实时数据流 |
+
+> **复权因子为何拉全历史**：hfq 锚定上市日（需要窗口之前的除权事件），qfq 锚定最新价（需要窗口之后的事件），且每个事件的因子都需要 ex_date 前一交易日的 close 作锚点。`get_factor*` 会自动把请求加宽到 `[19900101, 20991231]`（合法 YYYYMMDD 边界；哨兵值如 `0`/`MaxDate` 会被服务端解析为非法时间戳），传入的 `start_date/end_date` 仅作为 sid 过滤之外的语义保留。也因此大量标的的全历史因子计算属于批量操作，注意内存与超时预算（`timeout` 参数即流收集预算，默认取 MdApi 级默认值）。
+
+同步方法与 `subscribe` 在未 `start(loop)`（或 loop 已关闭）时会立即抛出带明确信息的 `RuntimeError`。
+- **单例 `timeout` 语义**：`GetMdApi(addr, timeout)` 按 `addr` 缓存进程级共享单例，再次调用传入不同正数 `timeout` 时会更新该共享实例的默认超时预算（last caller wins）；若单次调用需独立超时，请直接在 `get_instrument(timeout=...)` / `get_factor(..., timeout=...)` / `rpc_async(..., timeout=...)` 上传参。
+- **`disconnect()` vs `DisposeMdApi(addr)`**：`disconnect()` 仅关闭当前底层 gRPC channel（实例仍保留在注册表中，后续 `GetMdApi(addr)` 或 `start(loop)` 会自动复活并在下次请求时重连）；`DisposeMdApi(addr)` 则关闭连接并将其从全局注册表中移除；进程退出由 `atexit` 自动调用 `dispose()` 统一清理。
 
 ### 数据主题
 
@@ -235,8 +244,9 @@ C++ 因子计算不回调 Python，释放 GIL 后其他协程可并发执行。�
 ### Arrow 零拷贝
 
 ```python
-# rpc_callback: 原地 set_column，不重建整表
-table = table.set_column(i, name, pc.round(pc.multiply(col, factor), ndigits=2))
+# rpc_callback: 未修改的列以原数组引用进入新 Table（from_arrays 不拷贝数据），
+# 仅 scale/cast 列产生新数组（这是 scale 语义的必要成本）
+table = pa.Table.from_arrays(cols, names=names, metadata=table.schema.metadata)
 
 # _merge2DataFrame: rechunk=False 避免 Polars 额外拷贝
 aligned[sid] = pl.from_arrow(table, rechunk=False)

@@ -32,7 +32,30 @@ struct FactorResult {
     std::map<int, double> adj_factors; // 前/后复权累计复权因子
 };
 
-int get_pre_index(const std::vector<int>& trading_dates, int ex_date);
+FactorResult calc_adjust_factors_columns(
+    const int* trading_dates,
+    size_t n_dates,
+    const double* close,
+    size_t n_close,
+    const int* adj_ex_dates,
+    const double* adj_bonus_share,
+    const double* adj_transfer,
+    const double* adj_bonus,
+    size_t n_adj,
+    const int* rgt_ex_dates,
+    const double* rgt_price,
+    const double* rgt_ratio,
+    size_t n_rgt,
+    AdjustType type);
+
+FactorResult calc_adjust_factors(
+    const int* trading_dates,
+    size_t n_dates,
+    const double* close,
+    size_t n_close,
+    const std::vector<AdjustmentEvent>& adj_events,
+    const std::vector<RightmentEvent>& right_events,
+    AdjustType type);
 
 FactorResult calc_adjust_factors(
     const std::vector<int>& trading_dates,

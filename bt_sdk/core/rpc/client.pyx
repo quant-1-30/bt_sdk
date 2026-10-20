@@ -9,17 +9,12 @@ os.environ['GRPC_ENABLE_FORK_SUPPORT']='0' # spawn
 
 import asyncio
 import logging
-import numpy as np
 import pyarrow as pa
 import grpc
 import pyarrow.compute as pc
-from math import log10, floor
 
 logger = logging.getLogger(__name__)
 
-from typing import Iterator, AsyncIterator
-from google.protobuf import empty_pb2
-from google.protobuf.json_format import MessageToDict
 from bt_protocol.serialize.pb import bt_protocol_service_pb2, bt_protocol_service_pb2_grpc
 from bt_protocol.constant import RpcTopic
 from bt_sdk.core.rpc.scale_utils cimport get_scale_ndigits
@@ -54,11 +49,12 @@ cdef inline object rpc_callback(bytes arrow_bytes, int32_t rpc_type):
         if scale is not None and name in scale:
             factor_val = scale[name]
             factor = <double>factor_val
-            ndigits = get_scale_ndigits(factor)
-            
-            # ndigits ==0 ---> int64
-            if ndigits > 0:
-                col = pc.round(pc.multiply(col, factor), ndigits=ndigits)
+            if factor != 1.0:
+                ndigits = get_scale_ndigits(factor)
+                col = pc.multiply(col, factor)
+                # ndigits == 0 ---> integer / >=1.0 scale factor (no fractional rounding)
+                if ndigits > 0:
+                    col = pc.round(col, ndigits=ndigits)
 
         cols.append(col)
 
@@ -129,59 +125,38 @@ cdef class RpcClient:
     async def ensure_initialized(self):
         if self._channel is None:
             await self.initialize()
-    
-    cdef object _instrumentCall(self, object stub_req, bint wait_for_ready=True):
-        response_iterator = self._stub.InstrumentCall(stub_req, wait_for_ready=wait_for_ready)
-        return response_iterator
-
-    cdef object _tickCall(self, object stub_req, bint wait_for_ready=True):
-        response_iterator = self._stub.TickStreamCall(stub_req, wait_for_ready=wait_for_ready)
-        return response_iterator
-    
-    cdef object _dailyCall(self, object stub_req, bint wait_for_ready=True):
-        response_iterator = self._stub.DailyStreamCall(stub_req, wait_for_ready=wait_for_ready)
-        return response_iterator
-
-    cdef object _closeCall(self, object stub_req, bint wait_for_ready=True):
-        response_iterator = self._stub.CloseStreamCall(stub_req, wait_for_ready=wait_for_ready)
-        return response_iterator
-
-    cdef object _adjustmentCall(self, object stub_req, bint wait_for_ready=True):
-        response_iterator = self._stub.AdjustmentStreamCall(stub_req, wait_for_ready=wait_for_ready)
-        return response_iterator
-
-    cdef object _rightmentCall(self, object stub_req, bint wait_for_ready=True):
-        response_iterator = self._stub.RightStreamCall(stub_req, wait_for_ready=wait_for_ready)
-        return response_iterator
 
     cdef object _dispatch_rpc(self, int rpc_type, object req_body):
         cdef object request
-        cdef object response_iterator
 
-        if req_body:
-            request = bt_protocol_service_pb2.QuoteRequest(start_date=req_body.start_date, end_date=req_body.end_date, sid=req_body.sid)
-        else:
+        if req_body is not None:
+            request = bt_protocol_service_pb2.QuoteRequest(
+                start_date=req_body.start_date, end_date=req_body.end_date, sid=req_body.sid
+            )
+        elif rpc_type == RpcTopic.Instrument:
             request = bt_protocol_service_pb2.QuoteRequest(end_date=MaxDate)
-            
-        if rpc_type == RpcTopic.Instrument:
-            response_iterator = self._instrumentCall(request, wait_for_ready=True)
-        elif rpc_type == RpcTopic.Tick:
-            response_iterator = self._tickCall(request, wait_for_ready=True)
-        elif rpc_type == RpcTopic.Daily:
-            response_iterator = self._dailyCall(request, wait_for_ready=True)
-        elif rpc_type == RpcTopic.Close:
-            response_iterator = self._closeCall(request, wait_for_ready=True)
-        elif rpc_type == RpcTopic.Adjustment:
-            response_iterator = self._adjustmentCall(request, wait_for_ready=True)
-        elif rpc_type == RpcTopic.Rightment:
-            response_iterator = self._rightmentCall(request, wait_for_ready=True)
         else:
-            raise ValueError(f"Unknown RPC type: {rpc_type}")
-        return response_iterator
+            raise ValueError(
+                f"QueryBody req_body is required for RPC topic {rpc_type}; "
+                "only RpcTopic.Instrument allows req_body=None"
+            )
+
+        if rpc_type == RpcTopic.Instrument:
+            return self._stub.InstrumentCall(request, wait_for_ready=True)
+        elif rpc_type == RpcTopic.Tick:
+            return self._stub.TickStreamCall(request, wait_for_ready=True)
+        elif rpc_type == RpcTopic.Daily:
+            return self._stub.DailyStreamCall(request, wait_for_ready=True)
+        elif rpc_type == RpcTopic.Close:
+            return self._stub.CloseStreamCall(request, wait_for_ready=True)
+        elif rpc_type == RpcTopic.Adjustment:
+            return self._stub.AdjustmentStreamCall(request, wait_for_ready=True)
+        elif rpc_type == RpcTopic.Rightment:
+            return self._stub.RightStreamCall(request, wait_for_ready=True)
+        raise ValueError(f"Unknown RPC type: {rpc_type}")
 
     async def on_request(self, int32_t rpc_type, object req_body):
-        cdef object response, callback
-        cdef object resp
+        cdef object response, resp
 
         await self.ensure_initialized()
         response = self._dispatch_rpc(rpc_type, req_body)
@@ -190,23 +165,17 @@ cdef class RpcClient:
             yield rpc_callback(resp.payload, rpc_type)
 
     async def cleanup(self):
-        if self._channel is not None:
-            await self._channel.close()
-        # asyncio.Lock binds to the loop it first contended on; drop it so
-        # the next initialize() rebuilds the lock on the current loop
-        # (re-attach on a new loop otherwise raises
-        #  "Lock is bound to a different event loop")
+        # Capture and null references before awaiting close so any concurrent
+        # initialize() sees None and builds a fresh channel + loop-bound lock.
+        channel = self._channel
         self._channel = None
         self._stub = None
         self._init_lock = None
+        if channel is not None:
+            await channel.close()
 
     cpdef void hard_reset(self):
-        """Drop channel state synchronously, without closing the channel.
-
-        Used when the loop the channel was bound to is already dead and the
-        async close() can never run. C-level access from the owning class only:
-        these cdef attributes are invisible to Python-level setattr.
-        """
+        """Drop channel state synchronously when the bound loop is already dead."""
         self._channel = None
         self._stub = None
         self._init_lock = None

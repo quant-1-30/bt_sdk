@@ -340,11 +340,21 @@ async def _collect_async(observable, timeout):
 | P0 | C2 GIL 释放 | 低（1 行代码） | 🔴 极高 | ✅ 已修复 |
 | P0 | C1+C9 `_init_lock` 竞态 | 中 | 🔴 高 | ✅ 已修复 |
 | P1 | C4 `iter_rows` → 批量提取 | 低 | 🟡 高 | ✅ 已修复 |
-| P1 | C5 Task 引用 | 低 | 🟡 中 | ✅ 已修复 |
-| P1 | C6 rpc_callback 列重建优化 | 中 | 🟡 中 | ⏳ 待实施 |
-| P2 | C3 因子并行化 | 高 | 🟡 高（需配合 C2） | ⏳ 待实施 |
-| P2 | C7 Subject dispose | 中 | 🟢 中 | ⏳ 待实施 |
-| P3 | C8 merge 拷贝优化 | 中 | 🟢 低 | ⏳ 待实施 |
+| P1 | C5 Task 引用 | 低 | 🟡 中 | ✅ 已修复（同 loop 与跨 loop 路径均跟踪） |
+| P1 | C6 rpc_callback 列重建优化 | 中 | 🟢 低（见下） | ✅ 关闭：`from_arrays` 对未修改列是引用包装零拷贝，真实成本仅在 scale/cast 输出数组，为语义必要成本，无需改动 |
+| P2 | C3 因子并行化 | 高 | 🟡 高（需配合 C2） | ✅ 已修复（`Semaphore(cpu_count)` 有界并行） |
+| P2 | C7 Subject dispose | 中 | 🟢 中 | ✅ 已修复 |
+| P3 | C8 merge 拷贝优化 | 中 | 🟢 低 | ✅ 已修复 |
+
+## 六(续)、2026-10 追加修复（本轮）
+
+| # | 类别 | 严重度 | 问题 | 状态 |
+|---|------|--------|------|------|
+| C10 | 逻辑错误 | 🔴 严重 | `async_client.pxd` 派生类重复声明 `loop`/`timeout` 槽位，基类 `close()` 读到自身 None 槽位 → 同步上下文关闭时 gRPC channel **从不关闭**（本报告问题1的修复当时实际失效），跨线程关闭走错 loop；`fut.result(timeout=self.timeout)` 因基类无 `timeout` 属性必抛 AttributeError（此前为死代码未被触发） | ✅ 已修复：槽位仅在基类声明一次 |
+| C11 | 逻辑错误 | 🔴 严重 | `get_factor_async` 用用户窗口拉取 adj/rgt/close → 窗口外事件被 C++ lower_bound 边界静默跳过 → hfq 因子系统性错误、qfq 跨窗口边界的日期错误 | ✅ 已修复：三路请求自动加宽至 `[19900101, 20991231]`（必须是合法 YYYYMMDD：`0`/`MaxDate` 会被服务端渲染为 `0000-00-00`/`3000-00-00` 非法时间戳，实测 DuckDB ConversionException） |
+| C12 | 逻辑错误 | 🟡 中等 | 同步 API 无 loop 守卫；`timeout` 参数被内层固定 `self.timeout` 封顶；`rpc_async` 的裸 `except RuntimeError` 把无关错误改写为误导信息 | ✅ 已修复 |
+| C13 | Leak | 🟡 中等 | `close()` 不取消在途流任务/Subject，依赖 channel 报错间接结束 | ✅ 已修复：shutdown 主动 cancel（有界等待 5s） |
+| C14 | 并发风险 | 🟡 中等 | `RpcClient.cleanup` 先 `await close()` 后摘引用，与并发 `initialize` 交错时可关掉/泄漏新 channel | ✅ 已修复：先摘引用再关捕获的旧 channel |
 
 ---
 

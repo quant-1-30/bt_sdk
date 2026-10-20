@@ -3,9 +3,10 @@ from libc.stdint cimport int32_t
 
 cdef class MdApi:
     cdef bint _is_initialized
-    cdef int32_t timeout
+    cdef public bint _is_shared
+    cdef public int32_t timeout
     cdef public object loop
-    cdef object async_client
+    cdef public object async_client
     
     cpdef start(self, object loop)
 

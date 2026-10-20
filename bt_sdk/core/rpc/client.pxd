@@ -22,18 +22,6 @@ cdef class RpcClient:
     cdef str host
     cdef int port
     
-    cdef object _instrumentCall(self, object stub_req, bint wait_for_ready=?)
-
-    cdef object _tickCall(self, object stub_req, bint wait_for_ready=?)
-
-    cdef object _closeCall(self, object stub_req, bint wait_for_ready=?)
-    
-    cdef object _dailyCall(self, object stub_req, bint wait_for_ready=?)
-
-    cdef object _adjustmentCall(self, object stub_req, bint wait_for_ready=?)
-
-    cdef object _rightmentCall(self, object stub_req, bint wait_for_ready=?)
-    
     cdef object _dispatch_rpc(self, int rpc_type, object req_body)
 
     cpdef void hard_reset(self)

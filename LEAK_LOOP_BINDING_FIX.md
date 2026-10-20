@@ -11,6 +11,14 @@
 | 5 | Loop Binding | 🔴 严重 | `reset_connection()` 不重建 channel | `async_client.pyx` |
 | 6 | Loop Binding | 🔴 严重 | `reset()` 导致 Stale Loop 引用 | `ctx.py` |
 
+> **2026-10 复核注记**：问题 1 的修复（`_async_shutdown` 覆盖 `rpc_client.cleanup()`）在当时**实际未生效**——
+> `async_client.pxd` 派生类重复声明了 `loop` 槽位，`attach_loop()` 写派生槽位而基类 `close()` 读基类槽位
+> （恒为 None），导致关闭路径要么在错误的 loop 上执行、要么整体跳过；跨线程分支的
+> `fut.result(timeout=self.timeout)` 也因基类无 `timeout` 属性必抛 AttributeError（该分支此前为死代码）。
+> 2026-10 已修复：`loop`/`timeout` 仅在基类声明一次，并由
+> `tests/test_fixes_local.py::TestPendingTracking::test_shutdown_cancels_inflight` 回归覆盖。
+> 至此本文件的全部六项修复才真正完整生效。`DisposeMdApi(addr)` 亦已按本文件设计以 `cpdef` 公开。
+
 ---
 
 ## 一、Leak 问题详解

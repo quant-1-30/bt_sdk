@@ -1,8 +1,9 @@
 cdef class AsyncClient:
     cdef bint _running
+    cdef public int timeout  # declared here (not on subclasses): AsyncClient.close() reads it
     cdef object listen_task
+    cdef object _shutdown_task
     cdef object loop
-    cdef object _loop_thread
 
     cdef void _finalize_task(self, object future)
     
@@ -16,14 +17,16 @@ cdef class AsyncClient:
 
     
 cdef class AsyncRpcClient(AsyncClient):
-    cdef int timeout
+    # timeout + loop are inherited from AsyncClient (declaring them here would
+    # shadow the base slots and break AsyncClient.close())
     cdef bint _connected
     cdef object _conn_lock
     cdef object _pending_tasks
-    cdef object loop
+    cdef object _pending_futs
     cdef object rpc_client
 
     cpdef void attach_loop(self, loop)
+    cpdef void revive(self)
     cpdef void reset_connection(self)
 
     cdef object wrap_protocol(self, bytes req_id, object msg) # virtual / cython not supported nested function 

@@ -68,13 +68,13 @@ class AsyncRunner:
     def get_loop(self):
         return self._loop
 
-    def run_sync(self, coro):
+    def run_sync(self, coro, timeout=None):
         if not self._started:
             self.start()
 
         future = asyncio.run_coroutine_threadsafe(coro, self._loop)
         try:
-            return future.result()
+            return future.result(timeout=timeout)
         except Exception as e:
             logger.error(f"Async call failed: {e}")
             raise e
