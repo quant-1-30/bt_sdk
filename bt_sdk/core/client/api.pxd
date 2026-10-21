@@ -7,6 +7,9 @@ cdef class MdApi:
     cdef public int32_t timeout
     cdef public object loop
     cdef public object async_client
+
+    cdef inline bint _has_active_loop(self)
+    cdef void _refresh_shared(self, int32_t timeout)
     
     cpdef start(self, object loop)
 

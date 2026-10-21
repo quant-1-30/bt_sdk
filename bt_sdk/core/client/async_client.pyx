@@ -243,6 +243,17 @@ cdef class AsyncRpcClient(AsyncClient):
         if subject is not None and not subject.is_disposed:
             subject.on_error(error)
 
+    cdef inline object _submit_cross_loop(self, object coro):
+        cdef object fut = asyncio.run_coroutine_threadsafe(coro, self.loop)
+        self._pending_futs.add(fut)
+        return fut
+
+    cdef inline void _cancel_cross_loop(self, object fut):
+        if fut is not None:
+            self._pending_futs.discard(fut)
+            if not fut.done():
+                fut.cancel()
+
     async def _stream_request(self, bytes req_id, object msg, object subject):
         await self._ensure_connection()
         try:
@@ -344,8 +355,7 @@ cdef class AsyncRpcClient(AsyncClient):
                     if task is not None:
                         self.loop.call_soon_threadsafe(task.cancel)
                     elif fut_ref[0] is not None:
-                        self._pending_futs.discard(fut_ref[0])
-                        fut_ref[0].cancel()
+                        self._cancel_cross_loop(fut_ref[0])
                 except RuntimeError:
                     pass
                 finally:
@@ -364,11 +374,8 @@ cdef class AsyncRpcClient(AsyncClient):
                 task_ref[0] = task
                 self._pending_tasks.add(task)
             else:
-                # Case 2 & 3: different loop or sync context (e.g. Cerebro) —
-                # track the concurrent Future so (a) the wrapped task cannot be
-                # GC'd mid-flight and (b) shutdown can cancel it deterministically
-                fut_ref[0] = asyncio.run_coroutine_threadsafe(run(), self.loop)
-                self._pending_futs.add(fut_ref[0])
+                # Case 2 & 3: different loop or sync context (e.g. Cerebro)
+                fut_ref[0] = self._submit_cross_loop(run())
 
             return teardown
 
@@ -423,17 +430,11 @@ cdef class AsyncRpcClient(AsyncClient):
         if curr_loop is self.loop:
             return await asyncio.wait_for(_internal_run(), timeout=timeout)
 
-        fut = asyncio.run_coroutine_threadsafe(
-            asyncio.wait_for(_internal_run(), timeout=timeout),
-            self.loop,
-        )
-        self._pending_futs.add(fut)
+        fut = self._submit_cross_loop(asyncio.wait_for(_internal_run(), timeout=timeout))
         try:
             return await asyncio.wrap_future(fut)
         finally:
-            self._pending_futs.discard(fut)
-            if not fut.done():
-                fut.cancel()
+            self._cancel_cross_loop(fut)
 
     async def stream_batches_async(self, object msg, int max_queue=64):
         """Backpressure-aware async generator yielding Arrow Table batches on
@@ -470,8 +471,7 @@ cdef class AsyncRpcClient(AsyncClient):
             except Exception as e:
                 curr_loop.call_soon_threadsafe(q.put_nowait, (2, e))
 
-        fut = asyncio.run_coroutine_threadsafe(_produce(), self.loop)
-        self._pending_futs.add(fut)
+        fut = self._submit_cross_loop(_produce())
         try:
             while True:
                 kind, item = await q.get()
@@ -487,6 +487,4 @@ cdef class AsyncRpcClient(AsyncClient):
                 else:
                     raise item
         finally:
-            self._pending_futs.discard(fut)
-            if not fut.done():
-                fut.cancel()
+            self._cancel_cross_loop(fut)

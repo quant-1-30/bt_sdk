@@ -34,4 +34,8 @@ cdef class AsyncRpcClient(AsyncClient):
     cdef inline void _safe_on_completed(self, object subject)
 
     cdef inline void _safe_on_error(self, object subject, object error)
+
+    cdef inline object _submit_cross_loop(self, object coro)
+
+    cdef inline void _cancel_cross_loop(self, object fut)
     

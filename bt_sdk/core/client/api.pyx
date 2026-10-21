@@ -42,13 +42,16 @@ cdef class MdApi:
         self._is_initialized = False
         self._is_shared = False
 
+    cdef inline bint _has_active_loop(self):
+        return self.loop is not None and not self.loop.is_closed() and self.loop.is_running()
+
     cpdef start(self, object loop):
         self.async_client.revive()
 
         if self._is_initialized:
             if self.loop is loop and not self.loop.is_closed():
                 return
-            if self._is_shared and self.loop is not None and not self.loop.is_closed() and self.loop.is_running():
+            if self._is_shared and self._has_active_loop():
                 logger.warning(
                     f"[MdApi] Shared singleton already attached to active loop "
                     f"{id(self.loop)}; ignoring re-attach request to {id(loop)}"
@@ -101,7 +104,7 @@ cdef class MdApi:
             yield table
 
     def _ensure_loop_attached(self):
-        if self.loop is None or self.loop.is_closed() or not self.loop.is_running():
+        if not self._has_active_loop():
             raise RuntimeError(
                 "[MdApi] no usable event loop attached (loop is None, closed, "
                 "or not running). Create the api via external_mdapi_context() "
@@ -143,6 +146,13 @@ cdef class MdApi:
         if not self._is_shared:
             self.async_client.close()
 
+    cdef void _refresh_shared(self, int32_t timeout):
+        if timeout > 0 and self.timeout != timeout:
+            self.timeout = timeout
+            self.async_client.timeout = timeout
+        if self._has_active_loop():
+            self.async_client.revive()
+
 
 cpdef MdApi GetMdApi(tuple addr, int32_t timeout=30):
     global _md_api_registry
@@ -152,11 +162,7 @@ cpdef MdApi GetMdApi(tuple addr, int32_t timeout=30):
     with _md_api_lock:
         if addr in _md_api_registry:
             instance = _md_api_registry[addr]
-            if timeout > 0 and instance.timeout != timeout:
-                instance.timeout = timeout
-                instance.async_client.timeout = timeout
-            if instance.loop is not None and not instance.loop.is_closed() and instance.loop.is_running():
-                instance.async_client.revive()
+            instance._refresh_shared(timeout)
             return instance
 
         logger.info(f"[MdApi] Initializing new instance for target: {addr}")

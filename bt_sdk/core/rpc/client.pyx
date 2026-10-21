@@ -18,17 +18,22 @@ logger = logging.getLogger(__name__)
 from bt_protocol.serialize.pb import bt_protocol_service_pb2, bt_protocol_service_pb2_grpc
 from bt_protocol.constant import RpcTopic
 from bt_sdk.core.rpc.scale_utils cimport get_scale_ndigits
-from bt_sdk.core.rpc.constants import Scale, MaxDate 
+from bt_sdk.core.rpc.constants import Scale, BenchmarkScale, MaxDate 
 
 
-cdef inline object rpc_callback(bytes arrow_bytes, int32_t rpc_type):
+cpdef object rpc_callback(bytes arrow_bytes, int32_t rpc_type):
     if not arrow_bytes:
         return None
 
     cdef object table = pa.ipc.open_stream(pa.py_buffer(arrow_bytes)).read_all()
     cdef list names = table.schema.names
     cdef int n = len(names)
-    cdef dict scale = Scale.get(rpc_type)
+    cdef dict meta = table.schema.metadata
+    cdef dict scale = (
+        BenchmarkScale.get(rpc_type)
+        if (meta is not None and meta.get(b"asset_type") == b"benchmark")
+        else Scale.get(rpc_type)
+    )
     
     cdef list cols = []
     cdef object col
@@ -49,16 +54,15 @@ cdef inline object rpc_callback(bytes arrow_bytes, int32_t rpc_type):
         if scale is not None and name in scale:
             factor_val = scale[name]
             factor = <double>factor_val
-            if factor != 1.0:
-                ndigits = get_scale_ndigits(factor)
-                col = pc.multiply(col, factor)
-                # ndigits == 0 ---> integer / >=1.0 scale factor (no fractional rounding)
-                if ndigits > 0:
-                    col = pc.round(col, ndigits=ndigits)
+            ndigits = get_scale_ndigits(factor)
+
+            # ndigits == 0 ---> int64 (e.g. tick=1.0, or benchmark volume/amount=1.0)
+            if ndigits > 0:
+                col = pc.round(pc.multiply(col, factor), ndigits=ndigits)
 
         cols.append(col)
 
-    return pa.Table.from_arrays(cols, names=names, metadata=table.schema.metadata)
+    return pa.Table.from_arrays(cols, names=names, metadata=meta)
 
 
 cdef class RpcClient:

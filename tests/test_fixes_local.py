@@ -647,3 +647,37 @@ class TestAuditRound2EdgeGuards:
             assert api.timeout == 12
         finally:
             DisposeMdApi(("::1", 59990))
+
+    def test_plan_c_schema_metadata_scale_override(self):
+        """Plan C (L1): benchmark batches carrying b'asset_type'=b'benchmark' in
+        schema.metadata use BenchmarkScale (volume=1.0, amount=1.0 -> ndigits=0)
+        so volume/amount are not divided by 1000 while open/high/low/close still
+        scale by 1e-5."""
+        import pyarrow as pa
+        from bt_sdk.core.rpc.client import rpc_callback
+
+        raw_tbl = pa.table(
+            {
+                "sid": [b"1A0001"],
+                "day": pa.array([20240102], type=pa.int32()),
+                "open": pa.array([297277500], type=pa.int64()),
+                "high": pa.array([297626820], type=pa.int64()),
+                "low": pa.array([296227620], type=pa.int64()),
+                "close": pa.array([296227620], type=pa.int64()),
+                "volume": pa.array([30414000000], type=pa.int64()),
+                "amount": pa.array([345950000000], type=pa.int64()),
+            },
+            metadata={
+                b"rpc_type": b"daily",
+                b"asset_type": b"benchmark",
+            },
+        )
+        sink = pa.BufferOutputStream()
+        with pa.ipc.new_stream(sink, raw_tbl.schema) as writer:
+            writer.write_table(raw_tbl)
+        payload = sink.getvalue().to_pybytes()
+
+        out_tbl = rpc_callback(payload, RpcTopic.Daily)
+        assert out_tbl["close"][0].as_py() == pytest.approx(2962.2762)
+        assert out_tbl["volume"][0].as_py() == 30414000000
+        assert out_tbl["amount"][0].as_py() == 345950000000

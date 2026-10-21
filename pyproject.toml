@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "bt-sdk"
-version = "0.16.0"
-description = "revise bug with gemini and glm5.3"
+version = "0.16.1"
+description = "optimize and resolve leak bug"
 authors = ["hengxin.liu <hengxin.liu@inceptio.ai>"]
 readme = "README.md"
 build = "build_ext.py"
@@ -30,12 +30,12 @@ cython = "^3.2.3"
 pyarrow = "^22.0.0"
 poetry-core = "^2.4.0"
 polars = "^1.39.3"
-grpcio = ">=1.83.0,<2.0"
+grpcio = ">=1.84.0,<2.0"
 protobuf = ">=7.35.1,<8.0"
 build = "^1.5.0"
 numpy = "^2.4.6"
 pydantic = ">=2.11.0"
-bt-protocol = "0.3.0"
+bt-protocol = "0.3.1"
 
 [tool.poetry.group.build.dependencies]
 wheel = "^0.41.0"
